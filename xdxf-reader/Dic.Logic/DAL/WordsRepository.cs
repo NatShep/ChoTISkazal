@@ -34,7 +34,8 @@ namespace Dic.Logic.DAL
                 return new PairModel[0];
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<PairModel>($"Select TOP {count} * From Words order by AggregateScore").ToArray();
+            var query = $"Select * from Words order by AggregateScore limit {count}";
+            return cnn.Query<PairModel>(query).ToArray();
         }
 
         public void UpdateAgingAndRandomization()
