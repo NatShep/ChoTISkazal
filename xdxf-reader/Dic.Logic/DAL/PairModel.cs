@@ -9,14 +9,15 @@ namespace Dic.Logic.DAL
         private const int ExamFailedPenalty = 2;
         private const double RandomFactor = 1;
         private const double AgingFactor = 7;
-        public double AgregateScore { get; set; }
+        
+        public double AggregateScore { get; set; }
+        public long Id { get; set; }
         public int PassedScore { get; set; }
         public DateTime LastExam { get; set; }
         public int Examed { get; set; }
         public DateTime Created { get; set; }
-
         public string OriginWord { get; set; }
-        public string TranslationWord { get; set; }
+        public string Translation { get; set; }
         public string Transcription { get; set; }
 
         public static PairModel CreatePair(string originWord, string translationWord, string transcription)
@@ -24,9 +25,10 @@ namespace Dic.Logic.DAL
             return new PairModel
             {
                 Created = DateTime.Now,
+                LastExam = DateTime.Now,
                 OriginWord = originWord,
                 Transcription = transcription,
-                TranslationWord = translationWord,
+                Translation = translationWord,
             };
         }
 
@@ -35,7 +37,7 @@ namespace Dic.Logic.DAL
             PassedScore++;
             LastExam = DateTime.Now;
             Examed++;
-            AgregateScore = PassedScore;
+            AggregateScore = PassedScore;
         }
 
         public void OnExamFailed()
@@ -49,7 +51,7 @@ namespace Dic.Logic.DAL
 
             LastExam = DateTime.Now;
             Examed++;
-            AgregateScore = PassedScore;
+            AggregateScore = PassedScore;
         }
 
         public void UpdateAgingAndRandomization()
@@ -57,7 +59,10 @@ namespace Dic.Logic.DAL
             var res = (double)PassedScore;
             res -= (DateTime.Now - LastExam).TotalDays / AgingFactor;
             res += RandomFactor * (rnd.NextDouble() - 0.5);
-            AgregateScore = res;
+            if (res < 0)
+                res = 0;
+
+            AggregateScore = res;
 
         }
     }

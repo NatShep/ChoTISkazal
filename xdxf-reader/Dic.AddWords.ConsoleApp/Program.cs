@@ -15,7 +15,17 @@ namespace Dic.AddWords.ConsoleApp
             Console.WriteLine("Loading dictionary");
 
             var dictionary = Tools.ReadFromFile(path);
-            var service = new NewWordsService(dictionary, new KnowledgeRepository());
+            var service = new NewWordsService(dictionary, new WordsRepository());
+            Console.WriteLine("Updating Db");
+            service.UpdateAgingAndRandomize();
+            
+            var allModels = service.GetAll();
+            Console.WriteLine($"Has {allModels.Length} models");
+            foreach (var pairModel in allModels)
+            {
+                Console.WriteLine($"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.AggregateScore}");
+            }
+            
             while (true)
             {
                 EnterWord(service);

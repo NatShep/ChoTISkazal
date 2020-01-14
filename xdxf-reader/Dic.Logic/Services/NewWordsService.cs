@@ -6,9 +6,9 @@ namespace Dic.Logic.Services
     public class NewWordsService
     {
         private readonly RuengDictionary _dictionary;
-        private readonly KnowledgeRepository _repository;
+        private readonly WordsRepository _repository;
 
-        public NewWordsService(RuengDictionary dictionary, KnowledgeRepository repository)
+        public NewWordsService(RuengDictionary dictionary, WordsRepository repository)
         {
             _dictionary = dictionary;
             _repository = repository;
@@ -23,6 +23,7 @@ namespace Dic.Logic.Services
            return _dictionary.GetOrNull(word);
         }
 
+        public PairModel[] GetAll() => _repository.GetAll();
         public void UpdateAgingAndRandomize()
         {
             _repository.UpdateAgingAndRandomization();

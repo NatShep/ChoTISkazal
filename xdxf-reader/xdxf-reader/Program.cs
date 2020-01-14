@@ -18,6 +18,7 @@ namespace xdxf_reader
         {
             string path = "T:\\Dictionary\\eng_rus_full.json";
             var dictionary =  Tools.ReadFromFile(path);
+
             while (true)
             {
                 var line = Console.ReadLine();
