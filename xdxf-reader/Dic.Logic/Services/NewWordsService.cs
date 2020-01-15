@@ -1,4 +1,5 @@
-﻿using Dic.Logic.DAL;
+﻿using System;
+using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 
 namespace Dic.Logic.Services
@@ -39,6 +40,10 @@ namespace Dic.Logic.Services
              _repository.UpdateScores(model);
         }
 
+        public void RegistrateExam(DateTime started, int count, int successCount)
+        {
+             
+        }
         public void RegistrateSuccess(PairModel model)
         {
             model.OnExamPassed();
