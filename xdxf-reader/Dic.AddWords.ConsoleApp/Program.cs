@@ -11,10 +11,11 @@ namespace Dic.AddWords.ConsoleApp
     {
         static void Main(string[] args)
         {
+            WordsRepository.ApplyMigrations();
+
             Console.WriteLine("Dic started");
             string path = "T:\\Dictionary\\eng_rus_full.json";
             Console.WriteLine("Loading dictionary");
-
             var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
             var service = new NewWordsService(dictionary, new WordsRepository());
 
@@ -55,22 +56,49 @@ namespace Dic.AddWords.ConsoleApp
         static void ExamMode(NewWordsService service)
         {
             Console.WriteLine("Examination");
-            var words = service.GetPairsForTest(5);
-            
+            var words = service.GetPairsForTest(9);
+
+            for (int i = 0; i < 3; i++)
+            {
+                foreach (var pairModel in words.Randomize())
+                {
+                    Console.WriteLine();
+                    var next = Tools.Rnd.Next(4);
+                    switch (next)
+                    {
+                        case 0:
+                            if (!RuChooseExam(pairModel, words.Select(w => w.OriginWord).Randomize().ToArray(),
+                                service))
+                                return;
+                            break;
+                        case 1:
+                            if (!EngChooseExam(pairModel, words.Select(w => w.Translation).Randomize().ToArray(),
+                                service))
+                                return;
+                            break;
+                        case 2:
+                            if (!RuTrustExam(pairModel, service))
+                                return;
+                            break;
+                        case 3:
+                            if (!EngTrustExam(pairModel, service))
+                                return;
+                            break;
+                    }
+
+                }
+            }
+            Console.WriteLine();
+            Console.WriteLine("Test done");
+
             foreach (var pairModel in words)
             {
-                if (!RuChooseExam(pairModel, words.Select(w => w.OriginWord).Randomize().ToArray(), service))
-                    return;
-                Console.WriteLine();
+                Console.WriteLine(pairModel.OriginWord+" - "+ pairModel.Translation+"  ("+ pairModel.PassedScore+")");
             }
+            Console.WriteLine();
 
-            foreach (var pairModel in words.Randomize())
-            {
-                if (!EngChooseExam(pairModel, words.Select(w => w.Translation).Randomize().ToArray(), service))
-                    return;
-                Console.WriteLine();
-            }
         }
+
 
         static bool EngChooseExam(PairModel model, string[] variants, NewWordsService service)
         {
@@ -155,7 +183,7 @@ namespace Dic.AddWords.ConsoleApp
             while (true)
             {
 
-                Console.WriteLine("Translation is " + model.OriginWord + ". Did you guess?");
+                Console.WriteLine("Translation is \r\n" + model.OriginWord + "\r\n Did you guess?");
                 Console.WriteLine("[Y]es [N]o [E]xit");
                 var answer = Console.ReadKey();
                 switch (answer.Key)
@@ -212,7 +240,7 @@ namespace Dic.AddWords.ConsoleApp
             foreach (var pairModel in allModels)
             {
                 Console.WriteLine(
-                    $"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.AggregateScore}");
+                    $"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.PassedScore} / {pairModel.Examed}");
             }
         }
 

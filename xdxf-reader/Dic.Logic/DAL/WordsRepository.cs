@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Dapper;
+using Dic.Logic.DAL.Migrations;
 
 namespace Dic.Logic.DAL
 {
@@ -21,11 +22,10 @@ namespace Dic.Logic.DAL
             if(!File.Exists(DbFile))
                 return new PairModel[0];
 
-
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                return cnn.Query<PairModel>(@"Select * From Words order by AggregateScore").ToArray();
+                return cnn.Query<PairModel>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
         public PairModel[] GetWorst(int count)
@@ -83,7 +83,7 @@ namespace Dic.Logic.DAL
         {
             if (!File.Exists(DbFile))
             {
-                CreateDatabase();
+                ApplyMigrations();
             }
 
             using (var cnn = SimpleDbConnection())
@@ -110,25 +110,52 @@ namespace Dic.Logic.DAL
                 return result;
             }
         }
-        private static void CreateDatabase()
+        public static void ApplyMigrations()
         {
+            var migrationsList = new IMigration[]
+            {
+                new InitMigration(),
+                new AddWordsTableMigration(),
+                new AddHistoryMigration()
+            };
+            Console.WriteLine("Applying migrations");
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                cnn.Execute(
-                    @"create table Words
-              (
-                 Id                                  integer primary key AUTOINCREMENT,
-                 OriginWord                           nvarchar(100) not null,
-                 Translation                          nvarchar(100) not null,
-                 Created                              datetime not null,
-                 LastExam                             datetime not null,
-                 PassedScore integer not null,
-                 Examed integer not null,
-                 Transcription nvarchar(100) null,
-                 AggregateScore real not null 
+                int lastAppliedMigrationIndex = -1;
+                try
+                {
+                    var lastMigrationName = cnn.Query<string>("Select Name from migrations Order by id desc limit 1")
+                        .FirstOrDefault();
+                    Console.WriteLine("Last migration: "+ lastMigrationName);
 
-              )");
+                    if (lastMigrationName != null)
+                    {
+                        lastAppliedMigrationIndex =  Array.IndexOf(migrationsList, migrationsList.Single(m => m.Name == lastMigrationName));
+                    }
+                }
+                catch( Exception e)
+                {
+                    Console.WriteLine("Init migration skipped");
+                }
+
+                lastAppliedMigrationIndex++;
+                if (lastAppliedMigrationIndex < migrationsList.Length)
+                {
+                    for (int i = lastAppliedMigrationIndex; i < migrationsList.Length; i++)
+                    {
+                        Console.WriteLine("Applying migration "+ migrationsList[i]);
+                        cnn.Execute(migrationsList[i].Query);
+                    }
+
+                    cnn.Execute("insert into migrations (name) values (@name)", new {name = migrationsList.Last().Name});
+                }
+                else
+                {
+                    Console.WriteLine("No migration should be applied");
+                }
+            
+             
             }
         }
     }
