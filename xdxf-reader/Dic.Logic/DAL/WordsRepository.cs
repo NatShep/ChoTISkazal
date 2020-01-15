@@ -66,16 +66,16 @@ namespace Dic.Logic.DAL
             {
                 cnn.Open();
                 var op =
-                    $"Update words set AggregateScore = {word.AggregateScore.ToString(CultureInfo.InvariantCulture)}, " +
-                    $"PassedScore = {word.PassedScore}, " +
-                    $"Created = {word.Created}," +
-                    $"LastExam = {word.LastExam}," +
-                    $"Examed = {word.Examed} where Id = {word.Id}";
-                cnn.Execute(op);
+                    $"Update words set AggregateScore =  @AggregateScore,"+
+                    $"PassedScore = @PassedScore, " +
+                    $"Created = @Created," +
+                    $"LastExam = @LastExam," +
+                    $"Examed = @Examed where Id = @Id";
+                cnn.Execute(op, word);
             }
         }
 
-        public static string DbFile => Environment.CurrentDirectory + "\\SimpleDb.sqlite";
+        public static string DbFile => Environment.CurrentDirectory + "\\MyWords.sqlite";
 
         public static SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 

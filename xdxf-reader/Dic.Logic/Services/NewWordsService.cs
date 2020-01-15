@@ -36,11 +36,13 @@ namespace Dic.Logic.Services
         public void RegistrateFailure(PairModel model)
         {
              model.OnExamFailed();
+             _repository.UpdateScores(model);
         }
 
         public void RegistrateSuccess(PairModel model)
         {
-            model.OnExamPassed();    
+            model.OnExamPassed();
+            _repository.UpdateScores(model);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
@@ -14,7 +15,7 @@ namespace Dic.AddWords.ConsoleApp
             string path = "T:\\Dictionary\\eng_rus_full.json";
             Console.WriteLine("Loading dictionary");
 
-            var dictionary = Tools.ReadFromFile(path);
+            var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
             var service = new NewWordsService(dictionary, new WordsRepository());
 
             while (true)
@@ -54,18 +55,97 @@ namespace Dic.AddWords.ConsoleApp
         static void ExamMode(NewWordsService service)
         {
             Console.WriteLine("Examination");
-            var words = service.GetPairsForTest(10);
+            var words = service.GetPairsForTest(5);
+            
             foreach (var pairModel in words)
             {
-               if(!EngTrustExam(pairModel, service))
-                   return;
-            }
-            foreach (var pairModel in words)
-            {
-                if (!RuTrustExam(pairModel, service))
+                if (!RuChooseExam(pairModel, words.Select(w => w.OriginWord).Randomize().ToArray(), service))
                     return;
+                Console.WriteLine();
+            }
+
+            foreach (var pairModel in words.Randomize())
+            {
+                if (!EngChooseExam(pairModel, words.Select(w => w.Translation).Randomize().ToArray(), service))
+                    return;
+                Console.WriteLine();
             }
         }
+
+        static bool EngChooseExam(PairModel model, string[] variants, NewWordsService service)
+        {
+            Console.WriteLine("Eng choose exam");
+            while (true)
+            {
+                Console.WriteLine("=====>   " + model.OriginWord + "    <=====");
+                for (int i = 1; i <= variants.Length; i++)
+                {
+                    Console.WriteLine($"{i}: " + variants[i-1]);
+                }
+                Console.Write("Choose the translation: ");
+
+                var selected = Console.ReadLine();
+                if (selected.ToLower().StartsWith("e"))
+                    return false;
+                if (!int.TryParse(selected, out var selectedIndex) || selectedIndex> variants.Length || selectedIndex<1)
+                    continue;
+
+                if (variants[selectedIndex - 1] == model.Translation)
+                {
+                    Console.WriteLine("[Success]");
+                    service.RegistrateSuccess(model);
+                }
+                else
+                {
+                    Console.WriteLine("[Failed]");
+                    service.RegistrateFailure(model);
+                }
+
+                return true;
+            }
+
+
+        }
+
+        static bool RuChooseExam(PairModel model, string[] variants, NewWordsService service)
+        {
+            Console.WriteLine("Ru choose exam");
+            while (true)
+            {
+
+                Console.WriteLine("=====>   " + model.Translation + "    <=====");
+
+                for (int i = 1; i <= variants.Length; i++)
+                {
+                    Console.WriteLine($"{i}: " + variants[i-1]);
+                }
+
+                Console.Write("Choose the translation: ");
+
+                var selected = Console.ReadLine();
+                if (selected.ToLower().StartsWith("e"))
+                    return false;
+                if (!int.TryParse(selected, out var selectedIndex) || selectedIndex > variants.Length || selectedIndex < 1)
+                    continue;
+
+                if (variants[selectedIndex - 1] == model.OriginWord)
+                {
+                    Console.WriteLine("[Success]");
+                    service.RegistrateSuccess(model);
+                }
+
+                else
+                {
+                    Console.WriteLine("[Failed]");
+                    service.RegistrateFailure(model);
+                }
+
+                return true;
+            }
+
+
+        }
+
         static bool RuTrustExam(PairModel model, NewWordsService service)
         {
             Console.WriteLine("Ru Trust exam");
@@ -81,9 +161,11 @@ namespace Dic.AddWords.ConsoleApp
                 switch (answer.Key)
                 {
                     case ConsoleKey.Y:
+                        Console.WriteLine("[Success]");
                         service.RegistrateSuccess(model);
                         return true;
                     case ConsoleKey.N:
+                        Console.WriteLine("[Failed]");
                         service.RegistrateFailure(model);
                         return true;
                     case ConsoleKey.Escape:
@@ -107,9 +189,11 @@ namespace Dic.AddWords.ConsoleApp
                 switch (answer.Key)
                 {
                     case ConsoleKey.Y:
+                        Console.WriteLine("[Success]");
                         service.RegistrateSuccess(model);
                         return true;
                     case ConsoleKey.N:
+                        Console.WriteLine("[Failed]");
                         service.RegistrateFailure(model);
                         return true;
                     case ConsoleKey.Escape:
