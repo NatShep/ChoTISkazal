@@ -57,60 +57,80 @@ namespace Dic.AddWords.ConsoleApp
         {
             Console.WriteLine("Examination");
             var words = service.GetPairsForTest(9);
-
-            var exams = new IExam[]
+            for (int examNum = 0; examNum < 2; examNum++)
             {
-                new EngChooseExam(),
-                new RuChooseExam(),
-                new EnTrustExam(),
-                new RuTrustExam(),
-                new EngWriteExam(), 
-                new RuWriteExam() 
-            };
-            int examsCount = 0;
-            int examsPassed = 0;
-            DateTime started = DateTime.Now;
-            for (int i = 0; i < 3; i++)
-            {
-                foreach (var pairModel in words.Randomize())
+                var simpleExams = new IExam[]
                 {
-                    Console.WriteLine();
-                    var next = Tools.Rnd.Next(exams.Length);
-                    var exam = exams[next];
+                    new EngChooseExam(),
+                    new RuChooseExam(),
+                };
 
-                    bool retryFlag = false;
-                    do
+                var complexExams = new IExam[]
+                {
+                    new EngChooseExam(),
+                    new RuChooseExam(),
+                    new EnTrustExam(),
+                    new RuTrustExam(),
+                    new EngWriteExam(),
+                    new RuWriteExam()
+                };
+                int examsCount = 0;
+                int examsPassed = 0;
+                DateTime started = DateTime.Now;
+                for (int i = 0; i < 3; i++)
+                {
+                    foreach (var pairModel in words.Randomize())
                     {
-                        retryFlag = false;
                         Console.WriteLine();
-                        Console.WriteLine("***** "+exam.Name+ " *****");
-                        Console.WriteLine();
+                        IExam exam;
 
-                        var result = exam.Pass(service, pairModel, words);
-                        switch (result)
+                        if (i == 0 || pairModel.PassedScore < 2)
                         {
-                            case ExamResult.Passed:
-                                Console.WriteLine("\r\n[PASSED]");
-                                examsCount++;
-                                examsPassed++;
-                                break;
-                            case ExamResult.Failed:
-                                Console.WriteLine("\r\n[failed]");
-                                examsCount++;
-                                break;
-                            case ExamResult.Retry:
-                                retryFlag = true;
-                                break;
-                            case ExamResult.Exit: return;
+                            exam = SelectExam(simpleExams);
                         }
-                    } while (retryFlag);
+                        else
+                        {
+                            exam = SelectExam(complexExams);
+                        }
+
+                        bool retryFlag = false;
+                        do
+                        {
+                            retryFlag = false;
+                            Console.WriteLine();
+                            Console.WriteLine("***** " + exam.Name + " *****");
+                            Console.WriteLine();
+
+                            var result = exam.Pass(service, pairModel, words);
+                            switch (result)
+                            {
+                                case ExamResult.Passed:
+                                    Console.WriteLine("\r\n[PASSED]");
+                                    examsCount++;
+                                    examsPassed++;
+                                    break;
+                                case ExamResult.Failed:
+                                    Console.WriteLine("\r\n[failed]");
+                                    examsCount++;
+                                    break;
+                                case ExamResult.Retry:
+                                    retryFlag = true;
+                                    break;
+                                case ExamResult.Exit: return;
+                            }
+                        } while (retryFlag);
+                    }
                 }
+
+                service.RegistrateExam(started, examsCount, examsPassed);
+
+                Console.WriteLine();
+                Console.WriteLine($"Test done:  {examsPassed}/{examsCount}");
+                Console.WriteLine($"Repeat? [Y]es [N]o");
+                var key = Console.ReadKey();
+                if(key.Key!= ConsoleKey.Y)
+                    break;
             }
-            
-            service.RegistrateExam(started, examsCount, examsPassed);
-            
-            Console.WriteLine();
-            Console.WriteLine($"Test done:  {examsPassed}/{examsCount}");
 
             foreach (var pairModel in words)
             {
@@ -118,6 +138,13 @@ namespace Dic.AddWords.ConsoleApp
             }
             Console.WriteLine();
 
+        }
+
+        private static IExam SelectExam(IExam[] exams)
+        {
+            var next = Tools.Rnd.Next(exams.Length);
+            var exam = exams[next];
+            return exam;
         }
 
 
