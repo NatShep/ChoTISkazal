@@ -110,6 +110,24 @@ namespace Dic.Logic.DAL
                 return result;
             }
         }
+        public void AddExam(DateTime started, DateTime finished, int count, int passed, int failed)
+        {
+            if (!File.Exists(DbFile))
+                ApplyMigrations();
+            
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+            cnn.Execute(
+                @"INSERT INTO ExamHistory (Count, Passed, Failed, Started, Finished)
+                                Values(@Count, @Passed, @Failed,@Started, @Finished)", new
+                {
+                    Count = count,
+                    Passed = passed,
+                    Failed = failed,
+                    Started = started,
+                    Finished = finished,
+                });
+        }
         public static void ApplyMigrations()
         {
             var migrationsList = new IMigration[]
@@ -118,7 +136,7 @@ namespace Dic.Logic.DAL
                 new AddWordsTableMigration(),
                 new AddHistoryMigration()
             };
-            Console.WriteLine("Applying migrations");
+            Console.WriteLine(")Applying migrations");
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
@@ -158,5 +176,7 @@ namespace Dic.Logic.DAL
              
             }
         }
+
+       
     }
 }

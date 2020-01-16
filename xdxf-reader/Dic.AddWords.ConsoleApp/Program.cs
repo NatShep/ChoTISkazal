@@ -46,7 +46,7 @@ namespace Dic.AddWords.ConsoleApp
                         ExamMode(service);
                         break;
                     case ConsoleKey.D3:
-                        RandomizationMode(service);
+                        Randomize(service);
                         break;
 
                 }
@@ -64,6 +64,8 @@ namespace Dic.AddWords.ConsoleApp
                 new RuChooseExam(),
                 new EnTrustExam(),
                 new RuTrustExam(),
+                new EngWriteExam(), 
+                new RuWriteExam() 
             };
             int examsCount = 0;
             int examsPassed = 0;
@@ -88,12 +90,12 @@ namespace Dic.AddWords.ConsoleApp
                         switch (result)
                         {
                             case ExamResult.Passed:
-                                Console.WriteLine("[PASSED]");
+                                Console.WriteLine("\r\n[PASSED]");
                                 examsCount++;
                                 examsPassed++;
                                 break;
                             case ExamResult.Failed:
-                                Console.WriteLine("[failed]");
+                                Console.WriteLine("\r\n[failed]");
                                 examsCount++;
                                 break;
                             case ExamResult.Retry:
@@ -119,18 +121,30 @@ namespace Dic.AddWords.ConsoleApp
         }
 
 
-        static void RandomizationMode(NewWordsService service)
+        static void Randomize(NewWordsService service)
         {
             Console.WriteLine("Updating Db");
             service.UpdateAgingAndRandomize();
 
             var allModels = service.GetAll();
-            Console.WriteLine($"Has {allModels.Length} models");
+            
             foreach (var pairModel in allModels)
             {
                 Console.WriteLine(
                     $"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.PassedScore} / {pairModel.Examed}");
             }
+            
+            Console.WriteLine($"Has {allModels.Length} models");
+
+            var examSum   = allModels.Sum(a => a.Examed);
+            var passedSum = allModels.Sum(a => a.PassedScore);
+            var passedAggregatedSum = allModels.Sum(a => Math.Min(1, a.PassedScore/(double)PairModel.MaxExamScore));
+            var passedCount = allModels.Count(a => a.PassedScore >= PairModel.MaxExamScore);
+
+            var count = allModels.Length;
+            Console.WriteLine($"Knowledge:  {100*passedAggregatedSum/ (double)(count):##.##} %");
+            Console.WriteLine($"Known:  {100*passedCount/(double)(count):##.##} %");
+            Console.WriteLine($"Failures :  {100*passedSum / (double)(examSum):##.##} %");
         }
 
         static void EnterMode(NewWordsService service)

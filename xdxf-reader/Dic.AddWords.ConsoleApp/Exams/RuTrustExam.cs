@@ -18,8 +18,13 @@ namespace Dic.AddWords.ConsoleApp
             var answer = Console.ReadKey();
             switch (answer.Key)
             {
-                case ConsoleKey.Y: return ExamResult.Passed;
-                case ConsoleKey.N: return ExamResult.Failed;
+                case ConsoleKey.Y:
+                    service.RegistrateSuccess(word);
+                    return ExamResult.Passed;
+                case ConsoleKey.N:
+                    service.RegistrateFailure(word);
+                    return ExamResult.Failed;
+                case ConsoleKey.E: return ExamResult.Exit;
                 case ConsoleKey.Escape: return ExamResult.Exit;
                 default: return ExamResult.Retry;
             }

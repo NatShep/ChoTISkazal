@@ -5,7 +5,7 @@ namespace Dic.Logic.DAL
     public class PairModel
     {
         private static Random rnd = new Random(DateTime.Now.Millisecond);
-        private const int MaxExamScore = 5;
+        public const int MaxExamScore = 5;
         private const int ExamFailedPenalty = 2;
         private const double RandomFactor = 1;
         private const double AgingFactor = 7;
@@ -42,8 +42,8 @@ namespace Dic.Logic.DAL
 
         public void OnExamFailed()
         {
-            if (PassedScore > 5)
-                PassedScore = 5;
+            if (PassedScore > MaxExamScore)
+                PassedScore = MaxExamScore;
             
             PassedScore -= ExamFailedPenalty;
             if (PassedScore < 0)

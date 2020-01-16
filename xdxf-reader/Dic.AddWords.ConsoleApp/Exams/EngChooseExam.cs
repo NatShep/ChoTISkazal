@@ -11,7 +11,7 @@ namespace Dic.AddWords.ConsoleApp
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {
-            var variants = examList.Select(e => e.Translation).ToArray();
+            var variants = examList.Randomize().Select(e => e.Translation).ToArray();
 
             Console.WriteLine("=====>   " + word.OriginWord + "    <=====");
 
@@ -31,8 +31,11 @@ namespace Dic.AddWords.ConsoleApp
                 return ExamResult.Retry;
 
             if (variants[selectedIndex - 1] == word.Translation)
+            {
+                service.RegistrateSuccess(word);
                 return ExamResult.Passed;
-
+            }
+            service.RegistrateFailure(word);
             return ExamResult.Failed;
 
         }

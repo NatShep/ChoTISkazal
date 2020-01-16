@@ -42,7 +42,7 @@ namespace Dic.Logic.Services
 
         public void RegistrateExam(DateTime started, int count, int successCount)
         {
-             
+            _repository.AddExam(started, DateTime.Now,count, successCount, count-successCount);
         }
         public void RegistrateSuccess(PairModel model)
         {
