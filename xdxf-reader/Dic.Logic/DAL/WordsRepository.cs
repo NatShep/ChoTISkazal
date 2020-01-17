@@ -96,6 +96,18 @@ namespace Dic.Logic.DAL
             }
         }
 
+        public PairModel GetOrNull(string word)
+        {
+            if (!File.Exists(DbFile))
+                return null;
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var result = cnn.Query<PairModel>(
+                    @"SELECT * FROM Words WHERE OriginWord = @word", new { word }).FirstOrDefault();
+                return result;
+            }
+        }
         public PairModel GetOrNull(int id)
         {
             if (!File.Exists(DbFile))

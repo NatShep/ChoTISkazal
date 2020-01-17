@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Timers;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
+using Dic.Logic.yapi;
 
 
 namespace Dic.AddWords.ConsoleApp
 {
     class Program
     {
+        private static YandexApiClient _yapiClient;
+
         static void Main(string[] args)
         {
+            _yapiClient = new YandexApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
+                TimeSpan.FromSeconds(5));
+            
+
             WordsRepository.ApplyMigrations();
 
             Console.WriteLine("Dic started");
@@ -177,11 +186,39 @@ namespace Dic.AddWords.ConsoleApp
         static void EnterMode(NewWordsService service)
         {
             Console.WriteLine("Enter word mode");
+            _yapiClient.Ping().Wait();
+            var timer = new Timer(5000){AutoReset = false};
+            timer.Enabled = true;
+            timer.Elapsed += (s,e) => {
+                _yapiClient.Ping().Wait();
+                timer.Enabled = true;
+            };
+            if(_yapiClient.IsOnline)
+                Console.WriteLine("Yandex is online");
+            else
+                Console.WriteLine("Yandex is offline");
+
             while (true)
             {
                 Console.Write("Enter eng word: ");
                 string word = Console.ReadLine();
+                Task<YaDefenition[]> task = null;
+                if (_yapiClient.IsOnline)
+                    task = _yapiClient.Translate(word);
+
+                var alreadyExisted = service.Get(word);
+                if (alreadyExisted != null)
+                {
+                    Console.WriteLine("Already found: "+ alreadyExisted.Translation);
+                    continue;
+                }
                 var translations = service.GetTranlations(word);
+                task?.Wait();
+                if (task?.Result?.Any() == true)
+                {
+                    var yaTranslated = task.Result.SelectMany(r => r.Tr).Select(r => r.Text).ToArray();
+                    translations =  new DictionaryMatch(word, task.Result.First().Ts, yaTranslated);
+                }
                 if (translations == null)
                 {
                     Console.WriteLine("No translations found. Check the word and try again");
@@ -208,6 +245,7 @@ namespace Dic.AddWords.ConsoleApp
                     }
                 }
             }
+            timer.Dispose();
         }
 
         static string ChooseTranslation(DictionaryMatch match)

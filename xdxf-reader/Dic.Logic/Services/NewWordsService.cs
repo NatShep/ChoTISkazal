@@ -49,5 +49,10 @@ namespace Dic.Logic.Services
             model.OnExamPassed();
             _repository.UpdateScores(model);
         }
+
+        public PairModel Get(string word)
+        {
+            return _repository.GetOrNull(word);
+        }
     }
 }
