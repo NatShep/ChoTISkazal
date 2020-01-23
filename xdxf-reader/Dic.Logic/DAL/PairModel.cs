@@ -18,6 +18,16 @@ namespace Dic.Logic.DAL
         public string Translation { get; set; }
         public string Transcription { get; set; }
 
+        public LearningState State
+        {
+            get
+            {
+                if (Examed > PairModel.MaxExamScore)
+                    return LearningState.Done;
+                return (LearningState) (Examed / 2);
+            }
+        }
+
         public static PairModel CreatePair(string originWord, string translationWord, string transcription)
         {
             return new PairModel
@@ -69,5 +79,16 @@ namespace Dic.Logic.DAL
             AggregateScore = p;
 
         }
+        
+    }
+
+    public enum LearningState
+    {
+        New = 0,
+        Familiar = 1,
+        Known = 2,
+        NotSure = 3,
+        PreLearned = 4,
+        Done = 5,
     }
 }

@@ -43,6 +43,8 @@ namespace Dic.AddWords.ConsoleApp
                 Console.WriteLine("1: Enter words");
                 Console.WriteLine("2: Examination");
                 Console.WriteLine("3: Randomization");
+                Console.WriteLine("4: Stats");
+
                 Console.Write("Choose mode:");
 
                 var val = Console.ReadKey();
@@ -60,8 +62,26 @@ namespace Dic.AddWords.ConsoleApp
                     case ConsoleKey.D3:
                         Randomize(service);
                         break;
+                    case ConsoleKey.D4:
+                        ShowStats(service);
+                        break;
 
                 }
+            }
+        }
+
+        private static void ShowStats(NewWordsService service)
+        {
+            var allWords = service.GetAll();
+            Console.WriteLine($"Words count = {allWords.Length}");
+            var groups = allWords
+                .GroupBy(s => s.State)
+                .OrderBy(s=>(int)s.Key)
+                .Select(s => new {state = s.Key, count = s.Count()});
+
+            foreach (var group in groups)
+            {
+                Console.WriteLine($"{group.state} {group.count}");
             }
         }
 
