@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Dic.AddWords.ConsoleApp.Exams;
 using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
@@ -69,22 +70,7 @@ namespace Dic.AddWords.ConsoleApp
             Console.WriteLine("Examination");
             var words = service.GetPairsForTest(9);
             for (int examNum = 0; examNum < 2; examNum++)
-            {
-                var simpleExams = new IExam[]
-                {
-                    new EngChooseExam(),
-                    new RuChooseExam(),
-                };
-
-                var complexExams = new IExam[]
-                {
-                    new EngChooseExam(),
-                    new RuChooseExam(),
-                    new EnTrustExam(),
-                    new RuTrustExam(),
-                    new EngWriteExam(),
-                    new RuWriteExam()
-                };
+            { 
                 int examsCount = 0;
                 int examsPassed = 0;
                 DateTime started = DateTime.Now;
@@ -95,15 +81,7 @@ namespace Dic.AddWords.ConsoleApp
                         Console.WriteLine();
                         IExam exam;
 
-                        if (i == 0 || pairModel.PassedScore < 2)
-                        {
-                            exam = SelectExam(simpleExams);
-                        }
-                        else
-                        {
-                            exam = SelectExam(complexExams);
-                        }
-
+                        exam = ExamHelper.GetNextExamFor(i==0, pairModel);
                         bool retryFlag = false;
                         do
                         {
@@ -150,14 +128,7 @@ namespace Dic.AddWords.ConsoleApp
             Console.WriteLine();
 
         }
-
-        private static IExam SelectExam(IExam[] exams)
-        {
-            var next = RandomTools.Rnd.Next(exams.Length);
-            var exam = exams[next];
-            return exam;
-        }
-
+          
 
         static void Randomize(NewWordsService service)
         {
@@ -247,7 +218,6 @@ namespace Dic.AddWords.ConsoleApp
                     }
                 }
             }
-            timer.Dispose();
         }
 
         static string ChooseTranslation(DictionaryMatch match)
