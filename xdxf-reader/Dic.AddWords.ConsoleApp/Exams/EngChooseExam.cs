@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 

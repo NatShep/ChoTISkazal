@@ -34,7 +34,7 @@ namespace Dic.Logic.DAL
                 return new PairModel[0];
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            var query = $"Select * from Words order by AggregateScore limit {count}";
+            var query = $"Select * from Words order by AggregateScore desc limit {count}";
             return cnn.Query<PairModel>(query).ToArray();
         }
 
@@ -184,11 +184,7 @@ namespace Dic.Logic.DAL
                 {
                     Console.WriteLine("No migration should be applied");
                 }
-            
-             
             }
         }
-
-       
     }
 }

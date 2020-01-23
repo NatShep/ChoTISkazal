@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
@@ -10,10 +11,11 @@ using Dic.Logic.yapi;
 
 namespace Dic.AddWords.ConsoleApp
 {
+
+    
     class Program
     {
         private static YandexApiClient _yapiClient;
-
         static void Main(string[] args)
         {
             _yapiClient = new YandexApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
@@ -151,7 +153,7 @@ namespace Dic.AddWords.ConsoleApp
 
         private static IExam SelectExam(IExam[] exams)
         {
-            var next = Tools.Rnd.Next(exams.Length);
+            var next = RandomTools.Rnd.Next(exams.Length);
             var exam = exams[next];
             return exam;
         }
@@ -167,7 +169,7 @@ namespace Dic.AddWords.ConsoleApp
             foreach (var pairModel in allModels)
             {
                 Console.WriteLine(
-                    $"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.PassedScore} / {pairModel.Examed}");
+                    $"{pairModel.OriginWord} - {pairModel.Translation}   score: {pairModel.PassedScore} / {pairModel.Examed}  {pairModel.AggregateScore:##.##}");
             }
             
             Console.WriteLine($"Has {allModels.Length} models");

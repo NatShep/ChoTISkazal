@@ -8,7 +8,7 @@ namespace Dic.Logic.DAL
         public const int MaxExamScore = 5;
         private const int ExamFailedPenalty = 2;
         private const double RandomFactor = 1;
-        private const double AgingFactor = 7;
+        private const double AgingFactor = 3;
         
         public double AggregateScore { get; set; }
         public long Id { get; set; }
@@ -57,12 +57,18 @@ namespace Dic.Logic.DAL
         public void UpdateAgingAndRandomization()
         {
             var res = (double)PassedScore;
+            //res reduces for 1 point per AgingFactor days
             res -= (DateTime.Now - LastExam).TotalDays / AgingFactor;
-            res += RandomFactor * (rnd.NextDouble() - 0.5);
             if (res < 0)
                 res = 0;
 
-            AggregateScore = res;
+            //probability reduces twice for every res point
+            var p = 100 / Math.Pow(2, res);
+
+            //Randomize
+            var rndFactor = Math.Pow(2, RandomTools.RandomNormal(0, 1));
+            p = p*rndFactor ;
+            AggregateScore = p;
 
         }
     }
