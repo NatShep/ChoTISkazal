@@ -5,6 +5,8 @@ namespace Dic.Logic.DAL
     public class PairModel
     {
         public const int MaxExamScore = 10;
+        public const int PenaltyScore = 9;
+
         private const int ExamFailedPenalty = 2;
         private const double AgingFactor = 3;
         
@@ -50,8 +52,8 @@ namespace Dic.Logic.DAL
 
         public void OnExamFailed()
         {
-            if (PassedScore > MaxExamScore)
-                PassedScore = MaxExamScore;
+            if (PassedScore > PenaltyScore)
+                PassedScore = PenaltyScore;
             
             PassedScore =  (int) Math.Round(PassedScore*0.7);
             if (PassedScore < 0)

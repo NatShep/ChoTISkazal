@@ -79,16 +79,32 @@ namespace Dic.AddWords.ConsoleApp
                 .OrderBy(s=>(int)s.Key)
                 .Select(s => new {state = s.Key, count = s.Count()});
 
+            var doneCount = 0;
             foreach (var group in groups)
             {
                 Console.WriteLine($"{group.state} {group.count}");
+                if (group.state == LearningState.Done) 
+                doneCount = group.count;
             }
+            Console.WriteLine($"Done: {(doneCount*100/allWords.Length)}%");
+            Console.WriteLine($"Unknown: {allWords.Length- doneCount} words");
+
         }
 
         static void ExamMode(NewWordsService service)
         {
             Console.WriteLine("Examination");
             var words = service.GetPairsForTest(9);
+            Console.Clear();
+            Console.WriteLine("Examination: ");
+            foreach (var pairModel in words.Randomize())
+            {
+                Console.WriteLine($"{pairModel.OriginWord}\t\t:{pairModel.Translation}");
+            }
+            Console.WriteLine();
+            Console.WriteLine("Press any key to start an examination");
+            Console.ReadKey();
+            Console.Clear();
             for (int examNum = 0; examNum < 2; examNum++)
             { 
                 int examsCount = 0;
@@ -130,7 +146,7 @@ namespace Dic.AddWords.ConsoleApp
                         } while (retryFlag);
                     }
                 }
-
+                service.UpdateAgingAndRandomize();
                 service.RegistrateExam(started, examsCount, examsPassed);
 
                 Console.WriteLine();

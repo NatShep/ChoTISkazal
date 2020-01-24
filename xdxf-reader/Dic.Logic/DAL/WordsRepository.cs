@@ -56,6 +56,7 @@ namespace Dic.Logic.DAL
                 }
             }
         }
+     
 
         public void UpdateScores(PairModel word)
         {

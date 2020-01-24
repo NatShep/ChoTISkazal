@@ -37,6 +37,7 @@ namespace Dic.Logic.Services
         public void RegistrateFailure(PairModel model)
         {
              model.OnExamFailed();
+             model.UpdateAgingAndRandomization();
              _repository.UpdateScores(model);
         }
 
@@ -47,6 +48,8 @@ namespace Dic.Logic.Services
         public void RegistrateSuccess(PairModel model)
         {
             model.OnExamPassed();
+            model.UpdateAgingAndRandomization();
+
             _repository.UpdateScores(model);
         }
 

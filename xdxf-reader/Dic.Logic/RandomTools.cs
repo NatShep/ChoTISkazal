@@ -7,6 +7,11 @@ namespace Dic.Logic
     public static class RandomTools
     {
         public static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
+        public static T GetRandomItem<T>(this IList<T> origin)
+        {
+            var rnd = Rnd.Next(origin.Count - 1);
+            return origin[rnd];
+        }
         public static IEnumerable<T> Randomize<T>(this IEnumerable<T> origin)
         {
             var list = origin.ToList();
