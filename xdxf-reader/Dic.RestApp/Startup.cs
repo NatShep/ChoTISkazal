@@ -36,7 +36,14 @@ namespace Dic.RestApp
 
             var yadicapiKey = Configuration.GetValue<string>("yadicapi:key");
             var yadicapiTimeout = Configuration.GetValue<TimeSpan>("yadicapi:timeout");
-            services.AddSingleton(new YandexApiClient(yadicapiKey, yadicapiTimeout));
+
+            services.AddSingleton(new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout));
+
+            var yatransapiKey = Configuration.GetValue<string>("yatransapi:key");
+            var yatransapiTimeout = Configuration.GetValue<TimeSpan>("yatransapi:timeout");
+
+            services.AddSingleton(new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout));
+
             services.AddHostedService<YapiPingHostedService>();
         }
 

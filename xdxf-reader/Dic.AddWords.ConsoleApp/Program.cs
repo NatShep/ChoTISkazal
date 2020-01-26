@@ -16,10 +16,10 @@ namespace Dic.AddWords.ConsoleApp
     
     class Program
     {
-        private static YandexApiClient _yapiClient;
+        private static YandexDictionaryApiClient _yapiClient;
         static void Main(string[] args)
         {
-            _yapiClient = new YandexApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
+            _yapiClient = new YandexDictionaryApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
                 TimeSpan.FromSeconds(5));
             
 

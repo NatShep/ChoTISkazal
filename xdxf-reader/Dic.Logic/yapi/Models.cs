@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Dic.Logic.yapi
 {
-    public class YapiAnswer
+    public class YapiDicAnswer
     {
         [JsonPropertyName("def")]
         public YaDefenition[] Defenitions { get; set; }

@@ -100,7 +100,7 @@ namespace Dic.Logic.DAL
             }
         }
 
-        public  string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName ) + "\\MyWords.sqlite";
+        public  string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName );
 
         private SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 

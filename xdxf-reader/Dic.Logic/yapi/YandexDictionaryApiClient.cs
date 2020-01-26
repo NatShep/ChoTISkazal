@@ -9,12 +9,12 @@ using System.Web;
 
 namespace Dic.Logic.yapi
 {
-    public class YandexApiClient
+    public class YandexDictionaryApiClient
     {
         private readonly string _key;
         private readonly TimeSpan _timeout;
         public bool IsOnline { get; private set; }
-        public YandexApiClient(string key, TimeSpan timeout)
+        public YandexDictionaryApiClient(string key, TimeSpan timeout)
         {
             _key = key;
             _timeout = timeout;
@@ -50,7 +50,7 @@ namespace Dic.Logic.yapi
                 var query = MakeQuery(word);
                 var ans = await client.GetStringAsync(query);
                 IsOnline = true;
-                var deserialized = JsonSerializer.Deserialize<YapiAnswer>(ans);
+                var deserialized = JsonSerializer.Deserialize<YapiDicAnswer>(ans);
                 return deserialized.Defenitions;
             }
             catch (Exception e)

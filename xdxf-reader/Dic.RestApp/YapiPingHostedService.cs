@@ -11,15 +11,18 @@ namespace Dic.RestApp
 {
     public class YapiPingHostedService : IHostedService, IDisposable
     {
-        private int executionCount = 0;
         private readonly ILogger<YapiPingHostedService> _logger;
-        private readonly YandexApiClient _yadicapiClient;
+        private readonly YandexDictionaryApiClient _yadicapiClient;
+        private readonly YandexTranslateApiClient _yaTransClient;
         private Timer _timer;
 
-        public YapiPingHostedService(ILogger<YapiPingHostedService> logger, YandexApiClient yadicapiClient)
+        public YapiPingHostedService(
+            ILogger<YapiPingHostedService> logger, 
+            YandexDictionaryApiClient yadicapiClient, YandexTranslateApiClient yaTransClient)
         {
             _logger = logger;
             _yadicapiClient = yadicapiClient;
+            _yaTransClient = yaTransClient;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -35,7 +38,12 @@ namespace Dic.RestApp
             return Task.CompletedTask;
         }
 
-        private void DoWork(object state) => _yadicapiClient.Ping().Wait();
+        private void DoWork(object state)
+        {
+            var p1 = _yadicapiClient.Ping();
+            var p2 = _yaTransClient.Ping();
+            Task.WaitAll(p1, p2);
+        }
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
