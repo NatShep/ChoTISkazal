@@ -16,9 +16,9 @@ namespace Dic.Logic.DAL
         {
             _fileName = fileName;
         }
-        public PairModel CreateNew(string word, string translation, string transcription)
+        public PairModel CreateNew(string word, string translation, string transcription, Phrase[] phrases = null)
         {
-            var pair = PairModel.CreatePair(word, translation, transcription);
+            var pair = PairModel.CreatePair(word, translation, transcription, phrases);
             Add(pair);
             return pair;
         }
@@ -118,6 +118,18 @@ namespace Dic.Logic.DAL
                     @"INSERT INTO Words (  OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed )   
                                       VALUES( @OriginWord,  @Translation,  @Transcription, @Created, @LastExam, @PassedScore, @AggregateScore, @Examed ); 
                           select last_insert_rowid()", pair).First();
+
+                if (pair.Phrases != null)
+                {
+                    foreach (var phrase in pair.Phrases)
+                    {
+                        phrase.Created = DateTime.Now;
+                        cnn.Execute(
+                            @"INSERT INTO Words (  Origin,  Translation,  Created, OriginWord, TranslationWord)   
+                                      VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord); 
+                          select last_insert_rowid()", phrase);
+                    }
+                }
             }
         }
 
@@ -171,7 +183,8 @@ namespace Dic.Logic.DAL
             {
                 new InitMigration(),
                 new AddWordsTableMigration(),
-                new AddHistoryMigration()
+                new AddHistoryMigration(),
+                new AddPhraseMigration()
             };
             Console.WriteLine(")Applying migrations");
             using (var cnn = SimpleDbConnection())

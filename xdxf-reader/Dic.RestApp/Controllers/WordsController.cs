@@ -68,8 +68,10 @@ namespace Dic.RestApp.Controllers
         [HttpPut("Words")]
         public void SelectTranslation([FromBody] AddTranslationRequest translationRequest)
         {
-            var translations = translationRequest.Translations.Select(t => t.Text).ToArray();
-            _wordsService.SaveForExams(translationRequest.Word, null, translations);
+            var translations = translationRequest.Translations;
+            
+            var translationsTexts = translationRequest.Translations.Select(t => t.Text).ToArray();
+            _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
         }
 
     }

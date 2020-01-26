@@ -25,11 +25,11 @@ namespace Dic.Logic.Services
                     .Select(s=>s.Trim())
                     .ToArray());
         }
-        public void SaveForExams(string word, string transcription, string[] translations )
+        public void SaveForExams(string word, string transcription, string[] translations, Phrase[] phrases = null)
         {
             var alreadyExists = _repository.GetOrNull(word);
             if (alreadyExists == null)
-                _repository.CreateNew(word, string.Join(", ", translations), transcription);
+                _repository.CreateNew(word, string.Join(", ", translations), transcription, phrases);
             else
             {
 

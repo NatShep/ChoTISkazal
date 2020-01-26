@@ -2,6 +2,15 @@
 
 namespace Dic.Logic.DAL
 {
+    public class Phrase
+    {
+        public string OriginWord { get; set; }
+        public string Origin { get; set; }
+        public string Translation { get; set; }
+        public string TranslationWord { get; set; }
+        public DateTime Created { get; set; }
+
+    }
     public class PairModel
     {
         public const int MaxExamScore = 10;
@@ -19,7 +28,7 @@ namespace Dic.Logic.DAL
         public string OriginWord { get; set; }
         public string Translation { get; set; }
         public string Transcription { get; set; }
-
+        public Phrase[] Phrases { get; set; }
         public LearningState State
         {
             get
@@ -30,7 +39,11 @@ namespace Dic.Logic.DAL
             }
         }
 
-        public static PairModel CreatePair(string originWord, string translationWord, string transcription)
+        public static PairModel CreatePair(
+            string originWord, 
+            string translationWord, 
+            string transcription, 
+            Phrase[] phrases =null)
         {
             return new PairModel
             {
@@ -39,6 +52,7 @@ namespace Dic.Logic.DAL
                 OriginWord = originWord,
                 Transcription = transcription,
                 Translation = translationWord,
+                Phrases =  phrases,
             };
         }
 
