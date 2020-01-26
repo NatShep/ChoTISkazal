@@ -23,13 +23,14 @@ namespace Dic.AddWords.ConsoleApp
                 TimeSpan.FromSeconds(5));
             
 
-            WordsRepository.ApplyMigrations();
+            var repo = new WordsRepository("MyWords.sqlite");
+            repo.ApplyMigrations();
 
             Console.WriteLine("Dic started");
             string path = "T:\\Dictionary\\eng_rus_full.json";
             Console.WriteLine("Loading dictionary");
             var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
-            var service = new NewWordsService(dictionary, new WordsRepository());
+            var service = new NewWordsService(dictionary, repo);
 
             while (true)
             {

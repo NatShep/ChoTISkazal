@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dic.Logic.DAL;
+using Dic.Logic.Dictionaries;
+using Dic.Logic.Services;
+using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +30,14 @@ namespace Dic.RestApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
+            var dbFileName = Configuration.GetValue<string>("wordDb");
+            services.AddSingleton(new NewWordsService(new RuengDictionary(), new WordsRepository(dbFileName)));
+
+            var yadicapiKey = Configuration.GetValue<string>("yadicapi:key");
+            var yadicapiTimeout = Configuration.GetValue<TimeSpan>("yadicapi:timeout");
+            services.AddSingleton(new YandexApiClient(yadicapiKey, yadicapiTimeout));
+            services.AddHostedService<YapiPingHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

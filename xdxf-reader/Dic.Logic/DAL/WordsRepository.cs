@@ -10,6 +10,12 @@ namespace Dic.Logic.DAL
 {
     public class WordsRepository
     {
+        private readonly string _fileName;
+
+        public WordsRepository(string fileName)
+        {
+            _fileName = fileName;
+        }
         public PairModel CreateNew(string word, string translation, string transcription)
         {
             var pair = PairModel.CreatePair(word, translation, transcription);
@@ -94,9 +100,9 @@ namespace Dic.Logic.DAL
             }
         }
 
-        public static string DbFile => Environment.CurrentDirectory + "\\MyWords.sqlite";
+        public  string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName ) + "\\MyWords.sqlite";
 
-        public static SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
+        private SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 
         private void Add(PairModel pair)
         {
@@ -159,7 +165,7 @@ namespace Dic.Logic.DAL
                     Finished = finished,
                 });
         }
-        public static void ApplyMigrations()
+        public void ApplyMigrations()
         {
             var migrationsList = new IMigration[]
             {

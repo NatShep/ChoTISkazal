@@ -18,11 +18,10 @@ namespace Dic.RestApp.Controllers
         private YandexApiClient _yandexApiClient;
         private NewWordsService _wordsService;
 
-        public WordsController()
+        public WordsController(NewWordsService wordsService, YandexApiClient yaapiClient)
         {
-            _yandexApiClient = new YandexApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
-                TimeSpan.FromSeconds(5));
-            _wordsService = new NewWordsService(new RuengDictionary(), new WordsRepository());
+            _yandexApiClient = yaapiClient;
+            _wordsService = wordsService;
         }
         [HttpGet("Health")]
         public async Task<HealthResponse> GetHealth()
@@ -39,9 +38,13 @@ namespace Dic.RestApp.Controllers
         {
             var origin = HttpUtility.UrlDecode(word);
 
+            if (!_yandexApiClient.IsOnline) 
+                return new TranslationResponse(word, new Translation[0]);
+            
             var yandexResponse = await _yandexApiClient.Translate(origin);
             var result = yandexResponse.SelectMany(t => t.Tr)
                 .Select(t => new Translation(t.Text, TranslationSource.Yadic)).ToArray();
+            
             return new TranslationResponse(origin, result);
         }
 
