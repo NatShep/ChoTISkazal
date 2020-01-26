@@ -221,7 +221,7 @@ namespace Dic.AddWords.ConsoleApp
                     Console.WriteLine("Already found: "+ alreadyExisted.Translation);
                     continue;
                 }
-                var translations = service.GetTranlations(word);
+                var translations = service.GetTranslations(word);
                 task?.Wait();
                 if (task?.Result?.Any() == true)
                 {

@@ -75,6 +75,24 @@ namespace Dic.Logic.DAL
                 cnn.Execute(op, word);
             }
         }
+        public void UpdateScoresAndTranslation(PairModel word)
+        {
+            if (!File.Exists(DbFile))
+                return;
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var op =
+                    $"Update words set AggregateScore =  @AggregateScore," +
+                    $"PassedScore = @PassedScore, " +
+                    $"Translation = @Translation,"+
+                    $"Created = @Created," +
+                    $"LastExam = @LastExam," +
+                    $"Examed = @Examed where Id = @Id";
+                cnn.Execute(op, word);
+            }
+        }
 
         public static string DbFile => Environment.CurrentDirectory + "\\MyWords.sqlite";
 

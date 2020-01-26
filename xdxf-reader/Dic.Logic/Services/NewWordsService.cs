@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 
@@ -16,10 +17,35 @@ namespace Dic.Logic.Services
         }
         public void SaveForExams(string word, string translation, string transcription)
         {
-            _repository.CreateNew(word, translation, transcription);
+            SaveForExams(
+                word:          word, 
+                transcription: transcription, 
+                translations:  translation
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s=>s.Trim())
+                    .ToArray());
+        }
+        public void SaveForExams(string word, string transcription, string[] translations )
+        {
+            var alreadyExists = _repository.GetOrNull(word);
+            if (alreadyExists == null)
+                _repository.CreateNew(word, string.Join(", ", translations), transcription);
+            else
+            {
+
+                var updatedTranslations = alreadyExists
+                    .Translation
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .Union(translations)
+                    .ToArray();
+                alreadyExists.Translation = string.Join(", ", updatedTranslations);
+                alreadyExists.OnExamFailed();
+                _repository.UpdateScoresAndTranslation(alreadyExists);
+            }
         }
 
-        public DictionaryMatch GetTranlations(string word)
+        public DictionaryMatch GetTranslations(string word)
         {
            return _dictionary.GetOrNull(word);
         }
