@@ -12,7 +12,7 @@
                  Origin                               nvarchar(200) not null,
                  TranslationWord                      nvarchar(100) not null,
                  Translation                          nvarchar(200) not null,
-                 Created                              datetime not null,
+                 Created                              datetime not null
             )";
     }
 }

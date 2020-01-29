@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
@@ -23,6 +24,16 @@ namespace Dic.Logic.DAL
             return pair;
         }
 
+        public int GetContextPhrasesCount()
+        {
+            if (!File.Exists(DbFile))
+                return 0;
+
+            using var cnn = SimpleDbConnection();
+            
+            cnn.Open();
+            return cnn.Query<int>(@"Select count(*) From ContextPhrases").FirstOrDefault();
+        }
         public PairModel[] GetAll()
         {
             if(!File.Exists(DbFile))
@@ -34,15 +45,50 @@ namespace Dic.Logic.DAL
                 return cnn.Query<PairModel>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
+
+        public Phrase[] GetRandomPhrases(int count, string exceptWordOrTranlsation)
+        {
+            if (!File.Exists(DbFile))
+                return new Phrase[0];
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+
+            return cnn.Query<Phrase>(
+                @"SELECT *
+                    FROM ContextPhrases  
+                    Where OriginWord <> @exceptWordOrTranlsation and TranslationWord <> @exceptWordOrTranlsation
+                    ORDER BY RANDOM()                    
+                    limit @count
+                    ", new {exceptWordOrTranlsation}).ToArray();
+        }
         public PairModel[] GetWorst(int count)
         {
             if (!File.Exists(DbFile))
                 return new PairModel[0];
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            var query = $"Select * from Words order by AggregateScore desc limit {count}";
-            return cnn.Query<PairModel>(query).ToArray();
+
+            var lookup = new Dictionary<long, PairModel>();
+
+            cnn.Query<PairModel, Phrase, PairModel>(
+            @"Select w.*, c.* from 
+                (SELECT * FROM Words order by AggregateScore desc limit @count) w 
+                LEFT JOIN ContextPhrases c 
+                on c.OriginWord = w.OriginWord",
+                (w, c) =>
+                {
+                    if (!lookup.TryGetValue(w.Id, out var pair))
+                        lookup.Add(w.Id, pair = w);
+
+                    if (pair.Phrases == null)
+                        pair.Phrases = new List<Phrase>();
+                    if (!string.IsNullOrWhiteSpace(c.Origin))
+                        pair.Phrases.Add(c);
+                    return pair;
+                }, new {count});
+            return lookup.Values.ToArray();
         }
+
 
         public void UpdateAgingAndRandomization()
         {
@@ -125,9 +171,8 @@ namespace Dic.Logic.DAL
                     {
                         phrase.Created = DateTime.Now;
                         cnn.Execute(
-                            @"INSERT INTO Words (  Origin,  Translation,  Created, OriginWord, TranslationWord)   
-                                      VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord); 
-                          select last_insert_rowid()", phrase);
+                            @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
+                                      VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
                     }
                 }
             }
@@ -142,6 +187,36 @@ namespace Dic.Logic.DAL
                 cnn.Open();
                 var result = cnn.Query<PairModel>(
                     @"SELECT * FROM Words WHERE OriginWord = @word", new { word }).FirstOrDefault();
+                return result;
+            }
+        }
+
+        public PairModel GetOrNullWithPhrases(string word)
+        {
+            if (!File.Exists(DbFile))
+                return null;
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var lookup = new Dictionary<long, PairModel>();
+
+                var result = cnn.Query<PairModel, Phrase,PairModel>(
+                    @"SELECT w.*, c.* 
+                    FROM Words w 
+                    LEFT JOIN ContextPhrases c on c.OriginWord = @word
+                    WHERE w.OriginWord = @word 
+",
+                    (w, c) =>
+                    {
+                        if (!lookup.TryGetValue(w.Id, out var pair))
+                        {
+                            lookup.Add(w.Id, pair = w);
+                        }
+                        if(pair.Phrases==null)
+                            pair.Phrases = new List<Phrase>();
+                        pair.Phrases.Add(c);
+                        return pair;
+                    } , new { word }).FirstOrDefault();
                 return result;
             }
         }

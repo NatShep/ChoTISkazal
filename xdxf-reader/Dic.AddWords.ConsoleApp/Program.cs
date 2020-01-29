@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Dic.AddWords.ConsoleApp.Exams;
 using Dic.Logic;
 using Dic.Logic.DAL;
-using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
 
@@ -55,7 +55,7 @@ namespace Dic.AddWords.ConsoleApp
                     case ConsoleKey.Escape:
                         return;
                     case ConsoleKey.D1:
-                        EnterMode(service);
+                        EnterMode2(service);
                         break;
                     case ConsoleKey.D2:
                         ExamMode(service);
@@ -74,7 +74,10 @@ namespace Dic.AddWords.ConsoleApp
         private static void ShowStats(NewWordsService service)
         {
             var allWords = service.GetAll();
+            
+            Console.WriteLine($"Context phrases count = {service.GetContextPhraseCount()}");
             Console.WriteLine($"Words count = {allWords.Length}");
+            
             var groups = allWords
                 .GroupBy(s => s.State)
                 .OrderBy(s=>(int)s.Key)
@@ -90,12 +93,13 @@ namespace Dic.AddWords.ConsoleApp
             Console.WriteLine($"Done: {(doneCount*100/allWords.Length)}%");
             Console.WriteLine($"Unknown: {allWords.Length- doneCount} words");
 
+
         }
 
         static void ExamMode(NewWordsService service)
         {
             Console.WriteLine("Examination");
-            var words = service.GetPairsForTest(9);
+            var words = service.GetPairsForTest(9,3);
             Console.Clear();
             Console.WriteLine("Examination: ");
             foreach (var pairModel in words.Randomize())
@@ -193,17 +197,19 @@ namespace Dic.AddWords.ConsoleApp
             Console.WriteLine($"Failures :  {100*passedSum / (double)(examSum):##.##} %");
         }
 
-        static void EnterMode(NewWordsService service)
+        static void EnterMode2(NewWordsService service)
         {
             Console.WriteLine("Enter word mode");
             _yapiClient.Ping().Wait();
-            var timer = new Timer(5000){AutoReset = false};
+            
+            var timer = new Timer(5000) { AutoReset = false };
             timer.Enabled = true;
-            timer.Elapsed += (s,e) => {
+            timer.Elapsed += (s, e) => {
                 _yapiClient.Ping().Wait();
                 timer.Enabled = true;
             };
-            if(_yapiClient.IsOnline)
+            
+            if (_yapiClient.IsOnline)
                 Console.WriteLine("Yandex is online");
             else
                 Console.WriteLine("Yandex is offline");
@@ -216,65 +222,144 @@ namespace Dic.AddWords.ConsoleApp
                 if (_yapiClient.IsOnline)
                     task = _yapiClient.Translate(word);
 
-                var alreadyExisted = service.Get(word);
-                if (alreadyExisted != null)
-                {
-                    Console.WriteLine("Already found: "+ alreadyExisted.Translation);
-                    continue;
-                }
-                var translations = service.GetTranslations(word);
                 task?.Wait();
+                List<TranslationAndContext> translations = new List<TranslationAndContext>();
                 if (task?.Result?.Any() == true)
                 {
-                    var yaTranslated = task.Result.SelectMany(r => r.Tr).Select(r => r.Text).ToArray();
-                    translations =  new DictionaryMatch(word, task.Result.First().Ts, yaTranslated);
+
+                    var variants = task.Result.SelectMany(r => r.Tr);
+                    foreach (var yandexTranslation in variants)
+                    {
+                        List<Phrase> phrases = new List<Phrase>();
+                        if (yandexTranslation.Ex != null)
+                        {
+                            foreach (var example in yandexTranslation.Ex)
+                            {
+                                var phrase = new Phrase
+                                {
+                                    Created = DateTime.Now,
+                                    OriginWord = word,
+                                    Origin = example.Text,
+                                    Translation = example.Tr.FirstOrDefault()?.Text,
+                                    TranslationWord = yandexTranslation.Text,
+                                };
+                                phrases.Add(phrase);
+                            }
+                        }
+
+                        translations.Add(new TranslationAndContext(word, yandexTranslation.Text, yandexTranslation.Pos, phrases.ToArray()));
+                    }
+                    
                 }
-                if (translations == null)
+                else
+                {
+                    var dictionaryMatch = service.GetTranslations(word);
+                    if (dictionaryMatch != null)
+                    {
+                        translations.AddRange(
+                            dictionaryMatch.Translations.Select(t =>
+                                new TranslationAndContext(dictionaryMatch.Origin, t, dictionaryMatch.Transcription,
+                                    new Phrase[0])));
+                    }
+                }
+
+                if (!translations.Any())
                 {
                     Console.WriteLine("No translations found. Check the word and try again");
                 }
                 else
                 {
-                    Console.WriteLine($"[{translations.Transcription}]");
-                    Console.WriteLine("0: [CANCEL THE ENTRY]");
+                   // Console.WriteLine($"[{translations.Transcription}]");
+                    Console.WriteLine("e: [back to main menu]");
+                    Console.WriteLine("c: [CANCEL THE ENTRY]");
                     int i = 1;
-                    foreach (var translation in translations.Translations)
+                    foreach (var translation in translations)
                     {
-                        Console.WriteLine($"{i}: {translation}");
+                        Console.WriteLine($"{i}: {translation.Translation}");
                         i++;
                     }
 
-                    var result =  ChooseTranslation(translations);
-                    if(result==null)
+                    try
                     {
+                        var results = ChooseTranslation(translations.ToArray());
+                        if (results?.Any() == true)
+                        {
+                            var allTranslations = results.Select(t => t.Translation).ToArray();
+                            var allPhrases = results.SelectMany(t => t.Phrases).ToArray();
+                            service.SaveForExams(
+                                word: word,
+                                transcription: translations[0].Transcription,
+                                translations: allTranslations,
+                                phrases: allPhrases);
+                            Console.WriteLine($"Saved. Tranlations: {allTranslations.Length}, Phrases: {allPhrases.Length}");
+                        }
                     }
-                    else
+                    catch (OperationCanceledException)
                     {
-                        service.SaveForExams(translations.Origin, result, translations.Transcription);
-                        Console.WriteLine("Saved.");
+                        return;
                     }
                 }
             }
         }
 
-        static string ChooseTranslation(DictionaryMatch match)
+        static TranslationAndContext[] ChooseTranslation(TranslationAndContext[] translations)
         {
             while (true)
             {
                 Console.Write("Choose the word:");
-                var res = Console.ReadLine();
-                if (!int.TryParse(res, out var ires) )
+                var res = Console.ReadLine().Trim();
+                if(res.ToLower() == "e")
+                    throw new OperationCanceledException();
+                if (res.ToLower() == "c")
+                    return null;
+
+                if (!int.TryParse(res, out var ires))
                 {
+                    var subItems = res.Split(',');
+                    if (subItems.Length > 1)
+                    {
+                        try
+                        {
+                            return subItems
+                                .Select(s => int.Parse(s.Trim()))
+                                .Select(i => translations[i-1])
+                                .ToArray();
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                    }
                     if (res.Length > 1)
-                        return res;
+                        return new[]{new TranslationAndContext(translations[0].Origin, res, translations[0].Transcription, new Phrase[0])};
                     else continue;
                 }
                 if (ires == 0)
                     return null;
-                if(ires> match.Translations.Length|| ires<0)
+                if (ires > translations.Length || ires < 0)
                     continue;
-                return match.Translations[ires - 1];
+                return new []{translations[ires - 1]};
             }
         }
+
+       
+    }
+
+    public class TranslationAndContext
+    {
+        public TranslationAndContext(string origin, string translation, string transcription, Phrase[] phrases)
+        {
+            Origin = origin;
+            Translation = translation;
+            Transcription = transcription;
+            Phrases = phrases;
+        }
+
+        public string Origin { get; }
+
+        public string Translation { get; }
+        public string Transcription { get; }
+
+        public Phrase[] Phrases { get; }
     }
 }

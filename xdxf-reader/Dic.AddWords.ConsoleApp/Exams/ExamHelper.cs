@@ -8,6 +8,10 @@ namespace Dic.AddWords.ConsoleApp.Exams
 {
     public static class ExamHelper
     {
+        private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
+            exam: new EngChoosePhraseExam(), 
+            expectedScore: 4,
+            frequency: 20);
         private static readonly ExamAndPreferedScore EngChoose = new ExamAndPreferedScore(
             exam: new EngChooseExam(),
             expectedScore: 4,
@@ -81,13 +85,13 @@ namespace Dic.AddWords.ConsoleApp.Exams
             {
                 return ChooseExam(score, new []
                 {
-                    EngChoose,RuChoose, EngTrust, RuTrust, HideousRuTrust, HideousEngTrust
+                    EngChoose,RuChoose,EngPhraseChoose, EngTrust, RuTrust, HideousRuTrust, HideousEngTrust
                 });
             }
 
             return ChooseExam(score, new []
             {
-                EngChoose,RuChoose, EngTrust, RuTrust, EngWrite, RuWrite, HideousEngTrust, HideousRuTrust, HideousEngWriteExam, HideousRuWriteExam
+                EngChoose,RuChoose,EngPhraseChoose, EngTrust, RuTrust, EngWrite, RuWrite, HideousEngTrust, HideousRuTrust, HideousEngWriteExam, HideousRuWriteExam
             });
         }
 
@@ -108,7 +112,6 @@ namespace Dic.AddWords.ConsoleApp.Exams
         }
         class ExamAndPreferedScore
         {
-
             public ExamAndPreferedScore(IExam exam, int expectedScore, int frequency)
             {
                 Exam = exam;

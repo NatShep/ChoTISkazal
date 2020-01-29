@@ -1,16 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Dic.Logic.DAL
 {
-    public class Phrase
-    {
-        public string OriginWord { get; set; }
-        public string Origin { get; set; }
-        public string Translation { get; set; }
-        public string TranslationWord { get; set; }
-        public DateTime Created { get; set; }
-
-    }
     public class PairModel
     {
         public const int MaxExamScore = 10;
@@ -28,7 +21,22 @@ namespace Dic.Logic.DAL
         public string OriginWord { get; set; }
         public string Translation { get; set; }
         public string Transcription { get; set; }
-        public Phrase[] Phrases { get; set; }
+        public List<Phrase> Phrases { get; set; }
+        public IEnumerable<string> GetTranslations() => Translation.Split(',').Select(s => s.Trim());
+        public void SetTranslations(string[] translations)
+        {
+            Translation = string.Join(", ",translations);
+        }
+        public IEnumerable<Phrase> GetPhraseForTranslations(IEnumerable<string> translations)
+        {
+            foreach (var translation in translations)
+            {
+                foreach (var origin in Phrases.Where(p=>p.Translation==translation))
+                {
+                    yield return origin;
+                }
+            }
+        }
         public LearningState State
         {
             get
@@ -52,7 +60,7 @@ namespace Dic.Logic.DAL
                 OriginWord = originWord,
                 Transcription = transcription,
                 Translation = translationWord,
-                Phrases =  phrases,
+                Phrases =  phrases?.ToList(),
             };
         }
 

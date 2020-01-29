@@ -50,14 +50,30 @@ namespace Dic.Logic.Services
            return _dictionary.GetOrNull(word);
         }
 
+        public int GetContextPhraseCount() => _repository.GetContextPhrasesCount();
         public PairModel[] GetAll() => _repository.GetAll();
         public void UpdateAgingAndRandomize()
         {
             _repository.UpdateAgingAndRandomization();
         }
-        public PairModel[] GetPairsForTest(int count)
+        public PairModel[] GetPairsForTest(int count, int maxTranslationSize)
         {
-            return _repository.GetWorst(count);
+            var fullPairs = _repository.GetWorst(count);
+            foreach (var pairModel in fullPairs)
+            {
+                var translations = pairModel.GetTranslations().ToArray();
+                if(translations.Length<=maxTranslationSize)
+                    continue;
+                var usedTranslations = translations.Randomize().Take(maxTranslationSize).ToArray();
+                 pairModel.SetTranslations(usedTranslations);
+                 for (int i = 0; i < pairModel.Phrases.Count; i++)
+                 {
+                     var phrase = pairModel.Phrases[i];
+                       if (!usedTranslations.Contains(phrase.Translation))
+                           pairModel.Phrases.RemoveAt(i);
+                 }
+            }
+            return fullPairs;
         }
 
         public void RegistrateFailure(PairModel model)

@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dic.Logic", "Dic.Logic\Dic.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dic.AddWords.ConsoleApp", "Dic.AddWords.ConsoleApp\Dic.AddWords.ConsoleApp.csproj", "{86720D5F-8CE5-4334-899B-40C632211DAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dic.RestApp", "Dic.RestApp\Dic.RestApp.csproj", "{2D2A0EBF-C109-497A-9CA9-F4F19EDC6696}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dic.RestApp", "Dic.RestApp\Dic.RestApp.csproj", "{2D2A0EBF-C109-497A-9CA9-F4F19EDC6696}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dic.Tests", "Dic.Tests\Dic.Tests.csproj", "{54CDE720-B880-45FF-BE0B-114C4970D2DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{2D2A0EBF-C109-497A-9CA9-F4F19EDC6696}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D2A0EBF-C109-497A-9CA9-F4F19EDC6696}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D2A0EBF-C109-497A-9CA9-F4F19EDC6696}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54CDE720-B880-45FF-BE0B-114C4970D2DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54CDE720-B880-45FF-BE0B-114C4970D2DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54CDE720-B880-45FF-BE0B-114C4970D2DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54CDE720-B880-45FF-BE0B-114C4970D2DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
