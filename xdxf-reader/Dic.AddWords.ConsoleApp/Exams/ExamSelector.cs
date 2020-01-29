@@ -6,12 +6,9 @@ using Dic.Logic.DAL;
 
 namespace Dic.AddWords.ConsoleApp.Exams
 {
-    public static class ExamHelper
+    public static class ExamSelector
     {
-        private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
-            exam: new EngChoosePhraseExam(), 
-            expectedScore: 4,
-            frequency: 20);
+      
         private static readonly ExamAndPreferedScore EngChoose = new ExamAndPreferedScore(
             exam: new EngChooseExam(),
             expectedScore: 4,
@@ -31,7 +28,14 @@ namespace Dic.AddWords.ConsoleApp.Exams
             exam: new RuTrustExam(),
             expectedScore: 6,
             frequency: 10);
-
+        private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
+            exam: new EngChoosePhraseExam(),
+            expectedScore: 6,
+            frequency: 10);
+        private static readonly ExamAndPreferedScore RuPhraseChoose = new ExamAndPreferedScore(
+            exam: new RuChoosePhraseExam(),
+            expectedScore: 6,
+            frequency: 10);
         private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
@@ -42,27 +46,34 @@ namespace Dic.AddWords.ConsoleApp.Exams
             exam: new RuWriteExam(),
             expectedScore: 8,
             frequency: 10);
-
+        private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
+            exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
+            expectedScore: 8,
+            frequency: 10);
+        private static readonly ExamAndPreferedScore HideousRuPhraseChoose = new ExamAndPreferedScore(
+            exam: new ClearScreenExamDecorator(new RuChoosePhraseExam()),
+            expectedScore: 8,
+            frequency: 10);
         private static readonly ExamAndPreferedScore HideousEngTrust = new ExamAndPreferedScore(
-            exam: new CleatScreenExamDecorator(new EnTrustExam()),
+            exam: new ClearScreenExamDecorator(new EnTrustExam()),
             expectedScore: 10,
             frequency: 2);
 
         private static readonly ExamAndPreferedScore HideousRuTrust =
             new ExamAndPreferedScore(
-                exam: new CleatScreenExamDecorator(new RuTrustExam()),
+                exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
                 frequency: 3);
 
         private static readonly ExamAndPreferedScore HideousEngWriteExam =
             new ExamAndPreferedScore(
-                exam: new CleatScreenExamDecorator(new EngWriteExam()),
+                exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
                 frequency: 10);
 
         private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
-                exam: new CleatScreenExamDecorator(new RuWriteExam()),
+                exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
                 frequency: 10);
 
@@ -71,10 +82,12 @@ namespace Dic.AddWords.ConsoleApp.Exams
         {
             if (isFirstExam && model.PassedScore < 8)
             {
-                var list = new IExam[]
+                var list = new[]
                 {
-                    new EngChooseExam(),
-                    new RuChooseExam(),
+                    EngChoose.Exam,
+                    RuChoose.Exam,
+                    RuPhraseChoose.Exam,
+                    EngPhraseChoose.Exam
                 };
                 return list.GetRandomItem();
             }
@@ -85,13 +98,33 @@ namespace Dic.AddWords.ConsoleApp.Exams
             {
                 return ChooseExam(score, new []
                 {
-                    EngChoose,RuChoose,EngPhraseChoose, EngTrust, RuTrust, HideousRuTrust, HideousEngTrust
+                    EngChoose,
+                    RuChoose,
+                    EngPhraseChoose,
+                    RuPhraseChoose, 
+                    EngTrust, 
+                    RuTrust, 
+                    HideousRuTrust, 
+                    HideousEngTrust
                 });
             }
 
             return ChooseExam(score, new []
             {
-                EngChoose,RuChoose,EngPhraseChoose, EngTrust, RuTrust, EngWrite, RuWrite, HideousEngTrust, HideousRuTrust, HideousEngWriteExam, HideousRuWriteExam
+                EngChoose,
+                RuChoose,
+                EngPhraseChoose,
+                RuPhraseChoose, 
+                EngTrust, 
+                RuTrust, 
+                EngWrite, 
+                RuWrite, 
+                HideousRuPhraseChoose,
+                HideousEngPhraseChoose,
+                HideousEngTrust, 
+                HideousRuTrust, 
+                HideousEngWriteExam, 
+                HideousRuWriteExam
             });
         }
 

@@ -4,7 +4,7 @@ using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp
+namespace Dic.AddWords.ConsoleApp.Exams
 {
     public class EngChoosePhraseExam : IExam
     {
@@ -13,17 +13,16 @@ namespace Dic.AddWords.ConsoleApp
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {
             if (!word.Phrases.Any())
-                return new EngChooseExam().Pass(service, word, examList);
+                return ExamResult.Impossible;
             
             var targetPhrase = word.Phrases.GetRandomItem();
 
             var other = examList.SelectMany(e => e.Phrases)
-                .Where(p => !string.IsNullOrWhiteSpace(p?.Origin) && p!= targetPhrase)
-                .Take(9)
-                .ToArray();
+                .Where(p => !string.IsNullOrWhiteSpace(p?.Origin) && p != targetPhrase)
+                .Take(8);
 
             if(!other.Any())
-                return new EngChooseExam().Pass(service, word, examList);
+                return ExamResult.Impossible;
 
             var variants = other
                 .Append(targetPhrase)

@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using Dic.Logic.DAL;
+﻿using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp
+namespace Dic.AddWords.ConsoleApp.Exams
 {
     public interface IExam
     {
@@ -16,6 +14,7 @@ namespace Dic.AddWords.ConsoleApp
         Passed,
         Failed,
         Retry,
+        Impossible,
         Exit
     }
 }

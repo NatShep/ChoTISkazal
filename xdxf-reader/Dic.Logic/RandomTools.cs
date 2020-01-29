@@ -17,7 +17,7 @@ namespace Dic.Logic
             var list = origin.ToList();
             while (list.Count>0)
             {
-                var i = Rnd.Next(list.Count - 1);
+                var i = Rnd.Next(list.Count);
                 var item = list[i];
                 list.RemoveAt(i);
                 yield return item;

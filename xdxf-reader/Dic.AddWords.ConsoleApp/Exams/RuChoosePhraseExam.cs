@@ -6,15 +6,31 @@ using Dic.Logic.Services;
 
 namespace Dic.AddWords.ConsoleApp.Exams
 {
-    public class RuChooseExam: IExam
+    public class RuChoosePhraseExam : IExam
     {
-        public string Name => "RuChoose";
+        public string Name => "Ru Choose Phrase";
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {
-            var variants = examList.Randomize().Select(e => e.OriginWord).ToArray();
+            if (!word.Phrases.Any())
+                return ExamResult.Impossible;
+            
+            var targetPhrase = word.Phrases.GetRandomItem();
 
-            Console.WriteLine("=====>   " + word.Translation + "    <=====");
+            var other = examList.SelectMany(e => e.Phrases)
+                .Where(p => !string.IsNullOrWhiteSpace(p?.Origin) && p!= targetPhrase)
+                .Take(8);
+
+            if(!other.Any())
+                return ExamResult.Impossible;
+
+            var variants = other
+                .Append(targetPhrase)
+                .Randomize()
+                .Select(e => e.Origin)
+                .ToArray();
+            
+            Console.WriteLine("=====>   " + targetPhrase.Translation + "    <=====");
 
             for (int i = 1; i <= variants.Length; i++)
             {
@@ -31,13 +47,12 @@ namespace Dic.AddWords.ConsoleApp.Exams
                 selectedIndex < 1)
                 return ExamResult.Retry;
 
-            if (variants[selectedIndex - 1] == word.OriginWord)
+            if (variants[selectedIndex - 1] == targetPhrase.Origin)
             {
                 service.RegistrateSuccess(word);
                 return ExamResult.Passed;
             }
             service.RegistrateFailure(word);
-
             return ExamResult.Failed;
 
         }

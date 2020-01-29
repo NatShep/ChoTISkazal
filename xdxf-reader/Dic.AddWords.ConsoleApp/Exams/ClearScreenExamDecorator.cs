@@ -6,11 +6,11 @@ using Dic.Logic.Services;
 
 namespace Dic.AddWords.ConsoleApp.Exams
 {
-    public class CleatScreenExamDecorator: IExam
+    public class ClearScreenExamDecorator: IExam
     {
         private readonly IExam _origin;
 
-        public CleatScreenExamDecorator(IExam origin)
+        public ClearScreenExamDecorator(IExam origin)
         {
             _origin = origin;
         }

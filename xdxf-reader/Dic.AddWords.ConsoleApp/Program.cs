@@ -12,7 +12,6 @@ using Dic.Logic.yapi;
 
 namespace Dic.AddWords.ConsoleApp
 {
-
     
     class Program
     {
@@ -122,33 +121,45 @@ namespace Dic.AddWords.ConsoleApp
                         Console.WriteLine();
                         IExam exam;
 
-                        exam = ExamHelper.GetNextExamFor(i==0, pairModel);
+                        exam = ExamSelector.GetNextExamFor(i==0, pairModel);
                         bool retryFlag = false;
                         do
                         {
                             retryFlag = false;
-                            Console.WriteLine();
-                            Console.WriteLine("***** " + exam.Name + " *****");
-                            Console.WriteLine();
-
+                            
                             var result = exam.Pass(service, pairModel, words);
                             switch (result)
                             {
+                                case ExamResult.Impossible:
+                                    exam = ExamSelector.GetNextExamFor(i == 0, pairModel);
+                                    retryFlag = true;
+                                    break;
                                 case ExamResult.Passed:
+                                    Console.ForegroundColor = ConsoleColor.Green;
                                     Console.WriteLine("\r\n[PASSED]");
+                                    Console.ResetColor();
+                                    Console.WriteLine();
+                                    Console.WriteLine();
                                     examsCount++;
                                     examsPassed++;
                                     break;
                                 case ExamResult.Failed:
+                                    Console.ForegroundColor = ConsoleColor.Red;
                                     Console.WriteLine("\r\n[failed]");
+                                    Console.ResetColor();
+                                    Console.WriteLine();
+                                    Console.WriteLine();
                                     examsCount++;
                                     break;
                                 case ExamResult.Retry:
                                     retryFlag = true;
+                                    Console.WriteLine();
+                                    Console.WriteLine();
                                     break;
                                 case ExamResult.Exit: return;
                             }
                         } while (retryFlag);
+
                     }
                 }
                 service.UpdateAgingAndRandomize();

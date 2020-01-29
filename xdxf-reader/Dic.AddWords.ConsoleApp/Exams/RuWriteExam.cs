@@ -3,7 +3,7 @@ using System.Linq;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp
+namespace Dic.AddWords.ConsoleApp.Exams
 {
     public class RuWriteExam : IExam
     {
@@ -13,7 +13,7 @@ namespace Dic.AddWords.ConsoleApp
         {
             var words = word.OriginWord.Split(',').Select(s => s.Trim());
             if (words.All(t => t.Contains(' ')))
-                return new RuTrustExam().Pass(service, word, examList);
+                return ExamResult.Impossible;
 
             Console.WriteLine("=====>   " + word.Translation+ "    <=====");
 

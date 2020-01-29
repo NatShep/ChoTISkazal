@@ -3,7 +3,7 @@ using System.Linq;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp
+namespace Dic.AddWords.ConsoleApp.Exams
 {
     public class EngWriteExam : IExam
     {
@@ -13,7 +13,7 @@ namespace Dic.AddWords.ConsoleApp
         {
             var translations = word.Translation.Split(',').Select(s => s.Trim());
             if (translations.All(t => t.Contains(' ')))
-                return new EnTrustExam().Pass(service, word, examList);
+                return ExamResult.Impossible;
 
 
             Console.WriteLine("=====>   " + word.OriginWord + "    <=====");
