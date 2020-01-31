@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using Dic.AddWords.ConsoleApp.Exams;
@@ -9,6 +11,7 @@ using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
+using Microsoft.Extensions.Configuration;
 
 
 namespace Dic.AddWords.ConsoleApp
@@ -21,17 +24,29 @@ namespace Dic.AddWords.ConsoleApp
 
         static void Main(string[] args)
         {
-            _yapiDicClient = new YandexDictionaryApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
-                TimeSpan.FromSeconds(5));
+            
+            
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+            IConfigurationRoot configuration = builder .Build();
 
-            _yapiTransClient = new YandexTranslateApiClient(
-                "trnsl.1.1.20200117T130225Z.a19f679c4b3b6b66.bb3f6acc4e2a62270ef9b80d7ea870960ec45d2c",
-                TimeSpan.FromSeconds(5));
+             var yadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
+             var yadicapiTimeout = TimeSpan.FromSeconds(5);
 
-            var repo = new WordsRepository("MyWords.sqlite");
+            var dbFileName = configuration.GetSection("wordDb").Value;
+            var yatransapiKey = configuration.GetSection("yatransapi").GetSection("key").Value;
+            var yatransapiTimeout = TimeSpan.FromSeconds(5);
+
+            
+            _yapiDicClient = new YandexDictionaryApiClient(yadicapiKey,yadicapiTimeout);
+
+            _yapiTransClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout);
+
+            var repo = new WordsRepository(dbFileName);
             repo.ApplyMigrations();
 
             Console.WriteLine("Dic started"); 
+
             //string path = "T:\\Dictionary\\eng_rus_full.json";
             //Console.WriteLine("Loading dictionary");
             //var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
