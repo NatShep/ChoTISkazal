@@ -234,7 +234,17 @@ namespace Dic.Logic.DAL
                 return result;
             }
         }
-        public void AddExam(DateTime started, DateTime finished, int count, int passed, int failed)
+
+        public Exam[] GetAllExams()
+        {
+            if (!File.Exists(DbFile))
+                ApplyMigrations();
+
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+            return cnn.Query<Exam>(@"Select * from ExamHistory").ToArray();
+        }
+        public void AddExam(Exam exam)
         {
             if (!File.Exists(DbFile))
                 ApplyMigrations();
@@ -243,14 +253,7 @@ namespace Dic.Logic.DAL
             cnn.Open();
             cnn.Execute(
                 @"INSERT INTO ExamHistory (Count, Passed, Failed, Started, Finished)
-                                Values(@Count, @Passed, @Failed,@Started, @Finished)", new
-                {
-                    Count = count,
-                    Passed = passed,
-                    Failed = failed,
-                    Started = started,
-                    Finished = finished,
-                });
+                                Values(@Count, @Passed, @Failed,@Started, @Finished)", exam);
         }
         public void ApplyMigrations()
         {

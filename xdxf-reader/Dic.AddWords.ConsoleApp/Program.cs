@@ -43,7 +43,7 @@ namespace Dic.AddWords.ConsoleApp
             {
                 new ExamMode(),
                 new WordAdditionMode(_yapiTransClient, _yapiDicClient),
-                new StatsMode(),
+                new GraphsStatsMode(),
                 new RandomizeMode(),
             };
 

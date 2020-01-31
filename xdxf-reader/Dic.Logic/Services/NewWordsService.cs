@@ -83,9 +83,15 @@ namespace Dic.Logic.Services
              _repository.UpdateScores(model);
         }
 
+        public Exam[] GetAllExams() => _repository.GetAllExams();
         public void RegistrateExam(DateTime started, int count, int successCount)
         {
-            _repository.AddExam(started, DateTime.Now,count, successCount, count-successCount);
+            _repository.AddExam(new Exam{
+                Started = started,
+                Count = count,
+                Failed = count - successCount,
+                Finished = DateTime.Now,
+                Passed = successCount});
         }
         public void RegistrateSuccess(PairModel model)
         {
