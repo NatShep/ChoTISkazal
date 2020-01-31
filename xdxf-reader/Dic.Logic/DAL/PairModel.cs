@@ -10,7 +10,7 @@ namespace Dic.Logic.DAL
         public const int PenaltyScore = 9;
 
         private const int ExamFailedPenalty = 2;
-        private const double AgingFactor = 3;
+        private const double AgingFactor = 2;
         
         public double AggregateScore { get; set; }
         public long Id { get; set; }
@@ -98,7 +98,7 @@ namespace Dic.Logic.DAL
             var p = 100 / Math.Pow(2, res);
 
             //Randomize
-            var rndFactor = Math.Pow(2, RandomTools.RandomNormal(0, 1));
+            var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
             p = p*rndFactor ;
             AggregateScore = p;
 

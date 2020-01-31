@@ -8,75 +8,66 @@ namespace Dic.AddWords.ConsoleApp.Exams
 {
     public static class ExamSelector
     {
-      
         private static readonly ExamAndPreferedScore EngChoose = new ExamAndPreferedScore(
             exam: new EngChooseExam(),
             expectedScore: 4,
             frequency: 10);
-
         private static readonly ExamAndPreferedScore RuChoose = new ExamAndPreferedScore(
             exam: new RuChooseExam(),
             expectedScore: 4,
             frequency: 10);
-
         private static readonly ExamAndPreferedScore EngTrust = new ExamAndPreferedScore(
             exam: new EnTrustExam(),
             expectedScore: 6,
             frequency: 10);
-
         private static readonly ExamAndPreferedScore RuTrust = new ExamAndPreferedScore(
             exam: new RuTrustExam(),
             expectedScore: 6,
             frequency: 10);
         private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
             exam: new EngChoosePhraseExam(),
-            expectedScore: 6,
-            frequency: 10);
+            expectedScore: 5,
+            frequency: 12);
         private static readonly ExamAndPreferedScore RuPhraseChoose = new ExamAndPreferedScore(
             exam: new RuChoosePhraseExam(),
-            expectedScore: 6,
-            frequency: 10);
+            expectedScore: 5,
+            frequency: 12);
         private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
                 expectedScore: 8,
                 frequency: 10);
-
         private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
             exam: new RuWriteExam(),
             expectedScore: 8,
             frequency: 10);
         private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
-            expectedScore: 8,
+            expectedScore: 7,
             frequency: 10);
         private static readonly ExamAndPreferedScore HideousRuPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new RuChoosePhraseExam()),
-            expectedScore: 8,
+            expectedScore: 7,
             frequency: 10);
         private static readonly ExamAndPreferedScore HideousEngTrust = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EnTrustExam()),
             expectedScore: 10,
             frequency: 2);
-
         private static readonly ExamAndPreferedScore HideousRuTrust =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
                 frequency: 3);
-
         private static readonly ExamAndPreferedScore HideousEngWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
                 frequency: 10);
-
         private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
                 frequency: 10);
-
 
         public static IExam GetNextExamFor(bool isFirstExam, PairModel model)
         {

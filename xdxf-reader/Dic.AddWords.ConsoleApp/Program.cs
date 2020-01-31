@@ -6,6 +6,7 @@ using System.Timers;
 using Dic.AddWords.ConsoleApp.Exams;
 using Dic.Logic;
 using Dic.Logic.DAL;
+using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
 
@@ -15,21 +16,26 @@ namespace Dic.AddWords.ConsoleApp
     
     class Program
     {
-        private static YandexDictionaryApiClient _yapiClient;
+        private static YandexDictionaryApiClient _yapiDicClient;
+        private static YandexTranslateApiClient _yapiTransClient;
+
         static void Main(string[] args)
         {
-            _yapiClient = new YandexDictionaryApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
+            _yapiDicClient = new YandexDictionaryApiClient("dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d",
                 TimeSpan.FromSeconds(5));
-            
+
+            _yapiTransClient = new YandexTranslateApiClient(
+                "trnsl.1.1.20200117T130225Z.a19f679c4b3b6b66.bb3f6acc4e2a62270ef9b80d7ea870960ec45d2c",
+                TimeSpan.FromSeconds(5));
 
             var repo = new WordsRepository("MyWords.sqlite");
             repo.ApplyMigrations();
 
-            Console.WriteLine("Dic started");
-            string path = "T:\\Dictionary\\eng_rus_full.json";
-            Console.WriteLine("Loading dictionary");
-            var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
-            var service = new NewWordsService(dictionary, repo);
+            Console.WriteLine("Dic started"); 
+            //string path = "T:\\Dictionary\\eng_rus_full.json";
+            //Console.WriteLine("Loading dictionary");
+            //var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
+            var service = new NewWordsService(new RuengDictionary(), repo);
 
             while (true)
             {
@@ -211,33 +217,40 @@ namespace Dic.AddWords.ConsoleApp
         static void EnterMode2(NewWordsService service)
         {
             Console.WriteLine("Enter word mode");
-            _yapiClient.Ping().Wait();
-            
+            var dicPing = _yapiDicClient.Ping();
+            var transPing = _yapiTransClient.Ping();
+            Task.WaitAll(dicPing, transPing);
             var timer = new Timer(5000) { AutoReset = false };
             timer.Enabled = true;
             timer.Elapsed += (s, e) => {
-                _yapiClient.Ping().Wait();
+                var pingDicApi = _yapiDicClient.Ping();
+                var pingTransApi = _yapiTransClient.Ping();
+                Task.WaitAll(pingDicApi, pingTransApi);
                 timer.Enabled = true;
             };
             
-            if (_yapiClient.IsOnline)
-                Console.WriteLine("Yandex is online");
+            if (_yapiDicClient.IsOnline)
+                Console.WriteLine("Yandex dic is online");
             else
-                Console.WriteLine("Yandex is offline");
+                Console.WriteLine("Yandex dic is offline");
+
+            if (_yapiTransClient.IsOnline)
+                Console.WriteLine("Yandex trans is online");
+            else
+                Console.WriteLine("Yandex trans is offline");
 
             while (true)
             {
                 Console.Write("Enter eng word: ");
                 string word = Console.ReadLine();
                 Task<YaDefenition[]> task = null;
-                if (_yapiClient.IsOnline)
-                    task = _yapiClient.Translate(word);
+                if (_yapiDicClient.IsOnline)
+                    task = _yapiDicClient.Translate(word);
 
                 task?.Wait();
                 List<TranslationAndContext> translations = new List<TranslationAndContext>();
                 if (task?.Result?.Any() == true)
                 {
-
                     var variants = task.Result.SelectMany(r => r.Tr);
                     foreach (var yandexTranslation in variants)
                     {
@@ -276,9 +289,27 @@ namespace Dic.AddWords.ConsoleApp
 
                 if (!translations.Any())
                 {
-                    Console.WriteLine("No translations found. Check the word and try again");
+                    try
+                    {
+                        var transAnsTask = _yapiTransClient.Translate(word);
+                        transAnsTask.Wait();
+                        
+                        if(string.IsNullOrWhiteSpace(transAnsTask.Result))
+                        {
+                            Console.WriteLine("No translations found. Check the word and try again");
+                        }
+                        else
+                        {
+                            translations.Add(new TranslationAndContext(word, transAnsTask.Result, null, new Phrase[0]));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("No translations found. Check the word and try again");
+                    }
                 }
-                else
+
+                if(translations.Any())
                 {
                    // Console.WriteLine($"[{translations.Transcription}]");
                     Console.WriteLine("e: [back to main menu]");
@@ -352,25 +383,5 @@ namespace Dic.AddWords.ConsoleApp
                 return new []{translations[ires - 1]};
             }
         }
-
-       
-    }
-
-    public class TranslationAndContext
-    {
-        public TranslationAndContext(string origin, string translation, string transcription, Phrase[] phrases)
-        {
-            Origin = origin;
-            Translation = translation;
-            Transcription = transcription;
-            Phrases = phrases;
-        }
-
-        public string Origin { get; }
-
-        public string Translation { get; }
-        public string Transcription { get; }
-
-        public Phrase[] Phrases { get; }
     }
 }
