@@ -78,7 +78,7 @@ namespace Chotiskazal.App.Modes
                 for (int row = 0; row < wordHystogramm.Length; row++)
                 {
                     var rowHeight = Math.Ceiling(((height * wordHystogramm[row]) / (double) maxCount));
-                    if (rowHeight > height - line)
+                    if (rowHeight >= height - line)
                         Console.Write("|_| ");
                     else
                         Console.Write("    ");
@@ -106,7 +106,7 @@ namespace Chotiskazal.App.Modes
             int maxCount = 0;
             foreach (var pairModel in allWords)
             {
-                var score = (int)(DateTime.Now- pairModel.Created).TotalDays +1;
+                var score = (int)(DateTime.Now.Date - pairModel.Created.Date).TotalDays +1;
                 if(score>wordTimeline.Length || score<0)
                     continue;
                 wordTimeline[^score]++;
@@ -132,7 +132,7 @@ namespace Chotiskazal.App.Modes
                 for (int row = 0; row < wordTimeline.Length; row++)
                 {
                     var rowHeight = Math.Round(((height * wordTimeline[row]) / (double)maxCount));
-                    if (rowHeight > height - line)
+                    if (rowHeight >= height - line)
                         Console.Write("|_| ");
                     else
                         Console.Write("    ");
@@ -159,7 +159,7 @@ namespace Chotiskazal.App.Modes
 
             foreach (var pairModel in exams)
             {
-                var score = (int)(DateTime.Now - pairModel.Started).TotalDays + 1;
+                var score = (int)(DateTime.Now.Date - pairModel.Started.Date).TotalDays + 1;
                 if (score > wordTimeline.Length || score < 0)
                     continue;
                 wordTimeline[^score]++;
@@ -173,8 +173,8 @@ namespace Chotiskazal.App.Modes
 
                 for (int row = 0; row < wordTimeline.Length; row++)
                 {
-                    var rowHeight = Math.Round(((height * wordTimeline[row]) / (double)maxCount));
-                    if (rowHeight > height - line)
+                    var rowHeight = Math.Ceiling(((height * wordTimeline[row]) / (double)maxCount));
+                    if (rowHeight >= height - line)
                         Console.Write("|_| ");
                     else
                         Console.Write("    ");
