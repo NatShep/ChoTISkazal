@@ -4,8 +4,8 @@ using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Chotiskazal.Logic.DAL.Migrations;
 using Dapper;
-using Dic.Logic.DAL.Migrations;
 
 namespace Dic.Logic.DAL
 {
@@ -20,6 +20,7 @@ namespace Dic.Logic.DAL
         public PairModel CreateNew(string word, string translation, string transcription, Phrase[] phrases = null)
         {
             var pair = PairModel.CreatePair(word, translation, transcription, phrases);
+            pair.UpdateAgingAndRandomization();
             Add(pair);
             return pair;
         }
@@ -46,21 +47,7 @@ namespace Dic.Logic.DAL
             }
         }
 
-        public Phrase[] GetRandomPhrases(int count, string exceptWordOrTranlsation)
-        {
-            if (!File.Exists(DbFile))
-                return new Phrase[0];
-            using var cnn = SimpleDbConnection();
-            cnn.Open();
-
-            return cnn.Query<Phrase>(
-                @"SELECT *
-                    FROM ContextPhrases  
-                    Where OriginWord <> @exceptWordOrTranlsation and TranslationWord <> @exceptWordOrTranlsation
-                    ORDER BY RANDOM()                    
-                    limit @count
-                    ", new {exceptWordOrTranlsation}).ToArray();
-        }
+       
         public PairModel[] GetWorst(int count)
         {
             if (!File.Exists(DbFile))
@@ -89,14 +76,27 @@ namespace Dic.Logic.DAL
             return lookup.Values.ToArray();
         }
 
+        public void UpdateAgingAndRandomization(int count)
+        {
+            if (!File.Exists(DbFile))
+                return;
 
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                foreach (var word in cnn.Query<PairModel>(@"Select * From Words order by RANDOM() limit @count", new {count}).ToArray())
+                {
+                    word.UpdateAgingAndRandomization();
+                    var op = $"Update words set AggregateScore = {word.AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
+                    cnn.Execute(op);
+                }
+            }
+        }
         public void UpdateAgingAndRandomization()
         {
             if (!File.Exists(DbFile))
                 return;
 
-            //if (File.Exists(DbFile))
-            //    File.Delete(DbFile);
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();

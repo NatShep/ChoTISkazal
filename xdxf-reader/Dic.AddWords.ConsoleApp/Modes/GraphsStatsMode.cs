@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp.Modes
+namespace Chotiskazal.App.Modes
 {
     class GraphsStatsMode: IConsoleMode
     {

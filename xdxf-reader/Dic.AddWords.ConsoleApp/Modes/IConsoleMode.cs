@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dic.Logic.Services;
+﻿using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp.Modes
+namespace Chotiskazal.App.Modes
 {
     public interface IConsoleMode
     {

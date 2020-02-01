@@ -56,6 +56,10 @@ namespace Dic.Logic.Services
         {
             _repository.UpdateAgingAndRandomization();
         }
+        public void UpdateAgingAndRandomize(int count)
+        {
+            _repository.UpdateAgingAndRandomization(count);
+        }
         public PairModel[] GetPairsForTest(int count, int maxTranslationSize)
         {
             var fullPairs = _repository.GetWorst(count);

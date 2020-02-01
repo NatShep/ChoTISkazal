@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
 
-namespace Dic.AddWords.ConsoleApp.Modes
+namespace Chotiskazal.App.Modes
 {
     class WordAdditionMode: IConsoleMode
     {
@@ -47,8 +46,12 @@ namespace Dic.AddWords.ConsoleApp.Modes
 
             while (true)
             {
-                Console.Write("Enter eng word: ");
+                Console.Write("Enter [e] for exit or ");
+                Console.Write("Enter english word: ");
                 string word = Console.ReadLine();
+                if(word=="e")
+                    break;
+                
                 Task<YaDefenition[]> task = null;
                 if (_yapiDicClient.IsOnline)
                     task = _yapiDicClient.Translate(word);
@@ -60,22 +63,7 @@ namespace Dic.AddWords.ConsoleApp.Modes
                     var variants = task.Result.SelectMany(r => r.Tr);
                     foreach (var yandexTranslation in variants)
                     {
-                        List<Phrase> phrases = new List<Phrase>();
-                        if (yandexTranslation.Ex != null)
-                        {
-                            foreach (var example in yandexTranslation.Ex)
-                            {
-                                var phrase = new Phrase
-                                {
-                                    Created = DateTime.Now,
-                                    OriginWord = word,
-                                    Origin = example.Text,
-                                    Translation = example.Tr.FirstOrDefault()?.Text,
-                                    TranslationWord = yandexTranslation.Text,
-                                };
-                                phrases.Add(phrase);
-                            }
-                        }
+                        var phrases = GetPhrases(yandexTranslation, word);
 
                         translations.Add(new TranslationAndContext(word, yandexTranslation.Text, yandexTranslation.Pos, phrases.ToArray()));
                     }
@@ -148,6 +136,29 @@ namespace Dic.AddWords.ConsoleApp.Modes
                 }
             }
         }
+
+        private static List<Phrase> GetPhrases(Translation yandexTranslation, string word)
+        {
+            List<Phrase> phrases = new List<Phrase>();
+            if (yandexTranslation.Ex != null)
+            {
+                foreach (var example in yandexTranslation.Ex)
+                {
+                    var phrase = new Phrase
+                    {
+                        Created = DateTime.Now,
+                        OriginWord = word,
+                        Origin = example.Text,
+                        Translation = example.Tr.FirstOrDefault()?.Text,
+                        TranslationWord = yandexTranslation.Text,
+                    };
+                    phrases.Add(phrase);
+                }
+            }
+
+            return phrases;
+        }
+
         TranslationAndContext[] ChooseTranslation(TranslationAndContext[] translations)
         {
             while (true)

@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dic.Logic\Dic.Logic.csproj" />
+    <ProjectReference Include="..\Dic.Logic\Chotiskazal.Logic.csproj" />
   </ItemGroup>
 
 </Project>

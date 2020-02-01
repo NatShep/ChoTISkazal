@@ -1,6 +1,6 @@
 ﻿using Dic.Logic.DAL;
 
-namespace Dic.AddWords.ConsoleApp
+namespace Chotiskazal.App
 {
     public class TranslationAndContext
     {

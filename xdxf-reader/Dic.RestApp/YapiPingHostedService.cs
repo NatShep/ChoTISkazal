@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dic.Logic.yapi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Dic.RestApp
+namespace Chotiskazal.RestApp
 {
     public class YapiPingHostedService : IHostedService, IDisposable
     {

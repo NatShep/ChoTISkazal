@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Dic.Logic.DAL;
-using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dic.RestApp.Controllers
+namespace Chotiskazal.RestApp.Controllers
 {
     [ApiController]
     [Route("/")]

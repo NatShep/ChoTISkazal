@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dic.Logic.DAL.Migrations
+﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
     interface IMigration
     {

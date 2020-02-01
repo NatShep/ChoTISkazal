@@ -4,7 +4,7 @@ using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp.Exams
+namespace Chotiskazal.App.Exams
 {
     public class EngChooseExam : IExam
     {

@@ -3,7 +3,7 @@ using System.IO;
 using Dic.Logic.DAL;
 using NUnit.Framework;
 
-namespace Dic.Tests
+namespace Chotiskazal.Tests
 {
     public class WordRepositoryTest
     {

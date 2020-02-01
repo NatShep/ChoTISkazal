@@ -4,7 +4,7 @@ using System.Linq;
 using Dic.Logic;
 using Dic.Logic.DAL;
 
-namespace Dic.AddWords.ConsoleApp.Exams
+namespace Chotiskazal.App.Exams
 {
     public static class ExamSelector
     {

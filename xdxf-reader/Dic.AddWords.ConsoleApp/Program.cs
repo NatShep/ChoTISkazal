@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Timers;
-using Dic.AddWords.ConsoleApp.Exams;
-using Dic.AddWords.ConsoleApp.Modes;
-using Dic.Logic;
+using Chotiskazal.App.Modes;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.Extensions.Configuration;
 
-
-namespace Dic.AddWords.ConsoleApp
+namespace Chotiskazal.App
 {
     
     class Program
@@ -35,14 +26,14 @@ namespace Dic.AddWords.ConsoleApp
             var yatransapiTimeout = TimeSpan.FromSeconds(5);
 
 
-            var _yapiDicClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
+            var yapiDicClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
 
-            var _yapiTransClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout);
+            var yapiTransClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout);
 
             var modes = new IConsoleMode[]
             {
                 new ExamMode(),
-                new WordAdditionMode(_yapiTransClient, _yapiDicClient),
+                new WordAdditionMode(yapiTransClient, yapiDicClient),
                 new GraphsStatsMode(),
                 new RandomizeMode(),
             };
@@ -50,6 +41,7 @@ namespace Dic.AddWords.ConsoleApp
             var repo = new WordsRepository(dbFileName);
             repo.ApplyMigrations();
 
+            
             Console.WriteLine("Dic started"); 
 
             //string path = "T:\\Dictionary\\eng_rus_full.json";
@@ -100,5 +92,6 @@ namespace Dic.AddWords.ConsoleApp
                 Console.WriteLine("===========================================");
             }
         }
+
     }
 }

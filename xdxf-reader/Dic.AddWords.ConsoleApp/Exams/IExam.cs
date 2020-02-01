@@ -1,7 +1,7 @@
 ﻿using Dic.Logic.DAL;
 using Dic.Logic.Services;
 
-namespace Dic.AddWords.ConsoleApp.Exams
+namespace Chotiskazal.App.Exams
 {
     public interface IExam
     {

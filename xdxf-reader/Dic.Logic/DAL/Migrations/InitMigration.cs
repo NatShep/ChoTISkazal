@@ -1,4 +1,4 @@
-﻿namespace Dic.Logic.DAL.Migrations
+﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
     public class InitMigration : IMigration
     {
