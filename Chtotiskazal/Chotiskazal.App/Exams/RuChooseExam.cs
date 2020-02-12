@@ -20,11 +20,11 @@ namespace Chotiskazal.App.Exams
             {
                 Console.WriteLine($"{i}: " + variants[i - 1]);
             }
-
+            
             Console.Write("Choose the translation: ");
-
+                
             var selected = Console.ReadLine();
-            if (selected.ToLower().StartsWith("e"))
+            if (selected == null || selected.ToLower().StartsWith("e"))
                 return ExamResult.Exit;
 
             if (!int.TryParse(selected, out var selectedIndex) || selectedIndex > variants.Length ||
@@ -39,7 +39,6 @@ namespace Chotiskazal.App.Exams
             service.RegistrateFailure(word);
 
             return ExamResult.Failed;
-
         }
     }
 }

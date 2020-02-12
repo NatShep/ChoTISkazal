@@ -88,7 +88,7 @@ namespace Dic.Logic.DAL
 
         public void UpdateAgingAndRandomization()
         {
-            var res = (double)PassedScore;
+            double res = PassedScore;
             //res reduces for 1 point per AgingFactor days
             res -= (DateTime.Now - LastExam).TotalDays / AgingFactor;
             if (res < 0)
@@ -101,7 +101,6 @@ namespace Dic.Logic.DAL
             var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
             p = p*rndFactor ;
             AggregateScore = p;
-
         }
         
     }

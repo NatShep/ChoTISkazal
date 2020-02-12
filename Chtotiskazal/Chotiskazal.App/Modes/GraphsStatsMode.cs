@@ -32,15 +32,30 @@ namespace Chotiskazal.App.Modes
                 .OrderBy(s => (int)s.Key)
                 .Select(s => new { state = s.Key, count = s.Count() });
 
-            var doneCount = 0;
-            foreach (var group in groups)
-            {
-                Console.WriteLine($"{group.state} {group.count}");
-                if (group.state == LearningState.Done)
-                    doneCount = group.count;
-            }
-            Console.WriteLine($"Done: {(doneCount * 100 / allWords.Length)}%");
+            var doneCount = allWords.Count(a => a.PassedScore >= PairModel.MaxExamScore);
+
+            Console.WriteLine($"Done: {doneCount} words  ({(doneCount * 100 / allWords.Length)}%)");
             Console.WriteLine($"Unknown: {allWords.Length - doneCount} words");
+            Console.WriteLine();
+            var learningRate = GetLearningRate(allWords);
+            //var normalized = Math.Max(0, Math.Min(learningRate, 800));
+
+            Console.WriteLine("Score is "+ learningRate);
+            if (learningRate<200)
+                Console.WriteLine("You has to add more words!");
+            else if (learningRate < 300)
+                Console.WriteLine("It's time to add new words!");
+            else if (learningRate <500)
+                Console.WriteLine("Zen!");
+            else if (learningRate < 600)
+                Console.WriteLine("Examintation is good");
+            else
+            {
+                Console.WriteLine("Exams exams exams!");
+                Console.WriteLine($"You have to make at least {(learningRate-500)/13} more exams");
+            }
+
+
         }
 
         private static void RenderKnowledgeHistogram(PairModel[] allWords)
@@ -98,6 +113,12 @@ namespace Chotiskazal.App.Modes
 
         }
 
+        private static int GetLearningRate(PairModel[] allModels)
+        {
+            var learnSum =  allModels.Select(a => Math.Min(a.PassedScore, PairModel.MaxExamScore+2)).Sum();
+            var count = allModels.Count();
+            return count * PairModel.MaxExamScore -learnSum;
+        }
 
         private static void RenderAddingTimeLine(PairModel[] allWords)
         {
