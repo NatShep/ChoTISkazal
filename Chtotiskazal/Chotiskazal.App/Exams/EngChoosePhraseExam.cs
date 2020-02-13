@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Chotiskazal.Logic.Services;
 using Dic.Logic;
 using Dic.Logic.DAL;
-using Dic.Logic.Services;
 
 namespace Chotiskazal.App.Exams
 {

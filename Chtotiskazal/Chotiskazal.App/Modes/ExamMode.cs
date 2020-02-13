@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Chotiskazal.App.Exams;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
 using Dic.Logic;
-using Dic.Logic.Services;
 
 namespace Chotiskazal.App.Modes
 {
@@ -46,7 +47,20 @@ namespace Chotiskazal.App.Modes
                     {
                         retryFlag = false;
 
+                        var questionMetric = new QuestionMetric
+                        {
+                            AggregateScoreBefore = pairModel.AggregateScore,
+                            Created = DateTime.Now,
+                            ExamsPassed = pairModel.Examed,
+                            PassedScoreBefore = pairModel.PassedScore,
+                            PhrasesCount = pairModel.Phrases?.Count ?? 0,
+                            PreviousExam = pairModel.LastExam,
+                            Type = exam.Name,
+                            WordAdded = pairModel.Created
+                        };
+                        
                         var result = exam.Pass(service, pairModel, words);
+
                         switch (result)
                         {
                             case ExamResult.Impossible:
@@ -59,6 +73,8 @@ namespace Chotiskazal.App.Modes
                                 Console.ResetColor();
                                 Console.WriteLine();
                                 Console.WriteLine();
+                                questionMetric.Result = 1;
+                                service.SaveQuestionMetrics(questionMetric);
                                 examsCount++;
                                 examsPassed++;
                                 break;
@@ -68,6 +84,8 @@ namespace Chotiskazal.App.Modes
                                 Console.ResetColor();
                                 Console.WriteLine();
                                 Console.WriteLine();
+                                questionMetric.Result = 0;
+                                service.SaveQuestionMetrics(questionMetric);
                                 examsCount++;
                                 break;
                             case ExamResult.Retry:

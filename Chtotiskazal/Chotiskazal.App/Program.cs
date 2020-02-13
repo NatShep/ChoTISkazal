@@ -1,8 +1,9 @@
 ﻿using System;
 using Chotiskazal.App.Modes;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
-using Dic.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.Extensions.Configuration;
 
@@ -40,7 +41,6 @@ namespace Chotiskazal.App
 
             var repo = new WordsRepository(dbFileName);
             repo.ApplyMigrations();
-
             
             Console.WriteLine("Dic started"); 
 

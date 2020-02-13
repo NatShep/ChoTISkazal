@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Chotiskazal.Logic.DAL;
+using Dic.Logic;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 
-namespace Dic.Logic.Services
+namespace Chotiskazal.Logic.Services
 {
     public class NewWordsService
     {
@@ -108,6 +110,11 @@ namespace Dic.Logic.Services
         public PairModel Get(string word)
         {
             return _repository.GetOrNull(word);
+        }
+
+        public void SaveQuestionMetrics(QuestionMetric questionMetric)
+        {
+            _repository.AddQuestionMetric(questionMetric);
         }
     }
 }

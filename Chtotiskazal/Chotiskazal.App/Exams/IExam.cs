@@ -1,5 +1,5 @@
-﻿using Dic.Logic.DAL;
-using Dic.Logic.Services;
+﻿using Chotiskazal.Logic.Services;
+using Dic.Logic.DAL;
 
 namespace Chotiskazal.App.Exams
 {

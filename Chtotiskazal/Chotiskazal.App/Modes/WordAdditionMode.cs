@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.DAL;
-using Dic.Logic.Services;
 using Dic.Logic.yapi;
 
 namespace Chotiskazal.App.Modes
@@ -110,7 +110,10 @@ namespace Chotiskazal.App.Modes
                     int i = 1;
                     foreach (var translation in translations)
                     {
-                        Console.WriteLine($"{i}: {translation.Translation}");
+                        if(translation.Phrases.Any())
+                            Console.WriteLine($"{i}: {translation.Translation}\t (+{translation.Phrases.Length})");
+                        else
+                            Console.WriteLine($"{i}: {translation.Translation}");
                         i++;
                     }
 

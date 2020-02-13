@@ -1,4 +1,4 @@
-﻿using Dic.Logic.Services;
+﻿using Chotiskazal.Logic.Services;
 
 namespace Chotiskazal.App.Modes
 {

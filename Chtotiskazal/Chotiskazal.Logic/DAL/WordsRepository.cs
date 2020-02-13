@@ -6,8 +6,9 @@ using System.IO;
 using System.Linq;
 using Chotiskazal.Logic.DAL.Migrations;
 using Dapper;
+using Dic.Logic.DAL;
 
-namespace Dic.Logic.DAL
+namespace Chotiskazal.Logic.DAL
 {
     public class WordsRepository
     {
@@ -146,6 +147,52 @@ namespace Dic.Logic.DAL
             }
         }
 
+        public QuestionMetric[] GetAllQuestionMetrics()
+        {
+            if (!File.Exists(DbFile))
+                return new QuestionMetric[0];
+            using var cnn = SimpleDbConnection();
+
+            cnn.Open();
+            return cnn.Query<QuestionMetric>(@"Select * from QuestionMetrics").ToArray();
+        }
+
+        public void AddQuestionMetric(QuestionMetric metric)
+        {
+            if (!File.Exists(DbFile))
+            {
+                ApplyMigrations();
+            }
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                cnn.Execute(
+                    @"INSERT INTO QuestionMetrics ( 
+                    Created,  
+                    PreviousExam,  
+                    WordAdded, 
+                    AggregateScoreBefore, 
+                    PhrasesCount, 
+                    PassedScoreBefore, 
+                    ExamsPassed, 
+                    Result,
+                    Type)   
+                    
+                Values( 
+                    @Created,  
+                    @PreviousExam,  
+                    @WordAdded, 
+                    @AggregateScoreBefore, 
+                    @PhrasesCount, 
+                    @PassedScoreBefore, 
+                    @ExamsPassed, 
+                    @Result,
+                    @Type)             
+                    ", metric);
+            }
+        }
+
         public  string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName );
 
         private SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
@@ -262,7 +309,8 @@ namespace Dic.Logic.DAL
                 new InitMigration(),
                 new AddWordsTableMigration(),
                 new AddHistoryMigration(),
-                new AddPhraseMigration()
+                new AddPhraseMigration(),
+                new AddQuestionMetricsMigration(), 
             };
             Console.WriteLine(")Applying migrations");
             using (var cnn = SimpleDbConnection())
