@@ -32,6 +32,26 @@ namespace Chotiskazal.App.Exams
             exam: new RuChoosePhraseExam(),
             expectedScore: 5,
             frequency: 12);
+
+        private static readonly ExamAndPreferedScore EngPhraseSubstitude = new ExamAndPreferedScore(
+            exam: new EngPhraseSubstitudeExam(),
+            expectedScore: 6,
+            frequency: 10);
+        private static readonly ExamAndPreferedScore RuPhraseSubstitude = new ExamAndPreferedScore(
+            exam: new RuPhraseSubstitudeExam(),
+            expectedScore: 6,
+            frequency: 10);
+
+        private static readonly ExamAndPreferedScore ClearEngPhraseSubstitude = new ExamAndPreferedScore(
+            exam: new ClearScreenExamDecorator(new EngPhraseSubstitudeExam()), 
+            expectedScore: 8,
+            frequency: 10);
+
+        private static readonly ExamAndPreferedScore ClearRuPhraseSubstitude = new ExamAndPreferedScore(
+            exam: new ClearScreenExamDecorator(new RuPhraseSubstitudeExam()),
+            expectedScore: 8,
+            frequency: 10);
+
         private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
@@ -96,7 +116,7 @@ namespace Chotiskazal.App.Exams
                     EngTrust, 
                     RuTrust, 
                     HideousRuTrust, 
-                    HideousEngTrust
+                    HideousEngTrust,
                 });
             }
 
@@ -115,7 +135,12 @@ namespace Chotiskazal.App.Exams
                 HideousEngTrust, 
                 HideousRuTrust, 
                 HideousEngWriteExam, 
-                HideousRuWriteExam
+                HideousRuWriteExam,
+                ClearEngPhraseSubstitude,
+                ClearRuPhraseSubstitude,
+                EngPhraseSubstitude,
+                RuPhraseSubstitude
+
             });
         }
 
