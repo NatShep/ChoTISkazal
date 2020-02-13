@@ -33,7 +33,7 @@ namespace Chotiskazal.App
 
             var modes = new IConsoleMode[]
             {
-                new ExamMode(),
+                new ExamMode(), 
                 new WordAdditionMode(yapiTransClient, yapiDicClient),
                 new GraphsStatsMode(),
                 new RandomizeMode(),

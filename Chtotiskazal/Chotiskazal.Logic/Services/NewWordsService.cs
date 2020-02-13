@@ -62,7 +62,7 @@ namespace Chotiskazal.Logic.Services
         {
             _repository.UpdateAgingAndRandomization(count);
         }
-        public PairModel[] GetPairsForTest(int count, int maxTranslationSize)
+        public PairModel[] GetPairsForLearning(int count, int maxTranslationSize)
         {
             var fullPairs = _repository.GetWorst(count);
             foreach (var pairModel in fullPairs)
@@ -115,6 +115,11 @@ namespace Chotiskazal.Logic.Services
         public void SaveQuestionMetrics(QuestionMetric questionMetric)
         {
             _repository.AddQuestionMetric(questionMetric);
+        }
+
+        public PairModel[] GetPairsForTests(int count, int learnRate)
+        {
+            return _repository.GetPairsForTests(count, learnRate);
         }
     }
 }

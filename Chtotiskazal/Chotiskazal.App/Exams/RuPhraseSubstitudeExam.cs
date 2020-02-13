@@ -30,7 +30,7 @@ namespace Chotiskazal.App.Exams
                 var enter = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.CompareOrdinal(word.Translation.ToLower().Trim(), enter.ToLower().Trim()) == 0)
+                if (string.CompareOrdinal(phrase.TranslationWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
                     service.RegistrateSuccess(word);
                     return ExamResult.Passed;

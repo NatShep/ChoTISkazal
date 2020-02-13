@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Chotiskazal.App.Exams;
 using Chotiskazal.Logic.DAL;
 using Chotiskazal.Logic.Services;
 using Dic.Logic;
+using Dic.Logic.DAL;
+using Dic.Logic.Dictionaries;
 
 namespace Chotiskazal.App.Modes
 {
@@ -17,15 +20,38 @@ namespace Chotiskazal.App.Modes
             service.UpdateAgingAndRandomize(50);
 
             Console.WriteLine("Examination");
-            var words = service.GetPairsForTest(9, 3);
+            var learningWords = service.GetPairsForLearning(9, 3);
+
             Console.Clear();
             Console.WriteLine("Examination: ");
-            if (words.Average(w => w.PassedScore) <= 4)
+            if (learningWords.Average(w => w.PassedScore) <= 4)
             {
-                foreach (var pairModel in words.Randomize())
+                foreach (var pairModel in learningWords.Randomize())
                 {
                     Console.WriteLine($"{pairModel.OriginWord}\t\t:{pairModel.Translation}");
                 }
+            }
+
+            var examsList = new List<PairModel>(learningWords.Length * 4);
+            //Every learning word appears in test from 2 to 4 times
+
+            examsList.AddRange(learningWords.Randomize());
+            examsList.AddRange(learningWords.Randomize());
+            examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
+            examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
+
+            while (examsList.Count > 30)
+            {
+                examsList.RemoveAt(examsList.Count - 1);
+            }
+
+            var delta = Math.Min(5, (30 - examsList.Count));
+            PairModel[] testWords = new PairModel[0];
+            if (delta > 0)
+            {
+                var randomRate = 8 + RandomTools.Rnd.Next(5);
+                testWords = service.GetPairsForTests(delta, randomRate);
+                examsList.AddRange(testWords);
             }
 
             Console.WriteLine();
@@ -35,88 +61,97 @@ namespace Chotiskazal.App.Modes
             int examsCount = 0;
             int examsPassed = 0;
             DateTime started = DateTime.Now;
-            for (int i = 0; i < 3; i++)
+
+            int i = 0;
+            foreach (var pairModel in examsList)
             {
-                foreach (var pairModel in words.Randomize())
+                Console.WriteLine();
+
+                var exam = ExamSelector.GetNextExamFor(i < 9, pairModel);
+                i++;
+                bool retryFlag = false;
+                do
                 {
-                    Console.WriteLine();
-                    IExam exam;
+                    retryFlag = false;
+                    Stopwatch sw = Stopwatch.StartNew();
+                    var questionMetric = CreateQuestionMetric(pairModel, exam);
 
-                    exam = ExamSelector.GetNextExamFor(i == 0, pairModel);
-                    bool retryFlag = false;
-                    do
+                    var learnList = learningWords;
+
+                    if (!learningWords.Contains(pairModel))
+                        learnList = learningWords.Append(pairModel).ToArray();
+
+                    var result = exam.Pass(service, pairModel, learnList);
+
+                    sw.Stop();
+                    questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
+                    switch (result)
                     {
-                        retryFlag = false;
-                        Stopwatch sw = Stopwatch.StartNew();
-                        var questionMetric = new QuestionMetric
-                        {
-                            AggregateScoreBefore = pairModel.AggregateScore,
-                            WordId =  pairModel.Id,
-                            Created = DateTime.Now,
-                            ExamsPassed = pairModel.Examed,
-                            PassedScoreBefore = pairModel.PassedScore,
-                            PhrasesCount = pairModel.Phrases?.Count ?? 0,
-                            PreviousExam = pairModel.LastExam,
-                            Type = exam.Name,
-                            WordAdded = pairModel.Created
-                        };
-                        
-                        var result = exam.Pass(service, pairModel, words);
-                        sw.Stop();
-                        questionMetric.ElaspedMs = (int)sw.ElapsedMilliseconds;
-                        switch (result)
-                        {
-                            case ExamResult.Impossible:
-                                exam = ExamSelector.GetNextExamFor(i == 0, pairModel);
-                                retryFlag = true;
-                                break;
-                            case ExamResult.Passed:
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("\r\n[PASSED]");
-                                Console.ResetColor();
-                                Console.WriteLine();
-                                Console.WriteLine();
-                                questionMetric.Result = 1;
-                                service.SaveQuestionMetrics(questionMetric);
-                                examsCount++;
-                                examsPassed++;
-                                break;
-                            case ExamResult.Failed:
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\r\n[failed]");
-                                Console.ResetColor();
-                                Console.WriteLine();
-                                Console.WriteLine();
-                                questionMetric.Result = 0;
-                                service.SaveQuestionMetrics(questionMetric);
-                                examsCount++;
-                                break;
-                            case ExamResult.Retry:
-                                retryFlag = true;
-                                Console.WriteLine();
-                                Console.WriteLine();
-                                break;
-                            case ExamResult.Exit: return;
-                        }
-                    } while (retryFlag);
+                        case ExamResult.Impossible:
+                            exam = ExamSelector.GetNextExamFor(i == 0, pairModel);
+                            retryFlag = true;
+                            break;
+                        case ExamResult.Passed:
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\r\n[PASSED]");
+                            Console.ResetColor();
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            questionMetric.Result = 1;
+                            service.SaveQuestionMetrics(questionMetric);
+                            examsCount++;
+                            examsPassed++;
+                            break;
+                        case ExamResult.Failed:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\r\n[failed]");
+                            Console.ResetColor();
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            questionMetric.Result = 0;
+                            service.SaveQuestionMetrics(questionMetric);
+                            examsCount++;
+                            break;
+                        case ExamResult.Retry:
+                            retryFlag = true;
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            break;
+                        case ExamResult.Exit: return;
+                    }
+                } while (retryFlag);
 
 
-                    service.RegistrateExam(started, examsCount, examsPassed);
-
-
-                }
+                service.RegistrateExam(started, examsCount, examsPassed);
 
             }
 
             Console.WriteLine();
             Console.WriteLine($"Test done:  {examsPassed}/{examsCount}");
-            foreach (var pairModel in words)
+            foreach (var pairModel in learningWords.Concat(testWords))
             {
                 Console.WriteLine(pairModel.OriginWord + " - " + pairModel.Translation + "  (" + pairModel.PassedScore +
                                   ")");
             }
 
             Console.WriteLine();
+        }
+
+        private static QuestionMetric CreateQuestionMetric(PairModel pairModel, IExam exam)
+        {
+            var questionMetric = new QuestionMetric
+            {
+                AggregateScoreBefore = pairModel.AggregateScore,
+                WordId = pairModel.Id,
+                Created = DateTime.Now,
+                ExamsPassed = pairModel.Examed,
+                PassedScoreBefore = pairModel.PassedScore,
+                PhrasesCount = pairModel.Phrases?.Count ?? 0,
+                PreviousExam = pairModel.LastExam,
+                Type = exam.Name,
+                WordAdded = pairModel.Created
+            };
+            return questionMetric;
         }
     }
 }

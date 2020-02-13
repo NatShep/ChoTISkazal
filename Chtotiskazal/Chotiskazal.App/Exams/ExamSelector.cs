@@ -26,12 +26,12 @@ namespace Chotiskazal.App.Exams
             frequency: 10);
         private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
             exam: new EngChoosePhraseExam(),
-            expectedScore: 6,
-            frequency: 10);
+            expectedScore: 5,
+            frequency: 8);
         private static readonly ExamAndPreferedScore RuPhraseChoose = new ExamAndPreferedScore(
             exam: new RuChoosePhraseExam(),
-            expectedScore: 6,
-            frequency: 10);
+            expectedScore: 5,
+            frequency: 8);
         
         private static readonly ExamAndPreferedScore EngChooseWordInPhrase = new ExamAndPreferedScore(
             new EngChooseWordInPhraseExam(),6,20);

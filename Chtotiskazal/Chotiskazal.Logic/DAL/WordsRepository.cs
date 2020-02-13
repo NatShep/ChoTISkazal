@@ -47,8 +47,33 @@ namespace Chotiskazal.Logic.DAL
                 return cnn.Query<PairModel>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
+        public PairModel[] GetPairsForTests(int count, int learnRate)
+        {
+            if (!File.Exists(DbFile))
+                return new PairModel[0];
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+            var lookup = new Dictionary<long, PairModel>();
 
-       
+            cnn.Query<PairModel, Phrase, PairModel>(
+                @"Select w.*, c.* from 
+                (SELECT * FROM Words where PassedScore > @learnRate order by AggregateScore desc limit @count) w 
+                LEFT JOIN ContextPhrases c 
+                on c.OriginWord = w.OriginWord",
+                (w, c) =>
+                {
+                    if (!lookup.TryGetValue(w.Id, out var pair))
+                        lookup.Add(w.Id, pair = w);
+
+                    if (pair.Phrases == null)
+                        pair.Phrases = new List<Phrase>();
+                    if (!string.IsNullOrWhiteSpace(c.Origin))
+                        pair.Phrases.Add(c);
+                    return pair;
+                }, new { count, learnRate });
+            return lookup.Values.ToArray();
+        }
+
         public PairModel[] GetWorst(int count)
         {
             if (!File.Exists(DbFile))
@@ -354,5 +379,7 @@ namespace Chotiskazal.Logic.DAL
                 }
             }
         }
+
+        
     }
 }
