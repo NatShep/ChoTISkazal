@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Chotiskazal.App.Exams;
 using Chotiskazal.Logic.DAL;
@@ -46,10 +47,11 @@ namespace Chotiskazal.App.Modes
                     do
                     {
                         retryFlag = false;
-
+                        Stopwatch sw = Stopwatch.StartNew();
                         var questionMetric = new QuestionMetric
                         {
                             AggregateScoreBefore = pairModel.AggregateScore,
+                            WordId =  pairModel.Id,
                             Created = DateTime.Now,
                             ExamsPassed = pairModel.Examed,
                             PassedScoreBefore = pairModel.PassedScore,
@@ -60,7 +62,8 @@ namespace Chotiskazal.App.Modes
                         };
                         
                         var result = exam.Pass(service, pairModel, words);
-
+                        sw.Stop();
+                        questionMetric.ElaspedMs = (int)sw.ElapsedMilliseconds;
                         switch (result)
                         {
                             case ExamResult.Impossible:

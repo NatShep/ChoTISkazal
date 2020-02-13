@@ -5,9 +5,11 @@ namespace Chotiskazal.Logic.DAL
     public class QuestionMetric
     {
         public int Id { get; set; }
+        public long WordId { get; set; }
         public DateTime Created { get; set; }
         public DateTime PreviousExam { get; set; }
         public DateTime WordAdded { get; set; }
+        public int ElaspedMs { get; set; }
         public double AggregateScoreBefore { get; set; }
         public int PhrasesCount { get; set; }
         public double PassedScoreBefore { get; set; }

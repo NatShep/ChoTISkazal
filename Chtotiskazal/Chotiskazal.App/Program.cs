@@ -42,7 +42,9 @@ namespace Chotiskazal.App
             var repo = new WordsRepository(dbFileName);
             repo.ApplyMigrations();
             
-            Console.WriteLine("Dic started"); 
+            Console.WriteLine("Dic started");
+
+            //var metrics = repo.GetAllQuestionMetrics();
 
             //string path = "T:\\Dictionary\\eng_rus_full.json";
             //Console.WriteLine("Loading dictionary");

@@ -168,8 +168,10 @@ namespace Chotiskazal.Logic.DAL
             {
                 cnn.Open();
                 cnn.Execute(
-                    @"INSERT INTO QuestionMetrics ( 
+                @"INSERT INTO QuestionMetrics ( 
                     Created,  
+                    WordId,
+                    ElaspedMs,
                     PreviousExam,  
                     WordAdded, 
                     AggregateScoreBefore, 
@@ -181,6 +183,8 @@ namespace Chotiskazal.Logic.DAL
                     
                 Values( 
                     @Created,  
+                    @WordId,
+                    @ElaspedMs,
                     @PreviousExam,  
                     @WordAdded, 
                     @AggregateScoreBefore, 
