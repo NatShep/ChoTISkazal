@@ -32,6 +32,12 @@ namespace Chotiskazal.App.Exams
             exam: new RuChoosePhraseExam(),
             expectedScore: 5,
             frequency: 12);
+        
+        private static readonly ExamAndPreferedScore EngChooseWordInPhrase = new ExamAndPreferedScore(
+            new EngChooseWordInPhraseExam(),6,20);
+
+        private static readonly ExamAndPreferedScore ClearEngChooseWordInPhrase = new ExamAndPreferedScore(
+            new ClearScreenExamDecorator(new EngChooseWordInPhraseExam()), 7, 20);
 
         private static readonly ExamAndPreferedScore EngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new EngPhraseSubstitudeExam(),
@@ -98,7 +104,8 @@ namespace Chotiskazal.App.Exams
                     EngChoose.Exam,
                     RuChoose.Exam,
                     RuPhraseChoose.Exam,
-                    EngPhraseChoose.Exam
+                    EngPhraseChoose.Exam,  
+                    EngChooseWordInPhrase.Exam,
                 };
                 return list.GetRandomItem();
             }
@@ -139,7 +146,9 @@ namespace Chotiskazal.App.Exams
                 ClearEngPhraseSubstitude,
                 ClearRuPhraseSubstitude,
                 EngPhraseSubstitude,
-                RuPhraseSubstitude
+                RuPhraseSubstitude,
+                EngChooseWordInPhrase,
+                ClearEngChooseWordInPhrase,
 
             });
         }

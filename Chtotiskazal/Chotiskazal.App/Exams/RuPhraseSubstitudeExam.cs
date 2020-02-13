@@ -31,11 +31,15 @@ namespace Chotiskazal.App.Exams
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 if (string.CompareOrdinal(phrase.TranslationWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
+                {
+                    service.RegistrateSuccess(word);
                     return ExamResult.Passed;
+                }
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Origin phrase was \"{phrase.Translation}\"");
                 Console.ResetColor();
+                service.RegistrateFailure(word);
                 return ExamResult.Failed;
             }
         }
