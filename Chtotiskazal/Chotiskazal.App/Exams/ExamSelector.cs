@@ -48,6 +48,9 @@ namespace Chotiskazal.App.Exams
             expectedScore: 6,
             frequency: 12);
 
+        private static readonly ExamAndPreferedScore ClearEngAssemblePhraseExam = new ExamAndPreferedScore(
+            new ClearAssemblePhraseExam(), 7, 10);
+
         private static readonly ExamAndPreferedScore ClearEngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstitudeExam()), 
             expectedScore: 8,
@@ -124,6 +127,7 @@ namespace Chotiskazal.App.Exams
                     RuTrust, 
                     HideousRuTrust, 
                     HideousEngTrust,
+                    ClearEngAssemblePhraseExam,
                 });
             }
 
@@ -149,6 +153,7 @@ namespace Chotiskazal.App.Exams
                 RuPhraseSubstitude,
                 EngChooseWordInPhrase,
                 ClearEngChooseWordInPhrase,
+                ClearEngAssemblePhraseExam,
 
             });
         }
