@@ -36,7 +36,7 @@ namespace Chotiskazal.App.Exams
                 if (translationCandidate != null)
                 {
 
-                    if (translationCandidate.GetTranslations().Contains(word.Translation))
+                    if (translationCandidate.GetTranslations().Any(t1=> word.GetTranslations().Any(t2=> string.CompareOrdinal(t1.Trim(), t2.Trim())==0)))
                     {
                         //translation is correct, but for other word
                         Console.ForegroundColor = ConsoleColor.Red;

@@ -38,21 +38,20 @@ namespace Chotiskazal.App.Modes
             Console.WriteLine($"Unknown: {allWords.Length - doneCount} words");
             Console.WriteLine();
             var learningRate = GetLearningRate(allWords);
-            //var normalized = Math.Max(0, Math.Min(learningRate, 800));
 
             Console.WriteLine("Score is "+ learningRate);
-            if (learningRate<200)
+            if (learningRate<100)
                 Console.WriteLine("You has to add more words!");
-            else if (learningRate < 300)
+            else if (learningRate < 200)
                 Console.WriteLine("It's time to add new words!");
-            else if (learningRate <500)
+            else if (learningRate <300)
                 Console.WriteLine("Zen!");
-            else if (learningRate < 600)
-                Console.WriteLine("Examintation is good");
+            else if (learningRate < 400)
+                Console.WriteLine("Let's do some exams");
             else
             {
                 Console.WriteLine("Exams exams exams!");
-                Console.WriteLine($"You have to make at least {(learningRate-500)/13} more exams");
+                Console.WriteLine($"You have to make at least {(learningRate-300)/10} more exams");
             }
 
 
@@ -115,9 +114,22 @@ namespace Chotiskazal.App.Modes
 
         private static int GetLearningRate(PairModel[] allModels)
         {
-            var learnSum =  allModels.Select(a => Math.Min(a.PassedScore, PairModel.MaxExamScore+2)).Sum();
+
+            //PairModel.MaxExamScore+2, a.AggedScore 
+            double sum= 0;
+            foreach (var pair in allModels)
+            {
+                var hiLim = PairModel.MaxExamScore + 2;
+                if (pair.PassedScore < hiLim)
+                    sum += pair.PassedScore;
+                else
+                {
+                    sum+= Math.Min(hiLim, Math.Max(pair.AggedScore, hiLim - 1));
+                }
+            }
+
             var count = allModels.Count();
-            return count * PairModel.MaxExamScore -learnSum;
+            return (int) (count * PairModel.MaxExamScore -sum);
         }
 
         private static void RenderAddingTimeLine(PairModel[] allWords)

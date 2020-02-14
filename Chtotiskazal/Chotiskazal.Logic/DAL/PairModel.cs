@@ -86,13 +86,12 @@ namespace Dic.Logic.DAL
             AggregateScore = PassedScore;
         }
 
+        //res reduces for 1 point per AgingFactor days
+        public double AggedScore => Math.Max(0, PassedScore - (DateTime.Now - LastExam).TotalDays / AgingFactor);
+        
         public void UpdateAgingAndRandomization()
         {
-            double res = PassedScore;
-            //res reduces for 1 point per AgingFactor days
-            res -= (DateTime.Now - LastExam).TotalDays / AgingFactor;
-            if (res < 0)
-                res = 0;
+            double res = AggedScore;
 
             //probability reduces twice for every res point
             var p = 100 / Math.Pow(2, res);
