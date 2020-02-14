@@ -8,6 +8,8 @@ namespace Chotiskazal.App.Exams
 {
     public class RuChooseExam: IExam
     {
+        public bool NeedClearScreen => false;
+
         public string Name => "RuChoose";
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)

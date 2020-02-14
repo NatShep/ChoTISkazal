@@ -10,11 +10,11 @@ namespace Chotiskazal.App.Exams
     {
         private static readonly ExamAndPreferedScore EngChoose = new ExamAndPreferedScore(
             exam: new EngChooseExam(),
-            expectedScore: 4,
+            expectedScore: 2,
             frequency: 10);
         private static readonly ExamAndPreferedScore RuChoose = new ExamAndPreferedScore(
             exam: new RuChooseExam(),
-            expectedScore: 4,
+            expectedScore: 2,
             frequency: 10);
         private static readonly ExamAndPreferedScore EngTrust = new ExamAndPreferedScore(
             exam: new EnTrustExam(),
@@ -26,12 +26,12 @@ namespace Chotiskazal.App.Exams
             frequency: 10);
         private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
             exam: new EngChoosePhraseExam(),
-            expectedScore: 5,
-            frequency: 8);
+            expectedScore: 4,
+            frequency: 6);
         private static readonly ExamAndPreferedScore RuPhraseChoose = new ExamAndPreferedScore(
             exam: new RuChoosePhraseExam(),
-            expectedScore: 5,
-            frequency: 8);
+            expectedScore: 4,
+            frequency: 6);
         
         private static readonly ExamAndPreferedScore EngChooseWordInPhrase = new ExamAndPreferedScore(
             new EngChooseWordInPhraseExam(),6,20);
@@ -42,31 +42,31 @@ namespace Chotiskazal.App.Exams
         private static readonly ExamAndPreferedScore EngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new EngPhraseSubstitudeExam(),
             expectedScore: 6,
-            frequency: 10);
+            frequency: 12);
         private static readonly ExamAndPreferedScore RuPhraseSubstitude = new ExamAndPreferedScore(
             exam: new RuPhraseSubstitudeExam(),
             expectedScore: 6,
-            frequency: 10);
+            frequency: 12);
 
         private static readonly ExamAndPreferedScore ClearEngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstitudeExam()), 
             expectedScore: 8,
-            frequency: 10);
+            frequency: 12);
 
         private static readonly ExamAndPreferedScore ClearRuPhraseSubstitude = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new RuPhraseSubstitudeExam()),
             expectedScore: 8,
-            frequency: 10);
+            frequency: 12);
 
         private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
                 expectedScore: 8,
-                frequency: 10);
+                frequency: 14);
         private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
             exam: new RuWriteExam(),
             expectedScore: 8,
-            frequency: 10);
+            frequency: 14);
         private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
@@ -88,12 +88,12 @@ namespace Chotiskazal.App.Exams
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
-                frequency: 10);
+                frequency: 14);
         private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
-                frequency: 10);
+                frequency: 14);
 
         public static IExam GetNextExamFor(bool isFirstExam, PairModel model)
         {

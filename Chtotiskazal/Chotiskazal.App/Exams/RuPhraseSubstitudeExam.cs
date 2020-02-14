@@ -8,6 +8,8 @@ namespace Chotiskazal.App.Exams
 {
     public class RuPhraseSubstitudeExam : IExam
     {
+        public bool NeedClearScreen => false;
+
         public string Name => "Ru phrase substitude";
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {

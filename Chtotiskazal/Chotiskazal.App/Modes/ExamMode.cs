@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Chotiskazal.App.Exams;
 using Chotiskazal.Logic.DAL;
 using Chotiskazal.Logic.Services;
@@ -63,6 +64,7 @@ namespace Chotiskazal.App.Modes
             DateTime started = DateTime.Now;
 
             int i = 0;
+            ExamResult? lastExamResult = null;
             foreach (var pairModel in examsList)
             {
                 Console.WriteLine();
@@ -81,6 +83,25 @@ namespace Chotiskazal.App.Modes
                     if (!learningWords.Contains(pairModel))
                         learnList = learningWords.Append(pairModel).ToArray();
 
+                    if (exam.NeedClearScreen)
+                    {
+                        if (lastExamResult == ExamResult.Failed)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            Console.WriteLine("Press any key to clear the screen...");
+                            Thread.Sleep(100);
+                            Console.ReadKey();
+                        }
+
+                        if (lastExamResult != ExamResult.Impossible)
+                        {
+                            Console.Clear();
+                            if (lastExamResult == ExamResult.Passed)
+                                WritePassed();
+                        }
+                    }
+
                     var result = exam.Pass(service, pairModel, learnList);
 
                     sw.Stop();
@@ -92,22 +113,13 @@ namespace Chotiskazal.App.Modes
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("\r\n[PASSED]");
-                            Console.ResetColor();
-                            Console.WriteLine();
-                            Console.WriteLine();
-                            questionMetric.Result = 1;
+                            WritePassed();
                             service.SaveQuestionMetrics(questionMetric);
                             examsCount++;
                             examsPassed++;
                             break;
                         case ExamResult.Failed:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\r\n[failed]");
-                            Console.ResetColor();
-                            Console.WriteLine();
-                            Console.WriteLine();
+                            WriteFailed();
                             questionMetric.Result = 0;
                             service.SaveQuestionMetrics(questionMetric);
                             examsCount++;
@@ -119,6 +131,8 @@ namespace Chotiskazal.App.Modes
                             break;
                         case ExamResult.Exit: return;
                     }
+                    lastExamResult = result;
+
                 } while (retryFlag);
 
 
@@ -134,6 +148,24 @@ namespace Chotiskazal.App.Modes
                                   ")");
             }
 
+            Console.WriteLine();
+        }
+
+        private static void WriteFailed()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\r\n[failed]");
+            Console.ResetColor();
+            Console.WriteLine();
+            Console.WriteLine();
+        }
+
+        private static void WritePassed()
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\r\n[PASSED]");
+            Console.ResetColor();
+            Console.WriteLine();
             Console.WriteLine();
         }
 

@@ -8,6 +8,7 @@ namespace Chotiskazal.App.Exams
 {
     public class EngPhraseSubstitudeExam: IExam
     {
+        public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitude";
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {

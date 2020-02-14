@@ -5,6 +5,7 @@ namespace Chotiskazal.App.Exams
 {
     public interface IExam
     {
+        bool NeedClearScreen { get; }
         string Name { get; }
         ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList);
     }

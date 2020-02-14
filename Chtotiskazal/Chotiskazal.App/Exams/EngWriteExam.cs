@@ -7,12 +7,15 @@ namespace Chotiskazal.App.Exams
 {
     public class EngWriteExam : IExam
     {
+        public bool NeedClearScreen => false;
+
         public string Name => "Eng Write";
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {
             var translations = word.Translation.Split(',').Select(s => s.Trim());
-            if (translations.All(t => t.Contains(' ')))
+            var minCount = translations.Min(t => t.Count(c => c == ' '));
+            if (minCount>0 && word.PassedScore< minCount*4)
                 return ExamResult.Impossible;
 
 
@@ -30,6 +33,7 @@ namespace Chotiskazal.App.Exams
             }
             else
             {
+
                 Console.WriteLine("The translation was: "+ word.Translation);
                 service.RegistrateFailure(word);
                 return ExamResult.Failed;

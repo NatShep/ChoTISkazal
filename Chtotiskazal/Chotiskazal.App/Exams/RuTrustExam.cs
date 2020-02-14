@@ -6,6 +6,8 @@ namespace Chotiskazal.App.Exams
 {
     public class RuTrustExam : IExam
     {
+        public bool NeedClearScreen => false;
+
         public string Name => "Ru trust";
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)

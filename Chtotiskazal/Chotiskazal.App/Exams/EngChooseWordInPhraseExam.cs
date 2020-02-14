@@ -8,6 +8,8 @@ namespace Chotiskazal.App.Exams
 {
     public class EngChooseWordInPhraseExam : IExam
     {
+        public bool NeedClearScreen => false;
+
         public string Name => "Eng Choose word in phrase";
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)

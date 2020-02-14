@@ -6,6 +6,8 @@ namespace Chotiskazal.App.Exams
 {
     public class ClearScreenExamDecorator: IExam
     {
+        public bool NeedClearScreen => true;
+
         private readonly IExam _origin;
 
         public ClearScreenExamDecorator(IExam origin)
@@ -13,13 +15,8 @@ namespace Chotiskazal.App.Exams
             _origin = origin;
         }
 
-        public string Name => _origin.Name;
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
-        {
-            Console.WriteLine("Press any key to clear the screen");
-            Console.ReadKey();
-            Console.Clear();
-            return _origin.Pass(service, word, examList);
-        }
+        public string Name => "Clean "+ _origin.Name;
+        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList) 
+            => _origin.Pass(service, word, examList);
     }
 }
