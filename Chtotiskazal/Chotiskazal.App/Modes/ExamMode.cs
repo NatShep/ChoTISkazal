@@ -12,6 +12,14 @@ using Dic.Logic.Dictionaries;
 
 namespace Chotiskazal.App.Modes
 {
+    public class AddPhraseMode: IConsoleMode
+    {
+        public string Name => "Add phrases";
+        public void Enter(NewWordsService service)
+        {
+        }
+    }
+
     public class ExamMode : IConsoleMode
     {
         public string Name => "Examination";

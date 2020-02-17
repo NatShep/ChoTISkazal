@@ -100,7 +100,7 @@ namespace Chotiskazal.App.Exams
 
         public static IExam GetNextExamFor(bool isFirstExam, PairModel model)
         {
-            if (isFirstExam && model.PassedScore < 8)
+            if (isFirstExam && model.PassedScore < 7)
             {
                 var list = new[]
                 {
@@ -154,7 +154,6 @@ namespace Chotiskazal.App.Exams
                 EngChooseWordInPhrase,
                 ClearEngChooseWordInPhrase,
                 ClearEngAssemblePhraseExam,
-
             });
         }
 
