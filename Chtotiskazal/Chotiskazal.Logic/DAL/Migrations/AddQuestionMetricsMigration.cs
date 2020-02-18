@@ -1,10 +1,10 @@
 ﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
-    public class AddQuestionMetricsMigration : IMigration
+    public class AddQuestionMetricsMigration : SimpleMigration
     {
-        public string Name => "AddQuestionMetrics";
+        public override string Name => "AddQuestionMetrics";
 
-        public string  Query => @"create table if not exists QuestionMetrics
+        public override string Query => @"create table if not exists QuestionMetrics
               (
                  Id                                   integer primary key AUTOINCREMENT,
                  WordId                               integer not null,

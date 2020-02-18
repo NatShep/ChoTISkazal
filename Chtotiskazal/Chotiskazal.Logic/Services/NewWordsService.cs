@@ -54,6 +54,9 @@ namespace Chotiskazal.Logic.Services
 
         public int GetContextPhraseCount() => _repository.GetContextPhrasesCount();
         public PairModel[] GetAll() => _repository.GetAll();
+        public Phrase[] GetAllPhrases() => _repository.GetAllPhrases();
+        public PairModel GetOrNullWithPhrases(string word) => _repository.GetOrNullWithPhrases(word);
+
         public void UpdateAgingAndRandomize()
         {
             _repository.UpdateAgingAndRandomization();
@@ -120,6 +123,16 @@ namespace Chotiskazal.Logic.Services
         public PairModel[] GetPairsForTests(int count, int learnRate)
         {
             return _repository.GetPairsForTests(count, learnRate);
+        }
+
+        public void Add(Phrase phrase)
+        {
+            _repository.Add(phrase);
+        }
+
+        public void UpdateRatings(PairModel pairModel)
+        {
+            _repository.UpdateScoresAndTranslation(pairModel);
         }
     }
 }

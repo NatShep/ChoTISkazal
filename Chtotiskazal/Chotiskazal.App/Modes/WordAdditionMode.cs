@@ -63,7 +63,7 @@ namespace Chotiskazal.App.Modes
                     var variants = task.Result.SelectMany(r => r.Tr);
                     foreach (var yandexTranslation in variants)
                     {
-                        var phrases = GetPhrases(yandexTranslation, word);
+                        var phrases = yandexTranslation.GetPhrases(word);
 
                         translations.Add(new TranslationAndContext(word, yandexTranslation.Text, yandexTranslation.Pos, phrases.ToArray()));
                     }
@@ -140,27 +140,6 @@ namespace Chotiskazal.App.Modes
             }
         }
 
-        private static List<Phrase> GetPhrases(Translation yandexTranslation, string word)
-        {
-            List<Phrase> phrases = new List<Phrase>();
-            if (yandexTranslation.Ex != null)
-            {
-                foreach (var example in yandexTranslation.Ex)
-                {
-                    var phrase = new Phrase
-                    {
-                        Created = DateTime.Now,
-                        OriginWord = word,
-                        Origin = example.Text,
-                        Translation = example.Tr.FirstOrDefault()?.Text,
-                        TranslationWord = yandexTranslation.Text,
-                    };
-                    phrases.Add(phrase);
-                }
-            }
-
-            return phrases;
-        }
 
         TranslationAndContext[] ChooseTranslation(TranslationAndContext[] translations)
         {

@@ -37,6 +37,8 @@ namespace Chotiskazal.App
                 new WordAdditionMode(yapiTransClient, yapiDicClient),
                 new GraphsStatsMode(),
                 new RandomizeMode(),
+                new AddPhraseMode(), 
+                new AddPhraseToWordsMode(yapiDicClient), 
             };
 
             var repo = new WordsRepository(dbFileName);

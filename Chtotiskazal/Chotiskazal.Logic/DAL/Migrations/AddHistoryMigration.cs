@@ -1,10 +1,10 @@
 ﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
-    public class AddHistoryMigration : IMigration
+    public class AddHistoryMigration : SimpleMigration
     {
-        public string Name => "AddHistory";
+        public override string Name => "AddHistory";
 
-        public string Query => 
+        public override string Query => 
             @"create table if not exists ExamHistory
               (
                  Id                                  integer primary key AUTOINCREMENT,

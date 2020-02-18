@@ -47,6 +47,18 @@ namespace Chotiskazal.Logic.DAL
                 return cnn.Query<PairModel>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
+
+        public Phrase[] GetAllPhrases()
+        {
+            if (!File.Exists(DbFile))
+                return new Phrase[0];
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                return cnn.Query<Phrase>(@"Select * From ContextPhrases").ToArray();
+            }
+        }
         public PairModel[] GetPairsForTests(int count, int learnRate)
         {
             if (!File.Exists(DbFile))
@@ -167,6 +179,8 @@ namespace Chotiskazal.Logic.DAL
                     $"Translation = @Translation,"+
                     $"Created = @Created," +
                     $"LastExam = @LastExam," +
+                    $"AllMeanings = @AllMeanings," +
+                    $"Revision = @Revision," +
                     $"Examed = @Examed where Id = @Id";
                 cnn.Execute(op, word);
             }
@@ -226,6 +240,23 @@ namespace Chotiskazal.Logic.DAL
 
         private SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 
+        public void Add(Phrase phrase)
+        {
+            if (!File.Exists(DbFile))
+            {
+                ApplyMigrations();
+            }
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                phrase.Created = DateTime.Now;
+                cnn.Execute(
+                    @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
+                                      VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
+            }
+        }
+
         private void Add(PairModel pair)
         {
             if (!File.Exists(DbFile))
@@ -237,8 +268,8 @@ namespace Chotiskazal.Logic.DAL
             {
                 cnn.Open();
                 pair.Id = cnn.Query<long>(
-                    @"INSERT INTO Words (  OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed )   
-                                      VALUES( @OriginWord,  @Translation,  @Transcription, @Created, @LastExam, @PassedScore, @AggregateScore, @Examed ); 
+                    @"INSERT INTO Words (  OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed, AllMeanings,Revision )
+                                      VALUES( @OriginWord,  @Translation,  @Transcription, @Created, @LastExam, @PassedScore, @AggregateScore, @Examed, @AllMeanings, @Revision  ); 
                           select last_insert_rowid()", pair).First();
 
                 if (pair.Phrases != null)
@@ -339,7 +370,8 @@ namespace Chotiskazal.Logic.DAL
                 new AddWordsTableMigration(),
                 new AddHistoryMigration(),
                 new AddPhraseMigration(),
-                new AddQuestionMetricsMigration(), 
+                new AddQuestionMetricsMigration(),
+                new AddWordsPropertiesMigration(),
             };
             Console.WriteLine(")Applying migrations");
             using (var cnn = SimpleDbConnection())
@@ -368,7 +400,7 @@ namespace Chotiskazal.Logic.DAL
                     for (int i = lastAppliedMigrationIndex; i < migrationsList.Length; i++)
                     {
                         Console.WriteLine("Applying migration "+ migrationsList[i]);
-                        cnn.Execute(migrationsList[i].Query);
+                        migrationsList[i].Migrate(cnn, this);
                     }
 
                     cnn.Execute("insert into migrations (name) values (@name)", new {name = migrationsList.Last().Name});
@@ -379,7 +411,5 @@ namespace Chotiskazal.Logic.DAL
                 }
             }
         }
-
-        
     }
 }

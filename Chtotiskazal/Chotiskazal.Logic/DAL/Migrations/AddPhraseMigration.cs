@@ -1,10 +1,10 @@
 ﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
-    public class AddPhraseMigration : IMigration
+    public class AddPhraseMigration : SimpleMigration
     {
-        public string Name => "AddPhrase";
+        public override string Name => "AddPhrase";
 
-        public string Query =>
+        public override string Query =>
             @"create table if not exists ContextPhrases
               (
                  Id                                   integer primary key AUTOINCREMENT,

@@ -1,10 +1,10 @@
 ﻿namespace Chotiskazal.Logic.DAL.Migrations
 {
-    public class AddWordsTableMigration : IMigration
+    public class AddWordsTableMigration : SimpleMigration
     {
-        public string Name => "AddWords";
+        public override string Name => "AddWords";
 
-        public string  Query => @"create table if not exists Words
+        public override string  Query => @"create table if not exists Words
               (
                  Id                                  integer primary key AUTOINCREMENT,
                  OriginWord                           nvarchar(100) not null,

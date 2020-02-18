@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using Dic.Logic.DAL;
 
 namespace Dic.Logic.yapi
 {
@@ -38,6 +40,27 @@ namespace Dic.Logic.yapi
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public Example[] Ex { get; set; }
+        public List<Phrase> GetPhrases(string word)
+        {
+            List<Phrase> phrases = new List<Phrase>();
+            if (this.Ex != null)
+            {
+                foreach (var example in this.Ex)
+                {
+                    var phrase = new Phrase
+                    {
+                        Created = DateTime.Now,
+                        OriginWord = word,
+                        Origin = example.Text,
+                        Translation = example.Tr.FirstOrDefault()?.Text,
+                        TranslationWord = this.Text,
+                    };
+                    phrases.Add(phrase);
+                }
+            }
+
+            return phrases;
+        }
     }
 
     public class Synonim

@@ -11,8 +11,9 @@ namespace Dic.Logic.DAL
 
         private const int ExamFailedPenalty = 2;
         private const double AgingFactor = 1.5;
-        
+        public const double ReducingPerPointFactor = 1.7;
         public double AggregateScore { get; set; }
+        
         public long Id { get; set; }
         public int PassedScore { get; set; }
         public DateTime LastExam { get; set; }
@@ -21,6 +22,18 @@ namespace Dic.Logic.DAL
         public string OriginWord { get; set; }
         public string Translation { get; set; }
         public string Transcription { get; set; }
+        public string AllMeanings { get; set; }
+
+        public string[] GetAllMeanings()
+        {
+            if (!string.IsNullOrWhiteSpace(AllMeanings))
+                return AllMeanings.Split(";;");
+            else
+            {
+                return Translation.Split(',').Select(s => s.Trim()).ToArray();
+            }
+        }
+        public int Revision { get; set; }
         public List<Phrase> Phrases { get; set; }
         public IEnumerable<string> GetTranslations() => Translation.Split(',').Select(s => s.Trim());
         public void SetTranslations(string[] translations)
@@ -88,16 +101,15 @@ namespace Dic.Logic.DAL
 
         //res reduces for 1 point per AgingFactor days
         public double AggedScore => Math.Max(0, PassedScore - (DateTime.Now - LastExam).TotalDays / AgingFactor);
-        
         public void UpdateAgingAndRandomization()
         {
             double res = AggedScore;
 
-            //probability reduces 1.5 for every res point
-            var p = 100 / Math.Pow(1.5, res);
+            //probability reduces by reducingPerPointFactor for every res point
+            var p = 100 / Math.Pow(ReducingPerPointFactor, res);
 
             //Randomize
-            var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 2));
+            var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
             p = p*rndFactor ;
             AggregateScore = p;
         }

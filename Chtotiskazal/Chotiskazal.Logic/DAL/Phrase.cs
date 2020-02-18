@@ -9,6 +9,6 @@ namespace Dic.Logic.DAL
         public string Translation { get; set; }
         public string TranslationWord { get; set; }
         public DateTime Created { get; set; }
-
+        public bool IsEmpty => string.IsNullOrWhiteSpace(OriginWord);
     }
 }
