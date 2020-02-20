@@ -17,21 +17,22 @@ namespace Chotiskazal.Logic.Services
             _dictionary = dictionary;
             _repository = repository;
         }
-        public void SaveForExams(string word, string translation, string transcription)
+        public void SaveForExams(string word, string translation, string[] allMeanings, string transcription)
         {
             SaveForExams(
                 word:          word, 
                 transcription: transcription, 
+                allMeanings: allMeanings,
                 translations:  translation
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(s=>s.Trim())
                     .ToArray());
         }
-        public void SaveForExams(string word, string transcription, string[] translations, Phrase[] phrases = null)
+        public void SaveForExams(string word, string transcription, string[] translations, string[] allMeanings, Phrase[] phrases = null)
         {
             var alreadyExists = _repository.GetOrNull(word);
             if (alreadyExists == null)
-                _repository.CreateNew(word, string.Join(", ", translations), transcription, phrases);
+                _repository.CreateNew(word, string.Join(", ", translations), allMeanings, transcription,  phrases);
             else
             {
 
@@ -133,6 +134,11 @@ namespace Chotiskazal.Logic.Services
         public void UpdateRatings(PairModel pairModel)
         {
             _repository.UpdateScoresAndTranslation(pairModel);
+        }
+
+        public void Remove(Phrase phrase)
+        {
+            _repository.Remove(phrase);
         }
     }
 }

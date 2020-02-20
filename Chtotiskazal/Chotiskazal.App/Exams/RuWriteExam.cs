@@ -39,9 +39,10 @@ namespace Chotiskazal.App.Exams
                     if (translationCandidate.GetTranslations().Any(t1=> word.GetTranslations().Any(t2=> string.CompareOrdinal(t1.Trim(), t2.Trim())==0)))
                     {
                         //translation is correct, but for other word
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"the translation was correct, but the question was about the word '{word.OriginWord}'\r\nlet's try again");
                         Console.ResetColor();
+                        Console.ReadLine();
                         return ExamResult.Retry;
                     }
                     else

@@ -25,7 +25,9 @@ namespace Chotiskazal.App.Modes
             Console.WriteLine();    
             
             Console.WriteLine($"Context phrases count = {service.GetContextPhraseCount()}");
-            Console.WriteLine($"Words count = {allWords.Length}");
+            Console.WriteLine($"Words count = {allWords.Count(w=>!w.OriginWord.Contains(' '))}");
+            Console.WriteLine($"Words and sentences count = {allWords.Length}");
+
 
             var groups = allWords
                 .GroupBy(s => s.State)
@@ -59,7 +61,8 @@ namespace Chotiskazal.App.Modes
 
         private static void RenderKnowledgeHistogram(PairModel[] allWords)
         {
-            var wordHystogramm = new int[15];
+            var length = 19;
+            var wordHystogramm = new int[length];
 
             int maxCount = 0;
             foreach (var pairModel in allWords)

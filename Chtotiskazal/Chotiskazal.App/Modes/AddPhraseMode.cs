@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Chotiskazal.Logic.Services;
+using Dic.Logic;
 using Dic.Logic.DAL;
 
 namespace Chotiskazal.App.Modes
@@ -15,10 +16,12 @@ namespace Chotiskazal.App.Modes
 
             var allPhrases = service.GetAllPhrases();
             List<Phrase> searchedPhrases = new List<Phrase>();
+            int endings = 0;
             foreach (var phrase in allPhrases)
             {
                 var phraseText = phrase.Origin;
                 int count = 0;
+                int endingCount = 0;
                 foreach (var word in phraseText.Split(new[]{' ',','}))
                 {
                     
@@ -27,27 +30,47 @@ namespace Chotiskazal.App.Modes
                         count++;
                     else if (word.EndsWith('s'))
                     {
-                        if (allWords.Contains(lowerWord + 's'))
-                            count++;
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 1);
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
                     }
                     else if (word.EndsWith("ed"))
                     {
-                        if (allWords.Contains(lowerWord + "ed"))
-                            count++;
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 2);
+
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
                     }
                     else if (word.EndsWith("ing"))
                     {
-                        if (allWords.Contains(lowerWord + "ing"))
-                            count++;
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 3);
+
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
                     }
-                    if (count > 1)
+                    if (count + endingCount > 1 )
                     {
                         searchedPhrases.Add(phrase);
-                        Console.WriteLine(phraseText);
+                        if (endingCount > 0)
+                        {
+                            endings++;
+                        }
+                        if(count+endingCount>2)
+                            Console.WriteLine(phraseText);
                         break;
+
                     }
                 }
             }
+
+            var first10 = searchedPhrases.Randomize().Take(10);
+            foreach (var phrase in first10)
+            {
+                Console.WriteLine("Adding "+ phrase.Origin);
+                service.SaveForExams(phrase.Origin,  phrase.Translation, new []{phrase.Translation}, null);
+                service.Remove(phrase);
+            }
+            Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
         }
     }
 }

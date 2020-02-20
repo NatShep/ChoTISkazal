@@ -10,7 +10,7 @@ namespace Dic.Logic.DAL
         public const int PenaltyScore = 9;
 
         private const int ExamFailedPenalty = 2;
-        private const double AgingFactor = 1.5;
+        private const double AgingFactor = 1;
         public const double ReducingPerPointFactor = 1.7;
         public double AggregateScore { get; set; }
         
@@ -62,7 +62,8 @@ namespace Dic.Logic.DAL
 
         public static PairModel CreatePair(
             string originWord, 
-            string translationWord, 
+            string translationWord,
+            string[] allMeanings,
             string transcription, 
             Phrase[] phrases =null)
         {
@@ -72,7 +73,9 @@ namespace Dic.Logic.DAL
                 LastExam = DateTime.Now,
                 OriginWord = originWord,
                 Transcription = transcription,
+                AllMeanings = string.Join(";;", allMeanings),
                 Translation = translationWord,
+                Revision = 1,
                 Phrases =  phrases?.ToList(),
             };
         }

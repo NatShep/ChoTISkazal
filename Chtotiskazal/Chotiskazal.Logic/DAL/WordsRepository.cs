@@ -18,9 +18,10 @@ namespace Chotiskazal.Logic.DAL
         {
             _fileName = fileName;
         }
-        public PairModel CreateNew(string word, string translation, string transcription, Phrase[] phrases = null)
+        public PairModel CreateNew(string word, string translation, string[] allMeanings, string transcription, Phrase[] phrases = null)
         {
-            var pair = PairModel.CreatePair(word, translation, transcription, phrases);
+            var pair = PairModel.CreatePair(word, translation, allMeanings, transcription, phrases);
+            pair.Revision = 1;
             pair.UpdateAgingAndRandomization();
             Add(pair);
             return pair;
@@ -410,6 +411,17 @@ namespace Chotiskazal.Logic.DAL
                     Console.WriteLine("No migration should be applied");
                 }
             }
+        }
+
+        public void Remove(Phrase phrase)
+        {
+            if (!File.Exists(DbFile))
+                ApplyMigrations();
+
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+            cnn.Execute(@"DELETE FROM ContextPhrases where Origin = @Origin", phrase);
+
         }
     }
 }

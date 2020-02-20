@@ -128,6 +128,7 @@ namespace Chotiskazal.App.Modes
                                 word: word,
                                 transcription: translations[0].Transcription,
                                 translations: allTranslations,
+                                allMeanings: translations.Select(t=>t.Translation.Trim().ToLower()).ToArray(),
                                 phrases: allPhrases);
                             Console.WriteLine($"Saved. Tranlations: {allTranslations.Length}, Phrases: {allPhrases.Length}");
                         }
