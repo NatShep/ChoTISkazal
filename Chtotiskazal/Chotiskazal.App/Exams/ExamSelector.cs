@@ -27,11 +27,11 @@ namespace Chotiskazal.App.Exams
         private static readonly ExamAndPreferedScore EngPhraseChoose = new ExamAndPreferedScore(
             exam: new EngChoosePhraseExam(),
             expectedScore: 4,
-            frequency: 6);
+            frequency: 4);
         private static readonly ExamAndPreferedScore RuPhraseChoose = new ExamAndPreferedScore(
             exam: new RuChoosePhraseExam(),
             expectedScore: 4,
-            frequency: 6);
+            frequency: 4);
         
         private static readonly ExamAndPreferedScore EngChooseWordInPhrase = new ExamAndPreferedScore(
             new EngChooseWordInPhraseExam(),6,20);
@@ -121,13 +121,10 @@ namespace Chotiskazal.App.Exams
                 {
                     EngChoose,
                     RuChoose,
-                    EngPhraseChoose,
-                    RuPhraseChoose, 
                     EngTrust, 
                     RuTrust, 
                     HideousRuTrust, 
                     HideousEngTrust,
-                    ClearEngAssemblePhraseExam,
                 });
             }
 
