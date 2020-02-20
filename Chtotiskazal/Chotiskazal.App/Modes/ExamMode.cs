@@ -18,7 +18,14 @@ namespace Chotiskazal.App.Modes
 
         public void Enter(NewWordsService service)
         {
-            service.UpdateAgingAndRandomize(50);
+            //Randomization and jobs
+            if (RandomTools.Rnd.Next() % 20 == 0)
+            {
+                //Add phrases with mutual words to vocab
+                service.AddMutualPhrasesToVocab(10);
+            }
+            else
+                service.UpdateAgingAndRandomize(50);
 
             Console.WriteLine("Examination");
             var learningWords = service.GetPairsForLearning(9, 3);

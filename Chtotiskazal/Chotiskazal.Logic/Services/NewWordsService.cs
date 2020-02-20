@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Chotiskazal.Logic.DAL;
 using Dic.Logic;
@@ -139,6 +140,69 @@ namespace Chotiskazal.Logic.Services
         public void Remove(Phrase phrase)
         {
             _repository.Remove(phrase);
+        }
+
+        public void AddMutualPhrasesToVocab(int maxCount)
+        {
+            var allWords = GetAll().Select(s => s.OriginWord.ToLower().Trim()).ToHashSet();
+
+            var allPhrases = GetAllPhrases();
+            List<Phrase> searchedPhrases = new List<Phrase>();
+            int endings = 0;
+            foreach (var phrase in allPhrases)
+            {
+                var phraseText = phrase.Origin;
+                int count = 0;
+                int endingCount = 0;
+                foreach (var word in phraseText.Split(new[] { ' ', ',' }))
+                {
+
+                    var lowerWord = word.Trim().ToLower();
+                    if (allWords.Contains(lowerWord))
+                        count++;
+                    else if (word.EndsWith('s'))
+                    {
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 1);
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
+                    }
+                    else if (word.EndsWith("ed"))
+                    {
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 2);
+
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
+                    }
+                    else if (word.EndsWith("ing"))
+                    {
+                        var withoutEnding = lowerWord.Remove(lowerWord.Length - 3);
+
+                        if (allWords.Contains(withoutEnding))
+                            endingCount++;
+                    }
+                    if (count + endingCount > 1)
+                    {
+                        searchedPhrases.Add(phrase);
+                        if (endingCount > 0)
+                        {
+                            endings++;
+                        }
+                        if (count + endingCount > 2)
+                            Console.WriteLine(phraseText);
+                        break;
+
+                    }
+                }
+            }
+
+            var firstPhrases = searchedPhrases.Randomize().Take(maxCount);
+            foreach (var phrase in firstPhrases)
+            {
+                Console.WriteLine("Adding " + phrase.Origin);
+                SaveForExams(phrase.Origin, phrase.Translation, new[] { phrase.Translation }, null);
+                Remove(phrase);
+            }
+            Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
         }
     }
 }
