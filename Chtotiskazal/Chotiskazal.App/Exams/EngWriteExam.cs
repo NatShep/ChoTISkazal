@@ -13,7 +13,8 @@ namespace Chotiskazal.App.Exams
 
         public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
         {
-            var translations = word.Translation.Split(',').Select(s => s.Trim());
+            
+            var translations = word.GetTranslations();
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount>0 && word.PassedScore< minCount*4)
                 return ExamResult.Impossible;
@@ -33,6 +34,15 @@ namespace Chotiskazal.App.Exams
             }
             else
             {
+                if (word.GetAllMeanings()
+                    .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Choosen translation is out of scope (but it is correct). Expected translations are: " + word.Translation);
+                    Console.ResetColor();
+                    Console.WriteLine();
+                    return ExamResult.Impossible;
+                }
 
                 Console.WriteLine("The translation was: "+ word.Translation);
                 service.RegistrateFailure(word);

@@ -156,6 +156,7 @@ namespace Chotiskazal.App.Exams
 
         private static IExam ChooseExam(int score, ExamAndPreferedScore[] exams)
         {
+            score = Math.Min(score, 14);
             Dictionary<double, IExam> probability = new Dictionary<double, IExam>(exams.Length);
             double accumulator = 0;
             foreach (var e in exams)
