@@ -19,7 +19,7 @@ namespace Chotiskazal.App.Modes
         public void Enter(NewWordsService service)
         {
             //Randomization and jobs
-            if (RandomTools.Rnd.Next() % 20 == 0)
+            if (RandomTools.Rnd.Next() % 30 == 0)
             {
                 //Add phrases with mutual words to vocab
                 service.AddMutualPhrasesToVocab(10);
@@ -48,12 +48,12 @@ namespace Chotiskazal.App.Modes
             examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
             examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
 
-            while (examsList.Count > 30)
+            while (examsList.Count > 32)
             {
                 examsList.RemoveAt(examsList.Count - 1);
             }
 
-            var delta = Math.Min(5, (30 - examsList.Count));
+            var delta = Math.Min(7, (32 - examsList.Count));
             PairModel[] testWords = new PairModel[0];
             if (delta > 0)
             {

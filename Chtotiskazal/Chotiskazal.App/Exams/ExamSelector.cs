@@ -11,11 +11,11 @@ namespace Chotiskazal.App.Exams
         private static readonly ExamAndPreferedScore EngChoose = new ExamAndPreferedScore(
             exam: new EngChooseExam(),
             expectedScore: 2,
-            frequency: 10);
+            frequency: 7);
         private static readonly ExamAndPreferedScore RuChoose = new ExamAndPreferedScore(
             exam: new RuChooseExam(),
             expectedScore: 2,
-            frequency: 10);
+            frequency: 7);
         private static readonly ExamAndPreferedScore EngTrust = new ExamAndPreferedScore(
             exam: new EnTrustExam(),
             expectedScore: 6,
@@ -49,7 +49,7 @@ namespace Chotiskazal.App.Exams
             frequency: 12);
 
         private static readonly ExamAndPreferedScore ClearEngAssemblePhraseExam = new ExamAndPreferedScore(
-            new ClearAssemblePhraseExam(), 7, 10);
+            new ClearAssemblePhraseExam(), 7, 7);
 
         private static readonly ExamAndPreferedScore ClearEngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstitudeExam()), 

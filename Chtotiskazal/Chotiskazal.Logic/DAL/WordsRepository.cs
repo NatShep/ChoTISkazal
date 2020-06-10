@@ -379,36 +379,24 @@ namespace Chotiskazal.Logic.DAL
             {
                 cnn.Open();
                 int lastAppliedMigrationIndex = -1;
+                string[] allMigrationNames = new string[0];
                 try
                 {
-                    var lastMigrationName = cnn.Query<string>("Select Name from migrations Order by id desc limit 1")
-                        .FirstOrDefault();
-                    Console.WriteLine("Last migration: "+ lastMigrationName);
-
-                    if (lastMigrationName != null)
-                    {
-                        lastAppliedMigrationIndex =  Array.IndexOf(migrationsList, migrationsList.Single(m => m.Name == lastMigrationName));
-                    }
+                    allMigrationNames = cnn.Query<string>("Select Name from migrations").ToArray();
                 }
                 catch( Exception e)
                 {
                     Console.WriteLine("Init migration skipped");
                 }
 
-                lastAppliedMigrationIndex++;
-                if (lastAppliedMigrationIndex < migrationsList.Length)
+                foreach (var migration in migrationsList)
                 {
-                    for (int i = lastAppliedMigrationIndex; i < migrationsList.Length; i++)
+                    if (!allMigrationNames.Contains(migration.Name))
                     {
-                        Console.WriteLine("Applying migration "+ migrationsList[i]);
-                        migrationsList[i].Migrate(cnn, this);
+                        Console.WriteLine("Applying migration " + migration.Name);
+                        migration.Migrate(cnn, this);
+                        cnn.Execute("insert into migrations (name) values (@name)", new { name = migrationsList.Last().Name });
                     }
-
-                    cnn.Execute("insert into migrations (name) values (@name)", new {name = migrationsList.Last().Name});
-                }
-                else
-                {
-                    Console.WriteLine("No migration should be applied");
                 }
             }
         }
