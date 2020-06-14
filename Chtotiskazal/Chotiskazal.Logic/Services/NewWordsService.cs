@@ -10,10 +10,10 @@ namespace Chotiskazal.Logic.Services
 {
     public class NewWordsService
     {
-        private readonly RuengDictionary _dictionary;
+        private readonly RuEngDictionary _dictionary;
         private readonly WordsRepository _repository;
 
-        public NewWordsService(RuengDictionary dictionary, WordsRepository repository)
+        public NewWordsService(RuEngDictionary dictionary, WordsRepository repository)
         {
             _dictionary = dictionary;
             _repository = repository;

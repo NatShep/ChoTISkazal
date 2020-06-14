@@ -49,11 +49,11 @@ namespace Dic.Logic.Dictionaries
             File.WriteAllBytes(jsonFilePathTo, JsonSerializer.SerializeToUtf8Bytes(dic, options));
         }
 
-        public static RuengDictionary ReadFromFile(string filePath)
+        public static RuEngDictionary ReadFromFile(string filePath)
         {
             var text = File.ReadAllText(filePath);
             var serialized =  JsonSerializer.Deserialize<JsonDictionaryDto>(text);
-            var dic = new RuengDictionary();
+            var dic = new RuEngDictionary();
             foreach (var serializedWord in serialized.Words)
             {
                 dic.Add(serializedWord.Origin, serializedWord.Transcription, serializedWord.Translations);

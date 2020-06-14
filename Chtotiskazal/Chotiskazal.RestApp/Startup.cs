@@ -26,7 +26,7 @@ namespace Chotiskazal.RestApp
             services.AddControllers();
             
             var dbFileName = Configuration.GetValue<string>("wordDb");
-            services.AddSingleton(new NewWordsService(new RuengDictionary(), new WordsRepository(dbFileName)));
+            services.AddSingleton(new NewWordsService(new RuEngDictionary(), new WordsRepository(dbFileName)));
 
             var yadicapiKey = Configuration.GetValue<string>("yadicapi:key");
             var yadicapiTimeout = Configuration.GetValue<TimeSpan>("yadicapi:timeout");
