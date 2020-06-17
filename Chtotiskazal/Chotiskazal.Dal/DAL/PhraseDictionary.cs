@@ -10,7 +10,7 @@ namespace Chotiskazal.DAL
         public string OriginPhrase { get; set; }
         public string Translate { get; set; }
         public int WorId { get; set; }
-        
+        public DateTime Created { get; set; }
 
     }
 }

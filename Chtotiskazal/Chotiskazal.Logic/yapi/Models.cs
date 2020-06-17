@@ -40,6 +40,7 @@ namespace Dic.Logic.yapi
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public Example[] Ex { get; set; }
+
         public List<Phrase> GetPhrases(string word)
         {
             List<Phrase> phrases = new List<Phrase>();

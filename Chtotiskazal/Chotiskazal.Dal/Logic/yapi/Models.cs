@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using Dic.Logic.DAL;
 
-namespace Dic.Logic.yapi
+namespace Chotiskazal.LogicR.yapi
 {
     public class YapiDicAnswer
     {

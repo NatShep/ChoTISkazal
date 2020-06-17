@@ -4,10 +4,10 @@ using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Chotiskazal.Dal.Logic;
 using Chotiskazal.Dal.Repo;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.DAL;
+using Chotiskazal.LogicR;
 using Dapper;
 
 namespace Chotiskazal.Dal.Repo
@@ -16,18 +16,21 @@ namespace Chotiskazal.Dal.Repo
     {
         public DictionaryRepository(string fileName): base(fileName) { }
        
+        
         public WordPairDictionary[] GetAllWordPairs()
         {
             if(!File.Exists(DbFile))
-                return new PairModel[0];
+                return new WordPairDictionary[0];
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                return cnn.Query<PairModel>(@"Select * From Words order by PassedScore").ToArray();
+                return cnn.Query<WordPairDictionary>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
-        public Phrase[] GetAllPhrasesOrNull(WordPairDictionary wordPair)
+
+        //Get all Phreases for wordPair(or for Word?)
+        public Phrase[] GetAllPhrasesForWordOrNull(string word)
         {
             if (!File.Exists(DbFile))
                 return new Phrase[0];
@@ -38,6 +41,15 @@ namespace Chotiskazal.Dal.Repo
                 return cnn.Query<Phrase>(@"Select * From ContextPhrases").ToArray();
             }
         }     
+
+        //Get All translate for RuWord or EngWord
+        public string[] GetAllTranslate(string word)
+        {
+            //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
+            //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
+
+            return new string[0];
+        }
         
         public void AddWordPair(WordPairDictionary word)
         {
@@ -70,19 +82,12 @@ namespace Chotiskazal.Dal.Repo
         {
 
         }
-        public int GetContextPhrasesCount()
-        {
-            if (!File.Exists(DbFile))
-                return 0;
-
-            using var cnn = SimpleDbConnection();
-
-            cnn.Open();
-            return cnn.Query<int>(@"Select count(*) From ContextPhrases").FirstOrDefault();
-        }
 
         public WordPairDictionary GetWordPairOrNullByWord(string word)
         {
+            //We can finf by RuWord or by EnWord.
+            //Check the symbol of word before seeking
+            //.........................................
             if (!File.Exists(DbFile))
                 return null;
             using (var cnn = SimpleDbConnection())
@@ -90,18 +95,6 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Open();
                 var result = cnn.Query<WordPairDictionary>(
                     @"SELECT * FROM Words WHERE OriginWord = @word", new { word }).FirstOrDefault();
-                return result;
-            }
-        }
-        public WordPairDictionary GetWordPairOrNullbyTranslate(string translate)
-        {
-            if (!File.Exists(DbFile))
-                return null;
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                var result = cnn.Query<WordPairDictionary>(
-                    @"SELECT * FROM Words WHERE Translate = @translate", new { translate }).FirstOrDefault();
                 return result;
             }
         }

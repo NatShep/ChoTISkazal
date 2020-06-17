@@ -7,10 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.113.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Chotiskazal.Logic\Chotiskazal.Logic.csproj" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
 
 </Project>

@@ -124,7 +124,7 @@ namespace Chotiskazal.App.Modes
                         {
                             var allTranslations = results.Select(t => t.Translation).ToArray();
                             var allPhrases = results.SelectMany(t => t.Phrases).ToArray();
-                            service.SaveForExams(
+                            service.SaveToDictionary(
                                 word: word,
                                 transcription: translations[0].Transcription,
                                 translations: allTranslations,

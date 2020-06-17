@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Dic.Logic.yapi
+namespace Chotiskazal.LogicR.yapi
 {
     public class YandexDictionaryApiClient
     {
