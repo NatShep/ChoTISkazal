@@ -41,7 +41,7 @@ namespace Dic.Logic.DAL
         {
             Translation = string.Join(", ",translations);
         }
-        public IEnumerable<Phrase> GetPhraseForTranslations(IEnumerable<string> translations)
+     /*   public IEnumerable<Phrase> GetPhraseForTranslations(IEnumerable<string> translations)
         {
             foreach (var translation in translations)
             {
@@ -51,7 +51,8 @@ namespace Dic.Logic.DAL
                 }
             }
         }
-        public LearningState State
+       */
+     public LearningState State
         {
             get
             {

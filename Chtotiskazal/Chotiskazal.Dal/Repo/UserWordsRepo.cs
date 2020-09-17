@@ -29,14 +29,33 @@ namespace Chotiskazal.Dal.Repo
                 return new UsersPair[0];
             return new UsersPair[0];
         }
-        public UsersPair[] GetWorstForUser(int count)
+        public UsersPair[] GetWorstForUser(User user, int count)
         {
             if (!File.Exists(DbFile))
                 return new UsersPair[0];
-            return new UsersPair[0];
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+
+            var lookup = new Dictionary<string, UsersPair>();
+
+            cnn.Query<UsersPair, WordDictionary, UsersPair>(
+            @"Select DISTINCT dw.EnWord, w.* from 
+                (SELECT * FROM UserPairs WHERE UserId= @userId limit @count) w 
+                LEFT JOIN QuestionMetric q on q.Id=w.MetricId
+                LEFT JOIN PairDictionary dw on dw.Id=w.PairId
+                ORDER BY q.AggregateScore desc",
+            (w, dw) =>
+                {
+                    var pair = new UsersPair();
+                    if (!lookup.TryGetValue(dw.EnWord, out pair))
+                        lookup.Add(dw.EnWord, pair = w);
+                    return pair;
+                }, new { userId=user.UserId, count=count },
+            splitOn: "MetricId,PairId");
+            return lookup.Values.ToArray();
         }
         
-        public string[] GetAllTranslateForUser(User user, string word)
+        public string[] GetAllTranslateForUser(User user, int pairId)
         {
             //...
             return new string[0];
@@ -56,7 +75,7 @@ namespace Chotiskazal.Dal.Repo
 
         }
      
-        public void UpdateScores(WordPairDictionary word)
+        public void UpdateScores(WordDictionary word)
         {
             if (!File.Exists(DbFile))
                 return;
@@ -73,7 +92,7 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Execute(op, word);
             }
         }
-        public void UpdateScoresAndTranslation(WordPairDictionary word)
+        public void UpdateScoresAndTranslation(WordDictionary word)
         {
             if (!File.Exists(DbFile))
                 return;
@@ -93,5 +112,11 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Execute(op, word);
             }
         }
+
+
+        public int SaveToUserDictionary(WordDictionary pair, int userId)
+        {
+            throw new NotImplementedException();
         }
+    }
 }

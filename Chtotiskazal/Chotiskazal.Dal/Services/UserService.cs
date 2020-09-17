@@ -1,10 +1,8 @@
-﻿using Chotiskazal.DAL;
-using Chotiskazal.Logic.DAL;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Chotiskazal.Dal.Repo;
+using Chotiskazal.DAL;
 
-namespace Chotiskazal.Logic.Services
+
+namespace Chotiskazal.Dal.Services
 {
     public class UserService
     {
@@ -14,9 +12,9 @@ namespace Chotiskazal.Logic.Services
             _repository = repository;
         }
 
-        public void AddUser(User user)
+        public int AddUser(User user)
         {
-
+            return _repository.AddUser(user);
         }
 
         public void DeleteUser(User user)
@@ -29,6 +27,13 @@ namespace Chotiskazal.Logic.Services
             return null;
         }
 
+        public User GetUser(string login)
+        {
+            return _repository.GetUser(login);
+
+        }
+
+
         public bool IsUserOnline(User user)
         {
             return true;
@@ -36,9 +41,9 @@ namespace Chotiskazal.Logic.Services
 
         public User[] GetAllUser()
         {
-            return new User[0];
+            return _repository.GetAllUsers();
         }
 
-    
+
     }
 }

@@ -13,17 +13,27 @@ namespace Chotiskazal.Dal.Services
         private readonly UserWordsRepo _UserWordRepository;
         private readonly DictionaryRepository _dicRepository;
         private readonly ExamsAndMetricsRepo _metricRepository;
-
+        
         public UsersWordService(UserWordsRepo repository, DictionaryRepository dictionaryRepository, ExamsAndMetricsRepo examsAndMetrics)
         {
             _UserWordRepository = repository;
             _dicRepository = dictionaryRepository;
             _metricRepository = examsAndMetrics;
         }
-
-        public string[] GetAllUserTranslatesForWord(User user, string word)
+        
+        public int SavePairToUser(WordDictionary pair, int userId)
         {
-            return _UserWordRepository.GetAllTranslateForUser(user, word);
+            return _UserWordRepository.SaveToUserDictionary(pair, userId);
+        }
+
+        public int SavePairToUser(PhraseDictionary phrase, int userId)
+        {
+            return 1;
+        }
+
+        public string[] GetAllUserTranslatesForWord(User user, int id)
+        {
+            return _UserWordRepository.GetAllTranslateForUser(user, id);
         }
         public Phrase[] GetAllPhrasesForWord(User user, string word)
         {
@@ -46,27 +56,14 @@ namespace Chotiskazal.Dal.Services
             //find Pair
             return null;
         }
-        public UsersPair[] GetBestPairsForLearning(User user, int count, int maxTranslationSize)
+        public UsersPair[] GetPairsForLearning(User user, int count)
         {
-            var fullPairs = _UserWordRepository.GetWorstForUser(count);
-          /*  foreach (var pairModel in fullPairs)
-            {
-                var translations = pairModel.GetTranslations.ToArray();
-                if (translations.Length <= maxTranslationSize)
-                    continue;
-                var usedTranslations = translations.Randomize().Take(maxTranslationSize).ToArray();
-                pairModel.SetTranslations(usedTranslations);
-                for (int i = 0; i < pairModel.Phrases.Count; i++)
-                {
-                    var phrase = pairModel.Phrases[i];
-                    if (!usedTranslations.Contains(phrase.Translation))
-                        pairModel.Phrases.RemoveAt(i);
-                }
-            }*/
-                return fullPairs;
+            return _UserWordRepository.GetWorstForUser(user,count);
+         
         }
         public UsersPair[] GetPairsForTests(User user, int count, int learnRate)
         {
+
             return _UserWordRepository.GetWordsForUserTests(count, learnRate, user);
                
         }
@@ -75,6 +72,6 @@ namespace Chotiskazal.Dal.Services
             return null;
         }
 
-
+    
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
-using Chotiskazal.App.Modes;
-using Chotiskazal.App.Autorisation;
-using Chotiskazal.Logic.DAL;
-using Chotiskazal.Logic.Services;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
 using Dic.Logic.yapi;
 using Microsoft.Extensions.Configuration;
 using System.Linq.Expressions;
+using Chotiskazal.App.Modes;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
 
 namespace Chotiskazal.App
 {
@@ -44,7 +43,6 @@ namespace Chotiskazal.App
   
 
             var wordsRepo = new WordsRepository(dbFileName);
-            var userRepo = new UserRepo(dbFileName);
            
             wordsRepo.ApplyMigrations();
             
@@ -57,7 +55,6 @@ namespace Chotiskazal.App
             //var dictionary = Dic.Logic.Dictionaries.Tools.ReadFromFile(path);
           
             var wordService = new NewWordsService(new RuEngDictionary(), wordsRepo);
-            var userService = new UserService(userRepo);
             
 
         //  Console.Clear();
@@ -78,30 +75,7 @@ namespace Chotiskazal.App
                
                 ConsoleKeyInfo val;
                 int choice;
-                User user = null;
-                while(user==null)
-                {
-                    Console.WriteLine("1: NewUser");
-                    Console.WriteLine("2: Login");
-                    Console.WriteLine();
-                    Console.Write("Choose action:");
-                    val = Console.ReadKey();
-                    choice = ((int)val.Key - (int)ConsoleKey.D1);
-                    if (choice==1)
-                    {
-                        Autorize.CreateNewUser(userRepo);
-                        user=Autorize.LoginUser(userRepo);
-                    }
-                    if (choice==2)
-                    {
-                        user=Autorize.LoginUser(userRepo);
-                    }
-                    Console.Clear();
-
-                }
-
-                Console.Clear();
-
+               
                 for (int i = 0; i < modes.Length; i++)
                 {
                     Console.WriteLine($"{i+1}: {modes[i].Name}");

@@ -1,5 +1,4 @@
 ﻿using System.Data.SQLite;
-using Chotiskazal.Dal.Repo;
 using Dapper;
 
 namespace Chotiskazal.Dal.Migrations
@@ -8,7 +7,7 @@ namespace Chotiskazal.Dal.Migrations
     {
         string Name { get; }
 
-        void Migrate(SQLiteConnection cnn, BaseRepo baseRepo);
+        void Migrate(SQLiteConnection cnn);
     }
 
     public abstract class SimpleMigration : IMigration
@@ -20,7 +19,7 @@ namespace Chotiskazal.Dal.Migrations
         public abstract string Query { get; }
 
         public abstract  string Name { get; }
-        public void Migrate(SQLiteConnection connection, BaseRepo repository)
+        public void Migrate(SQLiteConnection connection)
         {
             connection.Execute(Query);
         }

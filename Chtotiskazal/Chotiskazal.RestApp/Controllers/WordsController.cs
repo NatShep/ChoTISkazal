@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Dic.Logic.Services;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Mvc;
 
@@ -67,7 +67,7 @@ namespace Chotiskazal.RestApp.Controllers
             var translations = translationRequest.Translations;
             
             var translationsTexts = translationRequest.Translations.Select(t => t.Text).ToArray();
-            _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
+      //      _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
         }
 
     }

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Globalization;
+
 using System.IO;
 using System.Linq;
-using Chotiskazal.Dal.Repo;
-using Chotiskazal.Dal.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 using Dapper;
@@ -16,16 +12,15 @@ namespace Chotiskazal.Dal.Repo
     {
         public DictionaryRepository(string fileName): base(fileName) { }
        
-        
-        public WordPairDictionary[] GetAllWordPairs()
+        public WordDictionary[] GetAllWordPairs()
         {
             if(!File.Exists(DbFile))
-                return new WordPairDictionary[0];
+                return new WordDictionary[0];
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                return cnn.Query<WordPairDictionary>(@"Select * From Words order by PassedScore").ToArray();
+                return cnn.Query<WordDictionary>(@"Select * From Words order by PassedScore").ToArray();
             }
         }
 
@@ -51,7 +46,7 @@ namespace Chotiskazal.Dal.Repo
             return new string[0];
         }
         
-        public void AddWordPair(WordPairDictionary word)
+        public int AddWordPair(WordDictionary word)
         {
             if (!File.Exists(DbFile))
             {
@@ -61,7 +56,7 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                word.Id = cnn.Query<long>(
+                word.Id = cnn.Query<int>(
                     @"INSERT INTO Words (  OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed, AllMeanings,Revision )
                                       VALUES( @OriginWord,  @Translation,  @Transcription, @Created, @LastExam, @PassedScore, @AggregateScore, @Examed, @AllMeanings, @Revision  ); 
                           select last_insert_rowid()", word).First();
@@ -70,20 +65,20 @@ namespace Chotiskazal.Dal.Repo
                 {
                     foreach (var phrase in word.Phrases)
                     {
-                        phrase.Created = DateTime.Now;
                         cnn.Execute(
                             @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
                                       VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
                     }
                 }
+                return word.Id;
             }
         }
-        public void AddPhrases(WordPairDictionary word, Phrase[] phrases)
+        public void AddPhrases(int pairId, Phrase[] phrases)
         {
 
         }
 
-        public WordPairDictionary GetWordPairOrNullByWord(string word)
+        public WordDictionary[] GetWordPairOrNullByWord(string word)
         {
             //We can finf by RuWord or by EnWord.
             //Check the symbol of word before seeking
@@ -93,19 +88,19 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var result = cnn.Query<WordPairDictionary>(
-                    @"SELECT * FROM Words WHERE OriginWord = @word", new { word }).FirstOrDefault();
-                return result;
+                var result = cnn.Query<WordDictionary>(
+                    @"SELECT * FROM Words WHERE OriginWord = @word", new { word });
+                return result.ToArray();
             }
         }
-        public WordPairDictionary GetWordPairOrNull(int id)
+        public WordDictionary GetWordPairOrNull(int id)
         {
             if (!File.Exists(DbFile))
                 return null;
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var result = cnn.Query<WordPairDictionary>(
+                var result = cnn.Query<WordDictionary>(
                     @"SELECT Id, OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed
             FROM Words
             WHERE Id = @id", new {id}).FirstOrDefault();

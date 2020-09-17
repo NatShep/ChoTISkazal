@@ -1,23 +1,21 @@
 ﻿using Chotiskazal.LogicR.yapi;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Chotiskazal.DAL
 {
-    public class WordPairDictionary
+    public class WordDictionary
     {
 
-        public WordPairDictionary() { }
+        public WordDictionary() { }
 
-        public WordPairDictionary(string originword, string translation, string transcription, string sourse)
+        public WordDictionary(string originword, string translation, string transcription, string sourse)
         {
             EnWord = originword;
             Transcription = transcription;
             RuWord = translation;
             Sourse = sourse;
         }
-        public WordPairDictionary(string originword, string translation, string transcription, string sourse, List<PhraseDictionary> phrases)
+        public WordDictionary(string originword, string translation, string transcription, string sourse, List<PhraseDictionary> phrases)
         {
             EnWord = originword;
             Transcription = transcription;
@@ -25,7 +23,7 @@ namespace Chotiskazal.DAL
             Phrases = phrases;
             Sourse = sourse;
         }
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string EnWord { get; set; }
 
         //for one Word has one Translation
@@ -44,9 +42,5 @@ namespace Chotiskazal.DAL
         public List<PhraseDictionary> Phrases { get; set; }
         public string Sourse { get; set; }
 
-        public void CreateFromYandexDTO(YaDefenition yandexDTO)
-        {
-
-        }
     }
 }

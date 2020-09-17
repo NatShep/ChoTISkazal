@@ -1,11 +1,11 @@
-﻿using Chotiskazal.DAL;
-using System;
+﻿using System;
 
-namespace Chotiskasal.DAL
+namespace Chotiskazal.DAL
 {
     public class Exam
     {
-        public User User { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; }
         public DateTime Started { get; set; }
         public  DateTime Finished { get; set; }
 

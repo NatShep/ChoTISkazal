@@ -8,8 +8,8 @@ namespace Dic.Logic.Dictionaries
 {
     public class JsonDictionaryDto
     {
-        [JsonPropertyName("Words")]
-        public List<WordWithTranslation> Words { get; set; }
+   //     [JsonPropertyName("Words")]
+        //     public List<WordWithTranslation> Words { get; set; }
     }
 
 }

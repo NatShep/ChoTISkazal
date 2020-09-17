@@ -1,5 +1,4 @@
-﻿using Chotiskasal.DAL;
-using Chotiskazal.Dal.Repo;
+﻿using Chotiskazal.Dal.Repo;
 using Chotiskazal.DAL;
 using System;
 using System.Collections.Generic;
@@ -7,9 +6,14 @@ using System.Text;
 
 namespace Chotiskazal.Dal.Services
 {
-    class ExamsAndMetricService
+    public class ExamsAndMetricService
     {
         private readonly ExamsAndMetricsRepo _examsAndMetricsRepo;
+
+        public ExamsAndMetricService(ExamsAndMetricsRepo repo)
+        {
+            _examsAndMetricsRepo = repo;
+        }
 
         public Exam[] GetAllExams() => _examsAndMetricsRepo.GetAllExams();
 
@@ -21,9 +25,9 @@ namespace Chotiskazal.Dal.Services
         {
             _examsAndMetricsRepo.UpdateAgingAndRandomization(count);
         }
-        public void RegistrateFailure(UsersPair pair)
+        public void RegistrateFailure(UsersPair usersPair)
         {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(pair.MetricId);
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(usersPair.MetricId);
             metric.OnExamFailed();
             metric.UpdateAgingAndRandomization();
             _examsAndMetricsRepo.UpdateScores(metric);
@@ -39,9 +43,9 @@ namespace Chotiskazal.Dal.Services
                 Passed = successCount
             });
         }
-        public void RegistrateSuccess(UsersPair pair)
+        public void RegistrateSuccess(UsersPair usersPair)
         {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(pair.MetricId);
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(usersPair.MetricId);
             metric.OnExamPassed();
             metric.UpdateAgingAndRandomization();
             _examsAndMetricsRepo.UpdateScores(metric);
@@ -50,9 +54,9 @@ namespace Chotiskazal.Dal.Services
         {
             _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
         }
-        public void UpdateRatings(UsersPair pairModel)
+        public void UpdateRatings(UsersPair usersPairModel)
         {
-            _examsAndMetricsRepo.UpdateScoresAndTranslation(pairModel);
+            _examsAndMetricsRepo.UpdateScoresAndTranslation(usersPairModel);
         }
     }
 }

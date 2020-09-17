@@ -19,7 +19,7 @@ namespace Chotiskazal.Logic.Services
             _repository = repository;
         }
 
-        private void SaveForExams(string word, string translation, string[] allMeanings, string transcription)
+        public void SaveForExams(string word, string translation, string[] allMeanings, string transcription)
         {
             SaveToDictionary(
                 word:          word, 
@@ -82,7 +82,7 @@ namespace Chotiskazal.Logic.Services
                  for (int i = 0; i < pairModel.Phrases.Count; i++)
                  {
                      var phrase = pairModel.Phrases[i];
-                       if (!usedTranslations.Contains(phrase.Translation))
+                       if (!usedTranslations.Contains(phrase.Trans))
                            pairModel.Phrases.RemoveAt(i);
                  }
             }
@@ -191,7 +191,7 @@ namespace Chotiskazal.Logic.Services
             foreach (var phrase in firstPhrases)
             {
                 Console.WriteLine("Adding " + phrase.Origin);
-                SaveForExams(phrase.Origin, phrase.Translation, new[] { phrase.Translation }, null);
+        //        SaveForExams(phrase.Origin, phrase.Translation, new[] { phrase.Translation }, null);
                 Remove(phrase);
             }
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");

@@ -6,11 +6,9 @@ namespace Chotiskazal.DAL
 {
     public class PhraseDictionary
     {
-        public long Id { get; set; }
-        public string OriginPhrase { get; set; }
-        public string Translate { get; set; }
-        public int WorId { get; set; }
-        public DateTime Created { get; set; }
-
+        public int Id { get; set; }
+        public int WordId { get; set; }
+        public string EnPhrase { get; set; }
+        public string RuTranslate { get; set; }
     }
 }

@@ -53,7 +53,7 @@ namespace Dic.Logic.yapi
                         Created = DateTime.Now,
                         OriginWord = word,
                         Origin = example.Text,
-                        Translation = example.Tr.FirstOrDefault()?.Text,
+                        //Translation = example.Tr.FirstOrDefault()?.Text,
                         TranslationWord = this.Text,
                     };
                     phrases.Add(phrase);

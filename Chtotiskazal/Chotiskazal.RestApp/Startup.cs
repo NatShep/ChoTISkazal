@@ -1,7 +1,8 @@
 using System;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
-using Dic.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

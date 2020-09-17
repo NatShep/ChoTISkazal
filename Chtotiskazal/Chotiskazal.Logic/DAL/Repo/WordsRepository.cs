@@ -373,7 +373,6 @@ namespace Chotiskazal.Logic.DAL
                 new AddPhraseMigration(),
                 new AddQuestionMetricsMigration(),
                 new AddWordsPropertiesMigration(),
-                new AddUserTableMigration(),
             };
             Console.WriteLine(")Applying migrations");
             using (var cnn = SimpleDbConnection())

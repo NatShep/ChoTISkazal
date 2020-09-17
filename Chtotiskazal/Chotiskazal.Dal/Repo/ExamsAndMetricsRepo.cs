@@ -1,5 +1,4 @@
-﻿using Chotiskasal.DAL;
-using Chotiskazal.DAL;
+﻿using Chotiskazal.DAL;
 using Dapper;
 using System;
 using System.Collections.Generic;
