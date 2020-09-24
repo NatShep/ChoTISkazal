@@ -10,8 +10,8 @@ public class CreateUserTableMigration : SimpleMigration
                  UserId                              integer primary key AUTOINCREMENT,
                  Name                                nvarchar(100) not null,
                  Login                               nvarchar(100) UNIQUE not null,
-                 Password                            nvarchar(100) not null
-                 Email                               nvarchar(100) UNIQUE CHECK(Email !='') not null,
+                 Password                            nvarchar(100) not null,
+                 Email                               nvarchar(100) not null UNIQUE CHECK(Email !=''),
                  Created                             datetime not null,
                  Online                              integer not null
               )";

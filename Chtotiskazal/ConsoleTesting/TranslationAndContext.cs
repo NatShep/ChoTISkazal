@@ -1,4 +1,5 @@
 ﻿
+using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ConsoleTesting

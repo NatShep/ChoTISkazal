@@ -51,11 +51,13 @@ namespace Chotiskazal.RestApp
             }
 
             app.UseRouting();
+            
 
-            app.UseEndpoints(endpoints =>
+           app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+    
         }
     }
 }

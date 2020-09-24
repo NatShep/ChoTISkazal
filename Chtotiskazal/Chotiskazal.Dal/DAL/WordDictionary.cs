@@ -1,5 +1,6 @@
 ﻿using Chotiskazal.LogicR.yapi;
 using System.Collections.Generic;
+using Chotiskazal.Dal.Enums;
 
 namespace Chotiskazal.DAL
 {
@@ -8,16 +9,16 @@ namespace Chotiskazal.DAL
 
         public WordDictionary() { }
 
-        public WordDictionary(string originword, string translation, string transcription, string sourse)
+        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse)
         {
-            EnWord = originword;
+            EnWord = enWord;
             Transcription = transcription;
             RuWord = translation;
             Sourse = sourse;
         }
-        public WordDictionary(string originword, string translation, string transcription, string sourse, List<PhraseDictionary> phrases)
+        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse, Phrase[] phrases)
         {
-            EnWord = originword;
+            EnWord = enWord;
             Transcription = transcription;
             RuWord = translation;
             Phrases = phrases;
@@ -39,8 +40,10 @@ namespace Chotiskazal.DAL
                public int WordSourse { get;set; }
         */
 
-        public List<PhraseDictionary> Phrases { get; set; }
-        public string Sourse { get; set; }
+        public Phrase[] Phrases { get; set; }
+        public TranslationSource Sourse { get; set; }
 
     }
+    
+    
 }

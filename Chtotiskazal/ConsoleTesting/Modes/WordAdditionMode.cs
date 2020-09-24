@@ -73,6 +73,7 @@ namespace ConsoleTesting.Modes
                 {
                     sourse="Yandex Dictionary";
                     var variants = task.Result.SelectMany(r => r.Tr);
+                    
                     foreach (var yandexTranslation in variants)
                     {
                         var phrases = yandexTranslation.GetPhrases(word);

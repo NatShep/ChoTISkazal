@@ -56,40 +56,49 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                word.Id = cnn.Query<int>(
-                    @"INSERT INTO Words (  OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed, AllMeanings,Revision )
-                                      VALUES( @OriginWord,  @Translation,  @Transcription, @Created, @LastExam, @PassedScore, @AggregateScore, @Examed, @AllMeanings, @Revision  ); 
-                          select last_insert_rowid()", word).First();
-
+                word.Id = cnn.ExecuteScalar<int>(
+                    @"INSERT INTO PairDictionary (  EnWord,  Transcription,  RuWord, Sourse)
+                                      VALUES( @EnWord,  @Transcription,  @RuWord, @Sourse); 
+                          select last_insert_rowid()", word);
+                
                 if (word.Phrases != null)
                 {
                     foreach (var phrase in word.Phrases)
                     {
-                        cnn.Execute(
-                            @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
-                                      VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
+                   //     cnn.Execute(
+                     //       @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
+                       //               VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
                     }
                 }
                 return word.Id;
             }
         }
-        public void AddPhrases(int pairId, Phrase[] phrases)
-        {
 
+        public int AddPhrase(int pairId, string enPhrase, string ruTranslate)
+        {
+            using (var cnn = SimpleDbConnection())
+            {
+                var phrase = new Phrase(pairId,enPhrase,ruTranslate);
+                cnn.Open();
+                return cnn.ExecuteScalar<int>(
+                    @"INSERT INTO Phrases ( PairId ,  EnPhrase, RuTranslate)
+                                      VALUES( @PairId,  @EnPhrase,  @RuTranslate); 
+                          select last_insert_rowid()", phrase);
+            }
         }
 
         public WordDictionary[] GetWordPairOrNullByWord(string word)
         {
             //We can finf by RuWord or by EnWord.
             //Check the symbol of word before seeking
-            //.........................................
+            //now just for EnWord!!!
             if (!File.Exists(DbFile))
                 return null;
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
                 var result = cnn.Query<WordDictionary>(
-                    @"SELECT * FROM Words WHERE OriginWord = @word", new { word });
+                    @"SELECT * FROM PairDictionary WHERE EnWord = @word", new { word });
                 return result.ToArray();
             }
         }

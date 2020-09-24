@@ -1,0 +1,26 @@
+@model IEnumerable<Chotiskazal.App.TranslationAndContext>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Перевод слова</title>
+</head>
+<body>
+<div>
+     <div>
+         @foreach (var translation in @Model)
+         {
+      //       @if (translation.Phrases.Any())
+        //         <p>@translation.Translation (@translation.Phrases.Length)</p>
+          //   @else
+                 <p>@translation</p>;
+         }
+     </div> 
+</div>
+</body>
+</html>

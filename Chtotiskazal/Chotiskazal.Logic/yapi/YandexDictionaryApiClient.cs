@@ -48,6 +48,7 @@ namespace Dic.Logic.yapi
             try
             {
                 var query = MakeQuery(word);
+                var ans2 = await client.GetAsync(query);
                 var ans = await client.GetStringAsync(query);
                 IsOnline = true;
                 var deserialized = JsonSerializer.Deserialize<YapiDicAnswer>(ans);

@@ -58,6 +58,7 @@ namespace Chotiskazal.App.Modes
 
                 task?.Wait();
                 List<TranslationAndContext> translations = new List<TranslationAndContext>();
+                
                 if (task?.Result?.Any() == true)
                 {
                     var variants = task.Result.SelectMany(r => r.Tr);

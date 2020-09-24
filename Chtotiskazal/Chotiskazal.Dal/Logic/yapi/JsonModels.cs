@@ -39,14 +39,14 @@ namespace Chotiskazal.LogicR.yapi
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public Example[] Ex { get; set; }
-        public List<Phrase> GetPhrases(string word)
+        public List<YaPhrase> GetPhrases(string word)
         {
-            List<Phrase> phrases = new List<Phrase>();
+            List<YaPhrase> phrases = new List<YaPhrase>();
             if (this.Ex != null)
             {
                 foreach (var example in this.Ex)
                 {
-                    var phrase = new Phrase
+                    var phrase = new YaPhrase
                     {
                         Created = DateTime.Now,
                         OriginWord = word,
@@ -57,9 +57,10 @@ namespace Chotiskazal.LogicR.yapi
                     phrases.Add(phrase);
                 }
             }
-
             return phrases;
         }
+        
+       
     }
 
     public class Synonim
@@ -85,5 +86,17 @@ namespace Chotiskazal.LogicR.yapi
         [JsonPropertyName("tr")]
         public JustText[] Tr { get; set; }
     }
+    
+    public class YaPhrase
+    {
+        public string OriginWord { get; set; }
+        public string Origin { get; set; }
+        public string Translation { get; set; }
+        public string TranslationWord { get; set; }
+        public DateTime Created { get; set; }
+        public bool IsEmpty => string.IsNullOrWhiteSpace(OriginWord);
+    }
+    
+    
 }
 

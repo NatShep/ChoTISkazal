@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Phrase = Chotiskazal.DAL.Phrase;
 
 namespace Chotiskazal.Dal.Services
 {
@@ -26,7 +27,7 @@ namespace Chotiskazal.Dal.Services
             return _UserWordRepository.SaveToUserDictionary(pair, userId);
         }
 
-        public int SavePairToUser(PhraseDictionary phrase, int userId)
+        public int SavePairToUser(Phrase phrase, int userId)
         {
             return 1;
         }
@@ -35,10 +36,10 @@ namespace Chotiskazal.Dal.Services
         {
             return _UserWordRepository.GetAllTranslateForUser(user, id);
         }
-        public Phrase[] GetAllPhrasesForWord(User user, string word)
-        {
-            return new Phrase[0];
-        }
+    //    public LogicR.Phrase[] GetAllPhrasesForWord(User user, string word)
+      //  {
+        //    return new LogicR.Phrase[0];
+     //   }
         public void AddWordToUserCollection(User user, int wordId)
         {
             //Before adding wordToUserCollection, check that this word is in WordPairDictionary

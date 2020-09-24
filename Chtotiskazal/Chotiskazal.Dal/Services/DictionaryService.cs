@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Chotiskazal.Dal.Enums;
 
 namespace Chotiskazal.Dal.Services
 {
@@ -16,19 +17,17 @@ namespace Chotiskazal.Dal.Services
         public DictionaryService( DictionaryRepository repository) => _dicRepository = repository;
 
         // Add Words or Phrases to dictionary
-        public void AddNewWordToDictionary(string enword, string ruword, string transcription, string sourse)
+        public int AddNewWordPairToDictionary(string enword, string ruword, string transcription, TranslationSource sourse)
         {
-
+            var word = new WordDictionary(enword,ruword,transcription,sourse);
+            return _dicRepository.AddWordPair(word);
         }
-        public void AddNewWordToDictionary(string enword, string ruword, string transcription, Phrase[] phrases, string sourse)
-        {
-        }
-        public void AddPhrasesForWordPair(int pairId, Phrase[] phrases)
+        public int AddPhraseForWordPair(int pairId, string enPhrase, string RuTranslate)
         {
             //look if there are some phrases
             //if not, add prases
             //if there is, update phrases
-            _dicRepository.AddPhrases(_dicRepository.GetWordPairOrNull(pairId).Id, phrases);
+            return _dicRepository.AddPhrase(pairId, enPhrase,RuTranslate);
         }
         public void AddWordTranslatesAndPhrasesToDictionary(YaDefenition yandexDTO)
         {
@@ -41,7 +40,7 @@ namespace Chotiskazal.Dal.Services
         {
             return _dicRepository.GetAllTranslate(word);
         }
-        public Phrase[] GetAllPhrasesByWord(string word) => _dicRepository.GetAllPhrasesForWordOrNull(word);
+    //    public Phrase[] GetAllPhrasesByWord(string word) => _dicRepository.GetAllPhrasesForWordOrNull(word);
         public Phrase[] GetAllPhrasesByWordId(int WordPairId)
         {
             return new Phrase[0];
@@ -75,6 +74,11 @@ namespace Chotiskazal.Dal.Services
         }
 
         // secondary methods
-        public string GetSourse(int pairId) => GetWordFromDictionaryOrNullById(pairId).Sourse;
-   }
+        public TranslationSource GetSourse(int pairId) => GetWordFromDictionaryOrNullById(pairId).Sourse;
+
+        public WordDictionary[] GetWordPairOrNullByWord(string word)
+        {
+            return _dicRepository.GetWordPairOrNullByWord(word);
+        }
+    }
 }

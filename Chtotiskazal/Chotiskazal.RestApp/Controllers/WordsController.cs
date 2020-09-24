@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Chotiskazal.RestApp.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("api/[controller]")]
+
     public class WordsController : ControllerBase
     {
         private readonly YandexDictionaryApiClient _yandexDictionaryApiClient;
@@ -21,7 +22,10 @@ namespace Chotiskazal.RestApp.Controllers
             _yaTransApi = yaTransApi;
             _wordsService = wordsService;
         }
-        [HttpGet("Health")]
+        
+ //       [Route("health")]
+
+        [HttpGet]
         public async Task<HealthResponse> GetHealth()
         {
             var pingResult =  await _yandexDictionaryApiClient.Ping();
