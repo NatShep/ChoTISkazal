@@ -76,9 +76,9 @@ namespace Chotiskazal.Dal.Services
         // secondary methods
         public TranslationSource GetSourse(int pairId) => GetWordFromDictionaryOrNullById(pairId).Sourse;
 
-        public WordDictionary[] GetWordPairOrNullByWord(string word)
+        public WordDictionary[] GetAllWordPairsByWord(string word)
         {
-            return _dicRepository.GetWordPairOrNullByWord(word);
+            return _dicRepository.GetAllWordPairsByWord(word);
         }
     }
 }

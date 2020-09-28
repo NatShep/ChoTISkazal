@@ -87,13 +87,13 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public WordDictionary[] GetWordPairOrNullByWord(string word)
+        public WordDictionary[] GetAllWordPairsByWord(string word)
         {
             //We can finf by RuWord or by EnWord.
             //Check the symbol of word before seeking
             //now just for EnWord!!!
             if (!File.Exists(DbFile))
-                return null;
+                throw new Exception("No Db File");
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();

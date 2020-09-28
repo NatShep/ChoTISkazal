@@ -50,13 +50,8 @@ namespace Chotiskazal.WebApp.Controllers
             var origin = HttpUtility.UrlDecode(word);
 
             //возвращаю из словаря массив пар слово-перевод, найденных по слову(без фраз)
-            var wordsFromDictionary = FindInDictionary(word);
-
-            //преобразую его в модель для вида
-            var translateWithContexts = new List<TranslationAndContext>();
-            foreach (var wordDictionary in wordsFromDictionary)
-                translateWithContexts.Add(wordDictionary.MapToTranslationAndContext());
-
+            var translateWithContexts = FindInDictionary(word);
+            
             //если ничего нет, иду в яндекс словарь(там перевожу слово и заношу его сразу в базу)
             if (!translateWithContexts.Any())
                 translateWithContexts = TranslateByYandex(word);
@@ -68,32 +63,36 @@ namespace Chotiskazal.WebApp.Controllers
             return View("ShowTranslate", translateWithContexts);
         }
 
-        public IActionResult SelectTranslation(TranslationAndContext[] translates)
-        {
-            return View(translates);
-        }
-
+        //TODO method should has autentification for user
         [HttpPut]
-        public void SelectTranslation([FromBody] AddTranslationRequest translationRequest)
+        public void SelectTranslation([FromBody] TranslationAndContext translation)
         { 
-            var translations = translationRequest.Translations;
-            var translationsTexts = translationRequest.Translations.Select(t => t.Text).ToArray();
-            //      _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
-        }
+            //если есть шфразы равны нулю, то проверить, есть ли фразы в базе. Если есть - добавить
+            
+            //добавляем выбранный перевод конкретному юзеру, если его еще нет
+            
+            //Если он есть, проверяем на схожесть и при необходимости добавляем данные
+            
+            // переходим на меню для работы
+            
+          }
         
-        private WordDictionary[] FindInDictionary(string word)
+        private List<TranslationAndContext> FindInDictionary(string word)
         {
             // возвращаю из бд список пар WordDictionary(Без подтягивания фраз)
-            var pairWords = _dictionaryService.GetWordPairOrNullByWord(word);
-            if (pairWords==null)
-                throw new Exception("error in finding words in dictionary");
-            return pairWords;
+            var pairWords = _dictionaryService.GetAllWordPairsByWord(word);
+          
+            // перевожу во viewModel
+            var translateWithContexts = new List<TranslationAndContext>();
+            foreach (var wordDictionary in pairWords)
+                translateWithContexts.Add(wordDictionary.MapToTranslationAndContext());
+            
+            return translateWithContexts;
         }
 
         private List<TranslationAndContext> TranslateByYandex(string word)
         {
-            List<TranslationAndContext> translations = new List<TranslationAndContext>();
-            List<WordDictionary> wordsForDictionary = new List<WordDictionary>();
+            List<TranslationAndContext> translationsWithContext = new List<TranslationAndContext>();
 
             if (!word.Contains(' '))
             {
@@ -121,7 +120,6 @@ namespace Chotiskazal.WebApp.Controllers
                             yandexTranslation.Text,
                             transcription,
                             TranslationSource.Yadic);
-
                         foreach (var yaPhrase in yaPhrases)
                         {
                             var phrase = yaPhrase.MapToDbPhrase();
@@ -129,54 +127,38 @@ namespace Chotiskazal.WebApp.Controllers
                             _dictionaryService.AddPhraseForWordPair(id, phrase.EnPhrase, phrase.RuTranslate);
                         }
                         
-                        translations.Add(new TranslationAndContext(word, yandexTranslation.Text, transcription,
+                        translationsWithContext.Add(new TranslationAndContext(word, yandexTranslation.Text, transcription,
                             dbPhrases.ToArray()));
                     }
                 }
-
-                /*        else //Если ответа нет, не понимаю, что делает он...???
-                        {
-                            var dictionaryMatch = service.GetTranslations(word);
-                            if (dictionaryMatch != null)
-                            {
-                                translations.AddRange(
-                                    dictionaryMatch.Translations.Select(t =>
-                                        new TranslationAndContext(dictionaryMatch.Origin, t, dictionaryMatch.Transcription,
-                                            new Phrase[0])));
-                            }
-                        }
-            */
             }
 
             //Если  в итоге не удалось составить список WordDictionary
-            if (!translations.Any())
+            if (!translationsWithContext.Any())
             {
                 try
                 {
                     var transAnsTask = _yaTransApi.Translate(word);
                     transAnsTask.Wait();
 
-                    //1. Заполняем бд(wordDictionary, фраз нет)
                     if (!string.IsNullOrWhiteSpace(transAnsTask.Result))
                     {
+                        //1. Заполняем бд(wordDictionary, фраз нет)
                         _dictionaryService.AddNewWordPairToDictionary(
                             word,
                             transAnsTask.Result,
                             "[]",
                             TranslationSource.Yadic);
-
-                        translations.Add(new TranslationAndContext(word, transAnsTask.Result, "[]", new Phrase[0]));
+                        //2. Дополняем ответ
+                        translationsWithContext.Add(new TranslationAndContext(word, transAnsTask.Result, "[]", new Phrase[0]));
                     }
                 }
                 catch (Exception e)
                 {
-                    return translations;
+                    return translationsWithContext;
                 }
             }
-
-            //Если удалось, то 
-            //2. Возвращаем список WordDictionary
-            return translations;
+            return translationsWithContext;
         }
 
         public class HealthResponse
@@ -187,12 +169,6 @@ namespace Chotiskazal.WebApp.Controllers
             }
 
             public string Status { get; }
-        }
-
-        public class AddTranslationRequest
-        {
-            public string Word { get; set; }
-            public Translation[] Translations { get; set; }
         }
     }
 }

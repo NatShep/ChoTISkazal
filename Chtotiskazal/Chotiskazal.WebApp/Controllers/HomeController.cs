@@ -18,7 +18,7 @@ namespace Chotiskazal.WebApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Menu()
         {
             return View();
         }
