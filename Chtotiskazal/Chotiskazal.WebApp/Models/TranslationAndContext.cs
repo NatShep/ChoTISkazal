@@ -5,8 +5,9 @@ namespace Chotiskazal.App
 {
     public class TranslationAndContext
     {
-        public TranslationAndContext(string enWord, string ruWord, string transcription, Phrase[] phrases)
+        public TranslationAndContext(int? id, string enWord, string ruWord, string transcription, Phrase[] phrases)
         {
+            IdInDB = id;
             EnWord = enWord;
             RuWord = ruWord;
             Transcription = transcription;

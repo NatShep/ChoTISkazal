@@ -10,6 +10,7 @@ using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR.yapi;
 using static Chotiskazal.LogicR.yapi.MapperForDBModels;
 using Chotiskazal.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -19,14 +20,19 @@ namespace Chotiskazal.WebApp.Controllers
     public class WordsController : Controller
     {
         private readonly YandexDictionaryApiClient _yandexDictionaryApiClient;
+        private readonly UsersWordService _usersWordService;
+        private readonly UserService _userService;
         private readonly YandexTranslateApiClient _yaTransApi;
         private readonly DictionaryService _dictionaryService;
 
-        public WordsController(YandexDictionaryApiClient yaapiClient, YandexTranslateApiClient yaTransApi,DictionaryService dictionaryService)
+        public WordsController(YandexDictionaryApiClient yaapiClient, YandexTranslateApiClient yaTransApi
+            ,DictionaryService dictionaryService, UsersWordService usersWordService, UserService userService)
         {
             _yandexDictionaryApiClient = yaapiClient;
             _yaTransApi = yaTransApi;
             _dictionaryService = dictionaryService;
+            _usersWordService = usersWordService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -39,12 +45,14 @@ namespace Chotiskazal.WebApp.Controllers
                 return new HealthResponse(HealthStatus.Offline);
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult GetTranslation()
         {
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> GetTranslation(string word)
         {
@@ -62,27 +70,30 @@ namespace Chotiskazal.WebApp.Controllers
             // возможно переводим в модель для вьюхи. Где не обязательно передавать все фразы, а только кол-во фраз.
             // потом подтянем фразы, если будет надо
             // сейчас я создаю модель для вьюхи сразу в поиске перевода слова
-            return View("ShowTranslate", translateWithContexts);
+            return View("SelectTranslation", translateWithContexts);
         }
 
-        //TODO method should has autentification for user
-        [HttpPut]
-        public void SelectTranslation([FromBody] TranslationAndContext translation)
-        { 
-            //если есть шфразы равны нулю, то проверить, есть ли фразы в базе. Если есть - добавить
-            
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> SelectTranslation(int id)
+        {
+            var wordFromDictionary = _dictionaryService.GetPairById(id);
+            var user = _userService.GetUserByLogin(User.Identity.Name);
+            if (user == null)
+                return RedirectToAction("Logout", "Account");
             //добавляем выбранный перевод конкретному юзеру, если его еще нет
-            
+            _usersWordService.AddWordToUserCollection(user, id);
             //Если он есть, проверяем на схожесть и при необходимости добавляем данные
-            
+
             // переходим на меню для работы
-            
-          }
+            return RedirectToAction("Menu", "Home");
+
+        }
         
         private List<TranslationAndContext> FindInDictionary(string word)
         {
             // возвращаю из бд список пар WordDictionary(Без подтягивания фраз)
-            var pairWords = _dictionaryService.GetAllWordPairsByWord(word);
+            var pairWords = _dictionaryService.GetAllPairsByWord(word);
           
             // перевожу во viewModel
             var translateWithContexts = new List<TranslationAndContext>();
@@ -129,7 +140,7 @@ namespace Chotiskazal.WebApp.Controllers
                             _dictionaryService.AddPhraseForWordPair(id, phrase.EnPhrase, phrase.RuTranslate);
                         }
                         
-                        translationsWithContext.Add(new TranslationAndContext(word, yandexTranslation.Text, transcription,
+                        translationsWithContext.Add(new TranslationAndContext(id, word, yandexTranslation.Text, transcription,
                             dbPhrases.ToArray()));
                     }
                 }
@@ -146,13 +157,13 @@ namespace Chotiskazal.WebApp.Controllers
                     if (!string.IsNullOrWhiteSpace(transAnsTask.Result))
                     {
                         //1. Заполняем бд(wordDictionary, фраз нет)
-                        _dictionaryService.AddNewWordPairToDictionary(
+                        var id =_dictionaryService.AddNewWordPairToDictionary(
                             word,
                             transAnsTask.Result,
                             "[]",
                             TranslationSource.Yadic);
                         //2. Дополняем ответ
-                        translationsWithContext.Add(new TranslationAndContext(word, transAnsTask.Result, "[]", new Phrase[0]));
+                        translationsWithContext.Add(new TranslationAndContext(id, word, transAnsTask.Result, "[]", new Phrase[0]));
                     }
                 }
                 catch (Exception e)

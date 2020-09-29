@@ -8,8 +8,8 @@
               (
                  Id                                  integer primary key AUTOINCREMENT,
                  UserId                              integer not null,           
-                 Started                              datetime not null,
-                 Finished                             datetime not null,
+                 Started                             datetime not null,
+                 Finished                            datetime not null,
                  Count
                  Passed                              integer not null,           
                  Failed                              integer not null,           

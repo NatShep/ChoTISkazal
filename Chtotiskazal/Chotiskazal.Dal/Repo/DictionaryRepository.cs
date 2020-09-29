@@ -8,24 +8,14 @@ using Dapper;
 
 namespace Chotiskazal.Dal.Repo
 {
-    public class DictionaryRepository: BaseRepo
+    public class DictionaryRepository : BaseRepo
     {
-        public DictionaryRepository(string fileName): base(fileName) { }
-       
-        public WordDictionary[] GetAllWordPairs()
+        public DictionaryRepository(string fileName) : base(fileName)
         {
-            if(!File.Exists(DbFile))
-                return new WordDictionary[0];
-
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                return cnn.Query<WordDictionary>(@"Select * From Words order by PassedScore").ToArray();
-            }
         }
 
-        //Get all Phreases for wordPair(or for Word?)
-        public Phrase[] GetAllPhrasesForWordOrNull(string word)
+        //TODO Get all Phrases for wordPair(or for Word?)
+        public Phrase[] GetAllPhrasesByPairId(int wordPiarId)
         {
             if (!File.Exists(DbFile))
                 return new Phrase[0];
@@ -35,17 +25,16 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Open();
                 return cnn.Query<Phrase>(@"Select * From ContextPhrases").ToArray();
             }
-        }     
+        }
 
         //Get All translate for RuWord or EngWord
         public string[] GetAllTranslate(string word)
         {
             //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
             //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
-
             return new string[0];
         }
-        
+
         public int AddWordPair(WordDictionary word)
         {
             if (!File.Exists(DbFile))
@@ -60,16 +49,17 @@ namespace Chotiskazal.Dal.Repo
                     @"INSERT INTO PairDictionary (  EnWord,  Transcription,  RuWord, Sourse)
                                       VALUES( @EnWord,  @Transcription,  @RuWord, @Sourse); 
                           select last_insert_rowid()", word);
-                
+
                 if (word.Phrases != null)
                 {
                     foreach (var phrase in word.Phrases)
                     {
-                   //     cnn.Execute(
-                     //       @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
-                       //               VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
+                        //     cnn.Execute(
+                        //       @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
+                        //               VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
                     }
                 }
+
                 return word.Id;
             }
         }
@@ -78,7 +68,7 @@ namespace Chotiskazal.Dal.Repo
         {
             using (var cnn = SimpleDbConnection())
             {
-                var phrase = new Phrase(pairId,enPhrase,ruTranslate);
+                var phrase = new Phrase(pairId, enPhrase, ruTranslate);
                 cnn.Open();
                 return cnn.ExecuteScalar<int>(
                     @"INSERT INTO Phrases ( PairId ,  EnPhrase, RuTranslate)
@@ -98,25 +88,44 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var result = cnn.Query<WordDictionary>(
-                    @"SELECT * FROM PairDictionary WHERE EnWord = @word", new { word });
+                    @"SELECT * FROM PairDictionary WHERE EnWord = @word", new {word});
                 return result.ToArray();
             }
         }
-        public WordDictionary GetWordPairOrNull(int id)
+
+
+        public WordDictionary GetPairById(int? id)
         {
             if (!File.Exists(DbFile))
-                return null;
+                throw new Exception("No Db File");
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
                 var result = cnn.Query<WordDictionary>(
-                    @"SELECT Id, OriginWord,  Translation,  Transcription, Created, LastExam, PassedScore, AggregateScore, Examed
-            FROM Words
-            WHERE Id = @id", new {id}).FirstOrDefault();
+                    @"SELECT * FROM PairDictionary 
+                    WHERE Id = @id", new {id}).FirstOrDefault();
                 return result;
             }
+            return null;
         }
 
-      
+        public WordDictionary GetPairByWithPhrasesById(int? id)
+        {
+            if (!File.Exists(DbFile))
+                throw new Exception("No Db File");
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var result = cnn.Query<WordDictionary, Phrase, WordDictionary>(
+                    @"SELECT * FROM PairDictionary PD WHERE Id = @id
+                    JOIN Phrases Ph ON Ph.PairId = PD.Id ", 
+                    (wd, ph) =>
+                    {
+                        wd.Phrases.Add(ph);
+                        return wd;
+                    });
+            }
+            return null;
+        }
     }
 }

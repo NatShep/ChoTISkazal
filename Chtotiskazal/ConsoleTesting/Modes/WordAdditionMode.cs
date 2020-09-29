@@ -82,13 +82,13 @@ namespace ConsoleTesting.Modes
                 }
                 else
                 {
-                    var dictionaryMatch =_dictionaryService.GetTranslations(word);
+                    var dictionaryMatch =_dictionaryService.GetAllTranslations(word);
                     if (dictionaryMatch.Length != 0)
                     {
                         sourse = "Offline Dictionary";
                         translations.AddRange(
                             dictionaryMatch.Select(t =>
-                                new TranslationAndContext(word, t, _dictionaryService.GetTranscription(word), _dictionaryService.GetAllPhrasesByWordPair(word, t))));
+                                new TranslationAndContext(word, t, _dictionaryService.GetTranscription(word), _dictionaryService.GetAllPhrasesByWordPairId(word, t))));
                     }
                 }
 

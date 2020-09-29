@@ -8,9 +8,81 @@ using System.Text;
 
 namespace Chotiskazal.Dal.Repo
 {
-    public class UserWordsRepo: BaseRepo
+    public class UserWordsRepo : BaseRepo
     {
-        public UserWordsRepo(string fileName) : base(fileName) { }       
+        public UserWordsRepo(string fileName) : base(fileName)
+        {
+        }
+
+        public int SaveToUserDictionary(int pairId, int userId)
+        {
+            if (!File.Exists(DbFile))
+                throw new Exception("No db file!");
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                using (var transaction = cnn.BeginTransaction())
+                {
+                    var metricId = cnn.ExecuteScalar<int>(
+                        @"INSERT INTO QuestionMetric (ElaspedMs, Result, Type, Revision, PreviousExam, 
+                          LastExam, ExamsPassed, Examed, PassedScore, AggregateScore, AggregateScoreBefore, PassedScoreBefore)
+                          VALUES(@ElaspedMs, @Result, @Type, @Revision, @PreviousExam, @LastExam, @ExamsPassed, 
+                          @Examed, @PassedScore, @AggregateScore, @AggregateScoreBefore, @PassedScoreBefore); 
+                          select last_insert_rowid()", new QuestionMetric());
+
+                    var result= cnn.ExecuteScalar<int>(
+                        @"INSERT INTO UserPairs ( UserId ,  PairId, MetricId, Created, IsPhrase)
+                      VALUES( @UserId,  @PairId, @MetricId, @Created, @IsPhrase); 
+                          select last_insert_rowid()", new UsersPair(userId, pairId, metricId, false));
+                    
+                    transaction.Commit();
+                    return result;
+                }
+            }
+
+
+        }
+
+        public UsersPair[] GetWordsForUserTests(int count, int learnRate, User user)
+        {
+            if (!File.Exists(DbFile))
+                return new UsersPair[0];
+            return new UsersPair[0];
+        }
+
+        public UsersPair[] GetWorstForUser(User user, int count)
+        {
+            if (!File.Exists(DbFile))
+                return new UsersPair[0];
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+
+            var lookup = new Dictionary<string, UsersPair>();
+
+            cnn.Query<UsersPair, WordDictionary, UsersPair>(
+                @"Select DISTINCT dw.EnWord, w.* from 
+                (SELECT * FROM UserPairs WHERE UserId= @userId limit @count) w 
+                LEFT JOIN QuestionMetric q on q.Id=w.MetricId
+                LEFT JOIN PairDictionary dw on dw.Id=w.PairId
+                ORDER BY q.AggregateScore desc",
+                (w, dw) =>
+                {
+                    var pair = new UsersPair();
+                    if (!lookup.TryGetValue(dw.EnWord, out pair))
+                        lookup.Add(dw.EnWord, pair = w);
+                    return pair;
+                }, new {userId = user.UserId, count = count},
+                splitOn: "MetricId,PairId");
+            return lookup.Values.ToArray();
+        }
+
+        public string[] GetAllTranslateForUser(User user, int pairId)
+        {
+            //...
+            return new string[0];
+        }
+
         public UsersPair[] GetAllWordsForUser(User user)
         {
             //...
@@ -23,58 +95,20 @@ namespace Chotiskazal.Dal.Repo
                 LEFT JOIN ContextPhrases c on c.WordId = w.Id");
             return new UsersPair[0];
         }
-        public UsersPair[] GetWordsForUserTests(int count, int learnRate, User user)
-        {
-            if (!File.Exists(DbFile))
-                return new UsersPair[0];
-            return new UsersPair[0];
-        }
-        public UsersPair[] GetWorstForUser(User user, int count)
-        {
-            if (!File.Exists(DbFile))
-                return new UsersPair[0];
-            using var cnn = SimpleDbConnection();
-            cnn.Open();
-
-            var lookup = new Dictionary<string, UsersPair>();
-
-            cnn.Query<UsersPair, WordDictionary, UsersPair>(
-            @"Select DISTINCT dw.EnWord, w.* from 
-                (SELECT * FROM UserPairs WHERE UserId= @userId limit @count) w 
-                LEFT JOIN QuestionMetric q on q.Id=w.MetricId
-                LEFT JOIN PairDictionary dw on dw.Id=w.PairId
-                ORDER BY q.AggregateScore desc",
-            (w, dw) =>
-                {
-                    var pair = new UsersPair();
-                    if (!lookup.TryGetValue(dw.EnWord, out pair))
-                        lookup.Add(dw.EnWord, pair = w);
-                    return pair;
-                }, new { userId=user.UserId, count=count },
-            splitOn: "MetricId,PairId");
-            return lookup.Values.ToArray();
-        }
-        
-        public string[] GetAllTranslateForUser(User user, int pairId)
-        {
-            //...
-            return new string[0];
-        }
-
-
 
         public void UpdateAgingAndRandomization(int count)
         {
             if (!File.Exists(DbFile))
-                return;          
+                return;
         }
+
         public void UpdateAgingAndRandomization()
         {
             if (!File.Exists(DbFile))
                 return;
 
         }
-     
+
         public void UpdateScores(WordDictionary word)
         {
             if (!File.Exists(DbFile))
@@ -92,6 +126,7 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Execute(op, word);
             }
         }
+
         public void UpdateScoresAndTranslation(WordDictionary word)
         {
             if (!File.Exists(DbFile))
@@ -113,10 +148,5 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-
-        public int SaveToUserDictionary(WordDictionary pair, int userId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

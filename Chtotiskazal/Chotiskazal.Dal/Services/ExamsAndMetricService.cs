@@ -10,13 +10,10 @@ namespace Chotiskazal.Dal.Services
     {
         private readonly ExamsAndMetricsRepo _examsAndMetricsRepo;
 
-        public ExamsAndMetricService(ExamsAndMetricsRepo repo)
-        {
-            _examsAndMetricsRepo = repo;
-        }
+        public ExamsAndMetricService(ExamsAndMetricsRepo repo) => _examsAndMetricsRepo = repo;
 
+        //TODO all methods
         public Exam[] GetAllExams() => _examsAndMetricsRepo.GetAllExams();
-
         public void UpdateAgingAndRandomize()
         {
             _examsAndMetricsRepo.UpdateAgingAndRandomization();

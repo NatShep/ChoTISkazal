@@ -11,16 +11,29 @@ namespace Chotiskazal.Dal
         private const int ExamFailedPenalty = 2;
         private const double AgingFactor = 1;
         public const double ReducingPerPointFactor = 1.7;
-        public double AggregateScore { get; set; }
         //res reduces for 1 point per AgingFactor days
         public double AggedScore => Math.Max(0, PassedScore - (DateTime.Now - LastExam).TotalDays / AgingFactor);
 
 
-
+        public QuestionMetric()
+        {
+            ElaspedMs = 0;
+            Result = 0;
+            Type = "";
+            Revision = 0;
+            PreviousExam=DateTime.Now;
+            LastExam=DateTime.Now;
+            ExamsPassed = 0;
+            Examed = 0;
+            PassedScore = 0;
+            AggregateScore = 0;
+            AggregateScoreBefore = 0;
+            PassedScoreBefore = 0;
+        }
 
         public int Id { get; set; }
-        public int UserPairId { get; set; }
         public int ElaspedMs { get; set; }
+        public double AggregateScore { get; set; }
         public double AggregateScoreBefore { get; set; }
         public double PassedScoreBefore { get; set; }
         public int Result { get; set; }

@@ -9,12 +9,15 @@ namespace Chotiskazal.Dal.Migrations
         public override string Query => @"create table if not exists UserPairs
               (
                  Id                                  integer primary key AUTOINCREMENT,
-                 UserId                         integer,
-                 PairId                        integer,
+                 UserId                              integer,
+                 PairId                              integer,
                  MetricId                            integer,
                  Created                             datetime not null,
-                 IsPhrase                               bit      , 
-                 FOREIGN KEY (Userid) REFERENCES Users(UserId)
+                 IsPhrase                            bit,
+                  
+                 FOREIGN KEY (UserId) REFERENCES Users(UserId),
+                 FOREIGN KEY (PairId) REFERENCES PairDictionary(Id),
+                 FOREIGN KEY (MetricId) REFERENCES QuestionMetric(Id)
               )";    }
 }
 

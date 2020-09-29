@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Dal;
 using Chotiskazal.Dal.Repo;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR.yapi;
@@ -61,7 +62,8 @@ namespace Chotiskazal.WebApp
 
             services.AddSingleton(new DictionaryService(new DictionaryRepository(dbFileName)));
             services.AddSingleton(new UserService(new UserRepo(dbFileName)));
-            
+            services.AddSingleton(new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName)));
+            services.AddSingleton(new UsersWordService(new UserWordsRepo(dbFileName)));
             services.AddHostedService<YapiPingHostedService>();
         }
 

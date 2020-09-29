@@ -24,61 +24,23 @@ namespace Chotiskazal.Dal.Services
         }
         public int AddPhraseForWordPair(int pairId, string enPhrase, string RuTranslate)
         {
-            //look if there are some phrases
-            //if not, add prases
-            //if there is, update phrases
+            //TODO look if there are some phrases
+            //TODO if not, add prases
+            //TODO if there is, update phrases
             return _dicRepository.AddPhrase(pairId, enPhrase,RuTranslate);
         }
-        public void AddWordTranslatesAndPhrasesToDictionary(YaDefenition yandexDTO)
-        {
-
-        }
-        
       
-        // Get Translations or Phrases of word
-        public string[] GetTranslations(string word)
-        {
-            return _dicRepository.GetAllTranslate(word);
-        }
-    //    public Phrase[] GetAllPhrasesByWord(string word) => _dicRepository.GetAllPhrasesForWordOrNull(word);
-        public Phrase[] GetAllPhrasesByWordId(int WordPairId)
-        {
-            return new Phrase[0];
-        }
-     
-        // Get All or single
-        public WordDictionary[] GetAllWords() => _dicRepository.GetAllWordPairs();
-        public Phrase[] GetAllPhrases()
-        {
-            
-            return null;
-        }
-        public Phrase[] GetAllPhrasesByWordPair(string word, string t)
-        {
-            throw new NotImplementedException();
-        }
-        public WordDictionary GetWordFromDictionaryOrNullById(int pairId)
-        {
-            return null;
-        }
-        public WordDictionary[] GetAllTranslateByWordOrNull(string Word)
-        {
-            return null;
-        }
+        public string[] GetAllTranslations(string word) => _dicRepository.GetAllTranslate(word);
+        
+        public object GetPairById(int id) => _dicRepository.GetPairById(id);
+        
+        public WordDictionary GetPairWithPhrasesById(int id) =>  _dicRepository.GetPairByWithPhrasesById(id);
+        
+        public WordDictionary[] GetAllPairsByWord(string word) => _dicRepository.GetAllWordPairsByWord(word);
+        
+        public Phrase[] GetAllPhrasesByWordPairId(int pairId) => _dicRepository.GetAllPhrasesByPairId(pairId);
 
-
-        //Another methods
-        public string GetTranscription(string word)
-        {
-            throw new NotImplementedException();
-        }
-
-        // secondary methods
-        public TranslationSource GetSourse(int pairId) => GetWordFromDictionaryOrNullById(pairId).Sourse;
-
-        public WordDictionary[] GetAllWordPairsByWord(string word)
-        {
-            return _dicRepository.GetAllWordPairsByWord(word);
-        }
+        //TODO
+        public string GetTranscription(string word) => throw new NotImplementedException();
     }
 }

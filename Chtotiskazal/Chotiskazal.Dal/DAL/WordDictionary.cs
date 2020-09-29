@@ -16,7 +16,7 @@ namespace Chotiskazal.DAL
             RuWord = translation;
             Sourse = sourse;
         }
-        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse, Phrase[] phrases)
+        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse, List<Phrase> phrases)
         {
             EnWord = enWord;
             Transcription = transcription;
@@ -40,7 +40,7 @@ namespace Chotiskazal.DAL
                public int WordSourse { get;set; }
         */
 
-        public Phrase[] Phrases { get; set; }
+        public List<Phrase> Phrases { get; set; } = new List<Phrase>();
         public TranslationSource Sourse { get; set; }
 
     }

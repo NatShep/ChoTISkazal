@@ -1,4 +1,5 @@
 ﻿using System;
+using Chotiskazal.Dal.Services;
 
 
 namespace Chotiskazal.DAL
@@ -13,6 +14,20 @@ namespace Chotiskazal.DAL
         public int PairId { get; set; }
         public bool IsPhrase { get; set; }
         public int MetricId { get; set; }
+
+        public UsersPair(int userId, int pairId, int metricId, bool isPhrase)
+        {
+            Created = DateTime.Now;
+            UserId = userId;
+            PairId = pairId;
+            IsPhrase = isPhrase;
+            MetricId = metricId;
+        }
+        
+        public UsersPair()
+        {}
+
     }
+    
 }
 

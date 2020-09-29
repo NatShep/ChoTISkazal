@@ -9,7 +9,7 @@ namespace Chotiskazal.WebApp.Models
     {
         public static TranslationAndContext MapToTranslationAndContext(this WordDictionary wordPair)
         {
-            return new TranslationAndContext(wordPair.EnWord, wordPair.RuWord,wordPair.Transcription,wordPair.Phrases);
+            return new TranslationAndContext(wordPair.Id, wordPair.EnWord, wordPair.RuWord,wordPair.Transcription,wordPair.Phrases.ToArray());
         }
     }
 }

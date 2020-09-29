@@ -9,11 +9,11 @@ using System.Text;
 
 namespace Chotiskazal.Dal.Repo
 {
-    public class UserRepo:BaseRepo
+    public class UserRepo : BaseRepo
     {
         private readonly string _fileName;
 
-        public UserRepo(string fileName) : base(fileName) { }
+        public UserRepo(string fileName) : base(fileName) {}
 
         public int AddUser(User user)
         {
@@ -28,7 +28,7 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public User GetUserByLogin(string login)
+        public User GetUserByLoginOrNull(string login)
         {
             using (var cnn = SimpleDbConnection())
             {
@@ -36,7 +36,7 @@ namespace Chotiskazal.Dal.Repo
                 var user = cnn.Query<User>(
                     @"SELECT UserId, Name, Login, Password,Email,Created,Online
                     FROM Users
-                    WHERE Login = @login", new { login }).FirstOrDefault(); 
+                    WHERE Login = @login", new {login}).FirstOrDefault();
                 return user;
             }
 
@@ -47,11 +47,9 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var user= cnn.Query<User>(@"Select * from Users order by Name").ToArray();
+                var user = cnn.Query<User>(@"Select * from Users order by Name").ToArray();
                 return user;
             }
         }
-
-       
     }
 }
