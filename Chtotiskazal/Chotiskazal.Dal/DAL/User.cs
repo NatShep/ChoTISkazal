@@ -20,7 +20,10 @@ namespace Chotiskazal.DAL
         public User() {
             Exams = new List<Exam>();
             UsersPairs = new List<UsersPair>();
+            Online = 0;
+            Created = DateTime.Now;
         }
+        
         public User (string name,string login, string password, string email)
         {
             Name = name;

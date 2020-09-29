@@ -27,12 +27,7 @@ namespace Chotiskazal.Dal.Services
             return null;
         }
 
-        public User GetUser(string login)
-        {
-            return _repository.GetUser(login);
-
-        }
-
+   
 
         public bool IsUserOnline(User user)
         {
@@ -45,5 +40,9 @@ namespace Chotiskazal.Dal.Services
         }
 
 
+        public User GetUserByLogin(string login)
+        {
+            return _repository.GetUserByLogin(login);
+        }
     }
 }

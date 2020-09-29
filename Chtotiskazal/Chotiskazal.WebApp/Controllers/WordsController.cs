@@ -12,6 +12,7 @@ using static Chotiskazal.LogicR.yapi.MapperForDBModels;
 using Chotiskazal.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace Chotiskazal.WebApp.Controllers
 {
     [Controller]
@@ -47,6 +48,7 @@ namespace Chotiskazal.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> GetTranslation(string word)
         {
+            
             var origin = HttpUtility.UrlDecode(word);
 
             //возвращаю из словаря массив пар слово-перевод, найденных по слову(без фраз)

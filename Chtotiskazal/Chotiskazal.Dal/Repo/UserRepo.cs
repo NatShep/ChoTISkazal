@@ -28,7 +28,7 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public User GetUser(string login)
+        public User GetUserByLogin(string login)
         {
             using (var cnn = SimpleDbConnection())
             {
@@ -51,5 +51,7 @@ namespace Chotiskazal.Dal.Repo
                 return user;
             }
         }
+
+       
     }
 }

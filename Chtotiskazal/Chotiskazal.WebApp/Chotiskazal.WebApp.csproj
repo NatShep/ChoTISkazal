@@ -11,8 +11,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.6" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.6" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6" />
     </ItemGroup>
@@ -34,9 +32,18 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+      <Content Update="Views\Account\Login.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="Views\Account\Register.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Data" />
       <Folder Include="Pages" />
     </ItemGroup>
 

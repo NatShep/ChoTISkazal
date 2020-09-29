@@ -6,12 +6,10 @@ using Chotiskazal.Dal.Repo;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR.yapi;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
-using Chotiskazal.WebApp.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,13 +28,19 @@ namespace Chotiskazal.WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-        //    services.AddDbContext<ApplicationDbContext>(options =>
-          //      options.UseSqlite(
-            //        Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<ApplicationDbContext>(options =>
+              //  options.UseSqlite(
+                //    Configuration.GetConnectionString("DefaultConnection")));
         
-       //     services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-         //       .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+//            .AddEntityFrameworkStores<ApplicationDbContext>();
          
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => 
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                });
+
             services.AddControllersWithViews();
             
             services.AddRazorPages();
@@ -56,6 +60,7 @@ namespace Chotiskazal.WebApp
             services.AddSingleton(new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout));
 
             services.AddSingleton(new DictionaryService(new DictionaryRepository(dbFileName)));
+            services.AddSingleton(new UserService(new UserRepo(dbFileName)));
             
             services.AddHostedService<YapiPingHostedService>();
         }
