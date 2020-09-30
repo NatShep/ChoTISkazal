@@ -31,7 +31,7 @@ namespace ConsoleTesting.Authorization
             Console.WriteLine("Enter password: ");
             var password = Console.ReadLine();
 
-            var user = userService.GetUser(login);
+            var user = userService.GetUserByLoginOrNull(login);
             if (user?.Password == password)
             {
                 return user;

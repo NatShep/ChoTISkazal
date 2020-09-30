@@ -1,37 +1,24 @@
-﻿using Chotiskazal.Dal.Services;
-using Chotiskazal.DAL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Chotiskazal.LogicR;
-using Chotiskazal.Dal;
-using Chotiskazal.ConsoleTesting.Exams;
+using Chotiskazal.App.Exams;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
+using Dic.Logic;
+using Dic.Logic.DAL;
 
-namespace ConsoleTesting.Modes
+
+namespace Chotiskazal.App.Modes
 {
     public class ExamMode : IConsoleMode
     {
         public string Name => "Examination";
-        private int NumberOfWordsForExam = 9;
-        private UsersWordService _usersWordService;
-        private UserService _userService;
-        private ExamsAndMetricService _examsAndMetricService;
-        private User user;
-        private readonly int _maxTranslationSize = 3;
-        
-        public ExamMode(UsersWordService usersWordService, UserService userService,ExamsAndMetricService examsAndMetricService )
+
+        public void Enter(NewWordsService service)
         {
-            _usersWordService = usersWordService;
-            _examsAndMetricService = examsAndMetricService;
-            _userService = userService;
-        }
-        
-        public void Enter(User user)
-        {
-  
-            /*          //Randomization and jobs
+            //Randomization and jobs
             if (RandomTools.Rnd.Next() % 30 == 0)
             {
                 //Add phrases with mutual words to vocab
@@ -40,24 +27,19 @@ namespace ConsoleTesting.Modes
             else
                 service.UpdateAgingAndRandomize(50);
 
-    */
-            var learningWords = SetExamWords(_usersWordService.GetPairsForLearning(user, NumberOfWordsForExam));          
+            Console.WriteLine("Examination");
+            var learningWords = service.GetPairsForLearning(9, 3);
 
+            Console.Clear();
             Console.WriteLine("Examination: ");
-      // пока пусть всегда показывает      if (learningWords.Average(w => w.Metric.PassedScore) <= 4)
+            if (learningWords.Average(w => w.PassedScore) <= 4)
             {
-                foreach (var word in learningWords.Randomize())
+                foreach (var pairModel in learningWords.Randomize())
                 {
-                    Console.WriteLine($"{word.Pair.EnWord}\t\t:{word.TranslationForExam}");
+                    Console.WriteLine($"{pairModel.OriginWord}\t\t:{pairModel.Translation}");
                 }
             }
-            if (learningWords.Length == 0)
-                Console.WriteLine("You haven't words for learning. Add new words to your dictionary.");
 
-            Console.ReadLine();
-
-
-            /*
             var examsList = new List<PairModel>(learningWords.Length * 4);
             //Every learning word appears in test from 2 to 4 times
 
@@ -130,7 +112,7 @@ namespace ConsoleTesting.Modes
                     var result = exam.Pass(service, pairModel, learnList);
 
                     sw.Stop();
-                    questionMetric.ElaspedMs = (int)sw.ElapsedMilliseconds;
+                    questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
                     switch (result)
                     {
                         case ExamResult.Impossible:
@@ -174,7 +156,6 @@ namespace ConsoleTesting.Modes
             }
 
             Console.WriteLine();
-            */
         }
 
         private static void WriteFailed()
@@ -195,45 +176,21 @@ namespace ConsoleTesting.Modes
             Console.WriteLine();
         }
 
-        private UserPairForExam[] SetExamWords(UserPair[] usersPairs)
-        {
-            List<UserPairForExam> LearnigWords = new List<UserPairForExam>();
-            foreach (var pair in usersPairs)
-            {
-                var WordForExam = new UserPairForExam(); //дописать как создается
-                var translations = _usersWordService.GetAllUserTranslatesForWord(user, pair.PairId).ToArray();
-
-                if (translations.Length <= _maxTranslationSize)
-                {
-                    LearnigWords.Add(WordForExam);
-                    continue;
-                }
-
-                var usedTranslations = translations.Randomize().Take(_maxTranslationSize).ToArray();
-                WordForExam.SetTranslations(usedTranslations);
-                LearnigWords.Add(WordForExam);
-               
-            }
-            return LearnigWords.ToArray();
-        }
-
-        private static QuestionMetric CreateQuestionMetric(UserPair userPair, IExam exam)
+        private static QuestionMetric CreateQuestionMetric(PairModel pairModel, IExam exam)
         {
             var questionMetric = new QuestionMetric
             {
-            //    AggregateScoreBefore = pairModel.AggregateScore,
-            //    WordId = pairModel.Id,
-             //   Created = DateTime.Now,
-              //  ExamsPassed = pairModel.Examed,
-               // PassedScoreBefore = pairModel.PassedScore,
-             //   PhrasesCount = pairModel.Phrases?.Count ?? 0,
-              //  PreviousExam = pairModel.LastExam,
-                //Type = exam.Name,
-               // WordAdded = pairModel.Created
+                AggregateScoreBefore = pairModel.AggregateScore,
+                WordId = pairModel.Id,
+                Created = DateTime.Now,
+                ExamsPassed = pairModel.Examed,
+                PassedScoreBefore = pairModel.PassedScore,
+                PhrasesCount = pairModel.Phrases?.Count ?? 0,
+                PreviousExam = pairModel.LastExam,
+                Type = exam.Name,
+                WordAdded = pairModel.Created
             };
             return questionMetric;
-
-
         }
     }
 }

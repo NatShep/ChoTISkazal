@@ -28,8 +28,4 @@
     <ProjectReference Include="..\Chotiskazal.Logic\Chotiskazal.Logic.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Autorisation\" />
-  </ItemGroup>
-
 </Project>

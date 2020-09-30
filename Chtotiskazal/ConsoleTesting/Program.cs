@@ -4,10 +4,10 @@ using Chotiskazal.Dal.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.LogicR.yapi;
 using ConsoleTesting.Authorization;
-using ConsoleTesting.Modes;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
+using Chotiskazal.Api.ConsoleModes;
 
 namespace ConsoleTesting
 {
@@ -36,15 +36,15 @@ namespace ConsoleTesting
             var dictionaryService = new DictionaryService(dicRepo);
             var examsAndMetricService = new ExamsAndMetricService(examsAndMetricRepo);
             var userService = new UserService(userRepo);
-            var userWordService = new UsersWordService(userWordRepo, dicRepo, examsAndMetricRepo);
+            var userWordService = new UsersWordService(userWordRepo);
 
             DoMigration.ApplyMigrations(dbFileName);
 
             var modes = new IConsoleMode[]
             {
-                new ExamMode(userWordService,userService,examsAndMetricService),
+                 //      new ExamMode(userWordService,userService,examsAndMetricService),
                 new WordAdditionMode(yapiTransClient, yapiDicClient,userWordService,dictionaryService),
-                new GraphsStatsMode(),
+             //   new GraphsStatsMode(),
              //   new RandomizeMode(),
              //   new AddPhraseToWordsMode(yapiDicClient), 
             };

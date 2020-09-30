@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Chotiskazal.Api\Chotiskazal.Api.csproj" />
     <ProjectReference Include="..\Chotiskazal.Dal\Chotiskazal.Dal.csproj" />
   </ItemGroup>
 

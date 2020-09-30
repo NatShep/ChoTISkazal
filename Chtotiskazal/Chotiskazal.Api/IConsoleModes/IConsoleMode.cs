@@ -3,7 +3,7 @@ using Chotiskazal.Dal.Repo;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.DAL;
 
-namespace ConsoleTesting.Modes
+namespace Chotiskazal.Api.ConsoleModes
 {
     public interface IConsoleMode
     {

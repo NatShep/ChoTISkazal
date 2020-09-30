@@ -1,5 +1,4 @@
-﻿using Chotiskazal.ConsoleTesting;
-using Chotiskazal.Dal.Services;
+﻿using Chotiskazal.Dal.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 using Chotiskazal.LogicR.yapi;
@@ -8,11 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Chotiskazal.ConsoleTesting;
 
 
-namespace ConsoleTesting.Modes
+namespace Chotiskazal.Api.ConsoleModes
+
 {
-    class WordAdditionMode : IConsoleMode
+    public class WordAdditionMode : IConsoleMode
     {
         private readonly YandexDictionaryApiClient _yapiDicClient;
         private readonly YandexTranslateApiClient _yapiTransClient;
@@ -20,21 +21,24 @@ namespace ConsoleTesting.Modes
         private readonly DictionaryService _dictionaryService;
         private string sourse = "Unknown sourse";
 
-        public WordAdditionMode(YandexTranslateApiClient yapiTranslateApiClient, YandexDictionaryApiClient yandexDictionaryApiClient, UsersWordService usersWordService, DictionaryService dictionaryService)
+        public WordAdditionMode(YandexTranslateApiClient yapiTranslateApiClient,
+            YandexDictionaryApiClient yandexDictionaryApiClient, UsersWordService usersWordService,
+            DictionaryService dictionaryService)
         {
             _yapiDicClient = yandexDictionaryApiClient;
             _yapiTransClient = yapiTranslateApiClient;
             _usersWordService = usersWordService;
             _dictionaryService = dictionaryService;
-
         }
+
         public string Name => "Add new words";
+
         public void Enter(User user)
         {
             var dicPing = _yapiDicClient.Ping();
             var transPing = _yapiTransClient.Ping();
             Task.WaitAll(dicPing, transPing);
-            var timer = new Timer(5000) { AutoReset = false };
+            var timer = new Timer(5000) {AutoReset = false};
             timer.Enabled = true;
             timer.Elapsed += (s, e) =>
             {
@@ -71,27 +75,17 @@ namespace ConsoleTesting.Modes
                 List<TranslationAndContext> translations = new List<TranslationAndContext>();
                 if (task?.Result?.Any() == true)
                 {
-                    sourse="Yandex Dictionary";
+                    sourse = "Yandex Dictionary";
                     var variants = task.Result.SelectMany(r => r.Tr);
-                    
+
                     foreach (var yandexTranslation in variants)
                     {
                         var phrases = yandexTranslation.GetPhrases(word);
-                        translations.Add(new TranslationAndContext(word, yandexTranslation.Text, yandexTranslation.Pos, phrases.ToArray()));
+                        translations.Add(new TranslationAndContext(word, yandexTranslation.Text, yandexTranslation.Pos,
+                            new Phrase[0])); //добавить переведенные фразы вместо Phrase[0]
                     }
                 }
-                else
-                {
-                    var dictionaryMatch =_dictionaryService.GetAllTranslations(word);
-                    if (dictionaryMatch.Length != 0)
-                    {
-                        sourse = "Offline Dictionary";
-                        translations.AddRange(
-                            dictionaryMatch.Select(t =>
-                                new TranslationAndContext(word, t, _dictionaryService.GetTranscription(word), _dictionaryService.GetAllPhrasesByWordPairId(word, t))));
-                    }
-                }
-
+             
                 if (!translations.Any())
                 {
                     try
@@ -133,14 +127,13 @@ namespace ConsoleTesting.Modes
                         var results = ChooseTranslation(translations.ToArray());
                         if (results?.Any() == true)
                         {
-                            
                             var userTranslations = results.Select(t => t.Translation).ToArray();
                             var allPhrases = results.SelectMany(t => t.Phrases).ToArray();
                             var allMeanings = translations.Select(t => t.Translation).ToArray();
-                        
-                            
+
+
                             //TODO Adding To dictionary
-                            
+
                             /*    _dictionaryService.AddNewWordToDictionary(
                                 enword: word,
                                 transcription: translations[0].Transcription,
@@ -152,9 +145,10 @@ namespace ConsoleTesting.Modes
                                 word: word,
                                 userTranslations: userTranslations,
                                 IsPhrase: false);
-                           */         
+                           */
 
-                            Console.WriteLine($"Saved. Tranlations: {userTranslations.Length}, Phrases: {allPhrases.Length}");
+                            Console.WriteLine(
+                                $"Saved. Tranlations: {userTranslations.Length}, Phrases: {allPhrases.Length}");
                         }
                     }
                     catch (OperationCanceledException)
@@ -194,21 +188,22 @@ namespace ConsoleTesting.Modes
                             continue;
                         }
                     }
+
                     if (res.Length > 1)
-                        return new[] { new TranslationAndContext(translations[0].Origin, res, translations[0].Transcription, new Phrase[0]) };
+                        return new[]
+                        {
+                            new TranslationAndContext(translations[0].Origin, res, translations[0].Transcription,
+                                new Phrase[0])
+                        };
                     else continue;
                 }
+
                 if (ires == 0)
                     return null;
                 if (ires > translations.Length || ires < 0)
                     continue;
-                return new[] { translations[ires - 1] };
+                return new[] {translations[ires - 1]};
             }
         }
     }
-
 }
-
-
-
-
