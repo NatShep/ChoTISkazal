@@ -5,6 +5,7 @@ using System.Linq;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Chotiskazal.Dal.Repo
@@ -17,6 +18,8 @@ namespace Chotiskazal.Dal.Repo
 
         public int AddUser(User user)
         {
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
@@ -30,6 +33,8 @@ namespace Chotiskazal.Dal.Repo
 
         public User GetUserByLoginOrNull(string login)
         {
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
@@ -39,15 +44,16 @@ namespace Chotiskazal.Dal.Repo
                     WHERE Login = @login", new {login}).FirstOrDefault();
                 return user;
             }
-
         }
 
         public User[] GetAllUsers()
         {
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var user = cnn.Query<User>(@"Select * from Users order by Name").ToArray();
+                var user = cnn.Query<User>(@"Select * from Users order by Login").ToArray();
                 return user;
             }
         }

@@ -11,19 +11,14 @@ namespace Chotiskazal.Dal.Services
         
         public int AddUser(User user) => _repository.AddUser(user);
         
-        public User GetUserByLogin(string login) => _repository.GetUserByLoginOrNull(login);
+        public User GetUserByLoginOrNull(string login) => _repository.GetUserByLoginOrNull(login);
+     
+        public User[] GetAllUser() => _repository.GetAllUsers();
         
         //TODO
         public void DeleteUser(User user) {}
 
         //TODO
         public bool IsUserOnline(User user) => true;
-       
-        //TODO
-        public User[] GetAllUser() => _repository.GetAllUsers();
-        
-
-
-       
     }
 }

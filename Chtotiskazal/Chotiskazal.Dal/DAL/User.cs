@@ -15,11 +15,11 @@ namespace Chotiskazal.DAL
         public int Online { get; set; }
 
         public List<Exam> Exams { get; set; }
-        public List<UsersPair> UsersPairs { get; set; }
+        public List<UserPair> UsersPairs { get; set; }
 
         public User() {
             Exams = new List<Exam>();
-            UsersPairs = new List<UsersPair>();
+            UsersPairs = new List<UserPair>();
             Online = 0;
             Created = DateTime.Now;
         }
@@ -31,7 +31,7 @@ namespace Chotiskazal.DAL
             Password = password;
             Email = email;
             Exams = new List<Exam>();
-            UsersPairs = new List<UsersPair>();
+            UsersPairs = new List<UserPair>();
             Online = 0;
             Created = DateTime.Now;
         }

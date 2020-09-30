@@ -18,7 +18,7 @@ namespace ConsoleTesting
         public string TranslationForExam { get; set; }
 
 
-        public UserPairForExam CreateFromBaseUserPair(UsersPair usersPair, User user, QuestionMetric metric)
+        public UserPairForExam CreateFromBaseUserPair(UserPair userPair, User user, QuestionMetric metric)
         {
             var userPairForExam = new UserPairForExam();
             return userPairForExam;

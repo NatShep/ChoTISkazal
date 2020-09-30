@@ -15,15 +15,17 @@ namespace Chotiskazal.Dal.Services
         
         public UsersWordService(UserWordsRepo repository) =>_UserWordRepository = repository;
   
-        public string[] GetAllUserTranslatesForWord(User user, int id) => _UserWordRepository.GetAllTranslateForUser(user, id);
+        public string[] GetAllUserTranslatesForWord(User user, string word) => _UserWordRepository.GetAllTranslateForWord(user, word);
         
         public int AddWordToUserCollection(User user, int wordId) =>  _UserWordRepository.SaveToUserDictionary(wordId, user.UserId);
-        
+
+        public UserPair GetPairByDicId(User user, int id) => _UserWordRepository.GetPairByDicIdOrNull(user, id);
+            
         //TODO
         public void DeleteWordFromUserCollection(User user, int wordId){}
         
         //TODO
-        public UsersPair GetPairByWordOrNull(User user, string word)
+        public UserPair[] GetPairsByWordOrNull(User user, string word)
         {
             //check ru or eng word?
             //find Pair
@@ -31,10 +33,12 @@ namespace Chotiskazal.Dal.Services
         }
         
         //TODO
-        public UsersPair[] GetPairsForLearning(User user, int count) => _UserWordRepository.GetWorstForUser(user,count);
+        public UserPair[] GetPairsForLearning(User user, int count) => _UserWordRepository.GetWorstForUser(user,count);
          
         //TODO
-        public UsersPair[] GetPairsForTests(User user, int count, int learnRate) =>
+        public UserPair[] GetPairsForTests(User user, int count, int learnRate) =>
             _UserWordRepository.GetWordsForUserTests(count, learnRate, user);
+
+      
     }
 }

@@ -195,7 +195,7 @@ namespace ConsoleTesting.Modes
             Console.WriteLine();
         }
 
-        private UserPairForExam[] SetExamWords(UsersPair[] usersPairs)
+        private UserPairForExam[] SetExamWords(UserPair[] usersPairs)
         {
             List<UserPairForExam> LearnigWords = new List<UserPairForExam>();
             foreach (var pair in usersPairs)
@@ -217,7 +217,7 @@ namespace ConsoleTesting.Modes
             return LearnigWords.ToArray();
         }
 
-        private static QuestionMetric CreateQuestionMetric(UsersPair usersPair, IExam exam)
+        private static QuestionMetric CreateQuestionMetric(UserPair userPair, IExam exam)
         {
             var questionMetric = new QuestionMetric
             {

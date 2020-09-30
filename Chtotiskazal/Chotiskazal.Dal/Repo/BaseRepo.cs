@@ -14,16 +14,10 @@ namespace Chotiskazal.Dal.Repo
         private readonly string _fileName;
         protected string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName);
 
-        public BaseRepo(string fileName)
-        {
-            _fileName = fileName;
-        }
-
+        public BaseRepo(string fileName) => _fileName = fileName;
+        
         public SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 
-        protected void ApplyMigrations()
-        {
-            DoMigration.ApplyMigrations(DbFile);
-        }
+        protected void ApplyMigrations() => DoMigration.ApplyMigrations(DbFile);
     }
 }

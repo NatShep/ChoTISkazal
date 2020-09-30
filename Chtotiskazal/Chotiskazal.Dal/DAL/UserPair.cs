@@ -6,7 +6,7 @@ namespace Chotiskazal.DAL
 {
     // хотим ли мы разделять слово-значение1, слово-значение2
     // или слово - все значения, помеченные юзером.
-    public class UsersPair
+    public class UserPair
     {
         public int Id { get; set; }
         public DateTime Created { get; set; }
@@ -15,7 +15,7 @@ namespace Chotiskazal.DAL
         public bool IsPhrase { get; set; }
         public int MetricId { get; set; }
 
-        public UsersPair(int userId, int pairId, int metricId, bool isPhrase)
+        public UserPair(int userId, int pairId, int metricId, bool isPhrase)
         {
             Created = DateTime.Now;
             UserId = userId;
@@ -24,7 +24,7 @@ namespace Chotiskazal.DAL
             MetricId = metricId;
         }
         
-        public UsersPair()
+        public UserPair()
         {}
 
     }

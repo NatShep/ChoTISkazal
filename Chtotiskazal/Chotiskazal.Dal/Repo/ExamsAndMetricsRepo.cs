@@ -90,7 +90,7 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                foreach (var word in cnn.Query<UsersPair>(@"Select * From Words order by RANDOM() limit @count", new { count }).ToArray())
+                foreach (var word in cnn.Query<UserPair>(@"Select * From Words order by RANDOM() limit @count", new { count }).ToArray())
                 {
                     
                     FindMetricOrNull(word.MetricId).UpdateAgingAndRandomization();
@@ -107,7 +107,7 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                foreach (var word in cnn.Query<UsersPair>(@"Select * From Words").ToArray())
+                foreach (var word in cnn.Query<UserPair>(@"Select * From Words").ToArray())
                 {
                     FindMetricOrNull(word.MetricId).UpdateAgingAndRandomization();
                     var op = $"Update words set AggregateScore = { FindMetricOrNull(word.MetricId).AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
@@ -137,7 +137,7 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Execute(op, metric);
             }
         }
-        public void UpdateScoresAndTranslation(UsersPair word)
+        public void UpdateScoresAndTranslation(UserPair word)
         {
             if (!File.Exists(DbFile))
                 return;

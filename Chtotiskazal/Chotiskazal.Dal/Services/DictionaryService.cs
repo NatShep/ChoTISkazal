@@ -32,9 +32,9 @@ namespace Chotiskazal.Dal.Services
       
         public string[] GetAllTranslations(string word) => _dicRepository.GetAllTranslate(word);
         
-        public object GetPairById(int id) => _dicRepository.GetPairById(id);
+        public WordDictionary GetPairByIdOrNull(int id) => _dicRepository.GetPairByIdOrNull(id);
         
-        public WordDictionary GetPairWithPhrasesById(int id) =>  _dicRepository.GetPairByWithPhrasesById(id);
+        public WordDictionary GetPairWithPhrasesById(int id) =>  _dicRepository.GetPairWithPhrasesById(id);
         
         public WordDictionary[] GetAllPairsByWord(string word) => _dicRepository.GetAllWordPairsByWord(word);
         

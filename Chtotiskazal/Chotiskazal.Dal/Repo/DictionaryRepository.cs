@@ -10,37 +10,11 @@ namespace Chotiskazal.Dal.Repo
 {
     public class DictionaryRepository : BaseRepo
     {
-        public DictionaryRepository(string fileName) : base(fileName)
-        {
-        }
-
-        //TODO Get all Phrases for wordPair(or for Word?)
-        public Phrase[] GetAllPhrasesByPairId(int wordPiarId)
-        {
-            if (!File.Exists(DbFile))
-                return new Phrase[0];
-
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                return cnn.Query<Phrase>(@"Select * From ContextPhrases").ToArray();
-            }
-        }
-
-        //Get All translate for RuWord or EngWord
-        public string[] GetAllTranslate(string word)
-        {
-            //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
-            //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
-            return new string[0];
-        }
-
+        public DictionaryRepository(string fileName) : base(fileName){}
+        
         public int AddWordPair(WordDictionary word)
         {
-            if (!File.Exists(DbFile))
-            {
-                ApplyMigrations();
-            }
+            CheckDbFile.Check(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
@@ -50,6 +24,7 @@ namespace Chotiskazal.Dal.Repo
                                       VALUES( @EnWord,  @Transcription,  @RuWord, @Sourse); 
                           select last_insert_rowid()", word);
 
+                //TODO 
                 if (word.Phrases != null)
                 {
                     foreach (var phrase in word.Phrases)
@@ -59,13 +34,16 @@ namespace Chotiskazal.Dal.Repo
                         //               VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
                     }
                 }
-
+                //TODO
+                
                 return word.Id;
             }
         }
 
         public int AddPhrase(int pairId, string enPhrase, string ruTranslate)
         {
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 var phrase = new Phrase(pairId, enPhrase, ruTranslate);
@@ -79,9 +57,12 @@ namespace Chotiskazal.Dal.Repo
 
         public WordDictionary[] GetAllWordPairsByWord(string word)
         {
-            //We can finf by RuWord or by EnWord.
+            //TODO
+            //We can find by RuWord or by EnWord.
             //Check the symbol of word before seeking
             //now just for EnWord!!!
+            //TODO
+
             if (!File.Exists(DbFile))
                 throw new Exception("No Db File");
             using (var cnn = SimpleDbConnection())
@@ -92,12 +73,22 @@ namespace Chotiskazal.Dal.Repo
                 return result.ToArray();
             }
         }
-
-
-        public WordDictionary GetPairById(int? id)
+        
+        public Phrase[] GetAllPhrasesByPairId(int wordPairId)
         {
-            if (!File.Exists(DbFile))
-                throw new Exception("No Db File");
+            CheckDbFile.Check(DbFile);
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                return cnn.Query<Phrase>(@"Select * From Phrases WHERE PairId = @wordPairId  ").ToArray();
+            }
+        }
+
+        public WordDictionary GetPairByIdOrNull(int? id)
+        {
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
@@ -106,13 +97,15 @@ namespace Chotiskazal.Dal.Repo
                     WHERE Id = @id", new {id}).FirstOrDefault();
                 return result;
             }
-            return null;
         }
 
-        public WordDictionary GetPairByWithPhrasesById(int? id)
+        //TODO
+        //need to test
+        //TODO
+        public WordDictionary GetPairWithPhrasesById(int? id)
         {
-            if (!File.Exists(DbFile))
-                throw new Exception("No Db File");
+            CheckDbFile.Check(DbFile);
+            
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
@@ -126,6 +119,13 @@ namespace Chotiskazal.Dal.Repo
                     });
             }
             return null;
+        }
+        //TODO
+        public string[] GetAllTranslate(string word)
+        {
+            //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
+            //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
+            return new string[0];
         }
     }
 }

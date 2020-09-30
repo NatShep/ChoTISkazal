@@ -22,9 +22,9 @@ namespace Chotiskazal.Dal.Services
         {
             _examsAndMetricsRepo.UpdateAgingAndRandomization(count);
         }
-        public void RegistrateFailure(UsersPair usersPair)
+        public void RegistrateFailure(UserPair userPair)
         {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(usersPair.MetricId);
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(userPair.MetricId);
             metric.OnExamFailed();
             metric.UpdateAgingAndRandomization();
             _examsAndMetricsRepo.UpdateScores(metric);
@@ -40,9 +40,9 @@ namespace Chotiskazal.Dal.Services
                 Passed = successCount
             });
         }
-        public void RegistrateSuccess(UsersPair usersPair)
+        public void RegistrateSuccess(UserPair userPair)
         {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(usersPair.MetricId);
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(userPair.MetricId);
             metric.OnExamPassed();
             metric.UpdateAgingAndRandomization();
             _examsAndMetricsRepo.UpdateScores(metric);
@@ -51,9 +51,9 @@ namespace Chotiskazal.Dal.Services
         {
             _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
         }
-        public void UpdateRatings(UsersPair usersPairModel)
+        public void UpdateRatings(UserPair userPairModel)
         {
-            _examsAndMetricsRepo.UpdateScoresAndTranslation(usersPairModel);
+            _examsAndMetricsRepo.UpdateScoresAndTranslation(userPairModel);
         }
     }
 }

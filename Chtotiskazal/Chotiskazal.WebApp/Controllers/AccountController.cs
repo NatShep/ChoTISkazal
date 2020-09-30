@@ -30,7 +30,7 @@ namespace Chotiskazal.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = _userService.GetUserByLogin(model.Login);
+                User user = _userService.GetUserByLoginOrNull(model.Login);
                 if (user != null)
                 {
                     await Authenticate(model.Login); // аутентификация
@@ -53,7 +53,7 @@ namespace Chotiskazal.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = _userService.GetUserByLogin(model.Login);
+                var user = _userService.GetUserByLoginOrNull(model.Login);
                 if (user == null)
                 {
                     // добавляем пользователя в бд
