@@ -22,21 +22,21 @@ namespace Chotiskazal.WebApp.Controllers
         private readonly YandexDictionaryApiClient _yandexDictionaryApiClient;
         private readonly UsersWordService _usersWordService;
         private readonly UserService _userService;
-        private readonly YandexTranslateApiClient _yaTransApi;
+        private readonly YandexTranslateApiClient _yandexTransApiClient;
         private readonly DictionaryService _dictionaryService;
 
-        public WordsController(YandexDictionaryApiClient yaapiClient, YandexTranslateApiClient yaTransApi
+        public WordsController(YandexDictionaryApiClient yaapiClient, YandexTranslateApiClient yandexTransApiClient
             ,DictionaryService dictionaryService, UsersWordService usersWordService, UserService userService)
         {
             _yandexDictionaryApiClient = yaapiClient;
-            _yaTransApi = yaTransApi;
+            _yandexTransApiClient = yandexTransApiClient;
             _dictionaryService = dictionaryService;
             _usersWordService = usersWordService;
             _userService = userService;
         }
 
         [HttpGet]
-        public async Task<HealthResponse> GetHealth()
+        public async Task<HealthResponse> GetHealthDictionary()
         {
             var pingResult = await _yandexDictionaryApiClient.Ping();
             if (pingResult)
@@ -45,6 +45,16 @@ namespace Chotiskazal.WebApp.Controllers
                 return new HealthResponse(HealthStatus.Offline);
         }
 
+        [HttpGet]
+        public async Task<HealthResponse> GetHealthTranslation()
+        {
+            var pingResult = await _yandexTransApiClient.Ping();
+            if (pingResult)
+                return new HealthResponse(HealthStatus.Online);
+            else
+                return new HealthResponse(HealthStatus.Offline);
+        }
+        
         [Authorize]
         [HttpGet]
         public IActionResult GetTranslation() => View();
@@ -96,6 +106,13 @@ namespace Chotiskazal.WebApp.Controllers
             return translateWithContexts;
         }
 
+        
+        public class HealthResponse
+        {
+            public HealthResponse(HealthStatus status) => Status = status.ToString();
+            public string Status { get; }
+        }
+
         //TODO
         //Isolate to Chotiskazal.Api
         //TODO
@@ -145,7 +162,7 @@ namespace Chotiskazal.WebApp.Controllers
 
             try
             {
-                var transAnsTask = _yaTransApi.Translate(word);
+                var transAnsTask = _yandexTransApiClient.Translate(word);
                 transAnsTask.Wait();
                 if (!string.IsNullOrWhiteSpace(transAnsTask.Result))
                 {
@@ -166,15 +183,6 @@ namespace Chotiskazal.WebApp.Controllers
             }
 
             return translationsWithContext;
-        }
-
-        //TODO
-        //Isolate to Chotiskazal.Api
-        //TODO
-        public class HealthResponse
-        {
-            public HealthResponse(HealthStatus status) => Status = status.ToString();
-            public string Status { get; }
         }
     }
 }

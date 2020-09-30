@@ -55,7 +55,6 @@ namespace Chotiskazal.LogicR.yapi
             catch (Exception e)
             {
                 IsOnline = false;
-
                 return null;
             }
         }
