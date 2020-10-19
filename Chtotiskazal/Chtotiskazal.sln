@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chotiskazal.App", "Chotiskazal.App\Chotiskazal.App.csproj", "{1AEAFC94-8A20-4D50-99DF-B13E92FA39B2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chotiskazal.Logic", "Chotiskazal.Logic\Chotiskazal.Logic.csproj", "{5BE1AC92-5E0A-4F7C-B9CA-C811A6EE6616}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chotiskazal.ConsoleApp", "Chotiskazal.ConsoleApp\Chotiskazal.ConsoleApp.csproj", "{1AEAFC94-8A20-4D50-99DF-B13E92FA39B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chotiskazal.Dal", "Chotiskazal.Dal\Chotiskazal.Dal.csproj", "{F4306F53-5B8E-4B16-8453-0D25C70575C2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTesting", "ConsoleTesting\ConsoleTesting.csproj", "{6B9DDE29-9A10-4754-8A38-6BEE678DB0B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chotiskazal.WebApp", "Chotiskazal.WebApp\Chotiskazal.WebApp.csproj", "{AB00C057-3532-4B58-86B0-8B0DC305035D}"
 EndProject
@@ -25,18 +21,10 @@ Global
 		{1AEAFC94-8A20-4D50-99DF-B13E92FA39B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AEAFC94-8A20-4D50-99DF-B13E92FA39B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AEAFC94-8A20-4D50-99DF-B13E92FA39B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BE1AC92-5E0A-4F7C-B9CA-C811A6EE6616}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BE1AC92-5E0A-4F7C-B9CA-C811A6EE6616}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BE1AC92-5E0A-4F7C-B9CA-C811A6EE6616}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BE1AC92-5E0A-4F7C-B9CA-C811A6EE6616}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B9DDE29-9A10-4754-8A38-6BEE678DB0B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B9DDE29-9A10-4754-8A38-6BEE678DB0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B9DDE29-9A10-4754-8A38-6BEE678DB0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B9DDE29-9A10-4754-8A38-6BEE678DB0B4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB00C057-3532-4B58-86B0-8B0DC305035D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB00C057-3532-4B58-86B0-8B0DC305035D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB00C057-3532-4B58-86B0-8B0DC305035D}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,5 +1,5 @@
-﻿using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+﻿using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -7,7 +7,7 @@ namespace Chotiskazal.ApI.Exams
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList);
+        ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList);
     }
 
     public enum ExamResult

@@ -17,6 +17,7 @@ namespace Chotiskazal.Dal.Migrations
                 new CreateUserPairTable(),
                 new CreateQuestionMetricTable(),
                 new CreatePhraseTableMigration(), 
+                new CreateExamTable(), 
             };
             Console.WriteLine("Applying migrations...");
 

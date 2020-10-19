@@ -1,6 +1,6 @@
 ﻿using System;
-using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -10,9 +10,9 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "Ru trust";
 
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
-            Console.WriteLine("=====>   " + word.Translation + "    <=====");
+            Console.WriteLine("=====>   " + word.Translations + "    <=====");
             Console.WriteLine("Press any key to see the translation...");
             Console.ReadKey();
             Console.WriteLine("Translation is \r\n" + word.OriginWord + "\r\n Did you guess?");
@@ -21,10 +21,10 @@ namespace Chotiskazal.ApI.Exams
             switch (answer.Key)
             {
                 case ConsoleKey.Y:
-                    service.RegistrateSuccess(word);
+                    service.RegistrateSuccess(word.MetricId);
                     return ExamResult.Passed;
                 case ConsoleKey.N:
-                    service.RegistrateFailure(word);
+                    service.RegistrateFailure(word.MetricId);
                     return ExamResult.Failed;
                 case ConsoleKey.E: return ExamResult.Exit;
                 case ConsoleKey.Escape: return ExamResult.Exit;

@@ -46,6 +46,7 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
+        //TODO additional methods 
         public User[] GetAllUsers()
         {
             CheckDbFile.Check(DbFile);

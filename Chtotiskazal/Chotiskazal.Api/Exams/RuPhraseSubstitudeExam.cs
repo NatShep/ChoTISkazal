@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -11,7 +11,7 @@ namespace Chotiskazal.ApI.Exams
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitude";
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -34,14 +34,14 @@ namespace Chotiskazal.ApI.Exams
                     continue;
                 if (string.CompareOrdinal(phrase.TranslationWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    service.RegistrateSuccess(word);
+                    service.RegistrateSuccess(word.MetricId);
                     return ExamResult.Passed;
                 }
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Origin phrase was \"{phrase.Translation}\"");
                 Console.ResetColor();
-                service.RegistrateFailure(word);
+                service.RegistrateFailure(word.MetricId);
                 return ExamResult.Failed;
             }
         }

@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams
 {
-    public class RuWriteExam : IExam
+   /* public class RuWriteExam : IExam
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
             var words = word.OriginWord.Split(',').Select(s => s.Trim());
             var minCount = words.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            Console.WriteLine("=====>   " + word.Translation+ "    <=====");
+            Console.WriteLine("=====>   " + word.Translations+ "    <=====");
 
             Console.Write("Write the translation: ");
             var userEntry = Console.ReadLine();
@@ -26,7 +26,7 @@ namespace Chotiskazal.ApI.Exams
 
             if (words.Any(t => string.Compare(userEntry, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccess(word.MetricId);
                 return ExamResult.Passed;
             }
             else
@@ -48,17 +48,17 @@ namespace Chotiskazal.ApI.Exams
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"'{userEntry}' translates as {translationCandidate.Translation}");
+                        Console.WriteLine($"'{userEntry}' translates as {translationCandidate.Translations}");
                         Console.ResetColor();
 
-                        service.RegistrateFailure(word);
+                        service.RegistrateFailure(word.MetricId);
                         return ExamResult.Failed;
                     }
                 }
                 Console.WriteLine("The translation was: " + word.OriginWord);
-                service.RegistrateFailure(word);
+                service.RegistrateFailure(word.MetricId);
                 return ExamResult.Failed;
             }
         }
-    }
+    }*/
 }

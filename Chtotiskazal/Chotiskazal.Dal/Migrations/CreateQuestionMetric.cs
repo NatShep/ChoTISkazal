@@ -6,7 +6,7 @@ public class CreateQuestionMetricTable : SimpleMigration
 
         public override string  Query => @"create table if not exists QuestionMetric
               (
-                 Id                                  integer primary key AUTOINCREMENT,
+                 MetricId                                  integer primary key AUTOINCREMENT,
                  ElaspedMs                           integer,
                  Result                              integer,
                  Type                                nvarchar(100) not null,

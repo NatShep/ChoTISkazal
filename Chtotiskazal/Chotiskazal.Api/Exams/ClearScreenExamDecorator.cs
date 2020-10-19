@@ -1,6 +1,6 @@
 ﻿using System;
-using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -16,7 +16,7 @@ namespace Chotiskazal.ApI.Exams
         }
 
         public string Name => "Clean "+ _origin.Name;
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList) 
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList) 
             => _origin.Pass(service, word, examList);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -12,11 +12,11 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "RuChoose";
 
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
             var variants = examList.Randomize().Select(e => e.OriginWord).ToArray();
 
-            Console.WriteLine("=====>   " + word.Translation + "    <=====");
+            Console.WriteLine("=====>   " + word.Translations + "    <=====");
 
             for (int i = 1; i <= variants.Length; i++)
             {
@@ -35,10 +35,10 @@ namespace Chotiskazal.ApI.Exams
 
             if (variants[selectedIndex - 1] == word.OriginWord)
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccess(word.MetricId);
                 return ExamResult.Passed;
             }
-            service.RegistrateFailure(word);
+            service.RegistrateFailure(word.MetricId);
 
             return ExamResult.Failed;
         }

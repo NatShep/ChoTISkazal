@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dic.Logic;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -66,10 +66,13 @@ namespace Chotiskazal.ApI.Exams
                 exam: new EngWriteExam(),
                 expectedScore: 8,
                 frequency: 14);
-        private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
+        /*
+        pr8ivate static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
             exam: new RuWriteExam(),
             expectedScore: 8,
             frequency: 14);
+        */
+        
         private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
@@ -92,13 +95,14 @@ namespace Chotiskazal.ApI.Exams
                 exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
                 frequency: 14);
-        private static readonly ExamAndPreferedScore HideousRuWriteExam =
+       
+        /*private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
                 frequency: 14);
-
-        public static IExam GetNextExamFor(bool isFirstExam, PairModel model)
+*/
+        public static IExam GetNextExamFor(bool isFirstExam, WordForLearning model)
         {
             if (isFirstExam && model.PassedScore < 7)
             {
@@ -137,13 +141,13 @@ namespace Chotiskazal.ApI.Exams
                 EngTrust, 
                 RuTrust, 
                 EngWrite, 
-                RuWrite, 
+       //         RuWrite, 
                 HideousRuPhraseChoose,
                 HideousEngPhraseChoose,
                 HideousEngTrust, 
                 HideousRuTrust, 
                 HideousEngWriteExam, 
-                HideousRuWriteExam,
+         //       HideousRuWriteExam,
                 ClearEngPhraseSubstitude,
                 ClearRuPhraseSubstitude,
                 EngPhraseSubstitude,

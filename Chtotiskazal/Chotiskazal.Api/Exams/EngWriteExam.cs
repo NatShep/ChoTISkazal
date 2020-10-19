@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -11,7 +11,7 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "Eng Write";
 
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
             
             var translations = word.GetTranslations();
@@ -29,7 +29,7 @@ namespace Chotiskazal.ApI.Exams
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccess(word.MetricId);
                 return ExamResult.Passed;
             }
             else
@@ -38,14 +38,14 @@ namespace Chotiskazal.ApI.Exams
                     .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Choosen translation is out of scope (but it is correct). Expected translations are: " + word.Translation);
+                    Console.WriteLine("Choosen translation is out of scope (but it is correct). Expected translations are: " + word.Translations);
                     Console.ResetColor();
                     Console.WriteLine();
                     return ExamResult.Impossible;
                 }
 
-                Console.WriteLine("The translation was: "+ word.Translation);
-                service.RegistrateFailure(word);
+                Console.WriteLine("The translation was: "+ word.Translations);
+                service.RegistrateFailure(word.MetricId);
                 return ExamResult.Failed;
             }
         }

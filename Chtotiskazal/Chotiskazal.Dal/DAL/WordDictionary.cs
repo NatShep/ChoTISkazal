@@ -24,7 +24,7 @@ namespace Chotiskazal.DAL
             Phrases = phrases;
             Sourse = sourse;
         }
-        public int Id { get; set; }
+        public int PairId { get; set; }
         public string EnWord { get; set; }
 
         //for one Word has one Translation

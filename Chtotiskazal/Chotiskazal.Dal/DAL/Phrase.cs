@@ -7,6 +7,8 @@ namespace Chotiskazal.DAL
 {
     public class Phrase
     {
+        public Phrase(){}
+        
         public Phrase(string enPhrase, string ruTranslate)
         {
             EnPhrase = enPhrase;

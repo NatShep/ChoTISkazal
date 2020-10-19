@@ -15,9 +15,9 @@ namespace Chotiskazal.Dal.Migrations
                  Created                             datetime not null,
                  IsPhrase                            bit,
                   
-                 FOREIGN KEY (UserId) REFERENCES Users(UserId),
-                 FOREIGN KEY (PairId) REFERENCES PairDictionary(Id),
-                 FOREIGN KEY (MetricId) REFERENCES QuestionMetric(Id)
+                 FOREIGN KEY (UserId) REFERENCES Users (UserId),
+                 FOREIGN KEY (PairId) REFERENCES PairDictionary (PairId),
+                 FOREIGN KEY (MetricId) REFERENCES QuestionMetric (MetricId)
               )";    }
 }
 

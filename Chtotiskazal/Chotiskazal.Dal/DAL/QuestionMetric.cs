@@ -15,8 +15,10 @@ namespace Chotiskazal.Dal
         public double AggedScore => Math.Max(0, PassedScore - (DateTime.Now - LastExam).TotalDays / AgingFactor);
 
 
+        
         public QuestionMetric()
         {
+            MetricId = 0;
             ElaspedMs = 0;
             Result = 0;
             Type = "";
@@ -31,7 +33,7 @@ namespace Chotiskazal.Dal
             PassedScoreBefore = 0;
         }
 
-        public int Id { get; set; }
+        public int MetricId { get; set; }
         public int ElaspedMs { get; set; }
         public double AggregateScore { get; set; }
         public double AggregateScoreBefore { get; set; }

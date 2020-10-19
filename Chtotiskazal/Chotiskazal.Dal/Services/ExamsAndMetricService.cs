@@ -12,27 +12,18 @@ namespace Chotiskazal.Dal.Services
 
         public ExamsAndMetricService(ExamsAndMetricsRepo repo) => _examsAndMetricsRepo = repo;
 
-        //TODO all methods
-        public Exam[] GetAllExams() => _examsAndMetricsRepo.GetAllExams();
-        public void UpdateAgingAndRandomize()
-        {
-            _examsAndMetricsRepo.UpdateAgingAndRandomization();
-        }
-        public void UpdateAgingAndRandomize(int count)
-        {
-            _examsAndMetricsRepo.UpdateAgingAndRandomization(count);
-        }
-        public void RegistrateFailure(UserPair userPair)
-        {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(userPair.MetricId);
-            metric.OnExamFailed();
-            metric.UpdateAgingAndRandomization();
-            _examsAndMetricsRepo.UpdateScores(metric);
-        }
-        public void RegistrateExam(DateTime started, int count, int successCount)
+        public QuestionMetric GetAllMetricsForPair(int metricId) => _examsAndMetricsRepo.FindMetricOrNull(metricId);
+
+        public void SaveQuestionMetrics(QuestionMetric questionMetric) =>
+            _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
+
+        public void UpdateAgingAndRandomize(int count) => _examsAndMetricsRepo.UpdateAgingAndRandomization(count);
+
+        public void RegistrateExam(int userId, DateTime started, int count, int successCount)
         {
             _examsAndMetricsRepo.AddExam(new Exam
             {
+                UserId = userId,
                 Started = started,
                 Count = count,
                 Failed = count - successCount,
@@ -40,20 +31,27 @@ namespace Chotiskazal.Dal.Services
                 Passed = successCount
             });
         }
-        public void RegistrateSuccess(UserPair userPair)
+
+        public void RegistrateFailure(int metricId)
         {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(userPair.MetricId);
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(metricId);
+            metric.OnExamFailed();
+            metric.UpdateAgingAndRandomization();
+            _examsAndMetricsRepo.UpdateScores(metric);
+        }
+
+        public void RegistrateSuccess(int metricId)
+        {
+            var metric = _examsAndMetricsRepo.FindMetricOrNull(metricId);
             metric.OnExamPassed();
             metric.UpdateAgingAndRandomization();
             _examsAndMetricsRepo.UpdateScores(metric);
         }
-        public void SaveQuestionMetrics(QuestionMetric questionMetric)
-        {
-            _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
-        }
-        public void UpdateRatings(UserPair userPairModel)
-        {
-            _examsAndMetricsRepo.UpdateScoresAndTranslation(userPairModel);
-        }
+
+        public Exam[] GetAllExams() =>  throw new NotImplementedException();
+
+        public void UpdateAgingAndRandomize() =>  throw new NotImplementedException();
+
+        public void UpdateRatings(UserPair userPairModel) => throw new NotImplementedException();
     }
 }

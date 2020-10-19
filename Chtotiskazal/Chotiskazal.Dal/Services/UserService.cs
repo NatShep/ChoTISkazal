@@ -1,4 +1,5 @@
-﻿using Chotiskazal.Dal.Repo;
+﻿using System;
+using Chotiskazal.Dal.Repo;
 using Chotiskazal.DAL;
 
 
@@ -13,12 +14,11 @@ namespace Chotiskazal.Dal.Services
         
         public User GetUserByLoginOrNull(string login) => _repository.GetUserByLoginOrNull(login);
      
-        public User[] GetAllUser() => _repository.GetAllUsers();
+        //TODO additional methods
+        public User[] GetAllUser() =>  throw new NotImplementedException();
         
-        //TODO
         public void DeleteUser(User user) {}
 
-        //TODO
-        public bool IsUserOnline(User user) => true;
+        public bool IsUserOnline(User user) =>  throw new NotImplementedException();
     }
 }

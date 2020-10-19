@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.DAL;
+using Chotiskazal.Dal.Services;
 
-namespace Chotiskazal.App.Modes
+namespace Chotiskazal.Api.ConsoleModes
 {
     class GraphsStatsMode: IConsoleMode
     {
         public string Name => "Show stats";
-        public void Enter(NewWordsService service)
+
+        private ExamService _examService;
+
+        public GraphsStatsMode(ExamService examService) => _examService = examService;
+        
+        public void Enter(int userId)
         {
-            var allWords = service.GetAll();
+            
+            //придумать модель для графиков
+            //м.б. изменить базу данных для метрик
+            var allWords = _examService.GetAllExamedWords(userId);
 
             RenderKnowledgeHistogram(allWords);
             Console.WriteLine();
             Console.WriteLine();
             RenderAddingTimeLine(allWords);
-            RenderExamsTimeLine(service.GetAllExams());
+            RenderExamsTimeLine(_examService.GetAllExams());
 
             Console.WriteLine();
             Console.WriteLine();
@@ -24,17 +34,23 @@ namespace Chotiskazal.App.Modes
             Console.ReadKey();
             Console.WriteLine();    
             
-            Console.WriteLine($"Context phrases count = {service.GetContextPhraseCount()}");
+            //-----------
+            //фразы для кого тут считаем? Все фразы, которые знает юзер?
+            //Console.WriteLine($"Context phrases count = {_usersWordService.GetAllPhrases()}");
+            //-----------
+            
             Console.WriteLine($"Words count = {allWords.Count(w=>!w.OriginWord.Contains(' '))}");
             Console.WriteLine($"Words and sentences count = {allWords.Length}");
 
-
+            //------ groups is never used
+            /*
             var groups = allWords
                 .GroupBy(s => s.State)
                 .OrderBy(s => (int)s.Key)
                 .Select(s => new { state = s.Key, count = s.Count() });
-
-            var doneCount = allWords.Count(a => a.PassedScore >= PairModel.MaxExamScore);
+            */
+            //-----------------------------
+            var doneCount = allWords.Count(a => a.PassedScore >= WordForLearning.MaxExamScore);
 
             Console.WriteLine($"Done: {doneCount} words  ({(doneCount * 100 / allWords.Length)}%)");
             Console.WriteLine($"Unknown: {allWords.Length - doneCount} words");
@@ -59,7 +75,7 @@ namespace Chotiskazal.App.Modes
 
         }
 
-        private static void RenderKnowledgeHistogram(PairModel[] allWords)
+        private static void RenderKnowledgeHistogram(WordForLearning[] allWords)
         {
             var length = 19;
             var wordHystogramm = new int[length];
@@ -115,14 +131,14 @@ namespace Chotiskazal.App.Modes
 
         }
 
-        private static int GetLearningRate(PairModel[] allModels)
+        private static int GetLearningRate(WordForLearning[] allModels)
         {
 
             //PairModel.MaxExamScore+2, a.AggedScore 
             double sum= 0;
             foreach (var pair in allModels)
             {
-                var hiLim = PairModel.MaxExamScore + 2;
+                var hiLim = WordForLearning.MaxExamScore + 2;
                 if (pair.PassedScore < hiLim)
                     sum += pair.PassedScore;
                 else
@@ -132,10 +148,10 @@ namespace Chotiskazal.App.Modes
             }
 
             var count = allModels.Count();
-            return (int) (count * PairModel.MaxExamScore -sum);
+            return (int) (count * WordForLearning.MaxExamScore -sum);
         }
 
-        private static void RenderAddingTimeLine(PairModel[] allWords)
+        private static void RenderAddingTimeLine(WordForLearning[] allWords)
         {
             var wordTimeline = new int[21];
 

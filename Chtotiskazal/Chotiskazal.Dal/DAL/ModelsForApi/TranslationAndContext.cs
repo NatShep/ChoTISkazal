@@ -1,11 +1,11 @@
 ﻿using Chotiskazal.DAL;
 using Chotiskazal.LogicR.yapi;
 
-namespace Chotiskazal.App
+namespace Chotiskazal.DAL.ModelsForApi
 {
-    public class TranslationAndContextr
+    public class TranslationAndContext
     {
-        public TranslationAndContextr(int? id, string enWord, string ruWord, string transcription, Phrase[] phrases)
+        public TranslationAndContext(int id, string enWord, string ruWord, string transcription, Phrase[] phrases)
         {
             IdInDB = id;
             EnWord = enWord;
@@ -14,7 +14,8 @@ namespace Chotiskazal.App
             Phrases = phrases;
         }
 
-        public int? IdInDB { get; } = null;
+        //maybe nullable? 
+        public int IdInDB { get; }
         public string EnWord { get; }
         public string RuWord { get; }
         public string Transcription { get; }

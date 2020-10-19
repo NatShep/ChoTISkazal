@@ -6,6 +6,7 @@ using System.Web;
 using Chotiskazal.App;
 using Chotiskazal.DAL;
 using Chotiskazal.Dal.Enums;
+using Chotiskazal.DAL.ModelsForApi;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR.yapi;
 using static Chotiskazal.LogicR.yapi.MapperForDBModels;
@@ -71,10 +72,9 @@ namespace Chotiskazal.WebApp.Controllers
             if (!translateWithContexts.Any())
                 translateWithContexts = TranslateByYandex(origin);
 
-            //TODO
+            //TODO ViewModel
             // подумать: о структурe viewmodel,  м.б. ее упростить
             // подумать: я создаю viewмодель сразу  в поиске перевода слова, м.б. лучше в другом месте
-            //TODO
             return View("SelectTranslation", translateWithContexts);
         }
 
@@ -86,9 +86,9 @@ namespace Chotiskazal.WebApp.Controllers
             if (user == null)
                 return RedirectToAction("Logout", "Account");
             
-            var userPair = _usersWordService.GetPairByDicId(user, id);
+            var userPair = _usersWordService.GetPairByDicId(user.UserId, id);
             if (userPair==null)
-                _usersWordService.AddWordToUserCollection(user, id);
+                _usersWordService.AddWordToUserCollection(user.UserId, id);
          
             return RedirectToAction("Menu", "Home");
 
@@ -113,9 +113,7 @@ namespace Chotiskazal.WebApp.Controllers
             public string Status { get; }
         }
 
-        //TODO
-        //Isolate to Chotiskazal.Api
-        //TODO
+        //TODO Isolate to Chotiskazal.Api
         private List<TranslationAndContext> TranslateByYandex(string word)
         {
             List<TranslationAndContext> translationsWithContext = new List<TranslationAndContext>();

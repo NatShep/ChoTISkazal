@@ -10,9 +10,9 @@
                  UserId                              integer not null,           
                  Started                             datetime not null,
                  Finished                            datetime not null,
-                 Count
+                 Count                                integer,
                  Passed                              integer not null,           
-                 Failed                              integer not null,           
+                 Failed                              integer not null           
               )";
     }
 }

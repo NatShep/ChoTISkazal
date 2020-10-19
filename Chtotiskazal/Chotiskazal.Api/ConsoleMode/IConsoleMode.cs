@@ -8,7 +8,7 @@ namespace Chotiskazal.Api.ConsoleModes
     public interface IConsoleMode
     {
         string Name { get; }
-        void Enter(User user);
+        void Enter(int userId);
 
     }
 }

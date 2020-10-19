@@ -14,31 +14,32 @@ namespace Chotiskazal.Dal.Services
         private readonly UserWordsRepo _UserWordRepository;
         
         public UsersWordService(UserWordsRepo repository) =>_UserWordRepository = repository;
-  
-        public string[] GetAllUserTranslatesForWord(User user, string word) => _UserWordRepository.GetAllTranslateForWord(user, word);
-        
-        public int AddWordToUserCollection(User user, int wordId) =>  _UserWordRepository.SaveToUserDictionary(wordId, user.UserId);
 
-        public UserPair GetPairByDicId(User user, int id) => _UserWordRepository.GetPairByDicIdOrNull(user, id);
-            
-        //TODO
+        public int AddWordToUserCollection(int userId, int wordId) =>  
+            _UserWordRepository.SaveToUserDictionary(wordId, userId);
+
+        public UserPair GetPairByDicId(int userId, int id) => _UserWordRepository.GetPairByDicIdOrNull(userId, id);
+
+        public UserPair[] GetWorstForUser(int userId, int count) => _UserWordRepository.GetWorstForUser(userId,count);
+        
+        public UserPair[] GetWorstTestWordForUser(int userId, int count, int learnRate) =>
+            _UserWordRepository.GetWorstTestWordsForUser(count, learnRate, userId);
+        
+        public string[] GetAllUserTranslatesForWord(int userId, string word) => 
+            _UserWordRepository.GetAllTranslatesForWordForUser(userId, word);
+        
+        public string[] GetAllWords(in int userId) =>_UserWordRepository.GetAllWordsForUser(userId);
+        
+        public Phrase[] GetAllPhrases(int userId) => _UserWordRepository.GetAllPhrases(userId);
+        
+        //TODO additional methods
         public void DeleteWordFromUserCollection(User user, int wordId){}
-        
-        //TODO
-        public UserPair[] GetPairsByWordOrNull(User user, string word)
-        {
-            //check ru or eng word?
-            //find Pair
-            return null;
-        }
-        
-        //TODO
-        public UserPair[] GetPairsForLearning(User user, int count) => _UserWordRepository.GetWorstForUser(user,count);
-         
-        //TODO
-        public UserPair[] GetPairsForTests(User user, int count, int learnRate) =>
-            _UserWordRepository.GetWordsForUserTests(count, learnRate, user);
+        public UserPair[] GetAllLearningWords(in int userId) => throw new NotImplementedException();
+        public UserPair[] GetAllPair(int userId) => throw new NotImplementedException();
 
-      
+        
+
+
+        
     }
 }

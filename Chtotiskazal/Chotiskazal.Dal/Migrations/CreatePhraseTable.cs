@@ -10,7 +10,7 @@
                  PairId                              integer not null,
                  EnPhrase                            nvarchar(100) not null,
                  RuTranslate                         nvarchar(100) not null,
-                 FOREIGN KEY (PairId) REFERENCES UsersPair(Id)
+                 FOREIGN KEY (PairId) REFERENCES PairDictionary(PairId)
               )";
     }
 }

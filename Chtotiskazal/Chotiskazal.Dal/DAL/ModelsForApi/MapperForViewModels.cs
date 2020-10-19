@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Chotiskazal.App;
 using Chotiskazal.DAL;
 using Chotiskazal.DAL.ModelsForApi;
 using Chotiskazal.LogicR.yapi;
 
-/*namespace Chotiskazal.WebApp.Models
+namespace Chotiskazal.WebApp.Models
 {
     public static class MapperForViewModels
     {
@@ -13,4 +12,4 @@ using Chotiskazal.LogicR.yapi;
             return new TranslationAndContext(wordPair.PairId, wordPair.EnWord, wordPair.RuWord,wordPair.Transcription,wordPair.Phrases.ToArray());
         }
     }
-}*/
+}

@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Chotiskazal.DAL;
@@ -19,24 +19,13 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                word.Id = cnn.ExecuteScalar<int>(
+                word.PairId = cnn.ExecuteScalar<int>(
                     @"INSERT INTO PairDictionary (  EnWord,  Transcription,  RuWord, Sourse)
                                       VALUES( @EnWord,  @Transcription,  @RuWord, @Sourse); 
                           select last_insert_rowid()", word);
+                //TODO Add Phrase if word has them
 
-                //TODO 
-                if (word.Phrases != null)
-                {
-                    foreach (var phrase in word.Phrases)
-                    {
-                        //     cnn.Execute(
-                        //       @"INSERT INTO ContextPhrases ( Origin,  Translation,  Created, OriginWord, TranslationWord)   
-                        //               VALUES( @Origin,  @Translation,  @Created, @OriginWord, @TranslationWord)", phrase);
-                    }
-                }
-                //TODO
-                
-                return word.Id;
+                return word.PairId;
             }
         }
 
@@ -57,11 +46,8 @@ namespace Chotiskazal.Dal.Repo
 
         public WordDictionary[] GetAllWordPairsByWord(string word)
         {
-            //TODO
-            //We can find by RuWord or by EnWord.
+            //TODO find by RuWord or by EnWord.
             //Check the symbol of word before seeking
-            //now just for EnWord!!!
-            //TODO
 
             if (!File.Exists(DbFile))
                 throw new Exception("No Db File");
@@ -81,10 +67,64 @@ namespace Chotiskazal.Dal.Repo
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                return cnn.Query<Phrase>(@"Select * From Phrases WHERE PairId = @wordPairId  ").ToArray();
+                return cnn.Query<Phrase>(@"Select * From Phrases WHERE PairId = @wordPairId",new{wordPairId}).ToArray();
             }
         }
 
+        public WordDictionary GetPairWithPhrasesByIdOrNull(int id)
+        {
+            CheckDbFile.Check(DbFile);
+            
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var phrases = new List<Phrase>();
+                var result = cnn.Query<WordDictionary, Phrase, WordDictionary>(
+                    @"SELECT * FROM 
+                    (SELECT * FROM PairDictionary WHERE PairId=@id) pd
+                     JOIN Phrases ph ON ph.PairId = pd.PairId",
+                    (pd, ph) =>
+                    {
+                        //TODO почему он не мапит Id для фразы???
+                       phrases.Add(ph);
+                       return pd;
+                    }, new {id},
+                    splitOn:"PairId").FirstOrDefault();
+                result.Phrases = phrases;
+                return result;
+            }
+            return null;
+        }
+        
+        public string[] GetAllTranslate(string word)
+        {
+            //TODO find by RuWord or by EnWord.
+            //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
+            //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по английскому слову все переводы
+          
+            CheckDbFile.Check(DbFile);
+            //TODO Is it need distinct?
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                return cnn.Query<string>(
+                    @"SELECT RuWord FROM PairDictionary  WHERE  EnWord=@word", new {word}).ToArray();
+            }
+        }
+
+        public void RemovePhrase(int phraseId)
+        {
+            CheckDbFile.Check(DbFile);
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var sqlQuery = "DELETE FROM Phrases WHERE Id = @phrasesId";
+                cnn.Execute(sqlQuery, new { phraseId });
+            }
+        }
+        
+        //TODO Additional methods 
         public WordDictionary GetPairByIdOrNull(int? id)
         {
             CheckDbFile.Check(DbFile);
@@ -94,38 +134,9 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Open();
                 var result = cnn.Query<WordDictionary>(
                     @"SELECT * FROM PairDictionary 
-                    WHERE Id = @id", new {id}).FirstOrDefault();
+                    WHERE PairId = @id", new {id}).FirstOrDefault();
                 return result;
             }
-        }
-
-        //TODO
-        //need to test
-        //TODO
-        public WordDictionary GetPairWithPhrasesById(int? id)
-        {
-            CheckDbFile.Check(DbFile);
-            
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                var result = cnn.Query<WordDictionary, Phrase, WordDictionary>(
-                    @"SELECT * FROM PairDictionary PD WHERE Id = @id
-                    JOIN Phrases Ph ON Ph.PairId = PD.Id ", 
-                    (wd, ph) =>
-                    {
-                        wd.Phrases.Add(ph);
-                        return wd;
-                    });
-            }
-            return null;
-        }
-        //TODO
-        public string[] GetAllTranslate(string word)
-        {
-            //if word == RuWord(английские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
-            //if word == EnWord(русские символы), ищем в таблице WordPairDictionary по русскому слову все переводы
-            return new string[0];
         }
     }
 }

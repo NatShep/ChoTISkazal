@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Logic.Services;
-using Dic.Logic;
-using Dic.Logic.DAL;
+using Chotiskazal.Api.ConsoleModes;
+using Chotiskazal.Api.Models;
+using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -12,9 +13,9 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "Eng Choose";
 
-        public ExamResult Pass(NewWordsService service, PairModel word, PairModel[] examList)
+        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
         {
-            var variants = examList.Randomize().Select(e => e.Translation).ToArray();
+            var variants = examList.Randomize().Select(e => e.Translations).ToArray();
 
             Console.WriteLine("=====>   " + word.OriginWord + "    <=====");
 
@@ -33,12 +34,12 @@ namespace Chotiskazal.ApI.Exams
                 selectedIndex < 1)
                 return ExamResult.Retry;
 
-            if (variants[selectedIndex - 1] == word.Translation)
+            if (variants[selectedIndex - 1] == word.Translations)
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccess(word.MetricId);
                 return ExamResult.Passed;
             }
-            service.RegistrateFailure(word);
+            service.RegistrateFailure(word.MetricId);
             return ExamResult.Failed;
 
         }

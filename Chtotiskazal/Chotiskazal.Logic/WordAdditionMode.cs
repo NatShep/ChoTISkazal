@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Chotiskazal.Api.Services;
 using Chotiskazal.ConsoleTesting;
 
 
@@ -21,39 +22,31 @@ namespace Chotiskazal.Api.ConsoleModes
         private readonly DictionaryService _dictionaryService;
         private string sourse = "Unknown sourse";
 
+        private readonly AddWordService _addWordService;
+
         public WordAdditionMode(YandexTranslateApiClient yapiTranslateApiClient,
             YandexDictionaryApiClient yandexDictionaryApiClient, UsersWordService usersWordService,
-            DictionaryService dictionaryService)
+            DictionaryService dictionaryService, AddWordService addWordService)
         {
             _yapiDicClient = yandexDictionaryApiClient;
             _yapiTransClient = yapiTranslateApiClient;
             _usersWordService = usersWordService;
             _dictionaryService = dictionaryService;
+            _addWordService = addWordService;
         }
 
         public string Name => "Add new words";
 
-        public void Enter(User user)
+        public void Enter(int userId)
         {
-            var dicPing = _yapiDicClient.Ping();
-            var transPing = _yapiTransClient.Ping();
-            Task.WaitAll(dicPing, transPing);
-            var timer = new Timer(5000) {AutoReset = false};
-            timer.Enabled = true;
-            timer.Elapsed += (s, e) =>
-            {
-                var pingDicApi = _yapiDicClient.Ping();
-                var pingTransApi = _yapiTransClient.Ping();
-                Task.WaitAll(pingDicApi, pingTransApi);
-                timer.Enabled = true;
-            };
-
-            if (_yapiDicClient.IsOnline)
+            var yaStatus = _addWordService.PingYandex();
+            
+            if (yaStatus.isYaDicOnline)
                 Console.WriteLine("Yandex dic is online");
             else
                 Console.WriteLine("Yandex dic is offline");
 
-            if (_yapiTransClient.IsOnline)
+            if (yaStatus.isYaTransOnline)
                 Console.WriteLine("Yandex trans is online");
             else
                 Console.WriteLine("Yandex trans is offline");
@@ -67,9 +60,13 @@ namespace Chotiskazal.Api.ConsoleModes
                     break;
 
                 Task<YaDefenition[]> task = null;
-                if (_yapiDicClient.IsOnline)
-                    task = _yapiDicClient.Translate(word);
+//                List<TranslationAndContext> translations = new List<TranslationAndContext>();
 
+                if (yaStatus.isYaDicOnline)
+                    _addWordService.Translate(word);
+               
+                
+                task = _addWordService.Translate(word);
                 task?.Wait();
 
                 List<TranslationAndContext> translations = new List<TranslationAndContext>();
