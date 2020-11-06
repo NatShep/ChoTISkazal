@@ -1,9 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Chotiskazal.LogicR
+namespace Chotiskazal.Dal.Enums
 {
     public enum LearningState
     {

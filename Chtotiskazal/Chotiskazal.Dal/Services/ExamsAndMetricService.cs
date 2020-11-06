@@ -17,7 +17,6 @@ namespace Chotiskazal.Dal.Services
         public void SaveQuestionMetrics(QuestionMetric questionMetric) =>
             _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
 
-        public void UpdateAgingAndRandomize(int count) => _examsAndMetricsRepo.UpdateAgingAndRandomization(count);
 
         public void RegistrateExam(int userId, DateTime started, int count, int successCount)
         {
@@ -32,21 +31,7 @@ namespace Chotiskazal.Dal.Services
             });
         }
 
-        public void RegistrateFailure(int metricId)
-        {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(metricId);
-            metric.OnExamFailed();
-            metric.UpdateAgingAndRandomization();
-            _examsAndMetricsRepo.UpdateScores(metric);
-        }
-
-        public void RegistrateSuccess(int metricId)
-        {
-            var metric = _examsAndMetricsRepo.FindMetricOrNull(metricId);
-            metric.OnExamPassed();
-            metric.UpdateAgingAndRandomization();
-            _examsAndMetricsRepo.UpdateScores(metric);
-        }
+       
 
         public Exam[] GetAllExams() =>  throw new NotImplementedException();
 

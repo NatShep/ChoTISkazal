@@ -18,15 +18,15 @@ namespace Chotiskazal.Api.Services
 {
     public class AddWordService
     {
-        private UsersWordService _usersWordService;
+        private UsersPairsService _usersPairsService;
         private readonly YandexDictionaryApiClient _yapiDicClient;
         private readonly YandexTranslateApiClient _yapiTransClient;
         private readonly DictionaryService _dictionaryService;
 
-        public AddWordService(UsersWordService usersWordService, YandexDictionaryApiClient yapiDicClient,
+        public AddWordService(UsersPairsService usersPairsService, YandexDictionaryApiClient yapiDicClient,
             YandexTranslateApiClient yapiTransClient, DictionaryService dictionaryService)
         {
-            _usersWordService = usersWordService;
+            _usersPairsService = usersPairsService;
             _yapiDicClient = yapiDicClient;
             _yapiTransClient = yapiTransClient;
             _dictionaryService = dictionaryService;
@@ -34,8 +34,8 @@ namespace Chotiskazal.Api.Services
 
         public void AddMutualPhrasesToVocab(int userId, int maxCount)
         {
-            var allWords = _usersWordService.GetAllWords(userId).Select(s => s.ToLower().Trim()).ToHashSet();
-            var allPhrases = _usersWordService.GetAllPhrases(userId);
+            var allWords = _usersPairsService.GetAllWords(userId).Select(s => s.ToLower().Trim()).ToHashSet();
+            var allPhrases = _usersPairsService.GetAllPhrases(userId);
             
            
             List<Phrase> searchedPhrases = new List<Phrase>();
@@ -90,8 +90,9 @@ namespace Chotiskazal.Api.Services
             foreach (var phrase in firstPhrases)
             {
                 Console.WriteLine("Adding " + phrase.EnPhrase);
-              //TODO    _examsAndMetricService.SaveForExams(phrase.EnPhrase, phrase.RuTranslate, new[] { phrase.RuTranslate }, null);
-                _dictionaryService.RemovePhrase(phrase.Id);
+                
+              //TODO   _usersWordService.AddPhraseAsWordToUserCollection();
+              _dictionaryService.RemovePhrase(phrase.Id);
             }
 
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
@@ -208,9 +209,9 @@ namespace Chotiskazal.Api.Services
 
         public void AddPairToUserCollection(in int userId, int id)
         {
-            var userPair = _usersWordService.GetPairByDicId(userId, id);
+            var userPair = _usersPairsService.GetPairByDicId(userId, id);
             if (userPair == null)
-                _usersWordService.AddWordToUserCollection(userId, id);
+                _usersPairsService.AddWordToUserCollection(userId, id);
         }
     }
 }

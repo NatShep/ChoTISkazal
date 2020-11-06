@@ -29,13 +29,13 @@ namespace Chotiskazal.ConsoleApp
             var yatransapiTimeout = TimeSpan.FromSeconds(5);
             
             var addWordService = new AddWordService(
-                new UsersWordService(new UserWordsRepo(dbFileName)), 
+                new UsersPairsService(new UserPairsRepo(dbFileName)), 
                 new YandexDictionaryApiClient(yadicapiKey,yadicapiTimeout), 
                 new YandexTranslateApiClient(yatransapiKey,yatransapiTimeout),
                 new DictionaryService(new DictionaryRepository(dbFileName)));
             
             var examService=new ExamService(
-                new UsersWordService(new UserWordsRepo(dbFileName)), 
+                new UsersPairsService(new UserPairsRepo(dbFileName)), 
                 new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName)),
                 new DictionaryService(new DictionaryRepository(dbFileName)));
             var authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
@@ -71,7 +71,7 @@ namespace Chotiskazal.ConsoleApp
             Console.ResetColor();
             
             //--------begin registration
-       /*     
+            
             User user = null;
             while (user == null)
             {
@@ -122,7 +122,7 @@ namespace Chotiskazal.ConsoleApp
                 Console.ReadKey();
             }
             Console.Clear();
-            */
+            
             //---------end registration-------
             
             while (true)

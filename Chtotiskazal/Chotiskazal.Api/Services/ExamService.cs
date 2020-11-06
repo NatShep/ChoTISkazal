@@ -13,14 +13,14 @@ namespace Chotiskazal.ConsoleTesting.Services
 {
     public class ExamService
     {
-        private UsersWordService _usersWordService;
+        private UsersPairsService _usersPairsService;
         private ExamsAndMetricService _examsAndMetricService;
         private DictionaryService _dictionaryService;
 
-        public ExamService(UsersWordService usersWordService, ExamsAndMetricService examsAndMetricService,
+        public ExamService(UsersPairsService usersPairsService, ExamsAndMetricService examsAndMetricService,
             DictionaryService dictionaryService)
         {
-            _usersWordService = usersWordService;
+            _usersPairsService = usersPairsService;
             _examsAndMetricService = examsAndMetricService;
             _dictionaryService = dictionaryService;
         }
@@ -28,7 +28,7 @@ namespace Chotiskazal.ConsoleTesting.Services
         public WordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
         {
             //получаю все худщие пары юзера
-            var fullPairs =_usersWordService.GetWorstForUser(userId, count);
+            var fullPairs =_usersPairsService.GetWorstForUser(userId, count);
            
             var wordsForLearning = new List<WordForLearning>();
             foreach (var pairModel in fullPairs)
@@ -40,7 +40,7 @@ namespace Chotiskazal.ConsoleTesting.Services
                 //получаю все метрики для данной пары
                 var metrics = _examsAndMetricService.GetAllMetricsForPair(pairModel.MetricId);
                 //получаю все переводы данного слова для юзера
-                var allTranslationsOfWordForUser = _usersWordService.GetAllUserTranslatesForWord(userId, pairFromDictionary.EnWord);
+                var allTranslationsOfWordForUser = _usersPairsService.GetAllUserTranslatesForWord(userId, pairFromDictionary.EnWord);
                 
                 // составляю их этого Ford For learning
                 var wordForLearning = new WordForLearning(pairModel,pairFromDictionary,metrics,allTranslates,allTranslationsOfWordForUser);
@@ -76,7 +76,7 @@ namespace Chotiskazal.ConsoleTesting.Services
         //TODO Зачем этот метод и метод выше, а еще GetTestWord
         public WordForLearning[] GetPairsForTestWords(int userId, int delta, int randomRate)
         {
-            var pairsFromDb = _usersWordService.GetWorstTestWordForUser(userId, delta,randomRate);
+            var pairsFromDb = _usersPairsService.GetWorstTestWordForUser(userId, delta,randomRate);
             // перевести в wordForLearning
             var wordsForLearning = new List<WordForLearning>();
             foreach (var pairModel in pairsFromDb)
@@ -89,7 +89,7 @@ namespace Chotiskazal.ConsoleTesting.Services
                 var metrics = _examsAndMetricService.GetAllMetricsForPair(pairModel.MetricId);
                 //получаю все переводы данного слова для юзера
                 var allTranslationsOfWordForUser =
-                    _usersWordService.GetAllUserTranslatesForWord(userId, pairFromDictionary.EnWord);
+                    _usersPairsService.GetAllUserTranslatesForWord(userId, pairFromDictionary.EnWord);
 
                 var wordForLearning = new WordForLearning(pairModel,pairFromDictionary,metrics,allTranslates,allTranslationsOfWordForUser);
                 wordsForLearning.Add(wordForLearning);

@@ -17,7 +17,7 @@ namespace Chotiskazal.Dal.Migrations
                   
                  FOREIGN KEY (UserId) REFERENCES Users (UserId),
                  FOREIGN KEY (PairId) REFERENCES PairDictionary (PairId),
-                 FOREIGN KEY (MetricId) REFERENCES QuestionMetric (MetricId)
+                 FOREIGN KEY (MetricId) REFERENCES PairMetric (MetricId)
               )";    }
 }
 

@@ -63,7 +63,7 @@ namespace Chotiskazal.WebApp
             services.AddSingleton(new DictionaryService(new DictionaryRepository(dbFileName)));
             services.AddSingleton(new UserService(new UserRepo(dbFileName)));
             services.AddSingleton(new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName)));
-            services.AddSingleton(new UsersWordService(new UserWordsRepo(dbFileName)));
+            services.AddSingleton(new UsersPairsService(new UserWordsRepo(dbFileName)));
             services.AddHostedService<YapiPingHostedService>();
         }
 

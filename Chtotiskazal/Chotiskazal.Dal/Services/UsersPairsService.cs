@@ -9,28 +9,28 @@ using Phrase = Chotiskazal.DAL.Phrase;
 
 namespace Chotiskazal.Dal.Services
 {
-    public class UsersWordService
+    public class UsersPairsService
     {
-        private readonly UserWordsRepo _UserWordRepository;
+        private readonly UserPairsRepo _userPairssRepository;
         
-        public UsersWordService(UserWordsRepo repository) =>_UserWordRepository = repository;
+        public UsersPairsService(UserPairsRepo repository) =>_userPairssRepository = repository;
 
         public int AddWordToUserCollection(int userId, int wordId) =>  
-            _UserWordRepository.SaveToUserDictionary(wordId, userId);
+            _userPairssRepository.SaveToUserDictionary(wordId, userId);
 
-        public UserPair GetPairByDicId(int userId, int id) => _UserWordRepository.GetPairByDicIdOrNull(userId, id);
+        public UserPair GetPairByDicId(int userId, int id) => _userPairssRepository.GetPairByDicIdOrNull(userId, id);
 
-        public UserPair[] GetWorstForUser(int userId, int count) => _UserWordRepository.GetWorstForUser(userId,count);
+        public UserPair[] GetWorstForUser(int userId, int count) => _userPairssRepository.GetWorstForUser(userId,count);
         
         public UserPair[] GetWorstTestWordForUser(int userId, int count, int learnRate) =>
-            _UserWordRepository.GetWorstTestWordsForUser(count, learnRate, userId);
+            _userPairssRepository.GetWorstTestWordsForUser(count, learnRate, userId);
         
         public string[] GetAllUserTranslatesForWord(int userId, string word) => 
-            _UserWordRepository.GetAllTranslatesForWordForUser(userId, word);
+            _userPairssRepository.GetAllTranslatesForWordForUser(userId, word);
         
-        public string[] GetAllWords(in int userId) =>_UserWordRepository.GetAllWordsForUser(userId);
+        public string[] GetAllWords(in int userId) =>_userPairssRepository.GetAllWordsForUser(userId);
         
-        public Phrase[] GetAllPhrases(int userId) => _UserWordRepository.GetAllPhrases(userId);
+        public Phrase[] GetAllPhrases(int userId) => _userPairssRepository.GetAllPhrases(userId);
         
         //TODO additional methods
         public void DeleteWordFromUserCollection(User user, int wordId){}

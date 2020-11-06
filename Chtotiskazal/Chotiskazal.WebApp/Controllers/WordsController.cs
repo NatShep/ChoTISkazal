@@ -21,18 +21,18 @@ namespace Chotiskazal.WebApp.Controllers
     public class WordsController : Controller
     {
         private readonly YandexDictionaryApiClient _yandexDictionaryApiClient;
-        private readonly UsersWordService _usersWordService;
+        private readonly UsersPairsService _usersPairsService;
         private readonly UserService _userService;
         private readonly YandexTranslateApiClient _yandexTransApiClient;
         private readonly DictionaryService _dictionaryService;
 
         public WordsController(YandexDictionaryApiClient yaapiClient, YandexTranslateApiClient yandexTransApiClient
-            ,DictionaryService dictionaryService, UsersWordService usersWordService, UserService userService)
+            ,DictionaryService dictionaryService, UsersPairsService usersPairsService, UserService userService)
         {
             _yandexDictionaryApiClient = yaapiClient;
             _yandexTransApiClient = yandexTransApiClient;
             _dictionaryService = dictionaryService;
-            _usersWordService = usersWordService;
+            _usersPairsService = usersPairsService;
             _userService = userService;
         }
 
@@ -86,9 +86,9 @@ namespace Chotiskazal.WebApp.Controllers
             if (user == null)
                 return RedirectToAction("Logout", "Account");
             
-            var userPair = _usersWordService.GetPairByDicId(user.UserId, id);
+            var userPair = _usersPairsService.GetPairByDicId(user.UserId, id);
             if (userPair==null)
-                _usersWordService.AddWordToUserCollection(user.UserId, id);
+                _usersPairsService.AddWordToUserCollection(user.UserId, id);
          
             return RedirectToAction("Menu", "Home");
 

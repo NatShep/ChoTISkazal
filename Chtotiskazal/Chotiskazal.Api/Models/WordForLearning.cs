@@ -5,6 +5,8 @@ using System.Linq;
  using Chotiskazal.DAL;
  using Chotiskazal.DAL.ModelsForApi;
  using Chotiskazal.LogicR;
+ using Chotiskazal.WebApp.Models;
+ using LearningState = Chotiskazal.Dal.Enums.LearningState;
 
  namespace Chotiskazal.Api.Models
 {
@@ -41,16 +43,13 @@ using System.Linq;
             
             MetricId = userPair.MetricId;
             AggregateScore = questionMetric.AggregateScoreBefore;
-            PassedScore = questionMetric.PassedScore;
-            LastExam = questionMetric.LastExam;
-            Examed = questionMetric.Examed;
             Created = userPair.Created;
             OriginWord = pairFromDictionary.EnWord;
             SetTranslations(allTranslationsOfWordForUser);
             Transcription = pairFromDictionary.Transcription;
             AllMeanings = allMeanings;
             Phrases=new List<PhraseForApi>();
-            foreach (var phrase in pairFromDictionary.Phrases)
+            foreach (var phrase in pairFromDictionary.Phrases) 
                 Phrases.Add(phrase.MapToApiPhrase());
             Revision = 1;
 
@@ -130,15 +129,5 @@ using System.Linq;
             AggregateScore = p;
         }
         
-    }
-
-    public enum LearningState
-    {
-        New = 0,
-        Familiar = 1,
-        Known = 2,
-        NotSure = 3,
-        PreLearned = 4,
-        Done = 5,
     }
 }

@@ -3,7 +3,7 @@ using Chotiskazal.DAL.ModelsForApi;
 
 namespace Chotiskazal.Api.Models
 {
-    public static class MapperForApiModels
+ /*   public static class MapperForApiModels
     {
         public static PhraseForApi MapToApiPhrase(this Phrase phrase)=> 
             new PhraseForApi
@@ -15,6 +15,6 @@ namespace Chotiskazal.Api.Models
             };
         
     }
-    
+   */ 
     
 }

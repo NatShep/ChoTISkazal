@@ -13,23 +13,7 @@ namespace Chotiskazal.Dal.Repo
     {
         public ExamsAndMetricsRepo(string fileName) : base(fileName) { }
 
-        public void UpdateAgingAndRandomization(int count)
-        {
-            CheckDbFile.Check(DbFile);
-
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                foreach (var word in cnn.Query<UserPair>(@"Select * From UserPairs order by RANDOM() limit @count", new { count }).ToArray())
-                {
-                    FindMetricOrNull(word.MetricId).UpdateAgingAndRandomization();
-                    var op = $"Update QuestionMetric set AggregateScore = " +
-                             $"{FindMetricOrNull(word.MetricId).AggregateScore.ToString(CultureInfo.InvariantCulture)} " +
-                             $"where MetricId = {word.MetricId}";
-                    cnn.Execute(op);
-                }
-            }
-        }
+      
         public QuestionMetric FindMetricOrNull(int metricId )
         {
             CheckDbFile.Check(DbFile);
@@ -118,22 +102,6 @@ namespace Chotiskazal.Dal.Repo
                                 Values(@UserId, @Count, @Passed, @Failed,@Started, @Finished)", exam);
         }
 
-        public void UpdateScores(QuestionMetric metric)
-        {
-            CheckDbFile.Check(DbFile);
-
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                var op =
-                    $"Update QuestionMetric set AggregateScore = @AggregateScore," +
-                    $"PassedScore = @PassedScore, " +
-                    $"LastExam = @LastExam," +
-                    $"Examed = @Examed "+
-                    $"WHERE MetricId = @MetricId";
-                cnn.Execute(op, metric);
-            }
-        }
       
         
      //TODO additional methods 
@@ -174,20 +142,6 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Execute(op, word);
             }
         }
-        public void UpdateAgingAndRandomization()
-        {
-            CheckDbFile.Check(DbFile);
-
-            using (var cnn = SimpleDbConnection())
-            {
-                cnn.Open();
-                foreach (var word in cnn.Query<UserPair>(@"Select * From UserPairs").ToArray())
-                {
-                    FindMetricOrNull(word.MetricId).UpdateAgingAndRandomization();
-                    var op = $"Update QuestionMetric set AggregateScore = { FindMetricOrNull(word.MetricId).AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
-                    cnn.Execute(op);
-                }
-            }
-        }
+      
     }
 }
