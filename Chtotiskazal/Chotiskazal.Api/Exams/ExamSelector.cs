@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Chotiskazal.Api.Models;
+using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
@@ -102,7 +102,7 @@ namespace Chotiskazal.ApI.Exams
                 expectedScore: 12,
                 frequency: 14);
 */
-        public static IExam GetNextExamFor(bool isFirstExam, WordForLearning model)
+        public static IExam GetNextExamFor(bool isFirstExam, UserWordForLearning model)
         {
             if (isFirstExam && model.PassedScore < 7)
             {

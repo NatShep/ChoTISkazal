@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Models;
 using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.DAL;
 
 namespace Chotiskazal.ApI.Exams
 {
@@ -11,7 +11,7 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "Eng Write";
 
-        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
+        public ExamResult Pass(ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             
             var translations = word.GetTranslations();
@@ -20,7 +20,7 @@ namespace Chotiskazal.ApI.Exams
                 return ExamResult.Impossible;
 
 
-            Console.WriteLine("=====>   " + word.OriginWord + "    <=====");
+            Console.WriteLine("=====>   " + word.EnWord + "    <=====");
 
             Console.Write("Write the translation: ");
             var translation = Console.ReadLine();
@@ -29,12 +29,13 @@ namespace Chotiskazal.ApI.Exams
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                service.RegistrateSuccess(word.MetricId);
+                service.RegistrateSuccess(word);
                 return ExamResult.Passed;
             }
             else
             {
-                if (word.GetAllMeanings()
+                //TODO что такое GetAllMeanings 
+           /*     if (word.GetAllMeanings()
                     .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -43,9 +44,9 @@ namespace Chotiskazal.ApI.Exams
                     Console.WriteLine();
                     return ExamResult.Impossible;
                 }
-
-                Console.WriteLine("The translation was: "+ word.Translations);
-                service.RegistrateFailure(word.MetricId);
+            */
+                Console.WriteLine("The translation was: "+ word.UserTranslations);
+                service.RegistrateFailure(word);
                 return ExamResult.Failed;
             }
         }

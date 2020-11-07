@@ -147,7 +147,7 @@ namespace Chotiskazal.WebApp.Controllers
                         {
                             var phrase = yaPhrase.MapToDbPhrase();
                             dbPhrases.Add(phrase);
-                            _dictionaryService.AddPhraseForWordPair(id, phrase.EnPhrase, phrase.RuTranslate);
+                            _dictionaryService.AddPhraseForWordPair(id, word, null, phrase.EnPhrase, phrase.RuTranslate);
                         }
 
                         translationsWithContext.Add(new TranslationAndContext(id, word, yandexTranslation.Text,

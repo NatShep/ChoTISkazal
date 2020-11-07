@@ -25,12 +25,12 @@ namespace Chotiskazal.Dal.Services
             return _dicRepository.AddWordPair(word);
         }
 
-        public int AddPhraseForWordPair(int pairId, string enPhrase, string RuTranslate)
+        public int AddPhraseForWordPair(int pairId, string enWord, string ruWord,string enPhrase, string RuTranslate)
         {
             //TODO look if there are some phrases
             //if not, add prases
             // if there is, update phrases
-            return _dicRepository.AddPhrase(pairId, enPhrase, RuTranslate);
+            return _dicRepository.AddPhrase(pairId, enWord, ruWord, enPhrase, RuTranslate);
         }
 
         public string[] GetAllTranslations(string word) => _dicRepository.GetAllTranslate(word);
@@ -49,14 +49,17 @@ namespace Chotiskazal.Dal.Services
                 var phrases = _dicRepository.GetAllPhrasesByPairId(wordDictionary.PairId);
                 wordDictionary.Phrases = phrases.ToList();
             }
+
             return wordPairs;
         }
 
         public void RemovePhrase(in int phraseId) => _dicRepository.RemovePhrase(phraseId);
 
-         public string GetTranscription(string word) => throw new NotImplementedException();
-         public WordDictionary GetPairByIdOrNull(int id) => throw new NotImplementedException();
+        public string GetTranscription(string word) => throw new NotImplementedException();
+        public WordDictionary GetPairByIdOrNull(int id) => throw new NotImplementedException();
 
 
+        public Phrase[] FindSeverealPrasesById(int[] allPhrasesIdForUser) =>
+            _dicRepository.FindSeveralPhraseById(allPhrasesIdForUser);
     }
 }

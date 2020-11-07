@@ -18,15 +18,15 @@ namespace Chotiskazal.Api.Services
 {
     public class AddWordService
     {
-        private UsersPairsService _usersPairsService;
+        private UsersWordsService _usersWordsService;
         private readonly YandexDictionaryApiClient _yapiDicClient;
         private readonly YandexTranslateApiClient _yapiTransClient;
         private readonly DictionaryService _dictionaryService;
 
-        public AddWordService(UsersPairsService usersPairsService, YandexDictionaryApiClient yapiDicClient,
+        public AddWordService(UsersWordsService usersWordsService, YandexDictionaryApiClient yapiDicClient,
             YandexTranslateApiClient yapiTransClient, DictionaryService dictionaryService)
         {
-            _usersPairsService = usersPairsService;
+            _usersWordsService = usersWordsService;
             _yapiDicClient = yapiDicClient;
             _yapiTransClient = yapiTransClient;
             _dictionaryService = dictionaryService;
@@ -34,9 +34,18 @@ namespace Chotiskazal.Api.Services
 
         public void AddMutualPhrasesToVocab(int userId, int maxCount)
         {
-            var allWords = _usersPairsService.GetAllWords(userId).Select(s => s.ToLower().Trim()).ToHashSet();
-            var allPhrases = _usersPairsService.GetAllPhrases(userId);
-            
+            var allWords = _usersWordsService.GetAllWords(userId).Select(s => s.ToLower().Trim()).ToHashSet();
+            var allWordsForLearning = _usersWordsService.GetAllUserWordsForLearning(userId);
+         
+            List<int> allPhrasesIdForUser = new List<int>();
+
+            foreach (var word in allWordsForLearning)
+            {
+                var phrases = word.GetPhrasesId;
+                allPhrasesIdForUser.AddRange(phrases);
+            }
+
+            var allPhrases = _dictionaryService.FindSeverealPrasesById(allPhrasesIdForUser.ToArray());
            
             List<Phrase> searchedPhrases = new List<Phrase>();
             int endings = 0;
@@ -91,8 +100,8 @@ namespace Chotiskazal.Api.Services
             {
                 Console.WriteLine("Adding " + phrase.EnPhrase);
                 
-              //TODO   _usersWordService.AddPhraseAsWordToUserCollection();
-              _dictionaryService.RemovePhrase(phrase.Id);
+              _usersWordsService.AddPhraseAsWordToUserCollection(phrase);
+           //cv    _usersWordsService.RemovePhrase(phrase.Id,userId);
             }
 
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
@@ -116,10 +125,10 @@ namespace Chotiskazal.Api.Services
             return (_yapiDicClient.IsOnline, _yapiTransClient.IsOnline);
         }
 
-        public List<TranslationAndContext> TranslateAndAddToDb(string word)
+        public List<UserWordForLearning> TranslateAndAddToDictionary(string word)
         {
-            List<TranslationAndContext> translationsWithContext = new List<TranslationAndContext>();
-
+            List<UserWordForLearning> WordsForLearning = new List<UserWordForLearning>();
+            List<int> phrasesId = new List<int>();
             if (!word.Contains(' '))
             {
                 Task<YaDefenition[]> task = null;
@@ -131,7 +140,8 @@ namespace Chotiskazal.Api.Services
                 {
                     var variants = task.Result.SelectMany(r => r.Tr);
                     var transcription = task.Result.Select(r => r.Ts).FirstOrDefault();
-
+                    
+                    
                     foreach (var yandexTranslation in variants)
                     {
                         var yaPhrases = yandexTranslation.GetPhrases(word);
@@ -143,19 +153,23 @@ namespace Chotiskazal.Api.Services
                             yandexTranslation.Text,
                             transcription,
                             TranslationSource.Yadic);
-                        foreach (var yaPhrase in yaPhrases)
+                        foreach (var phrase in yaPhrases)
                         {
-                            var phrase = yaPhrase.MapToDbPhrase();
                             dbPhrases.Add(phrase);
-                            _dictionaryService.AddPhraseForWordPair(id, phrase.EnPhrase, phrase.RuTranslate);
+                            phrasesId.Add(_dictionaryService.AddPhraseForWordPair(id, word, yandexTranslation.Text , phrase.EnPhrase, phrase.PhraseRuTranslate));
                         }
 
-                        translationsWithContext.Add(new TranslationAndContext(id, word, yandexTranslation.Text,
-                            transcription,
-                            dbPhrases.ToArray()));
+                        WordsForLearning.Add(new UserWordForLearning()
+                        {
+                            EnWord=word,
+                            UserTranslations = yandexTranslation.Text,
+                            Transcription = transcription,
+                            Phrases=dbPhrases,
+                            PhrasesIds =string.Join(",", phrasesId),
+                            IsPhrase = false,
+                        });
                     }
-
-                    return translationsWithContext;
+                    return WordsForLearning;
                 }
             }
 
@@ -172,46 +186,130 @@ namespace Chotiskazal.Api.Services
                         "[]",
                         TranslationSource.Yadic);
                     //2. Дополняем ответ
-                    translationsWithContext.Add(new TranslationAndContext(id, word, transAnsTask.Result, "[]",
-                        new Phrase[0]));
+                    WordsForLearning.Add(new UserWordForLearning()
+                    {
+                        EnWord=word,
+                        UserTranslations = transAnsTask.Result,
+                        Transcription = "",
+                        PhrasesIds = "",
+                        IsPhrase = false,
+                    });
                 }
             }
             catch (Exception e)
             {
-                return translationsWithContext;
+                return WordsForLearning;
             }
 
-            return translationsWithContext;
+            return WordsForLearning;
         }
-        
-        public List<TranslationAndContext> FindInDictionary(string word)
-        {
-            var pairWords = _dictionaryService.GetAllPairsByWord(word);
-          
-            // map to viewModel
-            var translateWithContexts = new List<TranslationAndContext>();
-            foreach (var wordDictionary in pairWords)
-                translateWithContexts.Add(wordDictionary.MapToTranslationAndContext());
-            
-            return translateWithContexts;
-        }
-        
-        public List<TranslationAndContext> FindInDictionaryWithPhrases(string word)
+
+
+        public List<UserWordForLearning> FindInDictionaryWithPhrases(string word)
         {
             var pairWords = _dictionaryService.GetAllPairsByWordWithPhrases(word);
           
-            // map to viewModel
-            var translateWithContexts = new List<TranslationAndContext>();
+            var translateWithContexts = new List<UserWordForLearning>();
             foreach (var wordDictionary in pairWords)
-                translateWithContexts.Add(wordDictionary.MapToTranslationAndContext());
-            
-            return translateWithContexts;        }
+            {
+                translateWithContexts.Add(new UserWordForLearning()
+                {
+                    EnWord = wordDictionary.EnWord,
+                    UserTranslations = wordDictionary.RuWord,
+                    Transcription = wordDictionary.Transcription,
+                    PhrasesIds =string.Join(",", wordDictionary.Phrases.Select(ph=>ph.Id)),
+                    Phrases = wordDictionary.Phrases,
+                    IsPhrase = false,
+                });
+            }
+            return translateWithContexts;
+        }
 
+        public int AddWordToUserCollection(UserWordForLearning userWordForLearning) =>
+            _usersWordsService.AddWordToUserCollection(userWordForLearning);
+        
+        public UserWordForLearning FindInUserWordsOrNull(int userId, string enWord)=> _usersWordsService.GetWordForLearningOrNullByWord(userId, enWord);
+        
+        
+        //TODO 
+        
         public void AddPairToUserCollection(in int userId, int id)
         {
-            var userPair = _usersPairsService.GetPairByDicId(userId, id);
-            if (userPair == null)
-                _usersPairsService.AddWordToUserCollection(userId, id);
+            int count = 0;
+            var wordFromDic = _dictionaryService.GetPairWithPhrasesByIdOrNull(id);
+            List<int> phrasesId = wordFromDic.Phrases.Select(p => p.Id).ToList();
+            
+            var wordForLearning=_usersWordsService.GetWordForLearningOrNullByWord(userId, wordFromDic.EnWord);
+         
+            if (wordForLearning != null)
+            {
+                var translates = wordForLearning.GetTranslations().ToList();
+                if (!translates.Contains(wordFromDic.RuWord))
+                {
+                    translates.Add(wordFromDic.RuWord);
+                    wordForLearning.SetTranslation(translates.ToArray());
+                    count++;
+                }
+                
+            }
+            else
+            {
+                var newWordForLearning= new UserWordForLearning()
+                {
+                    EnWord = wordFromDic.EnWord,
+                    UserTranslations = wordFromDic.RuWord,
+                    Transcription = wordFromDic.Transcription,
+                    PhrasesIds = string.Join(",",phrasesId),
+                    Phrases = wordFromDic.Phrases,
+                    IsPhrase=false, 
+                };
+                _usersWordsService.AddWordToUserCollection(newWordForLearning);
+
+            }
+             
+        }
+
+
+        public int AddResultToUserCollection(int userId, UserWordForLearning[] results)
+        {
+            var count = 0;
+            var userTranslations = results.Select(t => t.UserTranslations);
+            var allPhrases = new List<Phrase>();
+            foreach (var result in results)
+            {
+                allPhrases.AddRange(result.Phrases);
+            }
+
+            var userWord = _usersWordsService.GetWordForLearningOrNullByWord(userId, results.FirstOrDefault().EnWord);
+            if (userWord != null)
+            {
+                var translates = userWord.GetTranslations().ToList();
+                foreach (var userTranslation in userTranslations)
+                {
+                    if (!translates.Contains(userTranslation))
+                    {
+                        translates.Add(userTranslation);
+                        count++;
+                    }
+                }
+
+                userWord.SetTranslation(translates.ToArray());
+                _usersWordsService.UpdateWord(userWord);
+                return count;
+            }
+            
+            _usersWordsService.AddWordToUserCollection(new UserWordForLearning()
+            {
+                UserId = userId,
+                EnWord = results.FirstOrDefault().EnWord,
+                UserTranslations = string.Join(",", userTranslations),
+                Transcription = results.FirstOrDefault().Transcription,
+                PhrasesIds = "",
+                Phrases = allPhrases,
+                IsPhrase = false,
+            });
+            return userTranslations.Count();
+
         }
     }
 }

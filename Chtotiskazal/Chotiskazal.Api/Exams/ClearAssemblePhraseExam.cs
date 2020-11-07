@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Models;
 using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
@@ -12,7 +12,7 @@ namespace Chotiskazal.ApI.Exams
 
         public string Name => "Assemble phrase";
 
-        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
+        public ExamResult Pass(ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -23,12 +23,12 @@ namespace Chotiskazal.ApI.Exams
             while (true)
             {
                 var split = 
-                    targetPhrase.Origin.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                    targetPhrase.EnPhrase.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length < 2)
                     return ExamResult.Impossible;
 
                 shuffled = string.Join(" ", split.Randomize());
-                if(shuffled!= targetPhrase.Origin)
+                if(shuffled!= targetPhrase.EnPhrase)
                     break;
             }
 
@@ -40,16 +40,16 @@ namespace Chotiskazal.ApI.Exams
                 entry = Console.ReadLine().Trim();
             }
 
-            if (string.CompareOrdinal(targetPhrase.Origin, entry) == 0)
+            if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
             {
-                service.RegistrateSuccess(word.MetricId);
+                service.RegistrateSuccess(word);
                 return ExamResult.Passed;
             }
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Original phrase was: '{targetPhrase.Origin}'");
+            Console.WriteLine($"Original phrase was: '{targetPhrase.EnPhrase}'");
             Console.ResetColor();
-            service.RegistrateFailure(word.MetricId);
+            service.RegistrateFailure(word);
             return ExamResult.Failed;
         }
     }

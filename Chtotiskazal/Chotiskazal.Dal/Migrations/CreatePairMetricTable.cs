@@ -14,7 +14,7 @@ namespace Chotiskazal.Dal.Migrations
                  AggregateScore                      double ,
                  LastExam                            integer not null,               
                  Examed                              integer,
-                 Revision                            int not null,               
+                 Revision                            int not null               
               )";
         
     }

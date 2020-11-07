@@ -8,8 +8,10 @@
               (
                  Id                                  integer primary key AUTOINCREMENT,
                  PairId                              integer not null,
+                 EnWord                              nvarchar(100) not null,
+                 WordTranslate                              nvarchar(100) not null,
                  EnPhrase                            nvarchar(100) not null,
-                 RuTranslate                         nvarchar(100) not null,
+                 PhraseRuTranslate                         nvarchar(100) not null,
                  FOREIGN KEY (PairId) REFERENCES PairDictionary(PairId)
               )";
     }

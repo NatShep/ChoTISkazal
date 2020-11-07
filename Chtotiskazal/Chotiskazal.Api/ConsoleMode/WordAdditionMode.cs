@@ -55,7 +55,7 @@ namespace Chotiskazal.Api.ConsoleModes
                 //find word in local dictionary(if nor, find it in Ya dictionary
                 var translations = _addWordService.FindInDictionaryWithPhrases(word);
                 if (!translations.Any() && yaStatus.isYaDicOnline)
-                    translations = _addWordService.TranslateAndAddToDb(word);
+                    translations = _addWordService.TranslateAndAddToDictionary(word);
                 if (!translations.Any())
                     Console.WriteLine("No translations found. Check the word and try again");
                 
@@ -68,9 +68,9 @@ namespace Chotiskazal.Api.ConsoleModes
                     foreach (var translation in translations)
                     {
                         if (translation.Phrases.Any())
-                            Console.WriteLine($"{i}: {translation.RuWord}\t (+{translation.Phrases.Length})");
+                            Console.WriteLine($"{i}: {translation.GetTranslations().FirstOrDefault()}\t (+{translation.Phrases.Count})");
                         else
-                            Console.WriteLine($"{i}: {translation.RuWord}");
+                            Console.WriteLine($"{i}: {translation.GetTranslations().FirstOrDefault()}");
                         i++;
                     }
                     try
@@ -78,16 +78,8 @@ namespace Chotiskazal.Api.ConsoleModes
                         var results = ChooseTranslation(translations.ToArray());
                         if (results?.Any() == true)
                         {
-                            //adding to user collection, if there is no this word
-                            var idsInDb = results.Select(t => t.IdInDB).ToArray();
-                            var userTranslations = results.Select(t => t.RuWord).ToArray();
-                            var allPhrases = results.SelectMany(t => t.Phrases).ToArray();
-
-                            foreach (var id in idsInDb)
-                                 _addWordService.AddPairToUserCollection(userId, id);
-
-                            Console.WriteLine(
-                                $"Saved. Tranlations: {userTranslations.Length}, Phrases: {allPhrases.Length}");
+                            var count =_addWordService.AddResultToUserCollection(userId, results);
+                            Console.WriteLine($"Saved. Translations: {count}");
                         }
                     }
                     catch (OperationCanceledException)
@@ -99,7 +91,7 @@ namespace Chotiskazal.Api.ConsoleModes
         }
 
 
-        TranslationAndContext[] ChooseTranslation(TranslationAndContext[] translations)
+        UserWordForLearning[] ChooseTranslation(UserWordForLearning[] translations)
         {
             while (true)
             {
@@ -127,12 +119,18 @@ namespace Chotiskazal.Api.ConsoleModes
                             continue;
                         }
                     }
-
+                    
+//TODO What is this???
                     if (res.Length > 1)
                         return new[]
                         {
-                            new TranslationAndContext(translations[0].IdInDB, translations[0].EnWord, res, translations[0].Transcription,
-                                new Phrase[0])
+                            new UserWordForLearning()
+                            {
+                                 EnWord = translations[0].EnWord,
+                                 UserTranslations = res,
+                                 Transcription = translations[0].Transcription,
+                                 IsPhrase = false,
+                            }
                         };
                     else continue;
                 }

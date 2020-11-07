@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Models;
 using Chotiskazal.ConsoleTesting.Services;
 
 namespace Chotiskazal.ApI.Exams

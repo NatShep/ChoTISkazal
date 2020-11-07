@@ -3,33 +3,34 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Chotiskazal.ApI.Exams;
+using Chotiskazal.Api.Models;
 using Chotiskazal.Dal;
 using Chotiskazal.DAL;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR;
 
-namespace Chotiskazal.ConsoleTesting.Services
+namespace Chotiskazal.ConsoleTesting.OldServices
 {
     public class ExamService
     {
+        private UsersPairsService _usersPairsService;
         private ExamsAndMetricService _examsAndMetricService;
         private DictionaryService _dictionaryService;
-        private UsersWordsService _usersWordsService;
 
-        public ExamService( ExamsAndMetricService examsAndMetricService,
-            DictionaryService dictionaryService,UsersWordsService usersWordsService)
+        public ExamService(UsersPairsService usersPairsService, ExamsAndMetricService examsAndMetricService,
+            DictionaryService dictionaryService)
         {
+            _usersPairsService = usersPairsService;
             _examsAndMetricService = examsAndMetricService;
             _dictionaryService = dictionaryService;
-            _usersWordsService = usersWordsService;
         }
 
-     /*   public UserWordForLearning[] GetWordsForLearningOLD(int userId, int count, int maxTranslationSize)
+        public WordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
         {
             //получаю все худщие пары юзера
             var fullPairs =_usersPairsService.GetWorstForUser(userId, count);
            
-            var wordsForLearning = new List<UserWordForLearning>();
+            var wordsForLearning = new List<WordForLearning>();
             foreach (var pairModel in fullPairs)
             {
                 //получаю саму пару из словаря и его фразы и ее фразы
@@ -65,48 +66,40 @@ namespace Chotiskazal.ConsoleTesting.Services
                     var phrase = wordForLearning.Phrases[i];
                     if (!usedTranslations.Contains(phrase.Translation))
                         wordForLearning.Phrases.RemoveAt(i);
-                }//
+                }*/
                
                wordsForLearning.Add(wordForLearning);
             }
             return wordsForLearning.ToArray();
-        }*/
-
-     public UserWordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
-     {
-         //получаю все худщие пары юзера
-         var wordsForLearning = _usersWordsService.GetWorstForUser(userId, count);
-
-         foreach (var wordForLearning in wordsForLearning)
-         {
-             // отбор, если меньше трех переводов, то не отбираем, а берем все
-             var translations = wordForLearning.GetTranslations().ToArray();
-             if (translations.Length <= maxTranslationSize)
-                 continue;
-
-             // ели больше трех переводов, то отбираем нужные и присваиваем нашему слову для изучения
-             var usedTranslations = translations.Randomize().Take(maxTranslationSize).ToArray();
-             wordForLearning.SetTranslation(usedTranslations);
-
-
-             // убирает из фраз те фразы, которые оказались в переводах. Потмоу что мы их добавили в словарь пар
-             //TODO это зачем это? по идее мы убрали фразы, когда их переносили. Тут не может быть этих фраз
-             //вернуться позже и посмотреть на необходимость этого 
-
-         }
-
-         return wordsForLearning.ToArray();
-     }
-
-     //TODO Зачем этот метод и метод выше, а еще GetTestWord
-        public UserWordForLearning[] GetPairsForTestWords(int userId, int delta, int randomRate)
-        {
-              return _usersWordsService.GetWorstTestWordForUser(userId, delta,randomRate);
         }
 
-        public new List<UserWordForLearning> PreparingExamsList(UserWordForLearning[] learningWords)
+        //TODO Зачем этот метод и метод выше, а еще GetTestWord
+        public WordForLearning[] GetPairsForTestWords(int userId, int delta, int randomRate)
         {
-            var examsList = new List<UserWordForLearning>(learningWords.Length * 4);
+            var pairsFromDb = _usersPairsService.GetWorstTestWordForUser(userId, delta,randomRate);
+            // перевести в wordForLearning
+            var wordsForLearning = new List<WordForLearning>();
+            foreach (var pairModel in pairsFromDb)
+            {
+                //получаю саму пару из словаря и его фразы и ее фразы
+                var pairFromDictionary = _dictionaryService.GetPairWithPhrasesByIdOrNull(pairModel.PairId);
+                //получаю все его переводы(для данного слова!, а не только пару)
+                var allTranslates = _dictionaryService.GetAllTranslations(pairFromDictionary.EnWord);
+                //получаю все метрики для данной пары
+                var metrics = _examsAndMetricService.GetAllMetricsForPair(pairModel.MetricId);
+                //получаю все переводы данного слова для юзера
+                var allTranslationsOfWordForUser =
+                    _usersPairsService.GetAllUserTranslatesForWord(userId, pairFromDictionary.EnWord);
+
+                var wordForLearning = new WordForLearning(pairModel,pairFromDictionary,metrics,allTranslates,allTranslationsOfWordForUser);
+                wordsForLearning.Add(wordForLearning);
+            }
+            return wordsForLearning.ToArray();
+        }
+
+        public new List<WordForLearning> PreparingExamsList(WordForLearning[] learningWords)
+        {
+            var examsList = new List<WordForLearning>(learningWords.Length * 4);
             //Every learning word appears in test from 2 to 4 times
 
             examsList.AddRange(learningWords.Randomize());
@@ -120,12 +113,13 @@ namespace Chotiskazal.ConsoleTesting.Services
             }
             return examsList;
         }
-        public UserWordForLearning[] GetTestWords(int userId,List<UserWordForLearning> examsList)
+        
+        public WordForLearning[] GetTestWords(int userId,List<WordForLearning> examsList)
         {
             //TODO изучть по какому принципу получаем RandomRATE. связан ли он с прогрессом подбираемых слов.
             //TODO Или тут вообще рандомные слова будут
             var delta = Math.Min(7, (32 - examsList.Count));
-            UserWordForLearning[] testWords = new UserWordForLearning[0];
+            WordForLearning[] testWords = new WordForLearning[0];
             if (delta > 0)
             {
                 var randomRate = 8 + RandomTools.Rnd.Next(5);
@@ -134,7 +128,7 @@ namespace Chotiskazal.ConsoleTesting.Services
             return testWords;
         }
 
-        public void UpdateAgingAndRandomize(int i) => _usersWordsService.UpdateAgingAndRandomize(i);
+        public void UpdateAgingAndRandomize(int i) => new NotImplementedException();
 
         //TODO разобраться с QuestionMetric
         public void SaveQuestionMetrics(QuestionMetric questionMetric) =>
@@ -143,17 +137,16 @@ namespace Chotiskazal.ConsoleTesting.Services
         public void RegistrateExam(int userId, DateTime started, int examsCount, int examsPassed) =>
             _examsAndMetricService.RegistrateExam(userId, started, examsCount, examsPassed);
 
-        public void RegistrateSuccess(UserWordForLearning userWordForLearning) => 
-            _usersWordsService.RegistrateSuccess(userWordForLearning);
-       
-        public void RegistrateFailure(UserWordForLearning userWordForLearning) =>
-            _usersWordsService.RegistrateFailure(userWordForLearning);
+        public void RegistrateSuccess(int metricId) => new NotImplementedException();
+
+        public void RegistrateFailure(int metricId) => new NotImplementedException();
 
       
         
         //TODO additional methods
+
         //use for Graph Mode
-        public UserWordForLearning[] GetAllExamedWords(in int userId)
+        public WordForLearning[] GetAllExamedWords(in int userId)
         {
             throw new NotImplementedException();
         }

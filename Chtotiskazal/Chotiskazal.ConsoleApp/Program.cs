@@ -29,15 +29,16 @@ namespace Chotiskazal.ConsoleApp
             var yatransapiTimeout = TimeSpan.FromSeconds(5);
             
             var addWordService = new AddWordService(
-                new UsersPairsService(new UserPairsRepo(dbFileName)), 
+                new UsersWordsService(new UserWordsRepo(dbFileName)), 
                 new YandexDictionaryApiClient(yadicapiKey,yadicapiTimeout), 
                 new YandexTranslateApiClient(yatransapiKey,yatransapiTimeout),
                 new DictionaryService(new DictionaryRepository(dbFileName)));
             
             var examService=new ExamService(
-                new UsersPairsService(new UserPairsRepo(dbFileName)), 
                 new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName)),
-                new DictionaryService(new DictionaryRepository(dbFileName)));
+                new DictionaryService(new DictionaryRepository(dbFileName)),
+                new UsersWordsService(new UserWordsRepo(dbFileName))
+                );
             var authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
   
             var modes = new IConsoleMode[]

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using Chotiskazal.Api.ConsoleModes;
 using Chotiskazal.ApI.Exams;
-using Chotiskazal.Api.Models;
 using Chotiskazal.Api.Services;
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.Dal;
+using Chotiskazal.DAL;
 using Chotiskazal.Dal.Services;
 using Chotiskazal.LogicR;
 
@@ -46,11 +46,12 @@ namespace Chotiskazal.Api.ConsoleModes
             if (learningWords.Average(w => w.PassedScore) <= 4)
             {
                 foreach (var pairModel in learningWords.Randomize())
-                    Console.WriteLine($"{pairModel.OriginWord}\t\t:{pairModel.Translations}");
+                    Console.WriteLine($"{pairModel.EnWord}\t\t:{pairModel.UserTranslations}");
             }
             //Get exam list and test words
             var examsList =  _examService.PreparingExamsList(learningWords);
             var testWords = _examService.GetTestWords(userId, examsList);
+            
             examsList.AddRange(testWords);
 
             Console.WriteLine();
@@ -141,7 +142,7 @@ namespace Chotiskazal.Api.ConsoleModes
             Console.WriteLine($"Test done:  {examsPassed}/{examsCount}");
             foreach (var pairModel in learningWords.Concat(testWords))
             {
-                Console.WriteLine(pairModel.OriginWord + " - " + pairModel.Translations + "  (" + pairModel.PassedScore +
+                Console.WriteLine(pairModel.EnWord + " - " + pairModel.UserTranslations + "  (" + pairModel.PassedScore +
                                   ")");
             }
             //--------------------------------------
@@ -168,12 +169,13 @@ namespace Chotiskazal.Api.ConsoleModes
         }
 
         //TODO не понимаю, как работают метрики
-        private static QuestionMetric CreateQuestionMetric(WordForLearning pairModel, IExam exam)
+        private static QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam)
         {
             var questionMetric = new QuestionMetric
             {
+                WordId = pairModel.Id,
+                Created=DateTime.Now,
                 AggregateScoreBefore = pairModel.AggregateScore, 
-                MetricId = pairModel.MetricId,
                 ExamsPassed = pairModel.Examed,
                 PassedScoreBefore = pairModel.PassedScore,
                 PreviousExam = pairModel.LastExam,

@@ -29,17 +29,17 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public int AddPhrase(int pairId, string enPhrase, string ruTranslate)
+        public int AddPhrase(int pairId, string enWord, string ruWord, string enPhrase, string ruTranslate)
         {
             CheckDbFile.Check(DbFile);
             
             using (var cnn = SimpleDbConnection())
             {
-                var phrase = new Phrase(pairId, enPhrase, ruTranslate);
+                var phrase = new Phrase(pairId, enWord, ruWord , enPhrase, ruTranslate);
                 cnn.Open();
                 return cnn.ExecuteScalar<int>(
-                    @"INSERT INTO Phrases ( PairId ,  EnPhrase, RuTranslate)
-                                      VALUES( @PairId,  @EnPhrase,  @RuTranslate); 
+                    @"INSERT INTO Phrases ( PairId , EnWord, WordTranslate, EnPhrase, PhraseRuTranslate)
+                                      VALUES( @PairId,  @EnWord, @WordTranslate, @EnPhrase,  @PhraseRuTranslate); 
                           select last_insert_rowid()", phrase);
             }
         }
@@ -124,6 +124,20 @@ namespace Chotiskazal.Dal.Repo
             }
         }
         
+        public Phrase[] FindSeveralPhraseById(int[] allPhrasesIdForUser)
+        {
+            CheckDbFile.Check(DbFile);
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var result = cnn.Query<Phrase>(
+                    @"SELECT * FROM Phrases 
+                    WHERE PairId in @allPhrasesIdForUser", allPhrasesIdForUser);
+                return result.ToArray();
+            }
+        }
+        
         //TODO Additional methods 
         public WordDictionary GetPairByIdOrNull(int? id)
         {
@@ -138,5 +152,7 @@ namespace Chotiskazal.Dal.Repo
                 return result;
             }
         }
+
+      
     }
 }

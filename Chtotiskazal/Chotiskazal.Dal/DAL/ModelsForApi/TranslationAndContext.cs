@@ -3,9 +3,9 @@ using Chotiskazal.LogicR.yapi;
 
 namespace Chotiskazal.DAL.ModelsForApi
 {
-    public class TranslationAndContext
+    public class TranslationAndContextR
     {
-        public TranslationAndContext(int id, string enWord, string ruWord, string transcription, Phrase[] phrases)
+        public TranslationAndContextR(int id, string enWord, string ruWord, string transcription, Phrase[] phrases)
         {
             IdInDB = id;
             EnWord = enWord;

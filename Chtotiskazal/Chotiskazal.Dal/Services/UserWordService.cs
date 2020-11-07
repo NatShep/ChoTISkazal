@@ -26,6 +26,8 @@ namespace Chotiskazal.Dal.Services
    
         public string[] GetAllWords(int userId) =>_userWordsRepository.GetAllWordsForUser(userId);
         
+        public UserWordForLearning[] GetAllUserWordsForLearning(int userId) => _userWordsRepository.GetAllUserWordsForLearning(userId);
+
         public void RegistrateFailure(UserWordForLearning userWordForLearning)
         {
             userWordForLearning.OnExamFailed();
@@ -41,15 +43,31 @@ namespace Chotiskazal.Dal.Services
             userWordForLearning.OnExamPassed();
             userWordForLearning.UpdateAgingAndRandomization();
             _userWordsRepository.UpdateScores(userWordForLearning);
-        }        
+        }
+
+        public void AddPhraseAsWordToUserCollection(Phrase phrase)
+        {
+            var userWord=new UserWordForLearning()
+            {
+                    EnWord=phrase.EnPhrase,
+                    UserTranslations = phrase.PhraseRuTranslate,
+                    Transcription = "",
+                    PhrasesIds = "",
+                    IsPhrase = true,
+            };
+            _userWordsRepository.SaveToUserDictionary(userWord);
+        }
+
+        public UserWordForLearning GetWordForLearningOrNullByWord(int userId, string enWord) => _userWordsRepository.GetWordByEnWordOrNull(userId, enWord);
+
+
+
         //TODO additional methods
         public void DeleteWordFromUserCollection(User user, int wordId){}
         public UserPair[] GetAllLearningWords(in int userId) => throw new NotImplementedException();
-        public UserPair[] GetAllPair(int userId) => throw new NotImplementedException();
-
-        
 
 
-        
+        public void UpdateWord(UserWordForLearning userWord) =>
+            _userWordsRepository.UpdateWordTranslations(userWord);
     }
 }

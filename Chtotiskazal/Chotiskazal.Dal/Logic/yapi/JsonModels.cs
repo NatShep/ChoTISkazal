@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+ using Chotiskazal.DAL;
 
-namespace Chotiskazal.LogicR.yapi
+ namespace Chotiskazal.LogicR.yapi
 {
     public class YapiDicAnswer
     {
@@ -39,20 +40,19 @@ namespace Chotiskazal.LogicR.yapi
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public Example[] Ex { get; set; }
-        public List<YaPhrase> GetPhrases(string word)
+        public List<Phrase> GetPhrases(string word)
         {
-            List<YaPhrase> phrases = new List<YaPhrase>();
+            List<Phrase> phrases = new List<Phrase>();
             if (this.Ex != null)
             {
                 foreach (var example in this.Ex)
                 {
-                    var phrase = new YaPhrase
+                    var phrase = new Phrase
                     {
-                        Created = DateTime.Now,
-                        OriginWord = word,
-                        Origin = example.Text,
-                        Translation = example.Tr.FirstOrDefault()?.Text,
-                        TranslationWord = this.Text,
+                        EnWord = word,
+                        EnPhrase = example.Text,
+                        PhraseRuTranslate= example.Tr.FirstOrDefault()?.Text,
+                        WordTranslate = this.Text,
                     };
                     phrases.Add(phrase);
                 }
@@ -86,17 +86,6 @@ namespace Chotiskazal.LogicR.yapi
         [JsonPropertyName("tr")]
         public JustText[] Tr { get; set; }
     }
-    
-    public class YaPhrase
-    {
-        public string OriginWord { get; set; }
-        public string Origin { get; set; }
-        public string Translation { get; set; }
-        public string TranslationWord { get; set; }
-        public DateTime Created { get; set; }
-        public bool IsEmpty => string.IsNullOrWhiteSpace(OriginWord);
-    }
-    
     
 }
 

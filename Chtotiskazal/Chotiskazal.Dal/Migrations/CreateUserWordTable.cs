@@ -12,12 +12,13 @@ namespace Chotiskazal.Dal.Migrations
                  UserTranslations                    nvarchar(100) not null,
                  Transcription                       nvarchar(100) not null,
                  Created                             datetime not null,
-                 Phrases                             nvarchar(100) not null,
+                 PhrasesIds                          nvarchar(100) not null,
+                 IsPhrase                            boolean not null,
                  PassedScore                         real not null,             
                  AggregateScore                      double ,
-                 LastExam                            integer not null,               
+                 LastExam                            datetime,               
                  Examed                              integer,
-                 Revision                            int not null,               
+                 Revision                            int not null             
               )";
         
     }

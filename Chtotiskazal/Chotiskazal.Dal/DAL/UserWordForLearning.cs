@@ -23,22 +23,45 @@ using System.Linq;
          public string Transcription { get; set; }
          public DateTime Created { get; set; }
 
-         public string Phrases { get; set; }
+         public string PhrasesIds { get; set; }
+
+         public bool IsPhrase { get; set; }
+
          public int PassedScore { get; set; }
          public double AggregateScore { get; set; }
 
-         public DateTime LastExam { get; set; }
+         public DateTime? LastExam { get; set; }
          public int Examed { get; set; }
          public int Revision { get; set; }
 
-      
+
+         public List<Phrase> Phrases { get; set; }
+
+         public UserWordForLearning()
+         {
+             Phrases = new List<Phrase>();
+             Created = DateTime.Now;
+             LastExam = null;
+         }
+
 
          public IEnumerable<string> GetTranslations() => UserTranslations.Split(',').Select(s => s.Trim());
 
-         public void SetTranslations(string[] translations) => UserTranslations = string.Join(", ", translations);
+         public void SetTranslation(string[] translations) => UserTranslations = string.Join(", ", translations);
 
-         public IEnumerable<string> GetPhrases => Phrases.Split(',').Select(s => s.Trim());
+         public IEnumerable<int> GetPhrasesId
+         {
+             get
+             {
+                 List<int> phrasesId = new List<int>();
+                 foreach (var phraseId in PhrasesIds.Split(',').Select(s => s.Trim()))
+                 {
+                     phrasesId.Add(int.Parse(phraseId));
+                 }
 
+                 return phrasesId;
+             }
+         }
 
          public LearningState State
          {
@@ -65,7 +88,7 @@ using System.Linq;
                  Transcription = transcription,
                  UserTranslations = translationWord,
                  Revision = 1,
-                 Phrases = "",
+                 PhrasesIds = "",
              };
          }
 
@@ -92,11 +115,16 @@ using System.Linq;
          }
 
          //res reduces for 1 point per AgingFactor days
-         public double AggedScore => Math.Max(0, PassedScore - (DateTime.Now - LastExam).TotalDays / AgingFactor);
-
-         public void UpdateAgingAndRandomization()
+         public double AggedScore ()
          {
-             double res = AggedScore;
+             if (LastExam!=null)
+                 return Math.Max(0, PassedScore - (DateTime.Now - LastExam.Value).TotalDays / AgingFactor);
+             return 0;
+         }
+
+     public void UpdateAgingAndRandomization()
+         {
+             double res = AggedScore();
 
              //probability reduces by reducingPerPointFactor for every res point
              var p = 100 / Math.Pow(ReducingPerPointFactor, res);

@@ -23,15 +23,17 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var result = cnn.ExecuteScalar<int>(
-                    @"INSERT INTO UserWords (UserId, EnWord, UserTranslations, Transcription, Created, Phrases,
+                    @"INSERT INTO UserWords (UserId, EnWord, UserTranslations, Transcription, Created, PhrasesIds, IsPhrase,
                                                  PassedScore, AggregateScore,LastExam,Examed,Revision)
 
-                      VALUES(@UserId,  @EnWord, @UserTranslations, @Transcription, @Created, @Phrases,
+                      VALUES(@UserId,  @EnWord, @UserTranslations, @Transcription, @Created, @PhrasesIds, @IsPhrase,
                                                  @PassedScore, @AggregateScore,@LastExam,@Examed,@Revision)",
                     userWordForLearning);
+
+
                 return result;
             }
-       }
+        }
 
         public UserWordForLearning[] GetWorstForUser(int userId, int count)
         {
@@ -39,7 +41,7 @@ namespace Chotiskazal.Dal.Repo
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            
+
             var result = cnn.Query<UserWordForLearning>(
                 @"Select * FROM UserWords WHERE UserId=@userId               
 				  order by AggregateScore desc limit @count          		
@@ -54,11 +56,22 @@ namespace Chotiskazal.Dal.Repo
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            
+
             return cnn.Query<UserWordForLearning>(
-                @"Select * FROM UserWords WHERE UserId=@userId
-				  where PassedScore > @learnRate order by AggregateScore desc limit @count       		
+                @"Select * FROM UserWords WHERE UserId=@userId AND PassedScore > @learnRate 
+                  order by AggregateScore desc limit @count       		
                 ", new {userId, learnRate, count}).ToArray();
+        }
+
+        public UserWordForLearning[] GetAllUserWordsForLearning(int userId)
+        {
+            CheckDbFile.Check(DbFile);
+
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+            return cnn.Query<UserWordForLearning>(
+                @"Select * from UserWords WHERE UserId=userId
+                ", new {userId}).ToArray();
         }
 
         public string[] GetAllWordsForUser(in int userId)
@@ -71,6 +84,7 @@ namespace Chotiskazal.Dal.Repo
                 @"Select EnWord FROM UsersPairs where up.UserId==@userId
                   ", new {userId}).ToArray();
         }
+
         public void UpdateScores(UserWordForLearning userWordForLearning)
         {
             CheckDbFile.Check(DbFile);
@@ -82,12 +96,12 @@ namespace Chotiskazal.Dal.Repo
                     $"Update UserWords set AggregateScore = @AggregateScore," +
                     $"PassedScore = @PassedScore, " +
                     $"LastExam = @LastExam," +
-                    $"Examed = @Examed "+
+                    $"Examed = @Examed " +
                     $"WHERE Id = @Id";
-                cnn.Execute(op,userWordForLearning);
+                cnn.Execute(op, userWordForLearning);
             }
         }
-        
+
         public void UpdateAgingAndRandomization(int count)
         {
             CheckDbFile.Check(DbFile);
@@ -96,7 +110,7 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 foreach (var word in cnn.Query<UserWordForLearning>
-                    (@"Select * From UserWords order by RANDOM() limit @count", new { count }).ToArray())
+                    (@"Select * From UserWords order by RANDOM() limit @count", new {count}).ToArray())
                 {
                     word.UpdateAgingAndRandomization();
                     var op = $"Update UserWords set AggregateScore = " +
@@ -107,21 +121,23 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-
-
-        //TODO additional methods
-        public UserPair[] GetAllPairsForUser(int userId)
+        public UserWordForLearning GetWordByEnWordOrNull(int userId, string enWord)
         {
             CheckDbFile.Check(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<UserPair>(
-                @"Select DISTINCT EnWord, from 
-                (SELECT PairId FROM UsersPairs up where UserId==@userId 
-                LEFT JOIN PairDictionare pd w on up.PairId=pd.Id", new {userId}).ToArray();
+
+            return cnn.Query<UserWordForLearning>(
+                @"Select * FROM UserWords WHERE UserId=@userId AND enWord = @enWord       		
+                ", new {userId,enWord}).FirstOrDefault();
         }
-        
+
+
+
+        //TODO additional methods
+
+
         public void UpdateAgingAndRandomization()
         {
             CheckDbFile.Check(DbFile);
@@ -132,9 +148,29 @@ namespace Chotiskazal.Dal.Repo
                 foreach (var word in cnn.Query<UserWordForLearning>(@"Select * From UserPairs").ToArray())
                 {
                     word.UpdateAgingAndRandomization();
-                    var op = $"Update UserWords set AggregateScore = { word.AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
+                    var op =
+                        $"Update UserWords set AggregateScore = {word.AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
                     cnn.Execute(op);
                 }
+            }
+        }
+
+
+        public void UpdateWordTranslations(UserWordForLearning userWord)
+        {
+
+            CheckDbFile.Check(DbFile);
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+
+                var op =
+                        $"Update UserWords Set " +
+                        $" UserTranslations = @UserTranslations " +
+                        $"Where Id = @Id";
+                    cnn.Execute(op,userWord);
+
             }
         }
     }

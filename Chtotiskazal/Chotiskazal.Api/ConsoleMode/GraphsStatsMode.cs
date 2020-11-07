@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Models;
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.Dal.Services;
@@ -39,7 +38,7 @@ namespace Chotiskazal.Api.ConsoleModes
             //Console.WriteLine($"Context phrases count = {_usersWordService.GetAllPhrases()}");
             //-----------
             
-            Console.WriteLine($"Words count = {allWords.Count(w=>!w.OriginWord.Contains(' '))}");
+            Console.WriteLine($"Words count = {allWords.Count(w=>!w.EnWord.Contains(' '))}");
             Console.WriteLine($"Words and sentences count = {allWords.Length}");
 
             //------ groups is never used
@@ -50,7 +49,7 @@ namespace Chotiskazal.Api.ConsoleModes
                 .Select(s => new { state = s.Key, count = s.Count() });
             */
             //-----------------------------
-            var doneCount = allWords.Count(a => a.PassedScore >= WordForLearning.MaxExamScore);
+            var doneCount = allWords.Count(a => a.PassedScore >= UserWordForLearning.MaxExamScore);
 
             Console.WriteLine($"Done: {doneCount} words  ({(doneCount * 100 / allWords.Length)}%)");
             Console.WriteLine($"Unknown: {allWords.Length - doneCount} words");
@@ -75,7 +74,7 @@ namespace Chotiskazal.Api.ConsoleModes
 
         }
 
-        private static void RenderKnowledgeHistogram(WordForLearning[] allWords)
+        private static void RenderKnowledgeHistogram(UserWordForLearning[] allWords)
         {
             var length = 19;
             var wordHystogramm = new int[length];
@@ -131,27 +130,27 @@ namespace Chotiskazal.Api.ConsoleModes
 
         }
 
-        private static int GetLearningRate(WordForLearning[] allModels)
+        private static int GetLearningRate(UserWordForLearning[] allModels)
         {
 
             //PairModel.MaxExamScore+2, a.AggedScore 
             double sum= 0;
             foreach (var pair in allModels)
             {
-                var hiLim = WordForLearning.MaxExamScore + 2;
+                var hiLim = UserWordForLearning.MaxExamScore + 2;
                 if (pair.PassedScore < hiLim)
                     sum += pair.PassedScore;
                 else
                 {
-                    sum+= Math.Min(hiLim, Math.Max(pair.AggedScore, hiLim - 1));
+                    sum+= Math.Min(hiLim, Math.Max(pair.AggedScore(), hiLim - 1));
                 }
             }
 
             var count = allModels.Count();
-            return (int) (count * WordForLearning.MaxExamScore -sum);
+            return (int) (count * UserWordForLearning.MaxExamScore -sum);
         }
 
-        private static void RenderAddingTimeLine(WordForLearning[] allWords)
+        private static void RenderAddingTimeLine(UserWordForLearning[] allWords)
         {
             var wordTimeline = new int[21];
 

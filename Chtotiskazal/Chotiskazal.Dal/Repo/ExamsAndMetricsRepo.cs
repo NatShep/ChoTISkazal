@@ -35,61 +35,27 @@ namespace Chotiskazal.Dal.Repo
                 cnn.Open();
                 cnn.Execute(
                     @"INSERT INTO QuestionMetric ( 
+                    WordId,
+                    Created,
                     ElaspedMs,
                     Result,
                     Type,
-                    Revision,
                     PreviousExam,  
-                    LastExam,
-                    Examed,
                     ExamsPassed,
-                    PassedScore,
                     AggregateScoreBefore, 
-                    AggregateScore,
                     PassedScoreBefore)  
                     
                 Values( 
+                    @WordId,
+                    @Created,
                     @ElaspedMs,
                     @Result,
                     @Type,
-                    @Revision,
                     @PreviousExam,  
-                    @LastExam,
-                    @Examed,
                     @ExamsPassed,
-                    @PassedScore,
                     @AggregateScoreBefore, 
-                    @AggregateScore,
                     @PassedScoreBefore)", metric);
-               /* cnn.Execute(
-                    @"INSERT INTO QuestionMetric ( 
-                    ElaspedMs,
-                    Result,
-                    Type,
-                    Revision,
-                    PreviousExam,  
-                    LastExam,
-                    Examed,
-                    ExamsPassed,
-                    PassedScore,
-                    AggregateScoreBefore, 
-                    AggregateScore,
-                    PassedScoreBefore)  
-                    
-                Values( 
-                    @ElaspedMs,
-                    @Result,
-                    @Type,
-                    @Revision,
-                    @PreviousExam,  
-                    @LastExam,
-                    @Examed,
-                    @ExamsPassed,
-                    @PassedScore,
-                    @AggregateScoreBefore, 
-                    @AggregateScore,
-                    @PassedScoreBefore)", metric);
-        */    }
+               }
         }
         public void AddExam(Exam exam)
         {

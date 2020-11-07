@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Models;
 using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.DAL;
 using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams
@@ -11,18 +11,18 @@ namespace Chotiskazal.ApI.Exams
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitude";
-        public ExamResult Pass(ExamService service, WordForLearning word, WordForLearning[] examList)
+        public ExamResult Pass(ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
 
             var phrase = word.Phrases.GetRandomItem();
             
-            var replaced = phrase.Translation.Replace(phrase.TranslationWord, "...");
-            if (replaced == phrase.Translation)
+            var replaced = phrase.PhraseRuTranslate.Replace(phrase.WordTranslate, "...");
+            if (replaced == phrase.PhraseRuTranslate)
                 return ExamResult.Impossible;
 
-            Console.WriteLine($"\"{phrase.Origin}\"");
+            Console.WriteLine($"\"{phrase.EnPhrase}\"");
             Console.WriteLine($" translated as ");
             Console.WriteLine($"\"{replaced}\"");
             Console.WriteLine();
@@ -32,16 +32,16 @@ namespace Chotiskazal.ApI.Exams
                 var enter = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.CompareOrdinal(phrase.TranslationWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
+                if (string.CompareOrdinal(phrase.WordTranslate.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    service.RegistrateSuccess(word.MetricId);
+                    service.RegistrateSuccess(word);
                     return ExamResult.Passed;
                 }
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Origin phrase was \"{phrase.Translation}\"");
+                Console.WriteLine($"Origin phrase was \"{phrase.PhraseRuTranslate}\"");
                 Console.ResetColor();
-                service.RegistrateFailure(word.MetricId);
+                service.RegistrateFailure(word);
                 return ExamResult.Failed;
             }
         }
