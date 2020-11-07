@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Chotiskazal.LogicR
+namespace Chotiskazal.DAL.Services
 {
     public static class RandomTools
     {

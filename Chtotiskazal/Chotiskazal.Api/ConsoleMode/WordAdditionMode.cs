@@ -1,15 +1,7 @@
-﻿using Chotiskazal.Dal.Services;
-using Chotiskazal.DAL;
-using Chotiskazal.LogicR;
-using Chotiskazal.LogicR.yapi;
+﻿using Chotiskazal.DAL;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
 using Chotiskazal.Api.Services;
-using Chotiskazal.ConsoleTesting;
-using Chotiskazal.DAL.ModelsForApi;
 
 
 namespace Chotiskazal.Api.ConsoleModes
@@ -43,7 +35,7 @@ namespace Chotiskazal.Api.ConsoleModes
             else
                 Console.WriteLine("Yandex trans is offline");
 
-            // write wotd for translation
+            // ask word for translation
             while (true)
             {
                 Console.Write("Enter [e] for exit or ");
@@ -52,7 +44,7 @@ namespace Chotiskazal.Api.ConsoleModes
                 if (word == "e")
                     break;
 
-                //find word in local dictionary(if nor, find it in Ya dictionary
+                //find word in local dictionary(if not, find it in Ya dictionary)
                 var translations = _addWordService.FindInDictionaryWithPhrases(word);
                 if (!translations.Any() && yaStatus.isYaDicOnline)
                     translations = _addWordService.TranslateAndAddToDictionary(word);

@@ -6,9 +6,7 @@ namespace Chotiskazal.Dal
     public class QuestionMetric
     {
         public int MetricId { get; set; }
-        
         public long WordId { get; set; }
-        
         public DateTime Created { get; set; }
         public DateTime? PreviousExam { get; set; }
         public int ElaspedMs { get; set; }

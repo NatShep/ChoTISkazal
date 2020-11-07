@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
  using Chotiskazal.DAL;
  using Chotiskazal.Dal.Enums;
+ using Chotiskazal.DAL.Services;
  using Chotiskazal.LogicR;
 
  namespace Chotiskazal.DAL
@@ -22,14 +23,12 @@ using System.Linq;
          public string UserTranslations { get; set; }
          public string Transcription { get; set; }
          public DateTime Created { get; set; }
-
+         
+         //TODO Check How Add PhrasesIds. Do we need this param?
          public string PhrasesIds { get; set; }
-
          public bool IsPhrase { get; set; }
-
          public int PassedScore { get; set; }
          public double AggregateScore { get; set; }
-
          public DateTime? LastExam { get; set; }
          public int Examed { get; set; }
          public int Revision { get; set; }
@@ -49,18 +48,14 @@ using System.Linq;
 
          public void SetTranslation(string[] translations) => UserTranslations = string.Join(", ", translations);
 
-         public IEnumerable<int> GetPhrasesId
+         public IEnumerable<int> GetPhrasesId()
          {
-             get
+             List<int> phrasesId = new List<int>();
+             foreach (var phraseId in PhrasesIds.Split(',').Select(s => s.Trim()))
              {
-                 List<int> phrasesId = new List<int>();
-                 foreach (var phraseId in PhrasesIds.Split(',').Select(s => s.Trim()))
-                 {
-                     phrasesId.Add(int.Parse(phraseId));
-                 }
-
-                 return phrasesId;
+                 phrasesId.Add(int.Parse(phraseId));
              }
+             return phrasesId;
          }
 
          public LearningState State
@@ -122,7 +117,7 @@ using System.Linq;
              return 0;
          }
 
-     public void UpdateAgingAndRandomization()
+         public void UpdateAgingAndRandomization()
          {
              double res = AggedScore();
 

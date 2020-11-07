@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Chotiskazal.Api.ConsoleModes;
+using Chotiskazal.Api.Services;
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.DAL;
+using Chotiskazal.DAL.Services;
 using Chotiskazal.LogicR;
 
 namespace Chotiskazal.ApI.Exams

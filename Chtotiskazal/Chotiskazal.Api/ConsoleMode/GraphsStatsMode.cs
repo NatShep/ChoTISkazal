@@ -6,6 +6,7 @@ using Chotiskazal.Dal.Services;
 
 namespace Chotiskazal.Api.ConsoleModes
 {
+    //TODO THIS MODE
     class GraphsStatsMode: IConsoleMode
     {
         public string Name => "Show stats";

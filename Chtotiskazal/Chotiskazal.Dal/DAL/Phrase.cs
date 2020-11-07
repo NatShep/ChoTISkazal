@@ -26,7 +26,6 @@ namespace Chotiskazal.DAL
         public int Id { get; set; }
         public int PairId { get; set; }
         public string EnWord { get; set; }
-        
         public string WordTranslate { get; set; }
         public string EnPhrase { get; set; }
         public string PhraseRuTranslate { get; set; }

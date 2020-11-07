@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Chotiskazal.Api.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.DAL.Services;
-using Chotiskazal.LogicR;
 
-namespace Chotiskazal.ApI.Exams
+namespace Chotiskazal.Bot.Questions
 {
     public static class ExamSelector
     {
@@ -63,19 +61,18 @@ namespace Chotiskazal.ApI.Exams
             expectedScore: 8,
             frequency: 12);
 
-        private static readonly ExamAndPreferedScore EngWrite =
+      /*  private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
                 expectedScore: 8,
                 frequency: 14);
-        /*
-        pr8ivate static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
+       */
+   /*     private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
             exam: new RuWriteExam(),
             expectedScore: 8,
             frequency: 14);
-        */
-        
-        private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
+     */
+       private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
             frequency: 10);
@@ -92,13 +89,13 @@ namespace Chotiskazal.ApI.Exams
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
                 frequency: 3);
-        private static readonly ExamAndPreferedScore HideousEngWriteExam =
+       /* private static readonly ExamAndPreferedScore HideousEngWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
                 frequency: 14);
-       
-        /*private static readonly ExamAndPreferedScore HideousRuWriteExam =
+        */
+       /* private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
@@ -142,14 +139,14 @@ namespace Chotiskazal.ApI.Exams
                 RuPhraseChoose, 
                 EngTrust, 
                 RuTrust, 
-                EngWrite, 
-       //         RuWrite, 
+             //   EngWrite, 
+            //    RuWrite, 
                 HideousRuPhraseChoose,
                 HideousEngPhraseChoose,
                 HideousEngTrust, 
                 HideousRuTrust, 
-                HideousEngWriteExam, 
-         //       HideousRuWriteExam,
+           //     HideousEngWriteExam, 
+            //    HideousRuWriteExam,
                 ClearEngPhraseSubstitude,
                 ClearRuPhraseSubstitude,
                 EngPhraseSubstitude,

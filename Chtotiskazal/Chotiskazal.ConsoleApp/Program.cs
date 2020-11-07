@@ -43,7 +43,7 @@ namespace Chotiskazal.ConsoleApp
   
             var modes = new IConsoleMode[]
             {   
-                new ExamMode(addWordService,examService), 
+                new ExamMode(examService), 
                 new WordAdditionMode(addWordService),
               //  new GraphsStatsMode(),
              //   new RandomizeMode(),
@@ -122,9 +122,10 @@ namespace Chotiskazal.ConsoleApp
                 }
                 Console.ReadKey();
             }
+
             Console.Clear();
-            
             //---------end registration-------
+            
             
             while (true)
             {
@@ -154,7 +155,7 @@ namespace Chotiskazal.ConsoleApp
                     Console.WriteLine("======   "+ selected.Name + "    ======");
                     Console.ResetColor();
 
-                    modes[choice].Enter(1);
+                    modes[choice].Enter(user.UserId);
 
                 }
                 Console.WriteLine();

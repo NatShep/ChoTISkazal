@@ -2,14 +2,13 @@
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.DAL;
 
-namespace Chotiskazal.ApI.Exams
+namespace Chotiskazal.Bot.Questions
 {
     public interface IExam
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        ExamResult Pass(ExamService service, UserWordForLearning word,
-            UserWordForLearning[] examList);
+        Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList);
     }
 
     public enum ExamResult

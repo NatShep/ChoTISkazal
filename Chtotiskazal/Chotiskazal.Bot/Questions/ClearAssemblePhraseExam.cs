@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Linq;
-using Chotiskazal.Api.Services;
+using System.Threading.Tasks;
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.DAL;
 using Chotiskazal.DAL.Services;
-using Chotiskazal.LogicR;
-
-namespace Chotiskazal.ApI.Exams
+namespace Chotiskazal.Bot.Questions
 {
-    public class ClearAssemblePhraseExam : IExam
+    public class ClearAssemblePhraseExam :IExam
     {
         public bool NeedClearScreen => true;
+
         public string Name => "Assemble phrase";
 
-        public ExamResult Pass(ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -33,12 +32,12 @@ namespace Chotiskazal.ApI.Exams
                     break;
             }
 
-            Console.WriteLine("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
+            await chat.SendMessage("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
             string entry= null;
             while (string.IsNullOrWhiteSpace(entry))
             {
-                Console.WriteLine(":");
-                entry = Console.ReadLine().Trim();
+                entry = await chat.WaitUserTextInput();
+                entry = entry.Trim();
             }
 
             if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
@@ -47,9 +46,7 @@ namespace Chotiskazal.ApI.Exams
                 return ExamResult.Passed;
             }
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Original phrase was: '{targetPhrase.EnPhrase}'");
-            Console.ResetColor();
+            await chat.SendMessage($"Original phrase was: '{targetPhrase.EnPhrase}'");
             service.RegistrateFailure(word);
             return ExamResult.Failed;
         }
