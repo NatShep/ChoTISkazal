@@ -19,7 +19,7 @@ namespace Chotiskazal.Dal.Services
             _userWordsRepository.SaveToUserDictionary(userWordForLearning);
 
 
-        public UserWordForLearning[] GetWorstForUser(int userId, int count) => _userWordsRepository.GetWorstForUser(userId,count);
+        public UserWordForLearning[] GetWorstForUserWirhPhrases(int userId, int count) => _userWordsRepository.GetWorstForUserWithPhrases(userId,count);
         
         public UserWordForLearning[] GetWorstTestWordForUser(int userId, int count, int learnRate) =>
             _userWordsRepository.GetWorstTestWordsForUser(count, learnRate, userId);

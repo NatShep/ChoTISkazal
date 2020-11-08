@@ -26,9 +26,9 @@ namespace Chotiskazal.ConsoleTesting.Services
             _usersWordsService = usersWordsService;
         }
 
-        public UserWordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
+        public UserWordForLearning[] GetWordsForLearningWithPhrases(int userId, int count, int maxTranslationSize)
         {
-            var wordsForLearning = _usersWordsService.GetWorstForUser(userId, count);
+            var wordsForLearning = _usersWordsService.GetWorstForUserWirhPhrases(userId, count);
 
             foreach (var wordForLearning in wordsForLearning)
             {
@@ -77,11 +77,11 @@ namespace Chotiskazal.ConsoleTesting.Services
            //TODO изучть по какому принципу получаем RandomRATE. связан ли он с прогрессом подбираемых слов.
            //TODO Или тут вообще рандомные слова будут
            var delta = Math.Min(7, (32 - examsList.Count));
-           UserWordForLearning[] testWords = new UserWordForLearning[0];
+           var testWords = new UserWordForLearning[0];
            if (delta > 0)
            {
-               var randomRate = 8 + RandomTools.Rnd.Next(5);
-               return testWords = GetPairsForTestWords(userId, delta, randomRate);
+               var randomRate = 8 + RandomTools.Rnd.Next(5); 
+               testWords = GetPairsForTestWords(userId, delta, randomRate);
            }
            return testWords;
        }

@@ -28,7 +28,7 @@ namespace Chotiskazal.ConsoleTesting.Services
 
         public UserWordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
         {
-            var wordsForLearning = _usersWordsService.GetWorstForUser(userId, count);
+            var wordsForLearning = _usersWordsService.GetWorstForUserWirhPhrases(userId, count);
 
             foreach (var wordForLearning in wordsForLearning)
             {

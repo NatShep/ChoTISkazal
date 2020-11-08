@@ -35,18 +35,31 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public UserWordForLearning[] GetWorstForUser(int userId, int count)
+        public UserWordForLearning[] GetWorstForUserWithPhrases(int userId, int count)
         {
             CheckDbFile.Check(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-
+            //TODO how is better to do
             var result = cnn.Query<UserWordForLearning>(
                 @"Select * FROM UserWords WHERE UserId=@userId               
 				  order by AggregateScore desc limit @count          		
                 ", new {userId, count});
+            foreach (var userWordForLearning in result)
+            {
+                var phrases = new List<Phrase>();
+                foreach (var translation in userWordForLearning.GetTranslations())
+                {
+                    phrases.AddRange(cnn.Query<Phrase>(
+                        @"Select * FROM Phrases WHERE EnWord=@EnWord AND WordTranslate=@translation              		
+                ", new {userWordForLearning.EnWord, translation}));
+                }
 
+                userWordForLearning.Phrases = phrases;
+
+            }
+            
             return result.ToArray();
         }
 
@@ -93,8 +106,8 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var op =
-                    $"Update UserWords set AggregateScore = @AggregateScore," +
-                    $"PassedScore = @PassedScore, " +
+                    $"Update UserWords set AggregateScore = @AggregateScore, "+//" WHERE Id =@Id";
+                    $"PassedScore = @PassedScore," +
                     $"LastExam = @LastExam," +
                     $"Examed = @Examed " +
                     $"WHERE Id = @Id";
