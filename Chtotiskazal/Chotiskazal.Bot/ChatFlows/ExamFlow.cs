@@ -8,6 +8,7 @@ using Chotiskazal.Bot.Questions;
 using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.Dal;
 using Chotiskazal.DAL;
+using Chotiskazal.DAL.Services;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -31,7 +32,15 @@ namespace Chotiskazal.Bot.ChatFlows
 
             
             var sb = new StringBuilder("Examination\r\n");
-            var learningWords = _examService.GetWordsForLearning(userId, 9, 3);
+            var learningWords = _examService.GetWordsForLearningWithPhrases(userId, 9, 3);
+            if (learningWords.Average(w => w.PassedScore) <= 4)
+            {
+                foreach (var pairModel in learningWords.Randomize())
+                {
+                    sb.AppendLine($"{pairModel.EnWord}\t\t:{pairModel.UserTranslations}");
+                }
+            }
+
       
             var startMessageSending = _chat.SendMessage(sb.ToString(), new InlineKeyboardButton {
                 CallbackData = "/startExamination", 

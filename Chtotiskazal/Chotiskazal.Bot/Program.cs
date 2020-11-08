@@ -34,14 +34,18 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
             IConfigurationRoot configuration = builder.Build();
 
+            //TODO Why not reading from appsettings.json???
+            var dbFileName = configuration.GetSection("wordDb").Value;
+
+           if(dbFileName==null)
+               throw new Exception("No dbFileName");
+
             //TODO inkapsulate configuration to Chotiskazal.Api/Services
             
-            var dbFileName = configuration.GetSection("wordDb").Value;
             
             var yadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
             var yadicapiTimeout = TimeSpan.FromSeconds(5);
@@ -62,7 +66,7 @@ namespace Chotiskazal.Bot
             );
             authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
   
-            DoMigration.ApplyMigrations(dbFileName);
+          //  DoMigration.ApplyMigrations(dbFileName);
       
             Console.WriteLine("Dic started");
     
