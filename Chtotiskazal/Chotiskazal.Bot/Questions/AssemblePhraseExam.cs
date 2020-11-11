@@ -6,9 +6,9 @@ using Chotiskazal.DAL;
 using Chotiskazal.DAL.Services;
 namespace Chotiskazal.Bot.Questions
 {
-    public class ClearAssemblePhraseExam :IExam
+    public class AssemblePhraseExam :IExam
     {
-        public bool NeedClearScreen => true;
+        public bool NeedClearScreen => false;
 
         public string Name => "Assemble phrase";
 

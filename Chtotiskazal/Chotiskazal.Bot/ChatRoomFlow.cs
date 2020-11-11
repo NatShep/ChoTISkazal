@@ -9,19 +9,34 @@ namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(Chat chat)
+        public ChatRoomFlow(Chat chat, int userId)
         {
             Chat = chat;
+            UserId = userId;
         }
 
+        public int UserId { get; set; }        
         public AddWordService AddWordSrvc { get; set; }
         public ExamService ExamSrvc { get; set; }
         public GraphStatsService GraphStatsSrvc { get; set; }
         
         public Chat Chat { get;}
+
+
+        public void Greeting()
+        {
+            Chat.SendMessage($"Hello, {Chat.UserFirstName}! I am ChoTiSkazal.");
+        }
+        public void GoodBye()
+        {
+            Chat.SendMessage($"Bye-Bye, {Chat.UserFirstName}! I am OFFLINE now.");
+        }
         
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
+
+            Greeting();
+            
             while(true)
             {
                 try
@@ -48,7 +63,7 @@ namespace Chotiskazal.Bot
         }
         
         Task SendNotAllowedTooltip() => Chat.SendTooltip("action is not allowed");
-        Task Examinate() => new ExamFlow(Chat, ExamSrvc).Enter(1);
+        Task Examinate() => new ExamFlow(Chat, ExamSrvc).Enter(UserId);
         
         //show stats to user here
         /*
@@ -58,22 +73,19 @@ namespace Chotiskazal.Bot
             return statsFlow.Enter();
         }
 */
-        //TODO Откуда взять userId?
-        Task EnterWord(int userId, string text = null)
+        Task EnterWord(string text = null)
         {
             var mode = new AddingWordsMode(Chat, AddWordSrvc);
-            return mode.Enter(userId, text);
+            return mode.Enter(UserId, text);
         }
-
-      
-
+        
         Task HandleMainMenu(string command){
             switch (command){
                 case "/help": SendHelp(); break;
-                case "/add":  return EnterWord(1, null);
+                case "/add":  return EnterWord(null);
                 case "/train": return Examinate();
               //  case "/stats": ShowStats(); break;;
-                case "/start": break;
+                case "/start":  break;
             }
             return Task.CompletedTask;
         }
@@ -95,7 +107,7 @@ namespace Chotiskazal.Bot
 
                     if (action.Message!=null)
                     {
-                        await EnterWord(1, action.Message.Text);
+                        await EnterWord(action.Message.Text);
                         return;
                     }
 
@@ -104,7 +116,7 @@ namespace Chotiskazal.Bot
                         var btn = action.CallbackQuery.Data;
                         if (btn == InlineButtons.EnterWords.CallbackData)
                         {
-                            await EnterWord(1);
+                            await EnterWord();
                             return;
                         }
                         else if (btn == InlineButtons.Exam.CallbackData)

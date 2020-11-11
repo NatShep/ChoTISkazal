@@ -48,8 +48,8 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 6,
             frequency: 12);
 
-        private static readonly ExamAndPreferedScore ClearEngAssemblePhraseExam = new ExamAndPreferedScore(
-            new ClearAssemblePhraseExam(), 7, 7);
+        private static readonly ExamAndPreferedScore AssemblePhraseExam = new ExamAndPreferedScore(
+            new AssemblePhraseExam(), 7, 7);
 
         private static readonly ExamAndPreferedScore ClearEngPhraseSubstitude = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstitudeExam()), 
@@ -61,17 +61,17 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 8,
             frequency: 12);
 
-      /*  private static readonly ExamAndPreferedScore EngWrite =
+        private static readonly ExamAndPreferedScore EngWrite =
             new ExamAndPreferedScore(
                 exam: new EngWriteExam(),
                 expectedScore: 8,
                 frequency: 14);
-       */
-   /*     private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
+       
+        private static readonly ExamAndPreferedScore RuWrite = new ExamAndPreferedScore(
             exam: new RuWriteExam(),
             expectedScore: 8,
             frequency: 14);
-     */
+        
        private static readonly ExamAndPreferedScore HideousEngPhraseChoose = new ExamAndPreferedScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
@@ -89,18 +89,18 @@ namespace Chotiskazal.Bot.Questions
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
                 frequency: 3);
-       /* private static readonly ExamAndPreferedScore HideousEngWriteExam =
+        private static readonly ExamAndPreferedScore HideousEngWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new EngWriteExam()),
                 expectedScore: 12,
                 frequency: 14);
-        */
-       /* private static readonly ExamAndPreferedScore HideousRuWriteExam =
+        
+        private static readonly ExamAndPreferedScore HideousRuWriteExam =
             new ExamAndPreferedScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam()),
                 expectedScore: 12,
                 frequency: 14);
-*/
+
         public static IExam GetNextExamFor(bool isFirstExam, UserWordForLearning model)
         {
             if (isFirstExam && model.PassedScore < 7)
@@ -126,8 +126,8 @@ namespace Chotiskazal.Bot.Questions
                     RuChoose,
                     EngTrust, 
                     RuTrust, 
-                    HideousRuTrust, 
-                    HideousEngTrust,
+             //       HideousRuTrust, 
+              //      HideousEngTrust,
                 });
             }
 
@@ -139,21 +139,21 @@ namespace Chotiskazal.Bot.Questions
                 RuPhraseChoose, 
                 EngTrust, 
                 RuTrust, 
-             //   EngWrite, 
-            //    RuWrite, 
-                HideousRuPhraseChoose,
-                HideousEngPhraseChoose,
-                HideousEngTrust, 
-                HideousRuTrust, 
-           //     HideousEngWriteExam, 
-            //    HideousRuWriteExam,
-                ClearEngPhraseSubstitude,
-                ClearRuPhraseSubstitude,
+                EngWrite, 
+                RuWrite, 
+             //   HideousRuPhraseChoose,
+             //   HideousEngPhraseChoose,
+             //   HideousEngTrust, 
+             //   HideousRuTrust, 
+             //   HideousEngWriteExam, 
+             //   HideousRuWriteExam,
+             //   ClearEngPhraseSubstitude,
+             //   ClearRuPhraseSubstitude,
                 EngPhraseSubstitude,
                 RuPhraseSubstitude,
                 EngChooseWordInPhrase,
-                ClearEngChooseWordInPhrase,
-                ClearEngAssemblePhraseExam,
+             //   ClearEngChooseWordInPhrase,
+                AssemblePhraseExam,
             });
         }
 

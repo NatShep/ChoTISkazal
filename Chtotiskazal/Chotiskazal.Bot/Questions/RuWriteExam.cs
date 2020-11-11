@@ -5,7 +5,7 @@ using Chotiskazal.ConsoleTesting.Services;
 using Chotiskazal.DAL;
 
 namespace Chotiskazal.Bot.Questions
-{/*
+{
     public class RuWriteExam : IExam
     {
         public bool NeedClearScreen => false;
@@ -31,6 +31,8 @@ namespace Chotiskazal.Bot.Questions
             else
             {
                 //search for other translation
+                //TODO 
+                /*
                 var translationCandidate = service.Get(userEntry.ToLower());
                 if (translationCandidate != null)
                 {
@@ -49,10 +51,12 @@ namespace Chotiskazal.Bot.Questions
                         return ExamResult.Failed;
                     }
                 }
-                await chat.SendMessage("The translation was: " + word.OriginWord);
+                */
+                
+                await chat.SendMessage("The translation was: " + word.EnWord);
                 service.RegistrateFailure(word);
                 return ExamResult.Failed;
             }
         }
-    }*/
+    }
 }

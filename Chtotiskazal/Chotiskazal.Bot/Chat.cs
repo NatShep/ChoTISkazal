@@ -11,20 +11,26 @@ namespace Chotiskazal.Bot
     public class Chat
     {
         private readonly TelegramBotClient _client;
-        private readonly ChatId _chatId;
-        
+        public readonly ChatId ChatId;
+        public readonly string UserFirstName;
+        public readonly string UserLastName;
+
         private TaskCompletionSource<Update> _waitInputCompletionSource   = null;
         private TaskCompletionSource<string> _waitMessageCompletionSource = null;
 
         
-        public Chat(TelegramBotClient client, ChatId chatId)
+        //TODO почему тут было СhatId, а не тот класс что добавляетя в Programm
+        public Chat(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
         {
             _client = client;
-            _chatId = chatId;
+            ChatId = chat.Id;
+            UserFirstName = chat.FirstName;
+            UserLastName = chat.LastName;
         }
 
-        public string[] MenuItems = {"/help", "/stats", "/start", "/add", "/train"}; 
-
+        public string[] MenuItems = {"/help", "/stats", "/start", "/add", "/train"};
+       
+        
         internal void HandleUpdate(Update args)
         {
             string msg = args.Message?.Text;
@@ -62,17 +68,17 @@ namespace Chotiskazal.Bot
             }   
         }
 
-        public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(_chatId, tooltip);
-        public Task SendMessage(string message)=> _client.SendTextMessageAsync(_chatId, message);
+        public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);
+        public Task SendMessage(string message)=> _client.SendTextMessageAsync(ChatId, message);
         public Task SendMessage(string message, params InlineKeyboardButton[] buttons)
-            => _client.SendTextMessageAsync(_chatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
+            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
         
         
         public Task SendMessage(string message, params KeyboardButton[] buttons)
-            => _client.SendTextMessageAsync(_chatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
+            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
 
         public Task SendMessage(string message, IEnumerable<string> keyboard)
-            => _client.SendTextMessageAsync(_chatId, message, replyMarkup:  
+            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  
                 new ReplyKeyboardMarkup(keyboard.Select(b=> new KeyboardButton(b)), 
                     oneTimeKeyboard:true, resizeKeyboard:true));
 
@@ -102,6 +108,7 @@ namespace Chotiskazal.Bot
             var res = await WaitUserInput();
             if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))
                 return i;
+            
             return null;
         }
 

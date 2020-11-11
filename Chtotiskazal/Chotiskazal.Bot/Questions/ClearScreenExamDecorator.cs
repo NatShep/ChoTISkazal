@@ -4,8 +4,8 @@ using Chotiskazal.DAL;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class ClearScreenExamDecorator:IExam
-    {
+    //TODO Do we need this in Telgram?
+    public class ClearScreenExamDecorator:IExam {
         public bool NeedClearScreen => true;
 
         private readonly IExam _origin;

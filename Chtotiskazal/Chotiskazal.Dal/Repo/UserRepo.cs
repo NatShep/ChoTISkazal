@@ -24,14 +24,14 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var id = cnn.ExecuteScalar<int>(
-                    @"INSERT INTO Users ( Name,  Login,  Password, Email, Created, Online)   
-                                      VALUES( @Name,  @Login,  @Password, @Email, @Created, @Online);
+                    @"INSERT INTO Users (TelegramId, Name,  Login,  Password, Email, Created, Online)   
+                                      VALUES(@TelegramId, @Name,  @Login,  @Password, @Email, @Created, @Online);
                       SELECT last_insert_rowid();", user);
                 return id;
             }
         }
 
-        public User GetUserByLoginOrNull(string login)
+        public User GetUserByLoginOrNull(string login,string password)
         {
             CheckDbFile.Check(DbFile);
             
@@ -39,13 +39,28 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var user = cnn.Query<User>(
-                    @"SELECT UserId, Name, Login, Password,Email,Created,Online
+                    @"SELECT *
                     FROM Users
-                    WHERE Login = @login", new {login}).FirstOrDefault();
+                    WHERE Login = @login AND Password=@Password", new {login,password}).FirstOrDefault();
                 return user;
             }
         }
 
+        public User GetUserByTelegramId(in long telegramId)
+        {
+            CheckDbFile.Check(DbFile);
+
+            using (var cnn = SimpleDbConnection())
+            {
+                cnn.Open();
+                var user = cnn.Query<User>(
+                    @"SELECT *
+                    FROM Users
+                    WHERE TelegramId = @telegramId", new {telegramId}).FirstOrDefault();
+                return user;
+            }
+        }
+        
         //TODO additional methods 
         public User[] GetAllUsers()
         {
@@ -58,5 +73,7 @@ namespace Chotiskazal.Dal.Repo
                 return user;
             }
         }
+
+    
     }
 }

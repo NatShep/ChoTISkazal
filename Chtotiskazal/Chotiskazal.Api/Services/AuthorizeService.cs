@@ -15,7 +15,8 @@ namespace Chotiskazal.Api.Services
             var user = new User(name, login, password, email);
             try
             {
-                _userService.AddUser(user);
+               int id= _userService.AddUser(user);
+               user.UserId = id;
             }
             catch
             {
@@ -26,13 +27,8 @@ namespace Chotiskazal.Api.Services
 
         public User LoginUser(string login, string password)
         {
-            var user = _userService.GetUserByLoginOrNull(login);
-            if (user?.Password == password)
-            {
-                return user;
-            }
-            else
-                return null;
+            var user = _userService.GetUserByLoginOrNull(login,password);
+            return user;
         }
     }
 }

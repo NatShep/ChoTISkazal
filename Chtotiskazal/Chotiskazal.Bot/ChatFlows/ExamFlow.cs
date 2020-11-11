@@ -138,8 +138,8 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private async Task WriteDontPeakMessage() => await _chat.SendMessage("Don't peek\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n..\r\n.\r\n.\r\n.Don't peek");
 
-        private Task WriteFailed() => _chat.SendMessage("[failed]");
-        private Task WritePassed() => _chat.SendMessage("[PASSED]");
+        private Task WriteFailed() => _chat.SendMessage("Noo... \U0001F61E");
+        private Task WritePassed() => _chat.SendMessage($"It's right! \U0001F609");
         private static QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam) =>
             new QuestionMetric
             {
