@@ -10,7 +10,6 @@ using Chotiskazal.Dal.Enums;
 using Chotiskazal.DAL.Services;
 using Chotiskazal.LogicR;
 
-
 namespace Chotiskazal.Api.Services
 {
     public class AddWordService
@@ -28,7 +27,7 @@ namespace Chotiskazal.Api.Services
             _yapiTransClient = yapiTransClient;
             _dictionaryService = dictionaryService;
         }
-
+        //todo cr Убрать не используемый код, если только он не принципально важен
         public async Task AddMutualPhrasesToVocabAsync(int userId, int maxCount)
         {
             var allWords = (await _usersWordsService.GetAllWordsAsync(userId)).Select(s => s.ToLower().Trim()).ToHashSet();
@@ -103,12 +102,13 @@ namespace Chotiskazal.Api.Services
 
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
         }
-
+        // todo cr это не ответственность сервиса по добавлению слов. Вытащи его в отдельный сервис
         public (bool isYaDicOnline, bool isYaTransOnline) PingYandex()
         {
             var dicPing = _yapiDicClient.Ping();
             var transPing = _yapiTransClient.Ping();
             Task.WaitAll(dicPing, transPing);
+            //todo ЧТА?!?!?! Тут утечка памяти и вакханалия!! Юра - протрезвей!
             var timer = new Timer(5000) {AutoReset = false};
             timer.Enabled = true;
             timer.Elapsed += (s, e) =>
@@ -126,19 +126,24 @@ namespace Chotiskazal.Api.Services
         {
             word = word.ToLower();
             
+            //todo cr используй вары
             List<UserWordForLearning> WordsForLearning = new List<UserWordForLearning>();
             List<int> phrasesId = new List<int>();
             if (!word.Contains(' '))
             {
                 Task<YaDefenition[]> task = null;
-                task = _yapiDicClient.Translate(word);
-                task?.Wait();
+                task = _yapiDicClient.TranslateAsync(word);
+                //todo cr sync over async!!!
+                task.Wait();
 
                 //Создаем из ответа(если он есть)  TranslationAndContext или WordDictionary?
-                if (task?.Result?.Any() == true)
+                if (task.Result?.Any() == true)
                 {
                     var variants = task.Result.SelectMany(r => r.Tr);
+                    //todo cr task.Result.FirstOrDefault()?.Ts;
                     var transcription = task.Result.Select(r => r.Ts).FirstOrDefault();
+                    //todo cr отступ в две каретки используется только для разделения макро блоков 
+                    //испольуй одну каретку
                     
                     
                     foreach (var yandexTranslation in variants)
@@ -158,7 +163,7 @@ namespace Chotiskazal.Api.Services
                             phrasesId.Add(await _dictionaryService.AddPhraseForWordPairAsync(id, word, yandexTranslation.Text , phrase.EnPhrase, phrase.PhraseRuTranslate));
                         }
 
-                        WordsForLearning.Add(new UserWordForLearning()
+                        WordsForLearning.Add(new UserWordForLearning
                         {
                             EnWord=word,
                             UserTranslations = yandexTranslation.Text,
@@ -174,6 +179,7 @@ namespace Chotiskazal.Api.Services
 
             try
             {
+                //todo cr sync over async 
                 var transAnsTask = _yapiTransClient.Translate(word);
                 transAnsTask.Wait();
                 if (!string.IsNullOrWhiteSpace(transAnsTask.Result))
@@ -207,7 +213,7 @@ namespace Chotiskazal.Api.Services
         {
             word = word.ToLower();
             
-            var pairWords =await _dictionaryService.GetAllPairsByWordWithPhrases(word);
+            var pairWords = await _dictionaryService.GetAllPairsByWordWithPhrases(word);
           
             var translateWithContexts = new List<UserWordForLearning>();
             foreach (var wordDictionary in pairWords)

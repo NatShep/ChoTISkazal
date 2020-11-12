@@ -12,14 +12,15 @@ namespace Chotiskazal.Bot
     {
         private readonly TelegramBotClient _client;
         public readonly ChatId ChatId;
+        //todo cr - это не ответственность chatIO - перенести в ChatRoomFlow
         public readonly string UserFirstName;
+        //todo cr - это не ответственность chatIO - перенести в ChatRoomFlow
         public readonly string UserLastName;
 
         private TaskCompletionSource<Update> _waitInputCompletionSource   = null;
         private TaskCompletionSource<string> _waitMessageCompletionSource = null;
 
         
-        //TODO почему тут было СhatId, а не тот класс что добавляетя в Programm
         public ChatIO(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
         {
             _client = client;
@@ -45,8 +46,8 @@ namespace Chotiskazal.Bot
                         var objSrc = _waitInputCompletionSource;
                         _waitMessageCompletionSource = null;
                         _waitInputCompletionSource = null;
-                        textSrc?.SetException(new ProcessInteruptedWithMenuCommand(msg));
-                        objSrc?.SetException(new ProcessInteruptedWithMenuCommand(msg));
+                        textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                        objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
                         return;
                     }
                 }
@@ -70,21 +71,21 @@ namespace Chotiskazal.Bot
         }
 
         public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);
-        public Task SendMessage(string message)=> _client.SendTextMessageAsync(ChatId, message);
-        public Task SendMessage(string message, params InlineKeyboardButton[] buttons)
+        public Task SendMessageAsync(string message)=> _client.SendTextMessageAsync(ChatId, message);
+        public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
 
      
-        public Task SendMessage(string message, params KeyboardButton[] buttons)
+        public Task SendMessageAsync(string message, params KeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
 
-        public Task SendMessage(string message, IEnumerable<string> keyboard)
+        public Task SendMessageAsync(string message, IEnumerable<string> keyboard)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  
                 new ReplyKeyboardMarkup(keyboard.Select(b=> new KeyboardButton(b)), 
                     oneTimeKeyboard:true, resizeKeyboard:true));
 
         
-        public async Task<Update> WaitUserInput()
+        public async Task<Update> WaitUserInputAsync()
         {
             _waitInputCompletionSource = new TaskCompletionSource<Update>();
             Botlog.Write("Wait for any");
@@ -97,16 +98,16 @@ namespace Chotiskazal.Bot
         {
             while (true)
             {
-                var res = await WaitUserInput();
+                var res = await WaitUserInputAsync();
                 if (res.CallbackQuery != null)
                     return res.CallbackQuery.Data;
             }
              
         }
 
-        public async Task<int?> TryWaitInlineIntKeyboardInput()
+        public async Task<int?> TryWaitInlineIntKeyboardInputAsync()
         {
-            var res = await WaitUserInput();
+            var res = await WaitUserInputAsync();
             if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))
                 return i;
             
@@ -117,7 +118,7 @@ namespace Chotiskazal.Bot
         {
             while (true)
             {
-                var res = await WaitUserInput();
+                var res = await WaitUserInputAsync();
                 if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))
                     return i;
             }
@@ -127,13 +128,13 @@ namespace Chotiskazal.Bot
         {
             while (true)
             {
-                var res = await WaitUserInput();
+                var res = await WaitUserInputAsync();
                 if (res.CallbackQuery?.Data == expected)
                     return;
             }
         }
 
-        public async Task<string> WaitUserTextInput()
+        public async Task<string> WaitUserTextInputAsync()
         {
             Botlog.Write("Wait for text");
             _waitMessageCompletionSource = new TaskCompletionSource<string>();
@@ -144,6 +145,6 @@ namespace Chotiskazal.Bot
         }
 
         public Task SendTodo([CallerMemberName] string caller = null) =>
-            SendMessage($"{caller} is not implemented yet ");
+            SendMessageAsync($"{caller} is not implemented yet ");
     }
 }

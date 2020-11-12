@@ -32,11 +32,11 @@ namespace Chotiskazal.Bot.Questions
                     break;
             }
 
-            await chatIo.SendMessage("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
+            await chatIo.SendMessageAsync("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
             string entry= null;
             while (string.IsNullOrWhiteSpace(entry))
             {
-                entry = await chatIo.WaitUserTextInput();
+                entry = await chatIo.WaitUserTextInputAsync();
                 entry = entry.Trim();
             }
 
@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Passed;
             }
 
-            await chatIo.SendMessage($"Original phrase was: '{targetPhrase.EnPhrase}'");
+            await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.EnPhrase}'");
             await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }

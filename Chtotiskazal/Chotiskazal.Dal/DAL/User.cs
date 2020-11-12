@@ -12,6 +12,7 @@ namespace Chotiskazal.DAL
         public string Password { get; set; }
         public string Email { get; set; }
         public DateTime Created { get; set; }
+        // todo cr - не нужен
         public bool Online { get; set; }
 
         public List<Exam> Exams { get; set; }

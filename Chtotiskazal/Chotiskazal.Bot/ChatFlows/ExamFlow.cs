@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.ChatFlows
            
             if (!await _examService.HasAnyAsync(userId))
             {
-                await _chatIo.SendMessage("You need to add some words before examination");
+                await _chatIo.SendMessageAsync("You need to add some words before examination");
                 return;
             }
             
@@ -50,7 +50,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
       
-            var startMessageSending = _chatIo.SendMessage(sb.ToString(), new InlineKeyboardButton {
+            var startMessageSending = _chatIo.SendMessageAsync(sb.ToString(), new InlineKeyboardButton {
                 CallbackData = "/startExamination", 
                 Text = "Start"
             }, new InlineKeyboardButton
@@ -141,21 +141,21 @@ namespace Chotiskazal.Bot.ChatFlows
                 doneMessage.Append(pairModel.EnWord + " - " + pairModel.UserTranslations + "  (" + pairModel.PassedScore +
                                   ")\r\n");
             }
-            await _chatIo.SendMessage(doneMessage.ToString());
+            await _chatIo.SendMessageAsync(doneMessage.ToString());
         }
 
         private async Task WriteDontPeakMessage()
         {
 
-            await _chatIo.SendMessage(
+            await _chatIo.SendMessageAsync(
                 "\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.");
-            await _chatIo.SendMessage(
+            await _chatIo.SendMessageAsync(
                 "Don't peek");
-            await _chatIo.SendMessage("\U0001F648");
+            await _chatIo.SendMessageAsync("\U0001F648");
         }
 
-        private Task WriteFailed() => _chatIo.SendMessage("Noo... \U0001F61E");
-        private Task WritePassed() => _chatIo.SendMessage($"It's right! \U0001F609");
+        private Task WriteFailed() => _chatIo.SendMessageAsync("Noo... \U0001F61E");
+        private Task WritePassed() => _chatIo.SendMessageAsync($"It's right! \U0001F609");
         private static QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam) =>
             new QuestionMetric
             {

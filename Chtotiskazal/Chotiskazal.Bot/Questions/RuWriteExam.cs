@@ -18,8 +18,8 @@ namespace Chotiskazal.Bot.Questions
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chatIo.SendMessage($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
-            var userEntry = await chatIo.WaitUserTextInput();
+            await chatIo.SendMessageAsync($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
+            var userEntry = await chatIo.WaitUserTextInputAsync();
             if (string.IsNullOrEmpty(userEntry))
                 return ExamResult.Retry;
 
@@ -53,7 +53,7 @@ namespace Chotiskazal.Bot.Questions
                 }
                 */
                 
-                await chatIo.SendMessage("The translation was: " + word.EnWord);
+                await chatIo.SendMessageAsync("The translation was: " + word.EnWord);
                 await service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }

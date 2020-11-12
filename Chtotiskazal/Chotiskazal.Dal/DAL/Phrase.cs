@@ -29,11 +29,5 @@ namespace Chotiskazal.DAL
         public string WordTranslate { get; set; }
         public string EnPhrase { get; set; }
         public string PhraseRuTranslate { get; set; }
-        
-        
-       
     }
-    
-   
-    
 }

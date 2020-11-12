@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Enter missing word: ");
             while (true)
             {
-                var enter = await chatIo.WaitUserTextInput();
+                var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 if (string.CompareOrdinal(word.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
@@ -40,7 +40,7 @@ namespace Chotiskazal.Bot.Questions
                 }
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                await chatIo.SendMessage($"Origin phrase was \"{phrase.EnPhrase}\"");
+                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.EnPhrase}\"");
                 return ExamResult.Failed;
             }
         }

@@ -1,11 +1,7 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
 using Chotiskazal.Api.Services;
-using Chotiskazal.DAL;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -27,16 +23,6 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             var yaStatus = _addWordService.PingYandex();
 
-            /*if (_yapiDicClient.IsOnline)
-                await _chat.SendMessage("Yandex dic is online");
-            else
-                await _chat.SendMessage("Yandex dic is offline");
-
-            if (_yapiTransClient.IsOnline)
-                await _chat.SendMessage("Yandex trans is online");
-            else
-                await _chat.SendMessage("Yandex trans is offline");*/
-
             while (true)
             {
                 if(!await EnterSingleWordAsync(userId, yaStatus.isYaDicOnline, word))
@@ -49,16 +35,16 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await _chatIo.SendMessage("Enter english word", new InlineKeyboardButton
+                await _chatIo.SendMessageAsync("Enter english word", new InlineKeyboardButton
                 {
                     CallbackData = "/exit",
                     Text = "Cancel"
                 });
                 while (true)
                 {
-                    var input = await _chatIo.WaitUserInput();
+                    var input = await _chatIo.WaitUserInputAsync();
                     if (input.CallbackQuery != null && input.CallbackQuery.Data == "/exit")
-                        throw new ProcessInteruptedWithMenuCommand("/start");
+                        throw new ProcessInterruptedWithMenuCommand("/start");
 
                     if (!string.IsNullOrEmpty(input.Message.Text))
                     {
@@ -74,27 +60,26 @@ namespace Chotiskazal.Bot.ChatFlows
                 translations =await _addWordService.TranslateAndAddToDictionary(word);
             if (!translations.Any())
             {
-                await _chatIo.SendMessage("No translations found. Check the word and try again");
+                await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
                 return true;
             }
 
-            await _chatIo.SendMessage($"Choose translation for '{word}'",
+            await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
                 InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.UserTranslations)));
             
             while (true)
             {
-                var input = await _chatIo.TryWaitInlineIntKeyboardInput();
+                var input = await _chatIo.TryWaitInlineIntKeyboardInputAsync();
                 if (!input.HasValue )
                     return false;
-                if (input.Value >= 0 && input.Value < translations.Count)
+                if (input!.Value >= 0 && input.Value < translations.Count)
                 {
                     var selected = translations[input.Value];
-                    var count =await _addWordService.AddSomeWordsToUserCollectionAsync(userId, new UserWordForLearning[]{selected});
-                    await _chatIo.SendMessage($"Saved. Translations: {count}");
+                    var count = await _addWordService.AddSomeWordsToUserCollectionAsync(userId, new[]{selected});
+                    await _chatIo.SendMessageAsync($"Saved. Translations: {count}");
                     return true;
                 }
             }
         }
     }
-
-    }
+}
