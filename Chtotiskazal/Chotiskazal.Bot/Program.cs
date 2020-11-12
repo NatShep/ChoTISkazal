@@ -98,7 +98,7 @@ namespace Chotiskazal.Bot
             if (_chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
 
-            var newChat = new Chat(_botClient, chat);
+            var newChat = new ChatIO(_botClient, chat);
 
             var newChatRoom = new ChatRoomFlow(newChat)
             {
@@ -124,13 +124,13 @@ namespace Chotiskazal.Bot
                 if (e.Update.Message != null)
                 {
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
-                    chatRoom?.Chat.HandleUpdate(e.Update);
+                    chatRoom?.ChatIo.HandleUpdate(e.Update);
 
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
-                    chatRoom?.Chat.HandleUpdate(e.Update);
+                    chatRoom?.ChatIo.HandleUpdate(e.Update);
                     //TODO почему нельзя await??
                 //    task.RunSynchronously();
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);

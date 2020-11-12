@@ -9,8 +9,8 @@ namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(Chat chat) =>
-          Chat = chat;
+        public ChatRoomFlow(ChatIO chatIo) =>
+          ChatIo = chatIo;
         
         public int UserId { get; set; }        
         public AddWordService AddWordSrvc { get; set; }
@@ -18,22 +18,22 @@ namespace Chotiskazal.Bot
         public AuthorizeService AuthorizeSrvc { get; set; }
         public GraphStatsService GraphStatsSrvc { get; set; }
         
-        public Chat Chat { get;}
+        public ChatIO ChatIo { get;}
 
 
         public void Greeting()
         {
-            Chat.SendMessage($"Hello, {Chat.UserFirstName}! I am ChoTiSkazal.");
+            ChatIo.SendMessage($"Hello, {ChatIo.UserFirstName}! I am ChoTiSkazal.");
         }
         public void GoodBye()
         {
-            Chat.SendMessage($"Bye-Bye, {Chat.UserFirstName}! I am OFFLINE now.");
+            ChatIo.SendMessage($"Bye-Bye, {ChatIo.UserFirstName}! I am OFFLINE now.");
         }
         
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
             
-            var user = await AuthorizeSrvc.AuthorizeAsync(Chat.ChatId.Identifier, Chat.UserFirstName);
+            var user = await AuthorizeSrvc.AuthorizeAsync(ChatIo.ChatId.Identifier, ChatIo.UserFirstName);
             UserId = user.UserId;
             
             Greeting();
@@ -50,21 +50,21 @@ namespace Chotiskazal.Bot
                     await ModeSelection();	
                 }
                 catch(UserAFKException){
-                    await Chat.SendMessage("bybye");
+                    await ChatIo.SendMessage("bybye");
                     return;		
                 }
                 catch(ProcessInteruptedWithMenuCommand e){
                     mainMenuCommandOrNull = e.Command;
                 }
                 catch(Exception e){
-                    Console.WriteLine($"Error: {e}, from {Chat}");
-                    await Chat.SendMessage("Oops. something goes wrong ;(");
+                    Console.WriteLine($"Error: {e}, from {ChatIo}");
+                    await ChatIo.SendMessage("Oops. something goes wrong ;(");
                 }
             }
         }
         
-        Task SendNotAllowedTooltip() => Chat.SendTooltip("action is not allowed");
-        Task Examinate() => new ExamFlow(Chat, ExamSrvc).EnterAsync(UserId);
+        Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
+        Task Examinate() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(UserId);
         
         //show stats to user here
         /*
@@ -76,7 +76,7 @@ namespace Chotiskazal.Bot
 */
         Task EnterWord(string text = null)
         {
-            var mode = new AddingWordsMode(Chat, AddWordSrvc);
+            var mode = new AddingWordsMode(ChatIo, AddWordSrvc);
             return mode.Enter(UserId, text);
         }
         
@@ -91,20 +91,20 @@ namespace Chotiskazal.Bot
             return Task.CompletedTask;
         }
 
-        private Task SendHelp() => Chat.SendMessage("Call 112 for help");
+        private Task SendHelp() => ChatIo.SendMessage("Call 112 for help");
 
         async Task ModeSelection()
         {
             while (true)
             {
-                var _  = Chat.SendMessage("Select mode, or enter a word to translate",
+                var _  = ChatIo.SendMessage("Select mode, or enter a word to translate",
                     InlineButtons.EnterWords,
                     InlineButtons.Exam,
                     InlineButtons.Stats);
 
                 while (true)
                 {
-                    var action = await Chat.WaitUserInput();
+                    var action = await ChatIo.WaitUserInput();
 
                     if (action.Message!=null)
                     {

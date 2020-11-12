@@ -126,8 +126,8 @@ namespace Chotiskazal.Bot.Questions
                     RuChoose,
                     EngTrust, 
                     RuTrust, 
-             //       HideousRuTrust, 
-              //      HideousEngTrust,
+                    HideousRuTrust, 
+                    HideousEngTrust,
                 });
             }
 
@@ -141,18 +141,18 @@ namespace Chotiskazal.Bot.Questions
                 RuTrust, 
                 EngWrite, 
                 RuWrite, 
-             //   HideousRuPhraseChoose,
-             //   HideousEngPhraseChoose,
-             //   HideousEngTrust, 
-             //   HideousRuTrust, 
-             //   HideousEngWriteExam, 
-             //   HideousRuWriteExam,
-             //   ClearEngPhraseSubstitude,
-             //   ClearRuPhraseSubstitude,
+                HideousRuPhraseChoose,
+                HideousEngPhraseChoose, 
+                HideousEngTrust, 
+                HideousRuTrust, 
+                HideousEngWriteExam, 
+                HideousRuWriteExam,
+                ClearEngPhraseSubstitude,
+                ClearRuPhraseSubstitude,
                 EngPhraseSubstitude,
                 RuPhraseSubstitude,
                 EngChooseWordInPhrase,
-             //   ClearEngChooseWordInPhrase,
+                ClearEngChooseWordInPhrase,
                 AssemblePhraseExam,
             });
         }

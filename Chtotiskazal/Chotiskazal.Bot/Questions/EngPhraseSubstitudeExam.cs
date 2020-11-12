@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitude";
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Enter missing word: ");
             while (true)
             {
-                var enter = await chat.WaitUserTextInput();
+                var enter = await chatIo.WaitUserTextInput();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 if (string.CompareOrdinal(word.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
@@ -40,7 +40,7 @@ namespace Chotiskazal.Bot.Questions
                 }
 
                 Console.ForegroundColor = ConsoleColor.Red;
-                await chat.SendMessage($"Origin phrase was \"{phrase.EnPhrase}\"");
+                await chatIo.SendMessage($"Origin phrase was \"{phrase.EnPhrase}\"");
                 return ExamResult.Failed;
             }
         }

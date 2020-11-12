@@ -8,7 +8,7 @@ namespace Chotiskazal.Bot.Questions
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList);
+        Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList);
     }
 
     public enum ExamResult

@@ -8,7 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot
 {
-    public class Chat
+    public class ChatIO
     {
         private readonly TelegramBotClient _client;
         public readonly ChatId ChatId;
@@ -20,7 +20,7 @@ namespace Chotiskazal.Bot
 
         
         //TODO почему тут было СhatId, а не тот класс что добавляетя в Programm
-        public Chat(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
+        public ChatIO(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
         {
             _client = client;
             //TODO chatId - тип ChatId, a Chat.Id тип лонг
@@ -73,8 +73,8 @@ namespace Chotiskazal.Bot
         public Task SendMessage(string message)=> _client.SendTextMessageAsync(ChatId, message);
         public Task SendMessage(string message, params InlineKeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
-        
-        
+
+     
         public Task SendMessage(string message, params KeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
 

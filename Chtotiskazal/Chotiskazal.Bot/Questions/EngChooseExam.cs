@@ -12,15 +12,15 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var variants = examList.Randomize().Select(e => e.UserTranslations).ToArray();
 
             var msg = $"=====>   {word.EnWord}    <=====\r\nChoose the translation";
-            await chat.SendMessage(msg, InlineButtons.CreateVariants(variants));
+            await chatIo.SendMessage(msg, InlineButtons.CreateVariants(variants));
            
-                chat = chat as Chat;
-                var choice = await chat.TryWaitInlineIntKeyboardInput();
+                chatIo = chatIo as ChatIO;
+                var choice = await chatIo.TryWaitInlineIntKeyboardInput();
                 if (choice == null)
                     return ExamResult.Retry;
             

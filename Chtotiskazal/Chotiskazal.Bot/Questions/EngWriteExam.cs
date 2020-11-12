@@ -12,15 +12,15 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var translations = word.GetTranslations();
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount>0 && word.PassedScore< minCount*4)
                 return ExamResult.Impossible;
 
-            await chat.SendMessage($"=====>   {word.EnWord}    <=====\r\nWrite the translation... ");
-            var translation = await chat.WaitUserTextInput();
+            await chatIo.SendMessage($"=====>   {word.EnWord}    <=====\r\nWrite the translation... ");
+            var translation = await chatIo.WaitUserTextInput();
             if (string.IsNullOrEmpty(translation))
                 return ExamResult.Retry;
 

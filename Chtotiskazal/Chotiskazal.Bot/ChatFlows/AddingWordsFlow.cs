@@ -12,15 +12,15 @@ namespace Chotiskazal.Bot.ChatFlows
 {
     class AddingWordsMode
     {
-        private readonly Chat _chat;
+        private readonly ChatIO _chatIo;
         private readonly AddWordService _addWordService; 
 
         public AddingWordsMode(
-            Chat chat, 
+            ChatIO chatIo, 
             AddWordService addWordService
             )
         {
-            _chat = chat;
+            _chatIo = chatIo;
             _addWordService = addWordService;
         }
         public async Task Enter(int userId, string? word = null)
@@ -49,14 +49,14 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await _chat.SendMessage("Enter english word", new InlineKeyboardButton
+                await _chatIo.SendMessage("Enter english word", new InlineKeyboardButton
                 {
                     CallbackData = "/exit",
                     Text = "Cancel"
                 });
                 while (true)
                 {
-                    var input = await _chat.WaitUserInput();
+                    var input = await _chatIo.WaitUserInput();
                     if (input.CallbackQuery != null && input.CallbackQuery.Data == "/exit")
                         throw new ProcessInteruptedWithMenuCommand("/start");
 
@@ -74,23 +74,23 @@ namespace Chotiskazal.Bot.ChatFlows
                 translations =await _addWordService.TranslateAndAddToDictionary(word);
             if (!translations.Any())
             {
-                await _chat.SendMessage("No translations found. Check the word and try again");
+                await _chatIo.SendMessage("No translations found. Check the word and try again");
                 return true;
             }
 
-            await _chat.SendMessage($"Choose translation for '{word}'",
+            await _chatIo.SendMessage($"Choose translation for '{word}'",
                 InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.UserTranslations)));
             
             while (true)
             {
-                var input = await _chat.TryWaitInlineIntKeyboardInput();
+                var input = await _chatIo.TryWaitInlineIntKeyboardInput();
                 if (!input.HasValue )
                     return false;
                 if (input.Value >= 0 && input.Value < translations.Count)
                 {
                     var selected = translations[input.Value];
                     var count =await _addWordService.AddSomeWordsToUserCollectionAsync(userId, new UserWordForLearning[]{selected});
-                    await _chat.SendMessage($"Saved. Translations: {count}");
+                    await _chatIo.SendMessage($"Saved. Translations: {count}");
                     return true;
                 }
             }

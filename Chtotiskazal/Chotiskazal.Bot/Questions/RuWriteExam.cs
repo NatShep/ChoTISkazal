@@ -11,15 +11,15 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var words = word.EnWord.Split(',').Select(s => s.Trim());
             var minCount = words.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chat.SendMessage($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
-            var userEntry = await chat.WaitUserTextInput();
+            await chatIo.SendMessage($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
+            var userEntry = await chatIo.WaitUserTextInput();
             if (string.IsNullOrEmpty(userEntry))
                 return ExamResult.Retry;
 
@@ -53,7 +53,7 @@ namespace Chotiskazal.Bot.Questions
                 }
                 */
                 
-                await chat.SendMessage("The translation was: " + word.EnWord);
+                await chatIo.SendMessage("The translation was: " + word.EnWord);
                 await service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }

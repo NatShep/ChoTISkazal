@@ -11,18 +11,18 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru trust";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var msg = $"=====>   {word.UserTranslations}    <=====\r\nDo you know the translation?";
-            var _ = chat.SendMessage(msg,
+            var _ = chatIo.SendMessage(msg,
                 new InlineKeyboardButton()
                 {
                     CallbackData = "1",
                     Text = "See the translation"
                 });
-            await chat.WaitInlineIntKeyboardInput();
+            await chatIo.WaitInlineIntKeyboardInput();
             
-            _= chat.SendMessage("Translation is \r\n" + word.EnWord + "\r\n Did you guess?",
+            _= chatIo.SendMessage("Translation is \r\n" + word.EnWord + "\r\n Did you guess?",
                 
                 new InlineKeyboardButton
                 {
@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot.Questions
                     Text = "No"
                 });
             
-            var choice = await chat.WaitInlineIntKeyboardInput();
+            var choice = await chatIo.WaitInlineIntKeyboardInput();
 
             if (choice == 1)
             {

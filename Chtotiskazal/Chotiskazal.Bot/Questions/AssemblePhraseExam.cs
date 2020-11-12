@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Assemble phrase";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -32,11 +32,11 @@ namespace Chotiskazal.Bot.Questions
                     break;
             }
 
-            await chat.SendMessage("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
+            await chatIo.SendMessage("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
             string entry= null;
             while (string.IsNullOrWhiteSpace(entry))
             {
-                entry = await chat.WaitUserTextInput();
+                entry = await chatIo.WaitUserTextInput();
                 entry = entry.Trim();
             }
 
@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Passed;
             }
 
-            await chat.SendMessage($"Original phrase was: '{targetPhrase.EnPhrase}'");
+            await chatIo.SendMessage($"Original phrase was: '{targetPhrase.EnPhrase}'");
             await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }

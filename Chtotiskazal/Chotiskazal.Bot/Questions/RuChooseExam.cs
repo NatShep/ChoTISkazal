@@ -12,14 +12,14 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "RuChoose";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var variants = examList.Randomize().Select(e => e.EnWord).ToArray();
 
             var msg = $"=====>   {word.UserTranslations}    <=====\r\nChoose the translation";
-            await chat.SendMessage(msg, InlineButtons.CreateVariants(variants));
+            await chatIo.SendMessage(msg, InlineButtons.CreateVariants(variants));
             
-            var choice = await chat.TryWaitInlineIntKeyboardInput();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
             

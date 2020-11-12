@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru Choose Phrase";
 
-        public async Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -34,14 +34,14 @@ namespace Chotiskazal.Bot.Questions
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.PhraseRuTranslate}    <=====\r\nChoose the translation";
-            await chat.SendMessage(msg,
+            await chatIo.SendMessage(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
                     CallbackData = i.ToString(),
                     Text = v
                 }).ToArray());
             
-            var choice = await chat.TryWaitInlineIntKeyboardInput();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
             

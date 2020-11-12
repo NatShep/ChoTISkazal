@@ -90,7 +90,7 @@ namespace Chotiskazal.Dal.Repo
             using var cnn = SimpleDbConnection();
             cnn.Open();
             return (await cnn.QueryAsync<string>(
-                @"Select EnWord FROM UsersPairs where up.UserId==@userId
+                @"Select EnWord FROM UserWords where up.UserId==@userId
                   ", new {userId})).ToArray();
         }
 

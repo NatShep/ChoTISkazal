@@ -16,12 +16,12 @@ namespace Chotiskazal.Bot.ChatFlows
     
     public class ExamFlow
     {
-        private readonly Chat _chat;
+        private readonly ChatIO _chatIo;
         private readonly ExamService _examService;
 
-        public ExamFlow(Chat chat , ExamService service)
+        public ExamFlow(ChatIO chatIo , ExamService service)
         {
-            _chat = chat;
+            _chatIo = chatIo;
             _examService = service;
         }
 
@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.ChatFlows
            
             if (!await _examService.HasAnyAsync(userId))
             {
-                await _chat.SendMessage("You need to add some words before examination");
+                await _chatIo.SendMessage("You need to add some words before examination");
                 return;
             }
             
@@ -50,7 +50,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
       
-            var startMessageSending = _chat.SendMessage(sb.ToString(), new InlineKeyboardButton {
+            var startMessageSending = _chatIo.SendMessage(sb.ToString(), new InlineKeyboardButton {
                 CallbackData = "/startExamination", 
                 Text = "Start"
             }, new InlineKeyboardButton
@@ -72,7 +72,7 @@ namespace Chotiskazal.Bot.ChatFlows
             
             await startMessageSending;
             DateTime started = DateTime.Now;
-            var userInput = await _chat.WaitInlineKeyboardInput();
+            var userInput = await _chatIo.WaitInlineKeyboardInput();
             if (userInput != "/startExamination")
                 return;
             foreach (var pairModel in examsList)
@@ -98,7 +98,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             await WritePassed();
                     }
 
-                    var result = await exam.Pass(_chat, _examService, pairModel, learnList);
+                    var result = await exam.Pass(_chatIo, _examService, pairModel, learnList);
 
                     sw.Stop();
                     questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
@@ -141,13 +141,21 @@ namespace Chotiskazal.Bot.ChatFlows
                 doneMessage.Append(pairModel.EnWord + " - " + pairModel.UserTranslations + "  (" + pairModel.PassedScore +
                                   ")\r\n");
             }
-            await _chat.SendMessage(doneMessage.ToString());
+            await _chatIo.SendMessage(doneMessage.ToString());
         }
 
-        private async Task WriteDontPeakMessage() => await _chat.SendMessage("Don't peek\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n..\r\n.\r\n.\r\n.Don't peek");
+        private async Task WriteDontPeakMessage()
+        {
 
-        private Task WriteFailed() => _chat.SendMessage("Noo... \U0001F61E");
-        private Task WritePassed() => _chat.SendMessage($"It's right! \U0001F609");
+            await _chatIo.SendMessage(
+                "\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.");
+            await _chatIo.SendMessage(
+                "Don't peek");
+            await _chatIo.SendMessage("\U0001F648");
+        }
+
+        private Task WriteFailed() => _chatIo.SendMessage("Noo... \U0001F61E");
+        private Task WritePassed() => _chatIo.SendMessage($"It's right! \U0001F609");
         private static QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam) =>
             new QuestionMetric
             {

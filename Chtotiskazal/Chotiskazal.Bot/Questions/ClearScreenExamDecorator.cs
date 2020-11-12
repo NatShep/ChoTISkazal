@@ -16,7 +16,7 @@ namespace Chotiskazal.Bot.Questions
         }
 
         public string Name => "Clean "+ _origin.Name;
-        public Task<ExamResult> Pass(Chat chat, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
-            => _origin.Pass(chat, service, word, examList);
+        public Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
+            => _origin.Pass(chatIo, service, word, examList);
     }
 }
