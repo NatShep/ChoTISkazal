@@ -199,11 +199,11 @@ namespace Chotiskazal.ConsoleTesting.Services
            Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
        }
 
-    /*   public async Task<bool> HasAnyAsync()
+       public async Task<bool> HasAnyAsync(int userId)
        {
-           throw new NotImplementedException();
+           return await _usersWordsService.GatAnyWordAsync(userId);
        }
-      */ 
+       
        //TODO additional methods
        //use for Graph Mode
        public UserWordForLearning[] GetAllExamedWords(in int userId)

@@ -28,12 +28,12 @@ namespace Chotiskazal.Bot.ChatFlows
         public async Task EnterAsync(int userId)
         {
            
-            /*if (!await _examService.HasAnyAsync())
+            if (!await _examService.HasAnyAsync(userId))
             {
                 await _chat.SendMessage("You need to add some words before examination");
                 return;
             }
-            */
+            
             
             //Randomization and jobs
             await _examService.RandomizationAndJobsAsync(userId);

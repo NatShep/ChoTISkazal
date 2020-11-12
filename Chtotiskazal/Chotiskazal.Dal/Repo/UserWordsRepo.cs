@@ -142,6 +142,16 @@ namespace Chotiskazal.Dal.Repo
                 ", new {userId,enWord})).FirstOrDefault();
         }
 
+        public async Task<UserWordForLearning> GetAnyWordAsync(int userId)
+        {
+            CheckDbFile(DbFile);
+
+            using var cnn = SimpleDbConnection();
+            cnn.Open();
+
+            return (await  cnn.QueryAsync<UserWordForLearning>(
+                @"Select * FROM UserWords Where UserId =@userId Limit 1",new {userId})).FirstOrDefault();        
+        }
 
 
         //TODO additional methods
@@ -182,5 +192,7 @@ namespace Chotiskazal.Dal.Repo
 
             }
         }
+
+    
     }
 }

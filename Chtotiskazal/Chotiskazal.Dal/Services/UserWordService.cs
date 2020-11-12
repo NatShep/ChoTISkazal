@@ -65,6 +65,11 @@ namespace Chotiskazal.Dal.Services
             await _userWordsRepository.GetWordByEnWordOrNullAsync(userId, enWord);
 
 
+        public async Task<bool> GatAnyWordAsync(int userId)
+        {
+            var word=await _userWordsRepository.GetAnyWordAsync(userId);
+            return word != null;
+        }
 
         //TODO additional methods
         public void DeleteWordFromUserCollection(User user, int wordId){}
@@ -73,5 +78,7 @@ namespace Chotiskazal.Dal.Services
 
         public void UpdateWord(UserWordForLearning userWord) =>
             _userWordsRepository.UpdateWordTranslations(userWord);
+
+       
     }
 }
