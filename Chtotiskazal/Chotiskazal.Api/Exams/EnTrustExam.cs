@@ -21,10 +21,10 @@ namespace Chotiskazal.ApI.Exams
             switch (answer.Key)
             {
                 case ConsoleKey.Y:
-                    service.RegistrateSuccess(word);
+                    service.RegistrateSuccessAsync(word);
                     return ExamResult.Passed;
                 case ConsoleKey.N:
-                    service.RegistrateFailure(word);
+                    service.RegistrateFailureAsync(word);
                     return ExamResult.Failed;
                 case ConsoleKey.E: return ExamResult.Exit;
                 case ConsoleKey.Escape: return ExamResult.Exit;

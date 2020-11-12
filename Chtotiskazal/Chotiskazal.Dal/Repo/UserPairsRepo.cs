@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -14,23 +15,23 @@ namespace Chotiskazal.Dal.Repo
         {
         }
 
-        public int SaveToUserDictionary(int pairId, int userId)
+        public async Task<int> SaveToUserDictionaryAsync(int pairId, int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
                 using (var transaction = cnn.BeginTransaction())
                 {
-                    var metricId = cnn.ExecuteScalar<int>(
+                    var metricId = await cnn.ExecuteScalarAsync<int>(
                         @"INSERT INTO QuestionMetric (ElaspedMs, Result, Type, Revision, PreviousExam, 
                           LastExam, ExamsPassed, Examed, PassedScore, AggregateScore, AggregateScoreBefore, PassedScoreBefore)
                           VALUES(@ElaspedMs, @Result, @Type, @Revision, @PreviousExam, @LastExam, @ExamsPassed, 
                           @Examed, @PassedScore, @AggregateScore, @AggregateScoreBefore, @PassedScoreBefore); 
                           select last_insert_rowid()", new QuestionMetric());
 
-                    var result = cnn.ExecuteScalar<int>(
+                    var result = await cnn.ExecuteScalarAsync<int>(
                         @"INSERT INTO UserPairs ( UserId ,  PairId, MetricId, Created, IsPhrase)
                       VALUES( @UserId,  @PairId, @MetricId, @Created, @IsPhrase); 
                           select last_insert_rowid()", new UserPair(userId, pairId, metricId, false));
@@ -41,37 +42,37 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public UserPair GetPairByDicIdOrNull(int userId, int id)
+        public async Task<UserPair> GetPairByDicIdOrNullAsync(int userId, int id)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                return cnn.Query<UserPair>(
+                return (await cnn.QueryAsync<UserPair>(
                     @"SELECT * FROM UserPairs 
-                    WHERE UserId = @UserId AND PairId=@id", new {userId, id}).FirstOrDefault();
+                    WHERE UserId = @UserId AND PairId=@id", new {userId, id})).FirstOrDefault();
             }
         }
 
-        public string[] GetAllTranslatesForWordForUser(int userId, string word)
+        public async  Task<string[]> GetAllTranslatesForWordForUserAsync(int userId, string word)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
 
-                return cnn.Query<string>(
+                return (await cnn.QueryAsync<string>(
                     @"SELECT pd.RuWord FROM PairDictionary pd
                     JOIN UserPairs up on up.PairId=pd.PairId 
-                    WHERE up.UserId = @UserId AND pd.EnWord=@word", new {userId, word}).ToArray();
+                    WHERE up.UserId = @UserId AND pd.EnWord=@word", new {userId, word})).ToArray();
             }
         }
 
-        public UserPair[] GetWorstForUser(int userId, int count)
+        public async Task<UserPair[]> GetWorstForUserAsync(int userId, int count)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
@@ -80,7 +81,7 @@ namespace Chotiskazal.Dal.Repo
 
             //TODO make easier when change db(adding word to userPairs)
             //Then you don't need PairDicionary
-            cnn.Query<UserPair, QuestionMetric, WordDictionary, UserPair>(
+            await cnn.QueryAsync<UserPair, QuestionMetric, WordDictionary, UserPair>(
                 @"Select * FROM 
                  (Select * FROM UserPairs WHERE UserId=@userId) up
                   JOIN	QuestionMetric q on q.MetricId=up.MetricId
@@ -100,9 +101,9 @@ namespace Chotiskazal.Dal.Repo
             return lookup.Values.ToArray();
         }
 
-        public UserPair[] GetWorstTestWordsForUser(int count, int learnRate, int userId)
+        public async Task<UserPair[]> GetWorstTestWordsForUserAsync(int count, int learnRate, int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
@@ -113,7 +114,7 @@ namespace Chotiskazal.Dal.Repo
             //Then you don't need PairDicionary
             //TODO it's the same with GetWorstForUser sqlQuestion except LearnRate!!!
             //make it easier using GetWorstForUser method + aggregate by learnRate
-            cnn.Query<UserPair, QuestionMetric, WordDictionary, UserPair>(
+            await cnn.QueryAsync<UserPair, QuestionMetric, WordDictionary, UserPair>(
                 @"Select * FROM 
                  (Select * FROM UserPairs WHERE UserId=@userId) up
                   JOIN	QuestionMetric q on q.MetricId=up.MetricId
@@ -134,33 +135,33 @@ namespace Chotiskazal.Dal.Repo
 
         }
 
-        public string[] GetAllWordsForUser(in int userId)
+        public async Task<string[]> GetAllWordsForUserAsync(int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<string>(
+            return (await cnn.QueryAsync<string>(
                 @"Select DISTINCT EnWord 
                   FROM UsersPairs up where up.UserId==@userId
-                  LEFT JOIN PairDictionary pd on up.PairId=pd.Id", new {userId}).ToArray();
+                  LEFT JOIN PairDictionary pd on up.PairId=pd.Id", new {userId})).ToArray();
         }
 
-        public Phrase[] GetAllPhrases(in int userId)
+        public async  Task<Phrase[]> GetAllPhrasesAsync( int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<Phrase>(
+            return (await cnn.QueryAsync<Phrase>(
                 @"Select  * FROM Phrases p where (UserId==@userId) 
-                 LEFT JOIN (Select * FROM Users WHERE UserId=@userId) u on u.PairId=p.PairId", new {userId}).ToArray();
+                 LEFT JOIN (Select * FROM Users WHERE UserId=@userId) u on u.PairId=p.PairId", new {userId})).ToArray();
         }
         
         //TODO additional methods
         public UserPair[] GetAllPairsForUser(int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();

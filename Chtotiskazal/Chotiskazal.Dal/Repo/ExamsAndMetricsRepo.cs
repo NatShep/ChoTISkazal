@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -14,9 +15,9 @@ namespace Chotiskazal.Dal.Repo
         public ExamsAndMetricsRepo(string fileName) : base(fileName) { }
 
       
-        public QuestionMetric FindMetricOrNull(int metricId )
+        public async Task<QuestionMetric>FindMetricOrNullAsync(int metricId )
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
@@ -26,14 +27,14 @@ namespace Chotiskazal.Dal.Repo
             }
         }
         
-        public void AddQuestionMetric(QuestionMetric metric)
+        public async Task AddQuestionMetricAsync(QuestionMetric metric)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                cnn.Execute(
+                await cnn.ExecuteAsync(
                     @"INSERT INTO QuestionMetric ( 
                     WordId,
                     Created,
@@ -57,13 +58,13 @@ namespace Chotiskazal.Dal.Repo
                     @PassedScoreBefore)", metric);
                }
         }
-        public void AddExam(Exam exam)
+        public async Task AddExamAsync(Exam exam)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            cnn.Execute(
+            cnn.ExecuteAsync(
                 @"INSERT INTO Exams (UserId, Count, Passed, Failed, Started, Finished)
                                 Values(@UserId, @Count, @Passed, @Failed,@Started, @Finished)", exam);
         }

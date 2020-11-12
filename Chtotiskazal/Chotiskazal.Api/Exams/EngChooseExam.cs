@@ -38,10 +38,10 @@ namespace Chotiskazal.ApI.Exams
 
             if (variants[selectedIndex - 1] == word.UserTranslations)
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            service.RegistrateFailure(word);
+            service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
 
         }

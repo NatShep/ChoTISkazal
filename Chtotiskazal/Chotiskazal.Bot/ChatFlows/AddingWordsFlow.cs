@@ -39,13 +39,13 @@ namespace Chotiskazal.Bot.ChatFlows
 
             while (true)
             {
-                if(!await EnterSingleWord(userId, yaStatus.isYaDicOnline, word))
+                if(!await EnterSingleWordAsync(userId, yaStatus.isYaDicOnline, word))
                     break;
                 word = null;
             }
         }
 
-        async Task<bool> EnterSingleWord(int userId, bool isYaDicOnline, string? word = null)
+        async Task<bool> EnterSingleWordAsync(int userId, bool isYaDicOnline, string? word = null)
         {
             if (word == null)
             {
@@ -69,9 +69,9 @@ namespace Chotiskazal.Bot.ChatFlows
             }
             
             //find word in local dictionary(if not, find it in Ya dictionary)
-            var translations = _addWordService.FindInDictionaryWithPhrases(word);
+            var translations =await _addWordService.FindInDictionaryWithPhrases(word);
             if (!translations.Any() && isYaDicOnline)
-                translations = _addWordService.TranslateAndAddToDictionary(word);
+                translations =await _addWordService.TranslateAndAddToDictionary(word);
             if (!translations.Any())
             {
                 await _chat.SendMessage("No translations found. Check the word and try again");
@@ -89,7 +89,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (input.Value >= 0 && input.Value < translations.Count)
                 {
                     var selected = translations[input.Value];
-                    var count =_addWordService.AddResultToUserCollection(userId, new UserWordForLearning[]{selected});
+                    var count =await _addWordService.AddSomeWordsToUserCollectionAsync(userId, new UserWordForLearning[]{selected});
                     await _chat.SendMessage($"Saved. Translations: {count}");
                     return true;
                 }

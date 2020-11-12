@@ -38,12 +38,12 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (string.CompareOrdinal(phrase.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    service.RegistrateSuccess(word);
+                    await service.RegistrateSuccessAsync(word);
                     return ExamResult.Passed;
                 }
 
                 await chat.SendMessage($"Origin phrase was \"{phrase.PhraseRuTranslate}\"");
-                service.RegistrateFailure(word);
+                await service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }
         }

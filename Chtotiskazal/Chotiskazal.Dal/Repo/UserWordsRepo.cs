@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -15,37 +16,34 @@ namespace Chotiskazal.Dal.Repo
         {
         }
 
-        public int SaveToUserDictionary(UserWordForLearning userWordForLearning)
+        public async Task<int> SaveToUserDictionaryAsync(UserWordForLearning userWordForLearning)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var result = cnn.ExecuteScalar<int>(
+                return await cnn.ExecuteScalarAsync<int>(
                     @"INSERT INTO UserWords (UserId, EnWord, UserTranslations, Transcription, Created, PhrasesIds, IsPhrase,
                                                  PassedScore, AggregateScore,LastExam,Examed,Revision)
 
                       VALUES(@UserId,  @EnWord, @UserTranslations, @Transcription, @Created, @PhrasesIds, @IsPhrase,
                                                  @PassedScore, @AggregateScore,@LastExam,@Examed,@Revision)",
                     userWordForLearning);
-
-
-                return result;
             }
         }
 
-        public UserWordForLearning[] GetWorstForUserWithPhrases(int userId, int count)
+        public async Task<UserWordForLearning[]> GetWorstForUserWithPhrasesAsync(int userId, int count)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
             //TODO how is better to do
-            var result = cnn.Query<UserWordForLearning>(
+            var result =(await cnn.QueryAsync<UserWordForLearning>(
                 @"Select * FROM UserWords WHERE UserId=@userId               
 				  order by AggregateScore desc limit @count          		
-                ", new {userId, count});
+                ", new {userId, count})).ToArray();
             foreach (var userWordForLearning in result)
             {
                 var phrases = new List<Phrase>();
@@ -57,50 +55,48 @@ namespace Chotiskazal.Dal.Repo
                 }
 
                 userWordForLearning.Phrases = phrases;
-
             }
-            
             return result.ToArray();
         }
 
-        public UserWordForLearning[] GetWorstTestWordsForUser(int count, int learnRate, int userId)
+        public async Task<UserWordForLearning[]> GetWorstTestWordsForUserAsync(int count, int learnRate, int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
 
-            return cnn.Query<UserWordForLearning>(
+            return (await cnn.QueryAsync<UserWordForLearning>(
                 @"Select * FROM UserWords WHERE UserId=@userId AND PassedScore > @learnRate 
                   order by AggregateScore desc limit @count       		
-                ", new {userId, learnRate, count}).ToArray();
+                ", new {userId, learnRate, count})).ToArray();
         }
 
-        public UserWordForLearning[] GetAllUserWordsForLearning(int userId)
+        public async Task<UserWordForLearning[]> GetAllUserWordsForLearningAsync(int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<UserWordForLearning>(
+            return ( await  cnn.QueryAsync<UserWordForLearning>(
                 @"Select * from UserWords WHERE UserId=userId
-                ", new {userId}).ToArray();
+                ", new {userId})).ToArray();
         }
 
-        public string[] GetAllWordsForUser(in int userId)
+        public async Task<string[]> GetAllWordsForUserAsync(int userId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            return cnn.Query<string>(
+            return (await cnn.QueryAsync<string>(
                 @"Select EnWord FROM UsersPairs where up.UserId==@userId
-                  ", new {userId}).ToArray();
+                  ", new {userId})).ToArray();
         }
 
-        public void UpdateScores(UserWordForLearning userWordForLearning)
+        public async Task UpdateScoresAsync(UserWordForLearning userWordForLearning)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
@@ -111,13 +107,13 @@ namespace Chotiskazal.Dal.Repo
                     $"LastExam = @LastExam," +
                     $"Examed = @Examed " +
                     $"WHERE Id = @Id";
-                cnn.Execute(op, userWordForLearning);
+                await cnn.ExecuteAsync(op, userWordForLearning);
             }
         }
 
-        public void UpdateAgingAndRandomization(int count)
+        public async Task UpdateAgingAndRandomizationAsync(int count)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
@@ -129,21 +125,21 @@ namespace Chotiskazal.Dal.Repo
                     var op = $"Update UserWords set AggregateScore = " +
                              $"{word.AggregateScore.ToString(CultureInfo.InvariantCulture)} " +
                              $"where Id = {word.Id}";
-                    cnn.Execute(op);
+                    await cnn.ExecuteAsync(op);
                 }
             }
         }
 
-        public UserWordForLearning GetWordByEnWordOrNull(int userId, string enWord)
+        public async Task<UserWordForLearning> GetWordByEnWordOrNullAsync(int userId, string enWord)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
 
-            return cnn.Query<UserWordForLearning>(
+            return (await  cnn.QueryAsync<UserWordForLearning>(
                 @"Select * FROM UserWords WHERE UserId=@userId AND enWord = @enWord       		
-                ", new {userId,enWord}).FirstOrDefault();
+                ", new {userId,enWord})).FirstOrDefault();
         }
 
 
@@ -153,7 +149,7 @@ namespace Chotiskazal.Dal.Repo
 
         public void UpdateAgingAndRandomization()
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
@@ -172,7 +168,7 @@ namespace Chotiskazal.Dal.Repo
         public void UpdateWordTranslations(UserWordForLearning userWord)
         {
 
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {

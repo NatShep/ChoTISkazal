@@ -23,6 +23,7 @@ namespace Chotiskazal.Bot
         public Chat(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
         {
             _client = client;
+            //TODO chatId - тип ChatId, a Chat.Id тип лонг
             ChatId = chat.Id;
             UserFirstName = chat.FirstName;
             UserLastName = chat.LastName;

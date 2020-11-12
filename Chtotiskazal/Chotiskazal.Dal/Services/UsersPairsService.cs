@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Phrase = Chotiskazal.DAL.Phrase;
 
 namespace Chotiskazal.Dal.Services
@@ -15,22 +16,23 @@ namespace Chotiskazal.Dal.Services
         
         public UsersPairsService(UserPairsRepo repository) =>_userPairssRepository = repository;
 
-        public int AddWordToUserCollection(int userId, int wordId) =>  
-            _userPairssRepository.SaveToUserDictionary(wordId, userId);
+        public async Task<int> AddWordToUserCollectionAsync(int userId, int wordId) =>  
+           await _userPairssRepository.SaveToUserDictionaryAsync(wordId, userId);
 
-        public UserPair GetPairByDicId(int userId, int id) => _userPairssRepository.GetPairByDicIdOrNull(userId, id);
+        public async Task<UserPair> GetPairByDicIdAsync(int userId, int id) => await _userPairssRepository.GetPairByDicIdOrNullAsync(userId, id);
 
-        public UserPair[] GetWorstForUser(int userId, int count) => _userPairssRepository.GetWorstForUser(userId,count);
+        public async Task<UserPair[]> GetWorstForUserAsync(int userId, int count) => 
+            await _userPairssRepository.GetWorstForUserAsync(userId,count);
         
-        public UserPair[] GetWorstTestWordForUser(int userId, int count, int learnRate) =>
-            _userPairssRepository.GetWorstTestWordsForUser(count, learnRate, userId);
+        public async Task<UserPair[]> GetWorstTestWordForUserAsync(int userId, int count, int learnRate) =>
+          await  _userPairssRepository.GetWorstTestWordsForUserAsync(count, learnRate, userId);
         
-        public string[] GetAllUserTranslatesForWord(int userId, string word) => 
-            _userPairssRepository.GetAllTranslatesForWordForUser(userId, word);
+        public async Task<string[]> GetAllUserTranslatesForWordAsync(int userId, string word) => 
+            await _userPairssRepository.GetAllTranslatesForWordForUserAsync(userId, word);
         
-        public string[] GetAllWords(in int userId) =>_userPairssRepository.GetAllWordsForUser(userId);
+        public async Task<string[]> GetAllWordsAsync(int userId) =>await _userPairssRepository.GetAllWordsForUserAsync(userId);
         
-        public Phrase[] GetAllPhrases(int userId) => _userPairssRepository.GetAllPhrases(userId);
+        public async Task<Phrase[]> GetAllPhrasesAsync(int userId) =>await _userPairssRepository.GetAllPhrasesAsync(userId);
         
         //TODO additional methods
         public void DeleteWordFromUserCollection(User user, int wordId){}

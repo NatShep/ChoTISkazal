@@ -29,7 +29,7 @@ namespace Chotiskazal.ApI.Exams
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
             else
@@ -46,7 +46,7 @@ namespace Chotiskazal.ApI.Exams
                 }
             */
                 Console.WriteLine("The translation was: "+ word.UserTranslations);
-                service.RegistrateFailure(word);
+                service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }
         }

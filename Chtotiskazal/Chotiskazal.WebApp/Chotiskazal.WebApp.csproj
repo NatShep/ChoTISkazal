@@ -16,10 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Chotiskazal.Dal\Chotiskazal.Dal.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Update="Pages\Words\GetTranslation.cshtml">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

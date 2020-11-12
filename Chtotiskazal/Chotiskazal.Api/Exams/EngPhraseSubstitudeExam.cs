@@ -33,14 +33,14 @@ namespace Chotiskazal.ApI.Exams
                     continue;
                 if (string.CompareOrdinal(word.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    service.RegistrateSuccess(word);
+                    service.RegistrateSuccessAsync(word);
                     return ExamResult.Passed;
                 }
 
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Origin phrase was \"{phrase.EnPhrase}\"");
                 Console.ResetColor();
-                service.RegistrateFailure(word);
+                service.RegistrateFailureAsync(word);
 
                 return ExamResult.Failed;
             }

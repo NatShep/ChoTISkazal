@@ -70,7 +70,7 @@ namespace Chotiskazal.Api.ConsoleModes
                         var results = ChooseTranslation(translations.ToArray());
                         if (results?.Any() == true)
                         {
-                            var count =_addWordService.AddResultToUserCollection(userId, results);
+                            var count =_addWordService.AddResultToUserCollectionAsync(userId, results);
                             Console.WriteLine($"Saved. Translations: {count}");
                         }
                     }

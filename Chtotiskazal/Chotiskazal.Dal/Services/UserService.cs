@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Chotiskazal.Dal.Repo;
 using Chotiskazal.DAL;
 
@@ -10,10 +11,11 @@ namespace Chotiskazal.Dal.Services
         private readonly UserRepo _repository;
         public UserService(UserRepo repository) => _repository = repository;
         
-        public int AddUser(User user) => _repository.AddUser(user);
+        public async Task<int> AddUserAsync(User user) => await _repository.AddUserAsync(user);
         
-        public User GetUserByLoginOrNull(string login, string password) => _repository.GetUserByLoginOrNull(login,password);
-        public User GetUserByTelegramId(in long telegramId) => _repository.GetUserByTelegramId(telegramId);
+        public async Task<User> GetUserByLoginOrNullAsync(string login, string password) => 
+            await _repository.GetUserByLoginOrNullAsyc(login,password);
+        public async Task<User> GetUserByTelegramIdAsync(long telegramId) =>await _repository.GetUserByTelegramIdAsync(telegramId);
 
      
         //TODO additional methods

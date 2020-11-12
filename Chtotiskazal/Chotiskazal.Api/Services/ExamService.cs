@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Chotiskazal.ApI.Exams;
 using Chotiskazal.Api.Services;
 using Chotiskazal.Dal;
@@ -26,9 +27,9 @@ namespace Chotiskazal.ConsoleTesting.Services
             _usersWordsService = usersWordsService;
         }
 
-        public UserWordForLearning[] GetWordsForLearning(int userId, int count, int maxTranslationSize)
+        public async Task<UserWordForLearning[]> GetWordsForLearningAsync(int userId, int count, int maxTranslationSize)
         {
-            var wordsForLearning = _usersWordsService.GetWorstForUserWirhPhrases(userId, count);
+            var wordsForLearning = await _usersWordsService.GetWorstForUserWithPhrasesAsync(userId, count);
 
             foreach (var wordForLearning in wordsForLearning)
             {
@@ -52,8 +53,8 @@ namespace Chotiskazal.ConsoleTesting.Services
         }
 
         //TODO Зачем этот метод и метод выше, а еще GetTestWord
-       public UserWordForLearning[] GetPairsForTestWords(int userId, int delta, int randomRate)=>
-            _usersWordsService.GetWorstTestWordForUser(userId, delta,randomRate);
+       public async Task<UserWordForLearning[]> GetPairsForTestWordsAsync(int userId, int delta, int randomRate)=>
+            await _usersWordsService.GetWorstTestWordForUserAsync(userId, delta,randomRate);
        
 
        public new List<UserWordForLearning> PreparingExamsList(UserWordForLearning[] learningWords)
@@ -81,24 +82,24 @@ namespace Chotiskazal.ConsoleTesting.Services
            if (delta > 0)
            {
                var randomRate = 8 + RandomTools.Rnd.Next(5);
-               return testWords = GetPairsForTestWords(userId, delta, randomRate);
+               return testWords = GetPairsForTestWordsAsync(userId, delta, randomRate);
            }
            return testWords;
        }
 
-       public void UpdateAgingAndRandomize(int i) => _usersWordsService.UpdateAgingAndRandomize(i);
+       public async Task UpdateAgingAndRandomizeAsyn(int i) =>await _usersWordsService.UpdateAgingAndRandomizeAsync(i);
 
-       public void SaveQuestionMetrics(QuestionMetric questionMetric) =>
-           _examsAndMetricService.SaveQuestionMetrics(questionMetric);
+       public async Task SaveQuestionMetricsAsync(QuestionMetric questionMetric) =>
+           await _examsAndMetricService.SaveQuestionMetricsAsync(questionMetric);
        
-       public void RegistrateExam(int userId, DateTime started, int examsCount, int examsPassed) =>
-           _examsAndMetricService.RegistrateExam(userId, started, examsCount, examsPassed);
+       public async Task RegistrateExamAsync(int userId, DateTime started, int examsCount, int examsPassed) =>
+           await _examsAndMetricService.RegistrateExamAsync(userId, started, examsCount, examsPassed);
 
-       public void RegistrateSuccess(UserWordForLearning userWordForLearning) => 
-           _usersWordsService.RegistrateSuccess(userWordForLearning);
+       public async Task RegistrateSuccessAsync(UserWordForLearning userWordForLearning) => 
+           await _usersWordsService.RegistrateSuccessAwait(userWordForLearning);
       
-       public void RegistrateFailure(UserWordForLearning userWordForLearning) =>
-           _usersWordsService.RegistrateFailure(userWordForLearning);
+       public async Task RegistrateFailureAsync(UserWordForLearning userWordForLearning) =>
+          await _usersWordsService.RegistrateFailureAsync(userWordForLearning);
 
        public QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam)
        {
@@ -118,15 +119,15 @@ namespace Chotiskazal.ConsoleTesting.Services
        public void RandomizationAndJobs(int userId)
        {
            if (RandomTools.Rnd.Next() % 30 == 0)
-               AddMutualPhrasesToVocab(userId, 10);
+               AddMutualPhrasesToVocabAsync(userId, 10);
            else
-               UpdateAgingAndRandomize(50);
+               UpdateAgingAndRandomizeAsyn(50);
        }
        
-       private void AddMutualPhrasesToVocab(int userId, int maxCount)
+       private async Task AddMutualPhrasesToVocabAsync(int userId, int maxCount)
        {
-           var allWords = _usersWordsService.GetAllWords(userId).Select(s => s.ToLower().Trim()).ToHashSet();
-           var allWordsForLearning = _usersWordsService.GetAllUserWordsForLearning(userId);
+           var allWords = (await _usersWordsService.GetAllWordsAsync(userId)).Select(s => s.ToLower().Trim()).ToHashSet();
+           var allWordsForLearning = await _usersWordsService.GetAllUserWordsForLearningAsync(userId);
         
            List<int> allPhrasesIdForUser = new List<int>();
 
@@ -136,7 +137,7 @@ namespace Chotiskazal.ConsoleTesting.Services
                allPhrasesIdForUser.AddRange(phrases);
            }
 
-           var allPhrases = _dictionaryService.FindSeverealPrasesById(allPhrasesIdForUser.ToArray());
+           var allPhrases = await _dictionaryService.FindSeveralPhrasesByIdAsync(allPhrasesIdForUser.ToArray());
           
            List<Phrase> searchedPhrases = new List<Phrase>();
            int endings = 0;
@@ -191,7 +192,7 @@ namespace Chotiskazal.ConsoleTesting.Services
            {
                Console.WriteLine("Adding " + phrase.EnPhrase);
                
-             _usersWordsService.AddPhraseAsWordToUserCollection(phrase);
+            await _usersWordsService.AddPhraseAsWordToUserCollectionAsync(phrase);
           //cv    _usersWordsService.RemovePhrase(phrase.Id,userId);
            }
 

@@ -19,5 +19,16 @@ namespace Chotiskazal.Dal.Repo
         public SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 
         protected void ApplyMigrations() => DoMigration.ApplyMigrations(DbFile);
+
+
+        public static void CheckDbFile(string nameFile)
+        {
+            if (!File.Exists(nameFile))
+                throw new Exception("No db file!");
+
+            //  DoMigration.ApplyMigrations(nameFile);
+
+        }
     }
+    
 }

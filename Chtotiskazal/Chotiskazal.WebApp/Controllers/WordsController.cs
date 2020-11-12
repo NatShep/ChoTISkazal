@@ -82,13 +82,13 @@ namespace Chotiskazal.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SelectTranslation(int id)
         {
-            var user = _userService.GetUserByLoginOrNull(User.Identity.Name);
+            var user = _userService.GetUserByLoginOrNullAsync(User.Identity.Name);
             if (user == null)
                 return RedirectToAction("Logout", "Account");
             
-            var userPair = _usersPairsService.GetPairByDicId(user.UserId, id);
+            var userPair = _usersPairsService.GetPairByDicIdAsync(user.UserId, id);
             if (userPair==null)
-                _usersPairsService.AddWordToUserCollection(user.UserId, id);
+                _usersPairsService.AddWordToUserCollectionAsync(user.UserId, id);
          
             return RedirectToAction("Menu", "Home");
 
@@ -96,7 +96,7 @@ namespace Chotiskazal.WebApp.Controllers
         
         private List<TranslationAndContext> FindInDictionary(string word)
         {
-            var pairWords = _dictionaryService.GetAllPairsByWord(word);
+            var pairWords = _dictionaryService.GetAllPairsByWordAsync(word);
           
             // map to viewModel
             var translateWithContexts = new List<TranslationAndContext>();
@@ -114,7 +114,7 @@ namespace Chotiskazal.WebApp.Controllers
         }
 
         //TODO Isolate to Chotiskazal.Api
-        private List<TranslationAndContext> TranslateByYandex(string word)
+        private async Task<List<TranslationAndContext>> TranslateByYandex(string word)
         {
             List<TranslationAndContext> translationsWithContext = new List<TranslationAndContext>();
             
@@ -138,7 +138,7 @@ namespace Chotiskazal.WebApp.Controllers
                         var dbPhrases = new List<Phrase>();
 
                         //Заполняем бд(wordDictionary и фразы)
-                        var id = _dictionaryService.AddNewWordPairToDictionary(
+                        var id = _dictionaryService.AddNewWordPairToDictionaryAsync(
                             word,
                             yandexTranslation.Text,
                             transcription,
@@ -147,7 +147,7 @@ namespace Chotiskazal.WebApp.Controllers
                         {
                             var phrase = yaPhrase.MapToDbPhrase();
                             dbPhrases.Add(phrase);
-                            _dictionaryService.AddPhraseForWordPair(id, word, null, phrase.EnPhrase, phrase.RuTranslate);
+                            _dictionaryService.AddPhraseForWordPairAsync(id, word, null, phrase.EnPhrase, phrase.RuTranslate);
                         }
 
                         translationsWithContext.Add(new TranslationAndContext(id, word, yandexTranslation.Text,
@@ -165,7 +165,7 @@ namespace Chotiskazal.WebApp.Controllers
                 if (!string.IsNullOrWhiteSpace(transAnsTask.Result))
                 {
                     //1. Заполняем бд(wordDictionary, фраз нет)
-                    var id = _dictionaryService.AddNewWordPairToDictionary(
+                    var id = await _dictionaryService.AddNewWordPairToDictionaryAsync(
                         word,
                         transAnsTask.Result,
                         "[]",

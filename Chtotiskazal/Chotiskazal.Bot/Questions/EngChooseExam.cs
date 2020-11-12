@@ -27,10 +27,10 @@ namespace Chotiskazal.Bot.Questions
 
             if (variants[choice.Value] == word.UserTranslations)
             {
-                service.RegistrateSuccess(word);
+                await service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            service.RegistrateFailure(word);
+            await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
 
         }

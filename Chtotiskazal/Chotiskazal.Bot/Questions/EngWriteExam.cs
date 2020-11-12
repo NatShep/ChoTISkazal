@@ -26,7 +26,7 @@ namespace Chotiskazal.Bot.Questions
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                service.RegistrateSuccess(word);
+                await service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
             else
@@ -41,8 +41,9 @@ namespace Chotiskazal.Bot.Questions
                     return ExamResult.Impossible;
                 }
                 await chat.SendMessage("The translation was: "+ word.UserTranslations);
-                service.RegistrateFailure(word);
                 */
+               await service.RegistrateFailureAsync(word);
+                
                 return ExamResult.Failed; 
             }
         }

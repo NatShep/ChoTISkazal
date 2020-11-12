@@ -99,12 +99,12 @@ namespace Chotiskazal.Bot
                 return existedChatRoom;
 
             var newChat = new Chat(_botClient, chat);
-            var user = authorizeService.Authorize(chat.Id, chat.FirstName);
 
-            var newChatRoom = new ChatRoomFlow(newChat,user.UserId)
+            var newChatRoom = new ChatRoomFlow(newChat)
             {
                 ExamSrvc = examService,
                 AddWordSrvc = addWordService,
+                AuthorizeSrvc = authorizeService,
                 
             };
             

@@ -57,7 +57,7 @@ namespace Chotiskazal.ApI.Exams
 
             if (variants[selectedIndex - 1] == word.EnWord)
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
@@ -65,7 +65,7 @@ namespace Chotiskazal.ApI.Exams
             Console.WriteLine($"Origin was: \"{phrase.EnPhrase}\"");
             Console.ResetColor();
             
-            service.RegistrateFailure(word);
+            service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
 
         }

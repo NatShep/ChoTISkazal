@@ -37,12 +37,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (choice == 1)
             {
-                service.RegistrateSuccess(word);
+                await service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
             else
             {
-                service.RegistrateFailure(word);
+                await service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }
             /*var answer = Console.ReadKey();

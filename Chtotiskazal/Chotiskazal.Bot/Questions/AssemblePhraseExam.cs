@@ -42,12 +42,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
             {
-                service.RegistrateSuccess(word);
+                await service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
             await chat.SendMessage($"Original phrase was: '{targetPhrase.EnPhrase}'");
-            service.RegistrateFailure(word);
+            await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }
     }

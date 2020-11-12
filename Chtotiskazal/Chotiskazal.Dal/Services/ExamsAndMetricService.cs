@@ -3,6 +3,7 @@ using Chotiskazal.DAL;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chotiskazal.Dal.Services
 {
@@ -12,15 +13,15 @@ namespace Chotiskazal.Dal.Services
 
         public ExamsAndMetricService(ExamsAndMetricsRepo repo) => _examsAndMetricsRepo = repo;
 
-        public QuestionMetric GetAllMetricsForPair(int metricId) => _examsAndMetricsRepo.FindMetricOrNull(metricId);
+        public async Task<QuestionMetric> GetAllMetricsForPairAsync(int metricId) =>await _examsAndMetricsRepo.FindMetricOrNullAsync(metricId);
 
-        public void SaveQuestionMetrics(QuestionMetric questionMetric) =>
-            _examsAndMetricsRepo.AddQuestionMetric(questionMetric);
+        public async Task SaveQuestionMetricsAsync(QuestionMetric questionMetric) =>
+           await _examsAndMetricsRepo.AddQuestionMetricAsync(questionMetric);
 
 
-        public void RegistrateExam(int userId, DateTime started, int count, int successCount)
+        public async Task RegistrateExamAsync(int userId, DateTime started, int count, int successCount)
         {
-            _examsAndMetricsRepo.AddExam(new Exam
+            await _examsAndMetricsRepo.AddExamAsync(new Exam
             {
                 UserId = userId,
                 Started = started,

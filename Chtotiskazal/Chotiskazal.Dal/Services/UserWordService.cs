@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Phrase = Chotiskazal.DAL.Phrase;
 
 namespace Chotiskazal.Dal.Services
@@ -15,37 +16,39 @@ namespace Chotiskazal.Dal.Services
         
         public UsersWordsService(UserWordsRepo repository) =>_userWordsRepository = repository;
 
-        public int AddWordToUserCollection(UserWordForLearning userWordForLearning) =>  
-            _userWordsRepository.SaveToUserDictionary(userWordForLearning);
+        public async Task<int> AddWordToUserCollectionAsync(UserWordForLearning userWordForLearning) =>  
+           await  _userWordsRepository.SaveToUserDictionaryAsync(userWordForLearning);
 
 
-        public UserWordForLearning[] GetWorstForUserWirhPhrases(int userId, int count) => _userWordsRepository.GetWorstForUserWithPhrases(userId,count);
+        public async Task<UserWordForLearning[]> GetWorstForUserWithPhrasesAsync(int userId, int count) => 
+            await _userWordsRepository.GetWorstForUserWithPhrasesAsync(userId,count);
         
-        public UserWordForLearning[] GetWorstTestWordForUser(int userId, int count, int learnRate) =>
-            _userWordsRepository.GetWorstTestWordsForUser(count, learnRate, userId);
+        public async Task<UserWordForLearning[]> GetWorstTestWordForUserAsync(int userId, int count, int learnRate) =>
+            await _userWordsRepository.GetWorstTestWordsForUserAsync(count, learnRate, userId);
    
-        public string[] GetAllWords(int userId) =>_userWordsRepository.GetAllWordsForUser(userId);
+        public async Task<string[]> GetAllWordsAsync(int userId) =>await _userWordsRepository.GetAllWordsForUserAsync(userId);
         
-        public UserWordForLearning[] GetAllUserWordsForLearning(int userId) => _userWordsRepository.GetAllUserWordsForLearning(userId);
+        public async Task<UserWordForLearning[]> GetAllUserWordsForLearningAsync(int userId) =>
+            await _userWordsRepository.GetAllUserWordsForLearningAsync(userId);
 
-        public void RegistrateFailure(UserWordForLearning userWordForLearning)
+        public async Task RegistrateFailureAsync(UserWordForLearning userWordForLearning)
         {
             userWordForLearning.OnExamFailed();
             userWordForLearning.UpdateAgingAndRandomization();
-            _userWordsRepository.UpdateScores(userWordForLearning);
+            await _userWordsRepository.UpdateScoresAsync(userWordForLearning);
         }
         
-        public void UpdateAgingAndRandomize(int count) => _userWordsRepository.UpdateAgingAndRandomization(count);
+        public async Task UpdateAgingAndRandomizeAsync(int count) => await _userWordsRepository.UpdateAgingAndRandomizationAsync(count);
 
 
-        public void RegistrateSuccess(UserWordForLearning userWordForLearning)
+        public async Task RegistrateSuccessAwait(UserWordForLearning userWordForLearning)
         {
             userWordForLearning.OnExamPassed();
             userWordForLearning.UpdateAgingAndRandomization();
-            _userWordsRepository.UpdateScores(userWordForLearning);
+            await _userWordsRepository.UpdateScoresAsync(userWordForLearning);
         }
 
-        public void AddPhraseAsWordToUserCollection(Phrase phrase)
+        public async Task AddPhraseAsWordToUserCollectionAsync(Phrase phrase)
         {
             var userWord=new UserWordForLearning()
             {
@@ -55,10 +58,11 @@ namespace Chotiskazal.Dal.Services
                     PhrasesIds = "",
                     IsPhrase = true,
             };
-            _userWordsRepository.SaveToUserDictionary(userWord);
+            await _userWordsRepository.SaveToUserDictionaryAsync(userWord);
         }
 
-        public UserWordForLearning GetWordForLearningOrNullByWord(int userId, string enWord) => _userWordsRepository.GetWordByEnWordOrNull(userId, enWord);
+        public async Task<UserWordForLearning> GetWordForLearningOrNullByWordAsync(int userId, string enWord) =>
+            await _userWordsRepository.GetWordByEnWordOrNullAsync(userId, enWord);
 
 
 

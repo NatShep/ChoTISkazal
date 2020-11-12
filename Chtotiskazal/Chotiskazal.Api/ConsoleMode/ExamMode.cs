@@ -23,7 +23,7 @@ namespace Chotiskazal.Api.ConsoleModes
             //TODO Как добавляет слова( просто рандомно иногда добавляет фразы независимо от того, какой рейтинг выученности слов)
             _examService.RandomizationAndJobs(userId);
             
-            var learningWords = _examService.GetWordsForLearning(userId, 9, 3);
+            var learningWords = _examService.GetWordsForLearningAsync(userId, 9, 3);
 
             Console.Clear();
             Console.WriteLine("Examination: ");
@@ -98,14 +98,14 @@ namespace Chotiskazal.Api.ConsoleModes
                             break;
                         case ExamResult.Passed:
                             WritePassed();
-                            _examService.SaveQuestionMetrics(questionMetric);
+                            _examService.SaveQuestionMetricsAsync(questionMetric);
                             examsCount++;
                             examsPassed++;
                             break;
                         case ExamResult.Failed:
                             WriteFailed();
                             questionMetric.Result = 0;
-                            _examService.SaveQuestionMetrics(questionMetric);
+                            _examService.SaveQuestionMetricsAsync(questionMetric);
                             examsCount++;
                             break;
                         case ExamResult.Retry:
@@ -118,7 +118,7 @@ namespace Chotiskazal.Api.ConsoleModes
                     lastExamResult = result;
 
                 } while (retryFlag);
-                _examService.RegistrateExam(userId, started, examsCount, examsPassed);
+                _examService.RegistrateExamAsync(userId, started, examsCount, examsPassed);
             }
 
             Console.WriteLine();

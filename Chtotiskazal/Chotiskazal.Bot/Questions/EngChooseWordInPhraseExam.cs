@@ -41,12 +41,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (variants[choice.Value] == word.EnWord)
             {
-                service.RegistrateSuccess(word);
+                await service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
             await chat.SendMessage($"Origin was: \"{phrase.EnPhrase}\"");
-            service.RegistrateFailure(word);
+            await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }
     }

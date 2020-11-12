@@ -43,14 +43,14 @@ namespace Chotiskazal.ApI.Exams
 
             if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
             {
-                service.RegistrateSuccess(word);
+                service.RegistrateSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Original phrase was: '{targetPhrase.EnPhrase}'");
             Console.ResetColor();
-            service.RegistrateFailure(word);
+            service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }
     }

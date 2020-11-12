@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (string.CompareOrdinal(word.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    service.RegistrateSuccess(word);
+                    await service.RegistrateSuccessAsync(word);
                     return ExamResult.Passed;
                 }
 

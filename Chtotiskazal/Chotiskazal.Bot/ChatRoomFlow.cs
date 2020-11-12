@@ -9,15 +9,13 @@ namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(Chat chat, int userId)
-        {
-            Chat = chat;
-            UserId = userId;
-        }
-
+        public ChatRoomFlow(Chat chat) =>
+          Chat = chat;
+        
         public int UserId { get; set; }        
         public AddWordService AddWordSrvc { get; set; }
         public ExamService ExamSrvc { get; set; }
+        public AuthorizeService AuthorizeSrvc { get; set; }
         public GraphStatsService GraphStatsSrvc { get; set; }
         
         public Chat Chat { get;}
@@ -34,7 +32,10 @@ namespace Chotiskazal.Bot
         
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
-
+            
+            var user = await AuthorizeSrvc.AuthorizeAsync(Chat.ChatId.Identifier, Chat.UserFirstName);
+            UserId = user.UserId;
+            
             Greeting();
             
             while(true)
@@ -63,7 +64,7 @@ namespace Chotiskazal.Bot
         }
         
         Task SendNotAllowedTooltip() => Chat.SendTooltip("action is not allowed");
-        Task Examinate() => new ExamFlow(Chat, ExamSrvc).Enter(UserId);
+        Task Examinate() => new ExamFlow(Chat, ExamSrvc).EnterAsync(UserId);
         
         //show stats to user here
         /*

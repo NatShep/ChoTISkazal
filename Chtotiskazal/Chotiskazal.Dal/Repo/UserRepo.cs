@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -16,55 +17,52 @@ namespace Chotiskazal.Dal.Repo
 
         public UserRepo(string fileName) : base(fileName) {}
 
-        public int AddUser(User user)
+        public async  Task<int> AddUserAsync(User user)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
             
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var id = cnn.ExecuteScalar<int>(
+                return await cnn.ExecuteScalarAsync<int>(
                     @"INSERT INTO Users (TelegramId, Name,  Login,  Password, Email, Created, Online)   
                                       VALUES(@TelegramId, @Name,  @Login,  @Password, @Email, @Created, @Online);
                       SELECT last_insert_rowid();", user);
-                return id;
             }
         }
 
-        public User GetUserByLoginOrNull(string login,string password)
+        public async Task<User> GetUserByLoginOrNullAsyc(string login,string password)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
             
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var user = cnn.Query<User>(
+                return (await cnn.QueryAsync<User>(
                     @"SELECT *
                     FROM Users
-                    WHERE Login = @login AND Password=@Password", new {login,password}).FirstOrDefault();
-                return user;
+                    WHERE Login = @login AND Password=@Password", new {login,password})).FirstOrDefault();
             }
         }
 
-        public User GetUserByTelegramId(in long telegramId)
+        public async Task<User> GetUserByTelegramIdAsync(long telegramId)
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
 
             using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                var user = cnn.Query<User>(
+                return (await cnn.QueryAsync<User>(
                     @"SELECT *
                     FROM Users
-                    WHERE TelegramId = @telegramId", new {telegramId}).FirstOrDefault();
-                return user;
+                    WHERE TelegramId = @telegramId", new {telegramId})).FirstOrDefault();
             }
         }
         
         //TODO additional methods 
         public User[] GetAllUsers()
         {
-            CheckDbFile.Check(DbFile);
+            CheckDbFile(DbFile);
             
             using (var cnn = SimpleDbConnection())
             {
