@@ -2,9 +2,9 @@
 
 namespace Chotiskazal.Bot
 {
-    internal class ProcessInteruptedWithMenuCommand : Exception
+    internal class ProcessInterruptedWithMenuCommand : Exception
     {
-        public ProcessInteruptedWithMenuCommand(string command)
+        public ProcessInterruptedWithMenuCommand(string command)
         {
             Command = command;
         }

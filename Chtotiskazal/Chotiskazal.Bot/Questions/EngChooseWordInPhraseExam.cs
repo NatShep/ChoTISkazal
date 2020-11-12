@@ -33,9 +33,9 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Choose missing word...");
 
             var variants = examList.Randomize().Select(e => e.EnWord).ToArray();
-            var _ =chatIo.SendMessage(sb.ToString(), InlineButtons.CreateVariants(variants));
+            var _ =chatIo.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
             if (choice == null)
                 return ExamResult.Retry;
 
@@ -45,7 +45,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Passed;
             }
 
-            await chatIo.SendMessage($"Origin was: \"{phrase.EnPhrase}\"");
+            await chatIo.SendMessageAsync($"Origin was: \"{phrase.EnPhrase}\"");
             await service.RegistrateFailureAsync(word);
             return ExamResult.Failed;
         }

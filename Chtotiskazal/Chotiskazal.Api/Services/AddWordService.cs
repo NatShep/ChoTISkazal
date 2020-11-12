@@ -131,7 +131,7 @@ namespace Chotiskazal.Api.Services
             if (!word.Contains(' '))
             {
                 Task<YaDefenition[]> task = null;
-                task = _yapiDicClient.Translate(word);
+                task = _yapiDicClient.TranslateAsync(word);
                 task?.Wait();
 
                 //Создаем из ответа(если он есть)  TranslationAndContext или WordDictionary?

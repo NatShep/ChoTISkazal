@@ -23,7 +23,7 @@ namespace Chotiskazal.Dal.Services
         public async Task<UserWordForLearning[]> GetWorstForUserWithPhrasesAsync(int userId, int count) => 
             await _userWordsRepository.GetWorstForUserWithPhrasesAsync(userId,count);
         
-        public async Task<UserWordForLearning[]> GetWorstTestWordForUserAsync(int userId, int count, int learnRate) =>
+        public async Task<UserWordForLearning[]> GetWorstWordsForUserAsync(int userId, int count, int learnRate) =>
             await _userWordsRepository.GetWorstTestWordsForUserAsync(count, learnRate, userId);
    
         public async Task<string[]> GetAllWordsAsync(int userId) =>await _userWordsRepository.GetAllWordsForUserAsync(userId);

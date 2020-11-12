@@ -34,14 +34,14 @@ namespace Chotiskazal.Bot.Questions
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.PhraseRuTranslate}    <=====\r\nChoose the translation";
-            await chatIo.SendMessage(msg,
+            await chatIo.SendMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
                     CallbackData = i.ToString(),
                     Text = v
                 }).ToArray());
             
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
             if (choice == null)
                 return ExamResult.Retry;
             

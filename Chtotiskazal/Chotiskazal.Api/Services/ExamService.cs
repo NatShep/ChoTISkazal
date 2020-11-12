@@ -54,7 +54,7 @@ namespace Chotiskazal.ConsoleTesting.Services
 
         //TODO Зачем этот метод и метод выше, а еще GetTestWord
        public async Task<UserWordForLearning[]> GetPairsForTestWordsAsync(int userId, int delta, int randomRate)=>
-            await _usersWordsService.GetWorstTestWordForUserAsync(userId, delta,randomRate);
+            await _usersWordsService.GetWorstWordsForUserAsync(userId, delta,randomRate);
        
 
        public new List<UserWordForLearning> PreparingExamsList(UserWordForLearning[] learningWords)

@@ -53,8 +53,8 @@ namespace Chotiskazal.ConsoleTesting.Services
         }
 
         //TODO Зачем этот метод и метод выше, а еще GetTestWord
-       private async Task<UserWordForLearning[]> GetPairsForTestWordsAsync(int userId, int delta, int randomRate)=>
-            await _usersWordsService.GetWorstTestWordForUserAsync(userId, delta,randomRate);
+       private async Task<UserWordForLearning[]> GetPairsForExamAsync(int userId, int delta, int randomRate)=>
+            await _usersWordsService.GetWorstWordsForUserAsync(userId, delta,randomRate);
        
 
        public new List<UserWordForLearning> PreparingExamsList(UserWordForLearning[] learningWords)
@@ -82,7 +82,7 @@ namespace Chotiskazal.ConsoleTesting.Services
            if (delta > 0)
            {
                var randomRate = 8 + RandomTools.Rnd.Next(5); 
-               testWords = await GetPairsForTestWordsAsync(userId, delta, randomRate);
+               testWords = await GetPairsForExamAsync(userId, delta, randomRate);
            }
            return testWords;
        }

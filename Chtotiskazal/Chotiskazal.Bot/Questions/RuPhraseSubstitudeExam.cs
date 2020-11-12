@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.Questions
             
             while (true)
             {
-                var enter = await chatIo.WaitUserTextInput();
+                var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 if (string.CompareOrdinal(phrase.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.Questions
                     return ExamResult.Passed;
                 }
 
-                await chatIo.SendMessage($"Origin phrase was \"{phrase.PhraseRuTranslate}\"");
+                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.PhraseRuTranslate}\"");
                 await service.RegistrateFailureAsync(word);
                 return ExamResult.Failed;
             }

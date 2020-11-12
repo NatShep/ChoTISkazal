@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
         {
             var msg = $"=====>   {word.UserTranslations}    <=====\r\nDo you know the translation?";
-            var _ = chatIo.SendMessage(msg,
+            var _ = chatIo.SendMessageAsync(msg,
                 new InlineKeyboardButton()
                 {
                     CallbackData = "1",
@@ -22,7 +22,7 @@ namespace Chotiskazal.Bot.Questions
                 });
             await chatIo.WaitInlineIntKeyboardInput();
             
-            _= chatIo.SendMessage("Translation is \r\n" + word.EnWord + "\r\n Did you guess?",
+            _= chatIo.SendMessageAsync("Translation is \r\n" + word.EnWord + "\r\n Did you guess?",
                 
                 new InlineKeyboardButton
                 {

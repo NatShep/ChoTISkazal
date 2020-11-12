@@ -21,8 +21,9 @@ namespace Chotiskazal.Bot
     class Program
     {
         private const string ApiToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
-        static TelegramBotClient _botClient;
-        static ConcurrentDictionary<long, ChatRoomFlow> _chats = new ConcurrentDictionary<long,ChatRoomFlow>();
+        private static TelegramBotClient _botClient;
+        private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
+        //Todo cr rename with reshaper to _addWordService
         private static AddWordService addWordService;
         private static AuthorizeService authorizeService;
         private static ExamService examService;
@@ -95,7 +96,7 @@ namespace Chotiskazal.Bot
 
         static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
-            if (_chats.TryGetValue(chat.Id, out var existedChatRoom))
+            if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
 
             var newChat = new ChatIO(_botClient, chat);
@@ -111,15 +112,16 @@ namespace Chotiskazal.Bot
             var task = newChatRoom.Run();
 
             task.ContinueWith((t) => Botlog.Write($"faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
-            _chats.TryAdd(chat.Id, newChatRoom);
+            Chats.TryAdd(chat.Id, newChatRoom);
          
             return null;
         }
 
-        static async void BotClientOnOnUpdate(object? sender, UpdateEventArgs e)
-        { 
-
-             Botlog.Write($"Got query: {e.Update.Type}");
+        static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
+        {
+            try
+            {
+                Botlog.Write($"Got query: {e.Update.Type}");
 
                 if (e.Update.Message != null)
                 {
@@ -131,22 +133,13 @@ namespace Chotiskazal.Bot
                 {
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
-                    //TODO почему нельзя await??
-                //    task.RunSynchronously();
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
-
-
-                    //await  task.ContinueWith(
-                     //   t=> Botlog.Write($"Cannot send command confirmation tooltip because of {t.Exception?.Message}"), 
-                    //  TaskContinuationOptions.OnlyOnFaulted);                
-                    
                 }
-
-                
-
-
-            
-            
+            }
+            catch (Exception error)
+            {
+                Botlog.Write($"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
+            }
         }
 
         static void Bot_OnMessage(object sender, MessageEventArgs e)

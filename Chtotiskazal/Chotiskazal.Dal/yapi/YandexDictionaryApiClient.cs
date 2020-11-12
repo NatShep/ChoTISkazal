@@ -41,7 +41,7 @@ namespace Chotiskazal.LogicR.yapi
             }
         }
 
-        public async Task<YaDefenition[]> Translate(string word)
+        public async Task<YaDefenition[]> TranslateAsync(string word)
         {
             using var client = new HttpClient(){Timeout = _timeout};
             

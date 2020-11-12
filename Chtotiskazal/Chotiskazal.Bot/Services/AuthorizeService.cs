@@ -34,7 +34,7 @@ namespace Chotiskazal.Api.Services
             }
             return user;
         }
-        
+
         private async Task<User> CreateUserAsync(long telegramID, string name)
         {
             var user = new User(telegramID,name);
@@ -42,12 +42,12 @@ namespace Chotiskazal.Api.Services
             try
             {
                 user.UserId= await _userService.AddUserAsync(user);
+                return user;
             }
             catch
             {
                 return null;
             }
-            return user;
         }
         
         private async Task<User> LoginUserAsync(long telegramId)=>

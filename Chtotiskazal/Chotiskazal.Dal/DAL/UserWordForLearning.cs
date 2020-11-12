@@ -5,16 +5,15 @@ using System.Linq;
  using Chotiskazal.Dal.Enums;
  using Chotiskazal.DAL.Services;
  using Chotiskazal.LogicR;
+// ReSharper disable MemberCanBePrivate.Global
 
  namespace Chotiskazal.DAL
  {
      public class UserWordForLearning
      {
          public const int MaxExamScore = 10;
-         public const int PenaltyScore = 9;
-
-         private const int ExamFailedPenalty = 2;
-         private const double AgingFactor = 1;
+         public const int PenaltyScore = 9; 
+         public const double AgingFactor = 1;
          public const double ReducingPerPointFactor = 1.7;
 
          public long Id { get; set; }
@@ -129,7 +128,5 @@ using System.Linq;
              p = p * rndFactor;
              AggregateScore = p;
          }
-
      }
-
  }
