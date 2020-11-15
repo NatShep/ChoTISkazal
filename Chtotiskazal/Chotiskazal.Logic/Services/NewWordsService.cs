@@ -10,17 +10,18 @@ namespace Chotiskazal.Logic.Services
 {
     public class NewWordsService
     {
-        private readonly RuengDictionary _dictionary;
+        private readonly RuEngDictionary _dictionary;
         private readonly WordsRepository _repository;
 
-        public NewWordsService(RuengDictionary dictionary, WordsRepository repository)
+        public NewWordsService(RuEngDictionary dictionary, WordsRepository repository)
         {
             _dictionary = dictionary;
             _repository = repository;
         }
+
         public void SaveForExams(string word, string translation, string[] allMeanings, string transcription)
         {
-            SaveForExams(
+            SaveToDictionary(
                 word:          word, 
                 transcription: transcription, 
                 allMeanings: allMeanings,
@@ -29,7 +30,7 @@ namespace Chotiskazal.Logic.Services
                     .Select(s=>s.Trim())
                     .ToArray());
         }
-        public void SaveForExams(string word, string transcription, string[] translations, string[] allMeanings, Phrase[] phrases = null)
+        public void SaveToDictionary(string word, string transcription, string[] translations, string[] allMeanings, Phrase[] phrases = null)
         {
             var alreadyExists = _repository.GetOrNull(word);
             if (alreadyExists == null)
@@ -48,17 +49,18 @@ namespace Chotiskazal.Logic.Services
                 _repository.UpdateScoresAndTranslation(alreadyExists);
             }
         }
-
         public DictionaryMatch GetTranslations(string word)
         {
            return _dictionary.GetOrNull(word);
         }
-
         public int GetContextPhraseCount() => _repository.GetContextPhrasesCount();
         public PairModel[] GetAll() => _repository.GetAll();
         public Phrase[] GetAllPhrases() => _repository.GetAllPhrases();
+        public PairModel Get(string word)
+        {
+            return _repository.GetOrNull(word);
+        }
         public PairModel GetOrNullWithPhrases(string word) => _repository.GetOrNullWithPhrases(word);
-
         public void UpdateAgingAndRandomize()
         {
             _repository.UpdateAgingAndRandomization();
@@ -80,20 +82,22 @@ namespace Chotiskazal.Logic.Services
                  for (int i = 0; i < pairModel.Phrases.Count; i++)
                  {
                      var phrase = pairModel.Phrases[i];
-                       if (!usedTranslations.Contains(phrase.Translation))
+                       if (!usedTranslations.Contains(phrase.Trans))
                            pairModel.Phrases.RemoveAt(i);
                  }
             }
             return fullPairs;
         }
-
+        public PairModel[] GetPairsForTests(int count, int learnRate)
+        {
+            return _repository.GetPairsForTests(count, learnRate);
+        }
         public void RegistrateFailure(PairModel model)
         {
              model.OnExamFailed();
              model.UpdateAgingAndRandomization();
              _repository.UpdateScores(model);
         }
-
         public Exam[] GetAllExams() => _repository.GetAllExams();
         public void RegistrateExam(DateTime started, int count, int successCount)
         {
@@ -111,32 +115,20 @@ namespace Chotiskazal.Logic.Services
 
             _repository.UpdateScores(model);
         }
-
-        public PairModel Get(string word)
+        public void UpdateRatings(PairModel pairModel)
         {
-            return _repository.GetOrNull(word);
+            _repository.UpdateScoresAndTranslation(pairModel);
         }
-
         public void SaveQuestionMetrics(QuestionMetric questionMetric)
         {
             _repository.AddQuestionMetric(questionMetric);
         }
 
-        public PairModel[] GetPairsForTests(int count, int learnRate)
-        {
-            return _repository.GetPairsForTests(count, learnRate);
-        }
 
         public void Add(Phrase phrase)
         {
             _repository.Add(phrase);
         }
-
-        public void UpdateRatings(PairModel pairModel)
-        {
-            _repository.UpdateScoresAndTranslation(pairModel);
-        }
-
         public void Remove(Phrase phrase)
         {
             _repository.Remove(phrase);
@@ -199,7 +191,7 @@ namespace Chotiskazal.Logic.Services
             foreach (var phrase in firstPhrases)
             {
                 Console.WriteLine("Adding " + phrase.Origin);
-                SaveForExams(phrase.Origin, phrase.Translation, new[] { phrase.Translation }, null);
+        //        SaveForExams(phrase.Origin, phrase.Translation, new[] { phrase.Translation }, null);
                 Remove(phrase);
             }
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");

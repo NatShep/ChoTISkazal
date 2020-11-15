@@ -1,0 +1,16 @@
+﻿@using System.Security.Claims 
+
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = null;
+
+}
+
+<h2>Добрый день, @User.Identity.Name</h2>
+<div class="text-center" xmlns="http://www.w3.org/1999/html">
+    <a asp-action="GetHealthDictionary" asp-controller="Words">Постучать в яндекс словарь</a> |
+    <a asp-action="GetHealthTranslation" asp-controller="Words">Постучать в яндекс переводчик</a> 
+
+    <p> <a asp-action="GetTranslation" asp-controller="Words">Получить перевод</a>  </p>
+    <p> <a asp-action="Logout" asp-controller="Account">Выйти</a> </p>
+</div>

@@ -1,0 +1,24 @@
+@model object
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Введите слово</title>
+</head>
+
+ <form asp-action="GetTranslation" asp-controller="Words">
+        <div>
+            <div class="form-group">
+                <label>Сюда пиши слово</label>
+                <input type="text" name="word"/>
+            </div>
+           <div class="form-group">
+                <input type="submit" value="Перевести" class="btn btn-outline-dark"/>
+            </div>
+        </div>
+    </form>

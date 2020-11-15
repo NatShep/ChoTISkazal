@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +40,7 @@ namespace Dic.Logic.yapi
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public Example[] Ex { get; set; }
+
         public List<Phrase> GetPhrases(string word)
         {
             List<Phrase> phrases = new List<Phrase>();
@@ -52,7 +53,7 @@ namespace Dic.Logic.yapi
                         Created = DateTime.Now,
                         OriginWord = word,
                         Origin = example.Text,
-                        Translation = example.Tr.FirstOrDefault()?.Text,
+                        //Translation = example.Tr.FirstOrDefault()?.Text,
                         TranslationWord = this.Text,
                     };
                     phrases.Add(phrase);

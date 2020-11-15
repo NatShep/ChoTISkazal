@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Chotiskazal.Logic.DAL;
 using Dic.Logic.DAL;
 using NUnit.Framework;
 
@@ -12,7 +13,6 @@ namespace Chotiskazal.Tests
         {
             var repo = new WordsRepository("test");
             File.Delete(repo.DbFile);
-
         }
 
         [Test]
@@ -27,17 +27,7 @@ namespace Chotiskazal.Tests
         {
             var repo = new WordsRepository("test");
             repo.ApplyMigrations();
-            repo.CreateNew("word", "translation", "trans", new[]
-            {
-                new Phrase()
-                {
-                    Created = DateTime.Now, 
-                     Origin = "what is word",
-                     OriginWord = "word",
-                    Translation = "trans is trans",
-                    TranslationWord = "trans"
-                }
-            });
+         
             var word = repo.GetOrNullWithPhrases("word");
             Assert.IsNotNull(word.Phrases);
             Assert.AreEqual(1, word.Phrases.Count);
@@ -88,7 +78,7 @@ namespace Chotiskazal.Tests
             });
             repo.CreateNew("word3", "translation3", "trans", new[]
             {
-                new Phrase()
+                new Dic.Logic.DAL.Phrase()
                 {
                     Created = DateTime.Now,
                     Origin = "what is word",

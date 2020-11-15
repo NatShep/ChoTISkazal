@@ -1,0 +1,24 @@
+@model IEnumerable<Chotiskazal.DAL.ModelsForApi.TranslationAndContext>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Перевод слова</title>
+</head>
+<body>
+<div>
+    <form asp-action="SelectTranslation" asp-controller="Words" >   
+        @foreach (var translation in @Model)
+        {
+            <p><input name ="Id" type="radio" value=@translation.IdInDB> @translation.RuWord</p>;
+        }
+        <p><input type="submit" value="Выбрать"></p>
+    </form>
+</div>
+</body>
+</html>

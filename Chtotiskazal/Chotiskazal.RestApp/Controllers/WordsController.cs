@@ -1,14 +1,15 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Dic.Logic.Services;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chotiskazal.RestApp.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("api/[controller]")]
+
     public class WordsController : ControllerBase
     {
         private readonly YandexDictionaryApiClient _yandexDictionaryApiClient;
@@ -21,7 +22,10 @@ namespace Chotiskazal.RestApp.Controllers
             _yaTransApi = yaTransApi;
             _wordsService = wordsService;
         }
-        [HttpGet("Health")]
+        
+ //       [Route("health")]
+
+        [HttpGet]
         public async Task<HealthResponse> GetHealth()
         {
             var pingResult =  await _yandexDictionaryApiClient.Ping();
@@ -67,7 +71,7 @@ namespace Chotiskazal.RestApp.Controllers
             var translations = translationRequest.Translations;
             
             var translationsTexts = translationRequest.Translations.Select(t => t.Text).ToArray();
-            _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
+      //      _wordsService.SaveForExams(translationRequest.Word, null, translationsTexts);
         }
 
     }

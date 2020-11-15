@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Dic.Logic.Dictionaries
 {
-    public class RuengDictionary
+    public class RuEngDictionary
     {
         readonly Dictionary<string, DictionaryMatch> _dictionary = new Dictionary<string, DictionaryMatch>(); 
         public void Add(string originWord, string transcription, string[] translations)

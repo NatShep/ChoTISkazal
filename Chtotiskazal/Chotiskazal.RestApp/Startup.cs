@@ -1,7 +1,8 @@
 using System;
+using Chotiskazal.Logic.DAL;
+using Chotiskazal.Logic.Services;
 using Dic.Logic.DAL;
 using Dic.Logic.Dictionaries;
-using Dic.Logic.Services;
 using Dic.Logic.yapi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +27,7 @@ namespace Chotiskazal.RestApp
             services.AddControllers();
             
             var dbFileName = Configuration.GetValue<string>("wordDb");
-            services.AddSingleton(new NewWordsService(new RuengDictionary(), new WordsRepository(dbFileName)));
+            services.AddSingleton(new NewWordsService(new RuEngDictionary(), new WordsRepository(dbFileName)));
 
             var yadicapiKey = Configuration.GetValue<string>("yadicapi:key");
             var yadicapiTimeout = Configuration.GetValue<TimeSpan>("yadicapi:timeout");
@@ -50,11 +51,13 @@ namespace Chotiskazal.RestApp
             }
 
             app.UseRouting();
+            
 
-            app.UseEndpoints(endpoints =>
+           app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+    
         }
     }
 }
