@@ -4,7 +4,7 @@
     {
         public override string Name => "CreateExamTable";
 
-        public override string  Query => @"create table if not exists Exams
+        protected override string  Query => @"create table if not exists Exams
               (
                  Id                                  integer primary key AUTOINCREMENT,
                  UserId                              integer not null,           

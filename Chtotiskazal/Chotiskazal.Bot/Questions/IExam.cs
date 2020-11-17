@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Bot.Questions
 {

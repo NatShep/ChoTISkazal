@@ -4,7 +4,7 @@ public class CreatePairDictionaryTable : SimpleMigration
     {
         public override string Name => "PairDictionary Table";
 
-        public override string  Query => @"create table if not exists PairDictionary
+        protected override string  Query => @"create table if not exists PairDictionary
               (
                 PairId                                  integer primary key AUTOINCREMENT,
                 EnWord                              nvarchar(100) not null,

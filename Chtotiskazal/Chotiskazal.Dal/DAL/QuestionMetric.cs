@@ -1,7 +1,8 @@
 ﻿using System;
-using Chotiskazal.LogicR;
 
-namespace Chotiskazal.Dal
+// ReSharper disable MemberCanBePrivate.Global
+
+namespace Chotiskazal.Dal.DAL
 {
     public class QuestionMetric
     {

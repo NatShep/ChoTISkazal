@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -11,52 +11,42 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
+            UserWordForLearning[] examList)
         {
-            var words = word.EnWord.Split(',').Select(s => s.Trim());
+            var words = word.EnWord.Split(',').Select(s => s.Trim()).ToArray();
             var minCount = words.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
             var userEntry = await chatIo.WaitUserTextInputAsync();
+
             if (string.IsNullOrEmpty(userEntry))
                 return ExamResult.Retry;
 
             if (words.Any(t => string.Compare(userEntry, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            else
-            {
-                //search for other translation
-                //TODO 
-                /*
-                var translationCandidate = service.Get(userEntry.ToLower());
-                if (translationCandidate != null)
-                {
+            //search for other translation
+            var translationCandidate = await service.GetAllMeaningOfWordForExamination(userEntry.ToLower());
 
-                    if (translationCandidate.GetTranslations().Any(t1=> word.GetTranslations().Any(t2=> string.CompareOrdinal(t1.Trim(), t2.Trim())==0)))
-                    {
-                        //translation is correct, but for other word
-                        await chat.SendMessage($"the translation was correct, but the question was about the word '{word.OriginWord}'\r\nlet's try again");
-                        //Console.ReadLine();
-                        return ExamResult.Retry;
-                    }
-                    else
-                    {
-                        await chat.SendMessage($"'{userEntry}' translates as {translationCandidate.Translation}");
-                        service.RegistrateFailure(word);
-                        return ExamResult.Failed;
-                    }
-                }
-                */
-                
-                await chatIo.SendMessageAsync("The translation was: " + word.EnWord);
-                await service.RegistrateFailureAsync(word);
-                return ExamResult.Failed;
+            if (translationCandidate.Any(t1 =>
+                word.GetTranslations().Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))
+            {
+                //translation is correct, but for other word
+                await chatIo.SendMessageAsync(
+                    $"the translation was correct, but the question was about the word '{word.EnWord} - {word.UserTranslations}'\r\nlet's try again");
+                return ExamResult.Retry;
             }
+            
+            var translates = string.Join(",",translationCandidate);
+            await chatIo.SendMessageAsync($"'{userEntry}' translates as {translates}");
+            await chatIo.SendMessageAsync("The right translation was: " + word.EnWord);
+            await service.RegisterFailureAsync(word);
+            return ExamResult.Failed;
         }
     }
 }

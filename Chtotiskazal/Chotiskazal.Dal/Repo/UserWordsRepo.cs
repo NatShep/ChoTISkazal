@@ -1,12 +1,9 @@
-using Chotiskazal.DAL;
 using Dapper;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -39,59 +36,88 @@ namespace Chotiskazal.Dal.Repo
 
             using var cnn = SimpleDbConnection();
             cnn.Open();
-            //TODO how is better to do
-            var result =(await cnn.QueryAsync<UserWordForLearning>(
-                @"Select * FROM UserWords WHERE UserId=@userId               
-				  order by AggregateScore desc limit @count          		
-                ", new {userId, count})).ToArray();
-            foreach (var userWordForLearning in result)
+
+            using (var transaction = cnn.BeginTransaction())
             {
-                var phrases = new List<Phrase>();
-                foreach (var translation in userWordForLearning.GetTranslations())
+                var result = (await cnn.QueryAsync<UserWordForLearning>(
+                    @"Select * FROM UserWords WHERE UserId=@userId               
+				  order by AggregateScore desc limit @count          		
+                ", new {userId, count},transaction)).ToArray();
+
+                foreach (var userWordForLearning in result)
                 {
-                    phrases.AddRange(cnn.Query<Phrase>(
-                        @"Select * FROM Phrases WHERE EnWord=@EnWord AND WordTranslate=@translation              		
-                ", new {userWordForLearning.EnWord, translation}));
+                    var phrases = new List<Phrase>();
+                    foreach (var translation in userWordForLearning.GetTranslations())
+                    {
+                        phrases.AddRange(cnn.Query<Phrase>(
+                            @"Select * FROM Phrases WHERE EnWord=@EnWord AND WordTranslate=@translation              		
+                            ", new {userWordForLearning.EnWord, translation},transaction));
+                    }
+
+                    userWordForLearning.Phrases = phrases;
                 }
-
-                userWordForLearning.Phrases = phrases;
+                transaction.Commit();
+                return result.ToArray();
             }
-            return result.ToArray();
         }
 
-        public async Task<UserWordForLearning[]> GetWorstTestWordsForUserAsync(int count, int learnRate, int userId)
+        public async Task<UserWordForLearning[]> GetWorstTestWordsWithPhrasesForUserAsync(int count, int learnRate, int userId)
         {
             CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
-            cnn.Open();
-
-            return (await cnn.QueryAsync<UserWordForLearning>(
-                @"Select * FROM UserWords WHERE UserId=@userId AND PassedScore > @learnRate 
+            {
+                cnn.Open();
+                using (var transaction = cnn.BeginTransaction())
+                {
+                    var result = (await cnn.QueryAsync<UserWordForLearning>(
+                        @"Select * FROM UserWords WHERE UserId=@userId AND PassedScore > @learnRate 
                   order by AggregateScore desc limit @count       		
-                ", new {userId, learnRate, count})).ToArray();
+                ", new {userId, learnRate, count}, transaction)).ToArray();
+
+                    foreach (var userWordForLearning in result)
+                    {
+                        var phrases = new List<Phrase>();
+                        foreach (var translation in userWordForLearning.GetTranslations())
+                        {
+                            phrases.AddRange(cnn.Query<Phrase>(
+                                @"Select * FROM Phrases WHERE EnWord=@EnWord AND WordTranslate=@translation              		
+                            ", new {userWordForLearning.EnWord, translation}, transaction));
+                        }
+
+                        userWordForLearning.Phrases = phrases;
+                    }
+
+                    transaction.Commit();
+                    return result.ToArray();
+                }
+            }
         }
 
-        public async Task<UserWordForLearning[]> GetAllUserWordsForLearningAsync(int userId)
+        public async Task<UserWordForLearning[]> GetAllUserWordsAsync(int userId)
         {
             CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
-            cnn.Open();
-            return ( await  cnn.QueryAsync<UserWordForLearning>(
-                @"Select * from UserWords WHERE UserId=userId
+            {
+                cnn.Open();
+                return (await cnn.QueryAsync<UserWordForLearning>(
+                    @"Select * from UserWords WHERE UserId=userId
                 ", new {userId})).ToArray();
+            }
         }
 
-        public async Task<string[]> GetAllWordsForUserAsync(int userId)
+        public async Task<string[]> GetAllEnWordsForUserAsync(int userId)
         {
             CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
-            cnn.Open();
-            return (await cnn.QueryAsync<string>(
-                @"Select EnWord FROM UserWords where up.UserId==@userId
+            {
+                cnn.Open();
+                return (await cnn.QueryAsync<string>(
+                    @"Select EnWord FROM UserWords where UserId==@userId
                   ", new {userId})).ToArray();
+            }
         }
 
         public async Task UpdateScoresAsync(UserWordForLearning userWordForLearning)
@@ -102,8 +128,7 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 var op =
-                    $"Update UserWords set AggregateScore = @AggregateScore, "+//" WHERE Id =@Id";
-                    $"PassedScore = @PassedScore," +
+                    $"Update UserWords set AggregateScore = @AggregateScore, PassedScore = @PassedScore," +
                     $"LastExam = @LastExam," +
                     $"Examed = @Examed " +
                     $"WHERE Id = @Id";
@@ -111,7 +136,7 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public async Task UpdateAgingAndRandomizationAsync(int count)
+        public async Task UpdateAgingAndRandomizationAsync(int userId, int count)
         {
             CheckDbFile(DbFile);
 
@@ -119,7 +144,8 @@ namespace Chotiskazal.Dal.Repo
             {
                 cnn.Open();
                 foreach (var word in cnn.Query<UserWordForLearning>
-                    (@"Select * From UserWords order by RANDOM() limit @count", new {count}).ToArray())
+                    (@"Select * From UserWords WhERE UserId=@userId order by RANDOM() limit @count", 
+                    new {userId, count}).ToArray())
                 {
                     word.UpdateAgingAndRandomization();
                     var op = $"Update UserWords set AggregateScore = " +
@@ -130,16 +156,18 @@ namespace Chotiskazal.Dal.Repo
             }
         }
 
-        public async Task<UserWordForLearning> GetWordByEnWordOrNullAsync(int userId, string enWord)
+        public async Task<UserWordForLearning> GetWordForLearningByEnWordOrNullAsync(int userId, string enWord)
         {
             CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
-            cnn.Open();
+            {
+                cnn.Open();
 
-            return (await  cnn.QueryAsync<UserWordForLearning>(
-                @"Select * FROM UserWords WHERE UserId=@userId AND enWord = @enWord       		
-                ", new {userId,enWord})).FirstOrDefault();
+                return (await cnn.QueryAsync<UserWordForLearning>(
+                    @"Select * FROM UserWords WHERE UserId=@userId AND enWord = @enWord       		
+                ", new {userId, enWord})).Single();
+            }
         }
 
         public async Task<UserWordForLearning> GetAnyWordAsync(int userId)
@@ -147,33 +175,13 @@ namespace Chotiskazal.Dal.Repo
             CheckDbFile(DbFile);
 
             using var cnn = SimpleDbConnection();
-            cnn.Open();
-
-            return (await  cnn.QueryAsync<UserWordForLearning>(
-                @"Select * FROM UserWords Where UserId =@userId Limit 1",new {userId})).FirstOrDefault();        
-        }
-
-
-        //TODO additional methods
-
-
-        public void UpdateAgingAndRandomization()
-        {
-            CheckDbFile(DbFile);
-
-            using (var cnn = SimpleDbConnection())
             {
                 cnn.Open();
-                foreach (var word in cnn.Query<UserWordForLearning>(@"Select * From UserPairs").ToArray())
-                {
-                    word.UpdateAgingAndRandomization();
-                    var op =
-                        $"Update UserWords set AggregateScore = {word.AggregateScore.ToString(CultureInfo.InvariantCulture)} where Id = {word.Id}";
-                    cnn.Execute(op);
-                }
+
+                return (await cnn.QueryAsync<UserWordForLearning>(
+                    @"Select * FROM UserWords Where UserId =@userId Limit 1", new {userId})).Single();
             }
         }
-
 
         public void UpdateWordTranslations(UserWordForLearning userWord)
         {
@@ -186,7 +194,8 @@ namespace Chotiskazal.Dal.Repo
 
                 var op =
                         $"Update UserWords Set " +
-                        $" UserTranslations = @UserTranslations " +
+                        $" UserTranslations = @UserTranslations," +
+                        $"PhrasesIds = @PhrasesIds " +
                         $"Where Id = @Id";
                     cnn.Execute(op,userWord);
 

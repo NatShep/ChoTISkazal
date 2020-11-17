@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chotiskazal.DAL
+namespace Chotiskazal.Dal.DAL
 {
     public class Exam
     {

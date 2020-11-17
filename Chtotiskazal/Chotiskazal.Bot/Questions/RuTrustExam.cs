@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.Questions
@@ -38,12 +38,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (choice == 1)
             {
-                await  service.RegistrateSuccessAsync(word);
+                await  service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
             else
             {
-               await service.RegistrateFailureAsync(word);
+               await service.RegisterFailureAsync(word);
                 return ExamResult.Failed;
             }
         }

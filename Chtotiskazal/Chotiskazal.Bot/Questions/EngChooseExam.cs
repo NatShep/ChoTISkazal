@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 using Chotiskazal.DAL.Services;
 
 namespace Chotiskazal.Bot.Questions
@@ -12,27 +12,27 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
+            UserWordForLearning[] examList)
         {
             var variants = examList.Randomize().Select(e => e.UserTranslations).ToArray();
 
             var msg = $"=====>   {word.EnWord}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
-           
-                chatIo = chatIo as ChatIO;
-                var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
-                if (choice == null)
-                    return ExamResult.Retry;
-            
+
+            chatIo = chatIo as ChatIO;
+            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            if (choice == null)
+                return ExamResult.Retry;
 
             if (variants[choice.Value] == word.UserTranslations)
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            await service.RegistrateFailureAsync(word);
-            return ExamResult.Failed;
 
+            await service.RegisterFailureAsync(word);
+            return ExamResult.Failed;
         }
     }
 }

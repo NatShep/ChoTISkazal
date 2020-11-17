@@ -4,7 +4,7 @@ namespace Chotiskazal.Dal.Migrations
     {
         public override string Name => "CreateUserWordTable";
 
-        public override string  Query => @"create table if not exists UserWords
+        protected override string  Query => @"create table if not exists UserWords
               (
                  Id                            integer primary key AUTOINCREMENT,
                  UserId                              integer not null,

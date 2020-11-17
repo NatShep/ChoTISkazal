@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Chotiskazal.LogicR.yapi
+namespace Chotiskazal.Dal.yapi
 {
     public class YapiTransAnswer
     {

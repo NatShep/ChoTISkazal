@@ -1,34 +1,31 @@
-﻿using Chotiskazal.LogicR.yapi;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Chotiskazal.Dal.Enums;
 
-namespace Chotiskazal.DAL
+// ReSharper disable MemberCanBePrivate.Global
+
+namespace Chotiskazal.Dal.DAL
 {
     public class WordDictionary
     {
-
         public WordDictionary() { }
 
-        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse)
+        public WordDictionary(string enWord, string translation, string transcription, TranslationSource source)
         {
             EnWord = enWord;
-            Transcription = transcription;
+            Transcription = transcription ?? "[]" ;
             RuWord = translation;
-            Sourse = sourse;
+            Source = source;
         }
-        public WordDictionary(string enWord, string translation, string transcription, TranslationSource sourse, List<Phrase> phrases)
-            :this(enWord,translation,transcription,sourse) => Phrases = phrases;
-            
-        public int PairId { get; set; }
-        public string EnWord { get; set; }
+        public WordDictionary(string enWord, string translation, string transcription, TranslationSource source, List<Phrase> phrases)
+            :this(enWord,translation,transcription,source) => Phrases = phrases;
 
-        //for one Word has one Translation
-        //we can use composite key(EnWord+RuWord)   
-        public string RuWord { get; set; }
-        public string Transcription { get; set; }
+        public int PairId { get; set; } 
+        public string EnWord { get; }
+        public string RuWord { get; }
+        public string Transcription { get; }
 
         public List<Phrase> Phrases { get; set; } = new List<Phrase>();
-        public TranslationSource Sourse { get; set; }
+        public TranslationSource Source { get; }
 
     }
     

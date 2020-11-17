@@ -5,7 +5,7 @@ public class CreateUserTableMigration : SimpleMigration
     {
         public override string Name => "AddUserTable";
 
-        public override string  Query => @"create table if not exists Users
+        protected override string  Query => @"create table if not exists Users
               (
                  UserId                              integer primary key AUTOINCREMENT,
                  TelegramId                          BIGINT UNIQUE ,
@@ -13,8 +13,7 @@ public class CreateUserTableMigration : SimpleMigration
                  Login                               nvarchar(100) UNIQUE,
                  Password                            nvarchar(100),
                  Email                               nvarchar(100) UNIQUE CHECK(Email !=''),
-                 Created                             datetime not null,
-                 Online                              boolean not null
-              )";
+                 Created                             datetime not null
+             )";
     }
 }

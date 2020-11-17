@@ -4,7 +4,7 @@ public class CreateQuestionMetricTable : SimpleMigration
     {
         public override string Name => "CreateQuestionMetricTable";
 
-        public override string  Query => @"create table if not exists QuestionMetric
+        protected override string  Query => @"create table if not exists QuestionMetric
               (
                  MetricId                            integer primary key AUTOINCREMENT,
                  WordId                              integer not null,

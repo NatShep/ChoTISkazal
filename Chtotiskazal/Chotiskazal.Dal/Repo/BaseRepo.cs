@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using Chotiskazal.Dal.Migrations;
-using Dapper;
 
 namespace Chotiskazal.Dal.Repo
 {
@@ -14,18 +9,15 @@ namespace Chotiskazal.Dal.Repo
         private readonly string _fileName;
         protected string DbFile => Path.Combine(Environment.CurrentDirectory, _fileName);
 
-        public BaseRepo(string fileName) => _fileName = fileName;
-        
-        public SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
+        protected BaseRepo(string fileName) => _fileName = fileName;
 
-        protected void ApplyMigrations() => DoMigration.ApplyMigrations(DbFile);
+        protected SQLiteConnection SimpleDbConnection() => new SQLiteConnection("Data Source=" + DbFile);
 
-
-        public static void CheckDbFile(string nameFile)
+        protected static void CheckDbFile(string nameFile)
         {
             if (!File.Exists(nameFile))
                 throw new Exception("No db file!");
-
+            
             //  DoMigration.ApplyMigrations(nameFile);
 
         }

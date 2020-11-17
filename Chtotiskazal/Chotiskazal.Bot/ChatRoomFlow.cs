@@ -1,40 +1,39 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Api.Services;
 using Chotiskazal.Bot.ChatFlows;
-using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(ChatIO chatIo) =>
-          ChatIo = chatIo;
-        
-        public int UserId { get; set; }        
+        public ChatRoomFlow(ChatIO chatIo,string firstName)
+        {
+            ChatIo = chatIo;
+            _userFirstName = firstName;
+        }
+
+        private User User { get; set; }
+
+        private readonly string _userFirstName;
         public AddWordService AddWordSrvc { get; set; }
         public ExamService ExamSrvc { get; set; }
         public AuthorizeService AuthorizeSrvc { get; set; }
-        //todo cr - удалить тк не используется
-        public GraphStatsService GraphStatsSrvc { get; set; }
+        public YaService YaSrvc { get; set; }
         
         public ChatIO ChatIo { get;}
 
-        //todo cr - rename to SayHelloAsync
-        public void Greeting() => ChatIo.SendMessageAsync($"Hello, {ChatIo.UserFirstName}! I am ChoTiSkazal.");
+        private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userFirstName}! I am ChoTiSkazal.");
 
-        //todo cr - rename to SayGoodbyeAsync
-        public void GoodBye() => ChatIo.SendMessageAsync($"Bye-Bye, {ChatIo.UserFirstName}! I am OFFLINE now.");
+        public async Task SayGoodByeAsync() => await ChatIo.SendMessageAsync($"Bye-Bye, {_userFirstName}! I am OFFLINE now.");
 
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
             
-            var user = await AuthorizeSrvc.AuthorizeAsync(ChatIo.ChatId.Identifier, ChatIo.UserFirstName);
-            UserId = user.UserId;
-            //todo cr - тк нету эвэита, если отправка упадет - выле, тк не обрабатывается исключение
-            //todo cr - тк нету эвэита есть возможность что Hello обгонит сообщение главного меню
-            Greeting();
+            User = await AuthorizeSrvc.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
+            
+            await SayHelloAsync();
             
             while(true)
             {
@@ -60,37 +59,39 @@ namespace Chotiskazal.Bot
                 }
             }
         }
+
+        private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
+        private Task DoExamine() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(User.UserId);
         
-        Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        Task Examinate() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(UserId);
-        
-        //show stats to user here
+        //TODO show stats to user here
         /*
         Task ShowStats()
         {
             var statsFlow = new GraphsStatsFlow(Chat, GraphStatsSrvc);
             return statsFlow.Enter();
         }
-*/
-        Task EnterWord(string text = null)
+        */
+
+        private Task EnterWord(string text = null)
         {
-            var mode = new AddingWordsMode(ChatIo, AddWordSrvc);
-            return mode.Enter(UserId, text);
+            var mode = new AddingWordsMode(ChatIo, AddWordSrvc,YaSrvc);
+            return mode.Enter(User.UserId, text);
         }
-        
-        Task HandleMainMenu(string command){
+
+        private Task HandleMainMenu(string command){
             switch (command){
                 case "/help": SendHelp(); break;
                 case "/add":  return EnterWord(null);
-                case "/train": return Examinate();
+                case "/train": return DoExamine();
                 case "/start":  break;
             }
             return Task.CompletedTask;
         }
         
-        private Task SendHelp() => ChatIo.SendMessageAsync("Call 112 for help");
+        private  async Task SendHelp() => 
+            await ChatIo.SendMessageAsync("Call 112 for help");
 
-        async Task ModeSelection()
+        private async Task ModeSelection()
         {
             while (true)
             {
@@ -119,11 +120,12 @@ namespace Chotiskazal.Bot
                         }
                         else if (btn == InlineButtons.Exam.CallbackData)
                         {
-                            await Examinate();
+                            await DoExamine();
                             return;
                         }
 
-                     /*   else if (btn == InlineButtons.Stats.CallbackData)
+                        //TODO ShowStats
+                        /*   else if (btn == InlineButtons.Stats.CallbackData)
                         {
                             await ShowStats();
                             return;
