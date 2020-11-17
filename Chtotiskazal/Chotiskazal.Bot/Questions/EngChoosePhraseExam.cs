@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 using Chotiskazal.DAL.Services;
 
 namespace Chotiskazal.Bot.Questions
@@ -21,7 +21,7 @@ namespace Chotiskazal.Bot.Questions
 
             var other = examList.SelectMany(e => e.Phrases)
                 .Where(p => !string.IsNullOrWhiteSpace(p?.EnPhrase) && p != targetPhrase)
-                .Take(8);
+                .Take(8).ToArray();
 
             if(!other.Any())
                 return ExamResult.Impossible;
@@ -41,40 +41,11 @@ namespace Chotiskazal.Bot.Questions
             
             if (variants[choice.Value] == targetPhrase.PhraseRuTranslate)
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            await service.RegistrateFailureAsync(word);
+            await service.RegisterFailureAsync(word);
             return ExamResult.Failed;
-
-            
-            
-            /*
-            Console.WriteLine("=====>   " + targetPhrase.Origin + "    <=====");
-
-            for (int i = 1; i <= variants.Length; i++)
-            {
-                Console.WriteLine($"{i}: " + variants[i - 1]);
-            }
-
-            Console.Write("Choose the translation: ");
-
-            var selected = Console.ReadLine();
-            if (selected.ToLower().StartsWith("e"))
-                return ExamResult.Exit;
-
-            if (!int.TryParse(selected, out var selectedIndex) || selectedIndex > variants.Length ||
-                selectedIndex < 1)
-                return ExamResult.Retry;
-
-            if (variants[selectedIndex - 1] == targetPhrase.Translation)
-            {
-                service.RegistrateSuccess(word);
-                return ExamResult.Passed;
-            }
-            service.RegistrateFailure(word);
-            return ExamResult.Failed;*/
-
         }
     }
 }

@@ -12,35 +12,28 @@ namespace Chotiskazal.Bot
     {
         private readonly TelegramBotClient _client;
         public readonly ChatId ChatId;
-        //todo cr - это не ответственность chatIO - перенести в ChatRoomFlow
-        public readonly string UserFirstName;
-        //todo cr - это не ответственность chatIO - перенести в ChatRoomFlow
-        public readonly string UserLastName;
 
         private TaskCompletionSource<Update> _waitInputCompletionSource   = null;
         private TaskCompletionSource<string> _waitMessageCompletionSource = null;
 
         
-        public ChatIO(TelegramBotClient client, Telegram.Bot.Types.Chat chat)
+        public ChatIO(TelegramBotClient client, Chat chat)
         {
             _client = client;
-            //TODO chatId - тип ChatId, a Chat.Id тип лонг
-            ChatId = chat.Id;
-            UserFirstName = chat.FirstName;
-            UserLastName = chat.LastName;
+             ChatId = chat.Id;
         }
 
-        public string[] MenuItems = {"/help", "/stats", "/start", "/add", "/train"};
+        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/train"};
        
         
         internal void HandleUpdate(Update args)
         {
-            string msg = args.Message?.Text;
+            var msg = args.Message?.Text;
             if (!string.IsNullOrWhiteSpace(msg))
             {
                 if (msg[0] == '/')
                 {
-                    if (MenuItems.Contains(msg))
+                    if (_menuItems.Contains(msg))
                     {
                         var textSrc = _waitMessageCompletionSource;
                         var objSrc = _waitInputCompletionSource;

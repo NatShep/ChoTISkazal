@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Chotiskazal.LogicR.yapi;
-
-namespace Chotiskazal.DAL
+﻿namespace Chotiskazal.Dal.DAL
 {
     public class Phrase
     {
         public Phrase(){}
-        
+
         public Phrase(string enPhrase, string phraseRuTranslate)
         {
             EnPhrase = enPhrase;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,40 +12,41 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
+            UserWordForLearning[] examList)
         {
-            var translations = word.GetTranslations();
+            var translations = word.GetTranslations().ToArray();
+            
             var minCount = translations.Min(t => t.Count(c => c == ' '));
-            if (minCount>0 && word.PassedScore< minCount*4)
+            if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.EnWord}    <=====\r\nWrite the translation... ");
             var translation = await chatIo.WaitUserTextInputAsync();
+           
             if (string.IsNullOrEmpty(translation))
                 return ExamResult.Retry;
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            else
-            
+
+            var allMeaningsOfWord = await service.GetAllMeaningOfWordForExamination(word.EnWord);
+          
+            if (allMeaningsOfWord
+                .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                //TODO
-                /*
-                if (word.GetAllMeanings()
-                    .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
-                {
-                    await chat.SendMessage($"Choosen translation is out of scope (but it is correct). Expected translations are: " + word.UserTranslations);
-                    return ExamResult.Impossible;
-                }
-                await chat.SendMessage("The translation was: "+ word.UserTranslations);
-                */
-               await service.RegistrateFailureAsync(word);
-                
-                return ExamResult.Failed; 
+                await chatIo.SendMessageAsync(
+                    $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
+                    word.UserTranslations);
+                return ExamResult.Impossible;
             }
+
+            await chatIo.SendMessageAsync("The translation was: " + word.UserTranslations);
+            await service.RegisterFailureAsync(word);
+            return ExamResult.Failed;
         }
     }
 }

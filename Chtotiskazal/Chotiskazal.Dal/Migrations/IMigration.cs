@@ -3,7 +3,7 @@ using Dapper;
 
 namespace Chotiskazal.Dal.Migrations
 {
-    interface IMigration
+    internal interface IMigration
     {
         string Name { get; }
 
@@ -12,11 +12,7 @@ namespace Chotiskazal.Dal.Migrations
 
     public abstract class SimpleMigration : IMigration
     {
-        protected SimpleMigration()
-        {
-            
-        }
-        public abstract string Query { get; }
+        protected abstract string Query { get; }
 
         public abstract  string Name { get; }
         public void Migrate(SQLiteConnection connection)

@@ -4,7 +4,7 @@
     {
         public override string Name => "CreatePhraseTable";
 
-        public override string  Query => @"create table if not exists Phrases
+        protected override string  Query => @"create table if not exists Phrases
               (
                  Id                                  integer primary key AUTOINCREMENT,
                  PairId                              integer not null,

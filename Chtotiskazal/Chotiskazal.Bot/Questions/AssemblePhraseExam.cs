@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 using Chotiskazal.DAL.Services;
+
 namespace Chotiskazal.Bot.Questions
 {
     public class AssemblePhraseExam :IExam
@@ -42,12 +43,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
             await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.EnPhrase}'");
-            await service.RegistrateFailureAsync(word);
+            await service.RegisterFailureAsync(word);
             return ExamResult.Failed;
         }
     }

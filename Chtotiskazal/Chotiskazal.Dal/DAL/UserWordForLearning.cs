@@ -1,13 +1,12 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
- using Chotiskazal.DAL;
- using Chotiskazal.Dal.Enums;
- using Chotiskazal.DAL.Services;
- using Chotiskazal.LogicR;
+using Chotiskazal.Dal.Enums;
+using Chotiskazal.DAL.Services;
+
 // ReSharper disable MemberCanBePrivate.Global
 
- namespace Chotiskazal.DAL
+ namespace Chotiskazal.Dal.DAL
  {
      public class UserWordForLearning
      {
@@ -39,7 +38,9 @@ using System.Linq;
          {
              Phrases = new List<Phrase>();
              Created = DateTime.Now;
+             Revision = 1;
              LastExam = null;
+             Transcription = "";
          }
 
 
@@ -47,42 +48,45 @@ using System.Linq;
 
          public void SetTranslation(string[] translations) => UserTranslations = string.Join(", ", translations);
 
-         public IEnumerable<int> GetPhrasesId()
+         public List<int> GetPhrasesId()
          {
-             List<int> phrasesId = new List<int>();
-             foreach (var phraseId in PhrasesIds.Split(',').Select(s => s.Trim()))
-             {
-                 phrasesId.Add(int.Parse(phraseId));
-             }
-             return phrasesId;
+             if (PhrasesIds!="")
+                return PhrasesIds.Split(',').Select(s => s.Trim()).Select(int.Parse).ToList();
+             return new List<int>();
+             
          }
 
          public LearningState State
          {
              get
              {
-                 if (Examed > UserWordForLearning.MaxExamScore)
+                 if (Examed > MaxExamScore)
                      return LearningState.Done;
                  return (LearningState) (Examed / 2);
              }
          }
-
          public static UserWordForLearning CreatePair(
              string originWord,
              string translationWord,
-             string[] allMeanings,
              string transcription,
-             Phrase[] phrases = null)
+             List<Phrase> phrases = null,
+             int[] phrasesId=null,
+             bool isPhrase=false)
          {
+             var ids = "";
+             if (phrasesId != null)
+                 ids = string.Join(",", phrasesId);
              return new UserWordForLearning
              {
                  Created = DateTime.Now,
-                 LastExam = DateTime.Now,
+                 LastExam = null,
                  EnWord = originWord,
-                 Transcription = transcription,
+                 Transcription = transcription ?? "[]",
                  UserTranslations = translationWord,
                  Revision = 1,
-                 PhrasesIds = "",
+                 PhrasesIds = ids,
+                 Phrases = phrases ?? new List<Phrase>(),
+                 IsPhrase = isPhrase
              };
          }
 
@@ -109,7 +113,7 @@ using System.Linq;
          }
 
          //res reduces for 1 point per AgingFactor days
-         public double AggedScore ()
+         public double AgedScore ()
          {
              if (LastExam!=null)
                  return Math.Max(0, PassedScore - (DateTime.Now - LastExam.Value).TotalDays / AgingFactor);
@@ -118,14 +122,14 @@ using System.Linq;
 
          public void UpdateAgingAndRandomization()
          {
-             double res = AggedScore();
+             double res = AgedScore();
 
              //probability reduces by reducingPerPointFactor for every res point
              var p = 100 / Math.Pow(ReducingPerPointFactor, res);
 
              //Randomize
              var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
-             p = p * rndFactor;
+             p *= rndFactor;
              AggregateScore = p;
          }
      }

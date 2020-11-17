@@ -14,11 +14,9 @@ namespace Chotiskazal.Dal.Migrations
                 new InitMigration(),
                 new CreateUserTableMigration(),
                 new CreatePairDictionaryTable(),
-                new CreateUserPairTable(),
                 new CreateQuestionMetricTable(),
                 new CreatePhraseTableMigration(), 
                 new CreateExamTable(), 
-                new CreatePairMetricTable(), 
                 new CreateUserWordTable(), 
             };
             Console.WriteLine("Applying migrations...");
@@ -26,9 +24,7 @@ namespace Chotiskazal.Dal.Migrations
             using (var cnn = new SQLiteConnection("Data Source=" + dbFile))
             {
                 cnn.Open();
-                int lastAppliedMigrationIndex = -1;
-                string[] allMigrationNames = new string[0];
-       //         migrationsList[0].Migrate(cnn);
+                var allMigrationNames = new string[0];
                 try
                 {
                     allMigrationNames = cnn.Query<string>("Select Name from migrations").ToArray();
@@ -40,12 +36,11 @@ namespace Chotiskazal.Dal.Migrations
 
                 foreach (var migration in migrationsList)
                 {
-                    if (!allMigrationNames.Contains(migration.Name))
-                    {
-                        Console.WriteLine("Applying migration " + migration.Name);
-                        migration.Migrate(cnn);
-                        cnn.Execute("insert into migrations (name) values (@name)", new { name = migration.Name });
-                    }
+                    if (allMigrationNames.Contains(migration.Name)) 
+                        continue;
+                    Console.WriteLine("Applying migration " + migration.Name);
+                    migration.Migrate(cnn);
+                    cnn.Execute("insert into migrations (name) values (@name)", new { name = migration.Name });
                 }
             }
         }

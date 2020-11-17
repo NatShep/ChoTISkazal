@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Chotiskazal.Api.Services;
-using Chotiskazal.ConsoleTesting.Services;
+using Chotiskazal.Bot.Services;
 using Chotiskazal.Dal.Migrations;
 using Chotiskazal.Dal.Repo;
 using Chotiskazal.Dal.Services;
-using Chotiskazal.LogicR.yapi;
+using Chotiskazal.Dal.yapi;
 using Microsoft.Extensions.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -18,52 +13,51 @@ using Telegram.Bot.Args;
 
 namespace Chotiskazal.Bot
 {
-    class Program
+    static class Program
     {
         private const string ApiToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
-        //Todo cr rename with reshaper to _addWordService
-        private static AddWordService addWordService;
-        private static AuthorizeService authorizeService;
-        private static ExamService examService;
-        
-        
+        private static AddWordService _addWordService;
+        private static AuthorizeService _authorizeService;
+        private static ExamService _examService;
+        private static YaService _yaService;
 
-        static void Main()
+        private static void Main()
         {
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-            IConfigurationRoot configuration = builder.Build();
+            var configuration = builder.Build();
 
             var dbFileName = configuration.GetSection("wordDb").Value;
 
-           if(dbFileName==null)
+            if(dbFileName==null)
                throw new Exception("No dbFileName");
 
-            
-            
             var yadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
             var yadicapiTimeout = TimeSpan.FromSeconds(5);
 
             var yatransapiKey = configuration.GetSection("yatransapi").GetSection("key").Value;
             var yatransapiTimeout = TimeSpan.FromSeconds(5);
-            
+
+            var yandexDictionaryClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
+            var yandexTranslateApiClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout); 
+                
             var userWordService = new UsersWordsService(new UserWordsRepo(dbFileName));
             var dictionaryService= new DictionaryService(new DictionaryRepository(dbFileName));
             var examsAndMetricService = new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName));
-            
-            
-            authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
-            addWordService = new AddWordService(
+
+            _yaService = new YaService(yandexDictionaryClient,yandexTranslateApiClient);
+            _authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
+            _addWordService = new AddWordService(
                 userWordService, 
-                new YandexDictionaryApiClient(yadicapiKey,yadicapiTimeout), 
-                new YandexTranslateApiClient(yatransapiKey,yatransapiTimeout),
+                yandexDictionaryClient,
+                yandexTranslateApiClient,
                 dictionaryService);
-            examService=new ExamService(
+            _examService=new ExamService(
                 examsAndMetricService,
                 dictionaryService,
                 userWordService);
@@ -82,30 +76,26 @@ namespace Chotiskazal.Bot
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-            
-           
-            
-            
+
             Console.WriteLine("Press any key to exit");
             Console.ReadKey();
             
             _botClient.StopReceiving();
         }
 
-     
-
-        static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
+        private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
 
             var newChat = new ChatIO(_botClient, chat);
 
-            var newChatRoom = new ChatRoomFlow(newChat)
+            var newChatRoom = new ChatRoomFlow(newChat,chat.FirstName)
             {
-                ExamSrvc = examService,
-                AddWordSrvc = addWordService,
-                AuthorizeSrvc = authorizeService,
+                ExamSrvc = _examService,
+                AddWordSrvc = _addWordService,
+                AuthorizeSrvc = _authorizeService,
+                YaSrvc = _yaService
                 
             };
             
@@ -117,7 +107,7 @@ namespace Chotiskazal.Bot
             return null;
         }
 
-        static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
+        private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
             try
             {
@@ -142,19 +132,13 @@ namespace Chotiskazal.Bot
             }
         }
 
-        static void Bot_OnMessage(object sender, MessageEventArgs e)
+        private static void Bot_OnMessage(object sender, MessageEventArgs e)
         {
             
             if (e.Message.Text != null)
             {
                 Botlog.Write($"Received a text message in chat {e.Message.Chat.Id}.");
             }
-        }
-        
-        static async void SendGoodbyeMes(object? sender, ReceiveErrorEventArgs e)
-        {
-            
-
         }
     }
 }

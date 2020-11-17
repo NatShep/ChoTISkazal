@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.ConsoleTesting.Services;
-using Chotiskazal.DAL;
+using Chotiskazal.Bot.Services;
+using Chotiskazal.Dal.DAL;
 using Chotiskazal.DAL.Services;
 
 namespace Chotiskazal.Bot.Questions
@@ -25,10 +25,10 @@ namespace Chotiskazal.Bot.Questions
             
             if (variants[choice.Value] == word.EnWord)
             {
-                await service.RegistrateSuccessAsync(word);
+                await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
-            await service.RegistrateFailureAsync(word);
+            await service.RegisterFailureAsync(word);
 
             return ExamResult.Failed;
         }

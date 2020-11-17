@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Chotiskazal.LogicR.yapi
+namespace Chotiskazal.Dal.yapi
 {
     public class YandexDictionaryApiClient
     {
@@ -56,7 +54,6 @@ namespace Chotiskazal.LogicR.yapi
             catch (Exception e)
             {
                 IsOnline = false;
-
                 return null;
             }
         }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Chotiskazal.DAL
+// ReSharper disable MemberCanBePrivate.Global
+
+namespace Chotiskazal.Dal.DAL
 {
     public class User
     {
@@ -12,18 +14,14 @@ namespace Chotiskazal.DAL
         public string Password { get; set; }
         public string Email { get; set; }
         public DateTime Created { get; set; }
-        // todo cr - не нужен
-        public bool Online { get; set; }
-
         public List<Exam> Exams { get; set; }
-        public List<UserPair> UsersWords { get; set; }
+        public List<UserWordForLearning> UsersWords { get; set; }
 
         public User()
         {
             TelegramId = null;
             Exams = new List<Exam>();
-            UsersWords = new List<UserPair>();
-            Online = false;
+            UsersWords = new List<UserWordForLearning>();
             Created = DateTime.Now;
         }
         
@@ -35,8 +33,7 @@ namespace Chotiskazal.DAL
             Password = password;
             Email = email;
             Exams = new List<Exam>();
-            UsersWords = new List<UserPair>();
-            Online = false;
+            UsersWords = new List<UserWordForLearning>();
             Created = DateTime.Now;
         }
         
@@ -48,8 +45,7 @@ namespace Chotiskazal.DAL
             Password = null;
             Email = null;
             Exams = new List<Exam>();
-            UsersWords = new List<UserPair>();
-            Online = false;
+            UsersWords = new List<UserWordForLearning>();
             Created = DateTime.Now;
         }
     }

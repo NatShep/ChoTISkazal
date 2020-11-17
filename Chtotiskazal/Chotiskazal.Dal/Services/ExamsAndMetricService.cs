@@ -1,9 +1,7 @@
 ﻿using Chotiskazal.Dal.Repo;
-using Chotiskazal.DAL;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Dal.DAL;
 
 namespace Chotiskazal.Dal.Services
 {
@@ -13,13 +11,10 @@ namespace Chotiskazal.Dal.Services
 
         public ExamsAndMetricService(ExamsAndMetricsRepo repo) => _examsAndMetricsRepo = repo;
 
-        public async Task<QuestionMetric> GetAllMetricsForPairAsync(int metricId) =>await _examsAndMetricsRepo.FindMetricOrNullAsync(metricId);
-
         public async Task SaveQuestionMetricsAsync(QuestionMetric questionMetric) =>
            await _examsAndMetricsRepo.AddQuestionMetricAsync(questionMetric);
 
-
-        public async Task RegistrateExamAsync(int userId, DateTime started, int count, int successCount)
+        public async Task RegisterExamAsync(int userId, DateTime started, int count, int successCount)
         {
             await _examsAndMetricsRepo.AddExamAsync(new Exam
             {
@@ -31,13 +26,5 @@ namespace Chotiskazal.Dal.Services
                 Passed = successCount
             });
         }
-
-       
-
-        public Exam[] GetAllExams() =>  throw new NotImplementedException();
-
-        public void UpdateAgingAndRandomize() =>  throw new NotImplementedException();
-
-        public void UpdateRatings(UserPair userPairModel) => throw new NotImplementedException();
     }
 }

@@ -23,20 +23,15 @@ namespace Chotiskazal.Bot
         
         public static InlineKeyboardButton[] CreateVariantsWithCancel(IEnumerable<string> variants)
         {
-            var res= new List<InlineKeyboardButton>();
-            
-            //todo cr variants.Select(...).Append(..).ToArray();
-            res.AddRange(variants.Select((v, i) => new InlineKeyboardButton
+            return variants.Select((v, i) => new InlineKeyboardButton
             {
                 CallbackData = i.ToString(),
                 Text = v
-            }).ToList());
-            res.Add( new InlineKeyboardButton
+            }).Append(new InlineKeyboardButton
             {
                 CallbackData = "/start",
                 Text= "Cancel",
-            });
-            return res.ToArray();
+            }).ToArray();
         }
     }
 }

@@ -1,11 +1,9 @@
-﻿ using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
- using Chotiskazal.DAL;
+using Chotiskazal.Dal.DAL;
 
- namespace Chotiskazal.LogicR.yapi
+namespace Chotiskazal.Dal.yapi
 {
     public class YapiDicAnswer
     {
@@ -43,24 +41,18 @@ using System.Text.Json.Serialization;
         public List<Phrase> GetPhrases(string word)
         {
             List<Phrase> phrases = new List<Phrase>();
-            if (this.Ex != null)
+            if (this.Ex == null) 
+                return phrases;
+            phrases.AddRange(this.Ex.Select(example => new Phrase
             {
-                foreach (var example in this.Ex)
-                {
-                    var phrase = new Phrase
-                    {
-                        EnWord = word,
-                        EnPhrase = example.Text,
-                        PhraseRuTranslate= example.Tr.FirstOrDefault()?.Text,
-                        WordTranslate = this.Text,
-                    };
-                    phrases.Add(phrase);
-                }
-            }
+                EnWord = word, 
+                EnPhrase = example.Text, 
+                PhraseRuTranslate = example.Tr.FirstOrDefault()?.Text, 
+                WordTranslate = this.Text,
+            }));
             return phrases;
         }
-        
-       
+
     }
 
     public class Synonim
