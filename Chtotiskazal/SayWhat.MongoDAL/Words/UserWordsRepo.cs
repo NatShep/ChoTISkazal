@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using SayWa.MongoDAL.Users;
+using SayWhat.MongoDAL.Users;
 
-namespace SayWa.MongoDAL.Words
+namespace SayWhat.MongoDAL.Words
 {
-    public class UserWordsRepository : IMongoRepository
+    public class UserWordsRepo : IMongoRepo
     {
         public const string UserCollectionName = "words";
         public const string CurrentRatingFieldName = "currentRate";
@@ -14,7 +13,7 @@ namespace SayWa.MongoDAL.Words
 
         private readonly IMongoDatabase _db;
 
-        public UserWordsRepository(IMongoDatabase db) => _db = db;
+        public UserWordsRepo(IMongoDatabase db) => _db = db;
 
         public Task Add(UserWord word) => Collection.InsertOneAsync(word);
 

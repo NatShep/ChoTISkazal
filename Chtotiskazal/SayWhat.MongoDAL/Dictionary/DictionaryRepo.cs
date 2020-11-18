@@ -2,16 +2,16 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace SayWa.MongoDAL.Dictionary
+namespace SayWhat.MongoDAL.Dictionary
 {
-    public class DictionaryRepository: IMongoRepository
+    public class DictionaryRepo: IMongoRepo
     {
         public const string DictionaryCollectionName = "dictionary";
         public const string WordFieldBsonName = "Word";
         
         private readonly IMongoDatabase _db;
 
-        public DictionaryRepository(IMongoDatabase db) => _db = db;
+        public DictionaryRepo(IMongoDatabase db) => _db = db;
         
         public Task Add(DictionaryWord word) => Collection.InsertOneAsync(word);
         public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());

@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace SayWa.MongoDAL.Users
+namespace SayWhat.MongoDAL.Users
 {
-    public class UsersRepository: IMongoRepository
+    public class UsersRepo: IMongoRepo
     {
         public const string UserCollectionName = "users";
         public const string UserTelegramIdFieldName = "TelegramId";
         private readonly IMongoDatabase _db;
 
-        public UsersRepository(IMongoDatabase db) => _db = db;
+        public UsersRepo(IMongoDatabase db) => _db = db;
         
         public Task Add(User user) => Collection.InsertOneAsync(user);
         

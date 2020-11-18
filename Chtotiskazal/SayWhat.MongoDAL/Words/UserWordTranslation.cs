@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace SayWa.MongoDAL.Words
+namespace SayWhat.MongoDAL.Words
 {
     public class UserWordTranslation {
         public ObjectId Id { get; set;}

@@ -1,14 +1,13 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SayWa.MongoDAL.Users
+namespace SayWhat.MongoDAL.Users
 {
     public class User
     {
         public ObjectId Id { get; set; }
 
-        [BsonElement(UsersRepository.UserTelegramIdFieldName)]
+        [BsonElement(UsersRepo.UserTelegramIdFieldName)]
         public long? TelegramId { get; set; }
         
         public string? Nick { get; set; }

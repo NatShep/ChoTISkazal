@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace SayWa.MongoDAL.Dictionary
+namespace SayWhat.MongoDAL.Dictionary
 {
     public class DictionaryExample {
         public ObjectId Id { get; set; }

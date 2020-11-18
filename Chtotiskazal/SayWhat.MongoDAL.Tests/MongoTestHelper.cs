@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace SayWa.MongoDAL.Tests
+namespace SayWhat.MongoDAL.Tests
 {
     public static class MongoTestHelper
     {

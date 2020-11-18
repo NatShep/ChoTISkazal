@@ -4,28 +4,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using NUnit.Framework;
-using SayWa.MongoDAL.Users;
-using SayWa.MongoDAL.Words;
+using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 
-namespace SayWa.MongoDAL.Tests
+namespace SayWhat.MongoDAL.Tests
 {
-    public class UserWordsRepositoryTests
+    public class UserWordsRepoTests
     {
-        private UserWordsRepository _repository;
+        private UserWordsRepo _repo;
         
         [SetUp]
         public void Intitalize()
         {
             MongoTestHelper.DropAllCollections();
-            _repository =new UserWordsRepository(MongoTestHelper.Database);
-            _repository.UpdateDb().Wait();
+            _repo =new UserWordsRepo(MongoTestHelper.Database);
+            _repo.UpdateDb().Wait();
         }
         [Test]
         public async Task Add_GetAllForUserReturnsIt()
         {
             var user = new User {Id = ObjectId.GenerateNewId()};
-            await _repository.Add(CreateWord(user.Id,"table", "стол" ));
-            var allWords =  await _repository.GetAllUserWordsAsync(user);
+            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(1, allWords.Count);
             Assert.AreEqual("table", allWords[0].Word);
             Assert.AreEqual("стол", allWords[0].Translations[0].Translation);
@@ -54,13 +54,13 @@ namespace SayWa.MongoDAL.Tests
             
             foreach (var word in randomList)
             {
-                await _repository.Add(word);
+                await _repo.Add(word);
             }
 
             for (int i = 0; i < bestCount; i++)
-                await _repository.Add(CreateWord(user.Id,$"table{i}", $"стол{i}", i+worstCount ));
+                await _repo.Add(CreateWord(user.Id,$"table{i}", $"стол{i}", i+worstCount ));
 
-            var allWords =  await _repository.GetWorstLearned(user,worstCount);
+            var allWords =  await _repo.GetWorstLearned(user,worstCount);
             
             for (int i = 0; i < worstCount; i++)
             {
@@ -79,9 +79,9 @@ namespace SayWa.MongoDAL.Tests
         {
             var user = new User {Id = ObjectId.GenerateNewId()};
             for (int i = 0; i < count; i++) 
-                await _repository.Add(CreateWord(user.Id,$"table{i}", "стол{i}" ));
+                await _repo.Add(CreateWord(user.Id,$"table{i}", "стол{i}" ));
             
-            var allWords =  await _repository.GetAllUserWordsAsync(user);
+            var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(count, allWords.Count);
         }
 

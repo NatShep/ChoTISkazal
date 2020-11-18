@@ -1,29 +1,28 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using NUnit.Framework;
-using SayWa.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Dictionary;
 
-namespace SayWa.MongoDAL.Tests
+namespace SayWhat.MongoDAL.Tests
 {
     [TestFixture]
-    public class DictionaryRepositoryTests
+    public class DictionaryRepoTests
     {
-        private DictionaryRepository _repository;
+        private DictionaryRepo _repo;
         
         [SetUp]
         public void Intitalize()
         {
             MongoTestHelper.DropAllCollections();
-            _repository =new DictionaryRepository(MongoTestHelper.Database);
-            _repository.UpdateDb().Wait();
+            _repo =new DictionaryRepo(MongoTestHelper.Database);
+            _repo.UpdateDb().Wait();
         }
         [Test]
         public void AddWord_WordExistsInCollection()
         {
            var word = CreateWord("table", "cтол");
            
-           _repository.Add(word).Wait();
-           var read =  _repository.GetOrDefault("table").Result;
+           _repo.Add(word).Wait();
+           var read =  _repo.GetOrDefault("table").Result;
            Assert.AreEqual(read.Transcription, word.Transcription);
            Assert.AreEqual(read.Word, word.Word);
            Assert.AreEqual(read.Translations.Length, word.Translations.Length);
@@ -40,16 +39,16 @@ namespace SayWa.MongoDAL.Tests
         {
             for (int i = 0; i < count; i++)
             {
-                _repository.Add(CreateWord($"table{i}", "cтол")).Wait();
+                _repo.Add(CreateWord($"table{i}", "cтол")).Wait();
             }
-            Assert.AreEqual(count, _repository.GetCount().Result);
+            Assert.AreEqual(count, _repo.GetCount().Result);
         }
 
         [Test]
         public void AddSameWord_Throws()
         {
-            _repository.Add(CreateWord("table", "cтол")).Wait();
-            Assert.Catch(()=> _repository.Add(CreateWord("table", "таблица")).Wait());
+            _repo.Add(CreateWord("table", "cтол")).Wait();
+            Assert.Catch(()=> _repo.Add(CreateWord("table", "таблица")).Wait());
         }
 
         private DictionaryWord CreateWord(string origin, string translation)

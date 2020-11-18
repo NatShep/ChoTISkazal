@@ -1,4 +1,4 @@
-﻿namespace SayWa.MongoDAL
+﻿namespace SayWhat.MongoDAL
 {
     public enum Language {
         En =  1,
