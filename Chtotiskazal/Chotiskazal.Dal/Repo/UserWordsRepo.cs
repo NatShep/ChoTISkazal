@@ -9,7 +9,7 @@ namespace Chotiskazal.Dal.Repo
 {
     public class UserWordsRepo : BaseRepo
     {
-        public UserWordsRepo(string fileName) : base(fileName)
+        public UserWordsRepo(string fileName) : base(fileName) 
         {
         }
 
