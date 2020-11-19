@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using Chotiskazal.Dal.DAL;
+using SayWhat.Bll.Dto;
 
-namespace Chotiskazal.Dal.yapi
+namespace SayWhat.Bll.Yapi
 {
     public class YapiDicAnswer
     {

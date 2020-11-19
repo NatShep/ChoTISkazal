@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -105,7 +105,7 @@ namespace Chotiskazal.Bot.Questions
                 expectedScore: 12,
                 frequency: 14);
 
-        public static IExam GetNextExamFor(bool isFirstExam, UserWordForLearning model)
+        public static IExam GetNextExamFor(bool isFirstExam, UserWordModel model)
         {
             if (isFirstExam && model.PassedScore < 7)
             {

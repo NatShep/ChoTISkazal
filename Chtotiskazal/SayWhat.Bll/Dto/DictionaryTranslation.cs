@@ -3,20 +3,20 @@ using SayWhat.MongoDAL;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Chotiskazal.Dal.DAL
+namespace SayWhat.Bll.Dto
 {
-    public class WordDictionary
+    public class DictionaryTranslation
     {
-        public WordDictionary() { }
+        public DictionaryTranslation() { }
 
-        public WordDictionary(string enWord, string translation, string transcription, TranslationSource source)
+        public DictionaryTranslation(string enWord, string translation, string transcription, TranslationSource source)
         {
             EnWord = enWord;
             Transcription = transcription ?? "[]" ;
             RuWord = translation;
             Source = source;
         }
-        public WordDictionary(string enWord, string translation, string transcription, TranslationSource source, List<Phrase> phrases)
+        public DictionaryTranslation(string enWord, string translation, string transcription, TranslationSource source, List<Phrase> phrases)
             :this(enWord,translation,transcription,source) => Phrases = phrases;
 
         public int PairId { get; set; } 

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -22,24 +22,24 @@ namespace Chotiskazal.Bot.ChatFlows
             _examService = service;
         }
 
-        public async Task EnterAsync(int userId)
+        public async Task EnterAsync(User user)
         {
-            if (!await _examService.HasAnyAsync(userId))
+            if (!await _examService.HasAnyAsync(user))
             {
                 await _chatIo.SendMessageAsync("You need to add some words before examination");
                 return;
             }
 
             //Randomization and jobs
-            await _examService.RandomizationAndJobsAsync(userId);
+            await _examService.RandomizationAndJobsAsync(user);
 
             var sb = new StringBuilder("Examination\r\n");
-            var learningWords = await _examService.GetWordsForLearningWithPhrasesAsync(userId, 9, 3);
+            var learningWords = await _examService.GetWordsForLearningWithPhrasesAsync(user, 9, 3);
             if (learningWords.Average(w => w.PassedScore) <= 4)
             {
                 foreach (var pairModel in learningWords.Randomize())
                 {
-                    sb.AppendLine($"{pairModel.EnWord}\t\t:{pairModel.UserTranslations}");
+                    sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranlationAsList}");
                 }
             }
 
@@ -55,7 +55,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             //Get exam list and test words
             var examsList = _examService.PreparingExamsList(learningWords);
-            var testWords = await _examService.GetTestWordsAsync(userId, examsList);
+            var testWords = await _examService.GetTestWordsAsync(user, examsList);
             examsList.AddRange(testWords);
 
             var examsCount = 0;
@@ -68,21 +68,21 @@ namespace Chotiskazal.Bot.ChatFlows
             var userInput = await _chatIo.WaitInlineKeyboardInput();
             if (userInput != "/startExamination")
                 return;
-            foreach (var pairModel in examsList)
+            foreach (var word in examsList)
             {
-                var exam = ExamSelector.GetNextExamFor(i < 9, pairModel);
+                var exam = ExamSelector.GetNextExamFor(i < 9, word);
                 i++;
                 var retryFlag = false;
                 do
                 {
                     retryFlag = false;
                     var sw = Stopwatch.StartNew();
-                    var questionMetric = _examService.CreateQuestionMetric(pairModel, exam);
+                    var questionMetric = _examService.CreateQuestionMetric(word, exam);
 
                     var learnList = learningWords;
 
-                    if (!learningWords.Contains(pairModel))
-                        learnList = learningWords.Append(pairModel).ToArray();
+                    if (!learningWords.Contains(word))
+                        learnList = learningWords.Append(word).ToArray();
 
                     if (exam.NeedClearScreen && lastExamResult != ExamResult.Impossible)
                     {
@@ -91,14 +91,14 @@ namespace Chotiskazal.Bot.ChatFlows
                             await WritePassed();
                     }
 
-                    var result = await exam.Pass(_chatIo, _examService, pairModel, learnList);
+                    var result = await exam.Pass(_chatIo, _examService, word, learnList);
 
                     sw.Stop();
                     questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
                     switch (result)
                     {
                         case ExamResult.Impossible:
-                            exam = ExamSelector.GetNextExamFor(i == 0, pairModel);
+                            exam = ExamSelector.GetNextExamFor(i == 0, word);
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:
@@ -125,13 +125,13 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 } while (retryFlag);
 
-                await _examService.RegisterExamAsync(userId, started, examsCount, examsPassed);
+                await _examService.RegisterExamAsync(user, started, examsCount, examsPassed);
             }
 
             var doneMessage = new StringBuilder($"Test done:  {examsPassed}/{examsCount}\r\n");
             foreach (var pairModel in learningWords.Concat(testWords))
             {
-                doneMessage.Append(pairModel.EnWord + " - " + pairModel.UserTranslations + "  (" +
+                doneMessage.Append(pairModel.Word + " - " + pairModel.TranlationAsList + "  (" +
                                    pairModel.PassedScore + ")\r\n");
             }
 

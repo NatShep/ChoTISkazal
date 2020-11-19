@@ -12,6 +12,7 @@ namespace SayWhat.MongoDAL.Words
         public const string CurrentRatingFieldName = "currentRate";
         public const string UserIdFieldName = "userId";
         public const string PassedScoreFieldName = "passedScore";
+        public const string OriginWordFieldName = "originWord";
 
 
         private readonly IMongoDatabase _db;
@@ -91,5 +92,22 @@ namespace SayWhat.MongoDAL.Words
                 Builders<UserWord>.Filter.Eq(UserIdFieldName, entity.Id),
                 entity
             );
+
+        public async Task<bool> HasAnyFor(User user)
+        {
+            var docsCount = await Collection
+                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
+                .CountDocumentsAsync();
+            return docsCount > 0;
+        }
+
+        public Task<UserWord> GetWordOrDefault(User user, string enWord)
+        =>
+            Collection
+                .Find(Builders<UserWord>.Filter.And(
+                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWord>.Filter.Gt(OriginWordFieldName, enWord)
+                )).FirstOrDefaultAsync();
+        
     }
 }

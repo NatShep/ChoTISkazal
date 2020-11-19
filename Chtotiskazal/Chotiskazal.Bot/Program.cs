@@ -2,11 +2,13 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.Migrations;
-using Chotiskazal.Dal.Repo;
-using Chotiskazal.Dal.Services;
-using Chotiskazal.Dal.yapi;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
+using SayWhat.Bll.Services;
+using SayWhat.Bll.Yapi;
+using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
@@ -46,12 +48,16 @@ namespace Chotiskazal.Bot
             var yandexDictionaryClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
             var yandexTranslateApiClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout); 
                 
-            var userWordService = new UsersWordsService(new UserWordsRepo(dbFileName));
-            var dictionaryService= new DictionaryService(new DictionaryRepository(dbFileName));
-            var examsAndMetricService = new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName));
+            var connectionString = "mongodb://localhost";
+            var client = new MongoClient(connectionString);
+            var db = client.GetDatabase("SayWhat");
+            
+            var userWordService = new UsersWordsService(new UserWordsRepo(db));
+            var dictionaryService= new DictionaryService(new DictionaryRepo(db));
+            var examsAndMetricService = new ExamsAndMetricService();
 
             _yaService = new YaService(yandexDictionaryClient,yandexTranslateApiClient);
-            _authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
+            _authorizeService = new AuthorizeService(new UserService(new UsersRepo(db)));
             _addWordService = new AddWordService(
                 userWordService, 
                 yandexDictionaryClient,
@@ -62,7 +68,7 @@ namespace Chotiskazal.Bot
                 dictionaryService,
                 userWordService);
 
-            DoMigration.ApplyMigrations(dbFileName);
+            //DoMigration.ApplyMigrations(dbFileName);
       
             Console.WriteLine("Dic started");
     

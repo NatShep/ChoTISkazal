@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Chotiskazal.Dal.yapi;
 using System.Timers;
+using SayWhat.Bll.Yapi;
 
 
 namespace Chotiskazal.Bot.Services

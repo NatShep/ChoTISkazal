@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using Chotiskazal.Dal.DAL;
-using Chotiskazal.Dal.Services;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot.Services
 {
@@ -23,10 +25,10 @@ namespace Chotiskazal.Bot.Services
             _usersWordsService = usersWordsService;
         }
 
-        public async Task<UserWordForLearning[]> GetWordsForLearningWithPhrasesAsync(int userId, int count,
+        public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(User user, int count,
             int maxTranslationSize)
         {
-            var wordsForLearning = await _usersWordsService.GetWorstForUserWithPhrasesAsync(userId, count);
+            var wordsForLearning = await _usersWordsService.GetWorstForUserWithPhrasesAsync(user, count);
 
             foreach (var wordForLearning in wordsForLearning)
             {
@@ -38,22 +40,24 @@ namespace Chotiskazal.Bot.Services
                 wordForLearning.SetTranslation(usedTranslations);
 
                 // Remove Phrases added as learning word 
-                for (var i = 0; i < wordForLearning.Phrases.Count; i++)
+                /*
+                 todo wtf?
+                 for (var i = 0; i < wordForLearning.RuPhrases.Count; i++)
                 {
-                    var phrase = wordForLearning.Phrases[i];
+                    var phrase = wordForLearning.RuPhrases[i];
                     if (!usedTranslations.Contains(phrase.PhraseRuTranslate))
-                        wordForLearning.Phrases.RemoveAt(i);
-                }
+                        wordForLearning.RuPhrases.RemoveAt(i);
+                }*/
             }
             return wordsForLearning.ToArray();
         }
 
-        private async Task<UserWordForLearning[]> GetPairsForExamAsync(int userId, int delta, int randomRate) =>
-            await _usersWordsService.GetWorstWordsForUserAsync(userId, delta, randomRate);
+        private async Task<UserWordModel[]> GetPairsForExamAsync(User user, int delta, int randomRate) =>
+            await _usersWordsService.GetWorstWordsForUserAsync(user, delta, randomRate);
 
-        public List<UserWordForLearning> PreparingExamsList(UserWordForLearning[] learningWords)
+        public List<UserWordModel> PreparingExamsList(UserWordModel[] learningWords)
         {
-            var examsList = new List<UserWordForLearning>(learningWords.Length * 4);
+            var examsList = new List<UserWordModel>(learningWords.Length * 4);
 
             //Every learning word appears in test from 2 to 4 times
             examsList.AddRange(learningWords.Randomize());
@@ -69,38 +73,38 @@ namespace Chotiskazal.Bot.Services
             return examsList;
         }
 
-        public async Task<UserWordForLearning[]> GetTestWordsAsync(int userId, List<UserWordForLearning> examsList)
+        public async Task<UserWordModel[]> GetTestWordsAsync(User user, List<UserWordModel> examsList)
         {
             //TODO изучть по какому принципу получаем RandomRATE. связан ли он с прогрессом подбираемых слов.
             //Или тут вообще рандомные слова будут
             var delta = Math.Min(7, (32 - examsList.Count));
-            var testWords = new UserWordForLearning[0];
+            var testWords = new UserWordModel[0];
 
             if (delta <= 0)
                 return testWords;
 
             var randomRate = 8 + RandomTools.Rnd.Next(5);
-            testWords = await GetPairsForExamAsync(userId, delta, randomRate);
+            testWords = await GetPairsForExamAsync(user, delta, randomRate);
             return testWords;
         }
 
         public async Task SaveQuestionMetrics(QuestionMetric questionMetric) =>
             await _examsAndMetricService.SaveQuestionMetricsAsync(questionMetric);
 
-        public async Task RegisterExamAsync(int userId, DateTime started, int examsCount, int examsPassed) =>
-            await _examsAndMetricService.RegisterExamAsync(userId, started, examsCount, examsPassed);
+        public async Task RegisterExamAsync(User user, DateTime started, int examsCount, int examsPassed) =>
+            await _examsAndMetricService.RegisterExamAsync(user.TelegramId??-1, started, examsCount, examsPassed);
 
-        public async Task RegisterSuccessAsync(UserWordForLearning userWordForLearning) =>
+        public async Task RegisterSuccessAsync(UserWordModel userWordForLearning) =>
             await _usersWordsService.RegisterSuccessAwait(userWordForLearning);
 
-        public async Task RegisterFailureAsync(UserWordForLearning userWordForLearning) =>
+        public async Task RegisterFailureAsync(UserWordModel userWordForLearning) =>
             await _usersWordsService.RegisterFailureAsync(userWordForLearning);
 
-        public QuestionMetric CreateQuestionMetric(UserWordForLearning pairModel, IExam exam)
+        public QuestionMetric CreateQuestionMetric(UserWordModel pairModel, IExam exam)
         {
             var questionMetric = new QuestionMetric
             {
-                WordId = pairModel.Id,
+                Word = pairModel.Word,
                 Created = DateTime.Now,
                 AggregateScoreBefore = pairModel.AggregateScore,
                 ExamsPassed = pairModel.Examed,
@@ -111,20 +115,23 @@ namespace Chotiskazal.Bot.Services
             return questionMetric;
         }
 
-        public async Task RandomizationAndJobsAsync(int userId)
+        public async Task RandomizationAndJobsAsync(User user)
         {
             if (RandomTools.Rnd.Next() % 30 == 0)
-                await AddMutualPhrasesToVocabAsync(userId, 10);
+                await AddMutualPhrasesToVocabAsync(user, 10);
             else
-                await _usersWordsService.UpdateAgingAndRandomizeAsync(userId,50);
+                await _usersWordsService.UpdateAgingAndRandomizeAsync(user,50);
         }
 
-        private async Task AddMutualPhrasesToVocabAsync(int userId, int maxCount)
+        private  Task AddMutualPhrasesToVocabAsync(User user, int maxCount)
         {
-            var allWords = (await _usersWordsService.GetAllEnWordsForUserAsync(userId)).Select(s => s.ToLower().Trim())
-                .ToHashSet();
+            return Task.CompletedTask;
+            /*
+            //var allWords = (await _usersWordsService.GetAllEnWordsForUserAsync(user)).Select(s => s.ToLower().Trim())
+            //    .ToHashSet();
             
-            var allWordsForLearning = await _usersWordsService.GetAllUserWordsWithPhrasesForUserAsync(userId);
+            var allWordsForLearning = await _usersWordsService.GetAllUserWords(user);
+            var allEngWords = allWordsForLearning.Select(a => a.Word.ToLower().Trim()).ToHashSet();
 
             var allPhrasesIdForUser = new List<int>();
             
@@ -133,8 +140,9 @@ namespace Chotiskazal.Bot.Services
                 var phrases = word.GetPhrasesId();
                 allPhrasesIdForUser.AddRange(phrases);
             }
+            
 
-            var allPhrases = await _dictionaryService.FindPhrasesBySomeIdsAsync(allPhrasesIdForUser.ToArray());
+            var allPhrases =  allWordsForLearning.Select(a=>a.Entity) // await _dictionaryService.FindPhrasesBySomeIdsAsync(allPhrasesIdForUser.ToArray());
 
             var searchedPhrases = new List<Phrase>();
             var endings = 0;
@@ -146,26 +154,26 @@ namespace Chotiskazal.Bot.Services
                 foreach (var word in phraseText.Split(new[] {' ', ','}))
                 {
                     var lowerWord = word.Trim().ToLower();
-                    if (allWords.Contains(lowerWord))
+                    if (allEngWords.Contains(lowerWord))
                         count++;
                     else if (word.EndsWith('s'))
                     {
                         var withoutEnding = lowerWord.Remove(lowerWord.Length - 1);
-                        if (allWords.Contains(withoutEnding))
+                        if (allEngWords.Contains(withoutEnding))
                             endingCount++;
                     }
                     else if (word.EndsWith("ed"))
                     {
                         var withoutEnding = lowerWord.Remove(lowerWord.Length - 2);
 
-                        if (allWords.Contains(withoutEnding))
+                        if (allEngWords.Contains(withoutEnding))
                             endingCount++;
                     }
                     else if (word.EndsWith("ing"))
                     {
                         var withoutEnding = lowerWord.Remove(lowerWord.Length - 3);
 
-                        if (allWords.Contains(withoutEnding))
+                        if (allEngWords.Contains(withoutEnding))
                             endingCount++;
                     }
 
@@ -177,8 +185,8 @@ namespace Chotiskazal.Bot.Services
                         endings++;
                     }
 
-                    if (count + endingCount > 2)
-                        Console.WriteLine(phraseText);
+                    //if (count + endingCount > 2)
+                    //    Console.WriteLine(phraseText);
                 }
             }
 
@@ -191,12 +199,12 @@ namespace Chotiskazal.Bot.Services
                 await _usersWordsService.AddWordToUserCollectionAsync(userWord);
             }
 
-            Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");
+            Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");*/
         }
 
         public async Task<string[]> GetAllMeaningOfWordForExamination(string word) =>
             await _dictionaryService.GetAllTranslationsAsync(word);
 
-        public async Task<bool> HasAnyAsync(int userId) => await _usersWordsService.GetAnyWordAsync(userId);
+        public async Task<bool> HasAnyAsync(User user) => await _usersWordsService.HasWords(user);
     }
 }

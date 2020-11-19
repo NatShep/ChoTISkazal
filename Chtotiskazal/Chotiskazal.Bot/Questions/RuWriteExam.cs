@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -11,15 +12,15 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
-            UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word,
+            UserWordModel[] examList)
         {
-            var words = word.EnWord.Split(',').Select(s => s.Trim()).ToArray();
+            var words = word.Word.Split(',').Select(s => s.Trim()).ToArray();
             var minCount = words.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.UserTranslations}    <=====\r\nWrite the translation... ");
+            await chatIo.SendMessageAsync($"=====>   {word.TranlationAsList}    <=====\r\nWrite the translation... ");
             var userEntry = await chatIo.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(userEntry))
@@ -38,13 +39,13 @@ namespace Chotiskazal.Bot.Questions
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(
-                    $"the translation was correct, but the question was about the word '{word.EnWord} - {word.UserTranslations}'\r\nlet's try again");
+                    $"the translation was correct, but the question was about the word '{word.Word} - {word.TranlationAsList}'\r\nlet's try again");
                 return ExamResult.Retry;
             }
             
             var translates = string.Join(",",translationCandidate);
             await chatIo.SendMessageAsync($"'{userEntry}' translates as {translates}");
-            await chatIo.SendMessageAsync("The right translation was: " + word.EnWord);
+            await chatIo.SendMessageAsync("The right translation was: " + word.Word);
             await service.RegisterFailureAsync(word);
             return ExamResult.Failed;
         }

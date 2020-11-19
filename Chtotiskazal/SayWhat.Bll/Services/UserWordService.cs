@@ -61,8 +61,16 @@ namespace SayWhat.Bll.Services
             await _userWordsRepository.UpdateScores(model.Entity);
         }
 
-
+        public Task<bool> HasWords(User user) => _userWordsRepository.HasAnyFor(user);
         public Task UpdateWord(UserWordModel model) =>
              _userWordsRepository.Update(model.Entity);
+
+        public async Task<UserWordModel> GetWordNullByEngWord(User user, string enWord)
+        {
+            var word = await _userWordsRepository.GetWordOrDefault(user, enWord);
+            if (word == null)
+                return null;
+            return new UserWordModel(word);
+        }
     }
 }

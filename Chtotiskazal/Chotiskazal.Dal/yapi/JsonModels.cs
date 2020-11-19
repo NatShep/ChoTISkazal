@@ -21,7 +21,6 @@ namespace Chotiskazal.Dal.yapi
         public string Ts { get; set; }
         [JsonPropertyName("tr")]
         public Translation[] Tr { get; set; }
-
     }
 
     public class Translation

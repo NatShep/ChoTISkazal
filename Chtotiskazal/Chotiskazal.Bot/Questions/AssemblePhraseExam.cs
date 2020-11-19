@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -13,23 +13,23 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Assemble phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList) 
         {
-            if (!word.Phrases.Any())
+            if (!word.HasAnyPhrases)
                 return ExamResult.Impossible;
 
-            var targetPhrase = word.Phrases.GetRandomItem();
+            var targetPhrase = word.GetRandomExample();
 
             string shuffled;
             while (true)
             {
-                var split = 
-                    targetPhrase.EnPhrase.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-                if (split.Length < 2)
+                var wordsInExample = targetPhrase.OriginWords;
+                
+                if (wordsInExample.Length < 2)
                     return ExamResult.Impossible;
 
-                shuffled = string.Join(" ", split.Randomize());
-                if(shuffled!= targetPhrase.EnPhrase)
+                shuffled = string.Join(" ", wordsInExample.Randomize());
+                if(shuffled!= targetPhrase.OriginPhrase)
                     break;
             }
 
@@ -41,13 +41,13 @@ namespace Chotiskazal.Bot.Questions
                 entry = entry.Trim();
             }
 
-            if (string.CompareOrdinal(targetPhrase.EnPhrase, entry) == 0)
+            if (string.CompareOrdinal(targetPhrase.OriginPhrase, entry) == 0)
             {
                 await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;
             }
 
-            await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.EnPhrase}'");
+            await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.OriginPhrase}'");
             await service.RegisterFailureAsync(word);
             return ExamResult.Failed;
         }

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.Dal.Services;
+using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot.Services
 {
@@ -18,27 +18,13 @@ namespace Chotiskazal.Bot.Services
                 throw  new Exception("I can't add user!");
             return user;
         }
-        private async Task<User> CreateUser(string name, string login, string password, string email)
-        {
-            var user = new User(name, login, password, email);
-            try
-            {
-                user.UserId=await _userService.AddUserAsync(user);
-            }
-            catch
-            {
-                return null;
-            }
-            return user;
-        }
-
+        
         private async Task<User> CreateUserAsync(long telegramID, string name)
         {
-            var user = new User(telegramID,name);
-            
             try
             {
-                user.UserId= await _userService.AddUserAsync(user);
+                var user = new User(telegramID, name);
+                await _userService.AddUserAsync(user);
                 return user;
             }
             catch
@@ -49,8 +35,5 @@ namespace Chotiskazal.Bot.Services
         
         private async Task<User> LoginUserAsync(long telegramId)=>
             await  _userService.GetUserByTelegramIdAsync(telegramId);
-
-        public async Task<User> LoginUser(string login, string password)=>
-            await _userService.GetUserByLoginOrNullAsync(login,password);
     }
 }

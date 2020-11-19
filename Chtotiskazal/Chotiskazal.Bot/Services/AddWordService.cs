@@ -1,12 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.Dal.Enums;
-using Chotiskazal.Dal.Services;
-using Chotiskazal.Dal.yapi;
+using MongoDB.Bson;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
+using SayWhat.Bll.Yapi;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
+using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
 namespace Chotiskazal.Bot.Services
 {
@@ -26,121 +30,135 @@ namespace Chotiskazal.Bot.Services
             _dictionaryService = dictionaryService;
         }
 
-        public async Task<IReadOnlyList<UserWordForLearning>> TranslateAndAddToDictionary(string word)
+        public async Task<IReadOnlyList<DictionaryTranslation>> TranslateAndAddToDictionary(string englishWord)
         {
-            word = word.ToLower();
+            englishWord = englishWord.ToLower();
             
             var wordsForLearning = new List<UserWordForLearning>();
             
-            if (!word.Contains(' '))
+            if (!englishWord.Contains(' '))
             {
-                var result =await _yaDicClient.TranslateAsync(word);
+                var result =await _yaDicClient.TranslateAsync(englishWord);
 
-                //Создаем из ответа(если он есть)  TranslationAndContext или WordDictionary?
-                if (result?.Any() == true)
+                //Создаем из ответа(если он есть)  
+                if (result?.Any() != true) 
+                    return new DictionaryTranslation[0];
+                
+                var variants = result.SelectMany(r => r.Tr.Select(tr => new
                 {
-                    var variants = result.SelectMany(r => r.Tr);
-                    var transcription = result.FirstOrDefault()?.Ts;
-                  
-                    foreach (var yandexTranslation in variants)
+                    defenition = r,
+                    translation = tr,
+                }));
+
+                var word = new DictionaryWord
+                {
+                    Id = ObjectId.GenerateNewId(),
+                    Language = Language.En,
+                    Source = TranslationSource.Yadic,
+                    Transcription = result.FirstOrDefault()?.Ts,
+                    Translations = variants.Select(v => new SayWhat.MongoDAL.Dictionary.DictionaryTranslation
                     {
-                        var yaPhrases = yandexTranslation.GetPhrases(word);
-                       
-                        //Заполняем бд(wordDictionary и фразы)
-                        var phrasesId= await _dictionaryService.AddNewWordPairToDictionaryWithPhrasesAsync(word,
-                            yandexTranslation.Text, transcription, TranslationSource.Yadic, yaPhrases);
+                        Id = ObjectId.GenerateNewId(),
+                        Word = v.translation.Text,
+                        Transcription = v.defenition.Ts,
+                        Examples = v.translation.Ex.Select(e => new DictionaryExample
+                        {
+                            Id = ObjectId.GenerateNewId(),
+                            OriginExample = e.Text,
+                            TranslationExample = e.Tr.First().Text,
+                        }).ToArray()
+                    }).ToArray()
+                };
+                await _dictionaryService.AddNewWord(word);
+                return word.Translations.Select(
+                    t=> new DictionaryTranslation(word.Word,t.Word, t.Transcription, word.Source,
+                            t.Examples.Select(e=>new Phrase(e.OriginExample,e.TranslationExample)).ToList()
+                    )).ToArray();
 
-                        
-
-                        wordsForLearning.Add(UserWordForLearning.CreatePair(word, yandexTranslation.Text, transcription,
-                            yaPhrases,phrasesId.ToArray()));
-                    }
-                    return wordsForLearning;
-                }
             }
 
-            try
+            /*try
             {
-                var transAnsTask =  await _yaTransClient.Translate(word);
+                var transAnsTask =  await _yaTransClient.Translate(englishWord);
                 if (!string.IsNullOrWhiteSpace(transAnsTask))
                 {
                     //1. Заполняем бд(wordDictionary, фраз нет)
                     var id = await _dictionaryService.AddNewWordPairToDictionaryAsync(
-                        word,
+                        englishWord,
                         transAnsTask,
                         "[]",
                         TranslationSource.Yadic);
                     //2. Дополняем ответ
-                    wordsForLearning.Add(UserWordForLearning.CreatePair(word, transAnsTask, ""));
+                    wordsForLearning.Add(UserWordForLearning.CreatePair(englishWord, transAnsTask, ""));
                 }
             }
             catch (Exception e)
             {
                 return wordsForLearning;
-            }
+            }*/
 
-            return wordsForLearning;
+            return null;
         }
 
-        public async Task<IReadOnlyList<UserWordForLearning>> FindInDictionaryWithPhrases(string word)
-        {
-            word = word.ToLower();
-            
-            var pairWords = await _dictionaryService.GetAllPairsByWordWithPhrasesAsync(word);
+        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithPhrases(string word) 
+            => await _dictionaryService.GetAllPairsByWordWithPhrasesAsync(word.ToLower());
 
-            return pairWords.Select(wordDictionary => UserWordForLearning.CreatePair(
-                wordDictionary.EnWord,
-                wordDictionary.RuWord,
-                wordDictionary.Transcription,
-                wordDictionary.Phrases,
-                wordDictionary.Phrases.Select(ph => ph.Id).ToArray())
-            ).ToList();
-        }
-        
-        public async Task<int> AddSomeWordsToUserCollectionAsync(int userId, UserWordForLearning[] results)
+        public async Task<int> AddSomeWordsToUserCollectionAsync(User user, DictionaryTranslation[] results)
         {
-            var count = 0;
-            var userTranslations = results.Select(t => t.UserTranslations).ToArray();
             var allPhrasesForUser = new List<Phrase>();
             
             foreach (var result in results)
                 allPhrasesForUser.AddRange(result.Phrases);
-            
-            var userWord = await _usersWordsService.GetWordForLearningOrNullByEnWordAsync(userId, results.FirstOrDefault()?.EnWord);
-            
-            if (userWord != null)
+
+            var originWord = results.FirstOrDefault()?.EnWord;
+            if (originWord == null)
+                return 0;
+            var userWord = await _usersWordsService.GetWordNullByEngWord(user, originWord);
+
+            if (userWord == null)
             {
-                var translates = userWord.GetTranslations().ToList();
-                foreach (var userTranslation in userTranslations)
-                {
-                    if (translates.Contains(userTranslation))
-                        continue;
-                    translates.Add(userTranslation);
-                    
-                    count++;
-                }
-
-                var userPhrasesId=userWord.GetPhrasesId();
-                userWord.PhrasesIds += ',' + string.Join(",", allPhrasesForUser.Where(i=> !userPhrasesId.Contains(i.Id)).Select(i=>i.Id));
-
-                userWord.SetTranslation(translates.ToArray());
-                _usersWordsService.UpdateWord(userWord);
-                return count;
+                //Word is new
+                await _usersWordsService.AddWordToUserCollectionAsync(user,
+                    new UserWordModel(new UserWord
+                    {
+                        UserId = user.Id,
+                        Word = originWord,
+                        Language = TranlationDirection.EnRu,
+                        Translations = results.Select(r => new UserWordTranslation
+                        {
+                            Transcription = r.Transcription,
+                            Word = r.RuWord,
+                            Examples = r.Phrases.Select(p => new UserWordTranslationExample
+                            {
+                                Origin = p.EnPhrase,
+                                Translation = p.PhraseRuTranslate
+                            }).ToArray()
+                        }).ToArray(),
+                    }));
+                return results.Length;
             }
-
-            await _usersWordsService.AddWordToUserCollectionAsync(
-                new UserWordForLearning()
+            var translates = userWord.GetTranslations().ToList();
+            var newTranslations = new List<UserWordTranslation>();
+            foreach (var r in results)
             {
-                UserId = userId,
-                EnWord = results.FirstOrDefault()?.EnWord,
-                UserTranslations = string.Join(",", userTranslations),
-                Transcription = results.FirstOrDefault()?.Transcription ?? "",
-                PhrasesIds = string.Join(",",allPhrasesForUser.Select(ph => ph.Id).ToArray()),
-                Phrases = allPhrasesForUser,
-                IsPhrase = false,
-            });
-            
-            return userTranslations.Count();
+                if (translates.Contains(r.RuWord))
+                    continue;
+                newTranslations.Add(new UserWordTranslation
+                {
+                    Transcription = r.Transcription,
+                    Word = r.RuWord,
+                    Examples = r.Phrases.Select(p => new UserWordTranslationExample
+                    {
+                        Origin = p.EnPhrase,
+                        Translation = p.PhraseRuTranslate
+                    }).ToArray()
+                });
+            }
+            if(newTranslations.Count==0)
+                return 0;
+            userWord.AddTranslations(newTranslations);
+            await _usersWordsService.UpdateWord(userWord);
+            return newTranslations.Count;
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,20 +12,20 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
-            UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word,
+            UserWordModel[] examList)
         {
-            var variants = examList.Randomize().Select(e => e.UserTranslations).ToArray();
+            
+            var variants = examList.Randomize().SelectMany(e => e.GetTranslations()).ToArray();
 
-            var msg = $"=====>   {word.EnWord}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {word.Word}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
-            chatIo = chatIo as ChatIO;
             var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (variants[choice.Value] == word.UserTranslations)
+            if (word.GetTranslations().Contains(variants[choice.Value]))
             {
                 await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
+using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot
 {
@@ -15,7 +15,7 @@ namespace Chotiskazal.Bot
         }
 
         private User User { get; set; }
-
+            
         private readonly string _userFirstName;
         public AddWordService AddWordSrvc { get; set; }
         public ExamService ExamSrvc { get; set; }
@@ -61,7 +61,7 @@ namespace Chotiskazal.Bot
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task DoExamine() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(User.UserId);
+        private Task DoExamine() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(User);
         
         //TODO show stats to user here
         /*
@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot
         private Task EnterWord(string text = null)
         {
             var mode = new AddingWordsMode(ChatIo, AddWordSrvc,YaSrvc);
-            return mode.Enter(User.UserId, text);
+            return mode.Enter(User, text);
         }
 
         private Task HandleMainMenu(string command){

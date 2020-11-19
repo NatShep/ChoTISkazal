@@ -5,6 +5,17 @@ namespace SayWhat.MongoDAL.Users
 {
     public class User
     {
+        public User()
+        {
+            
+        }
+
+        public User(long telegramId, string nick)
+        {
+            this.TelegramId = telegramId;
+            this.Nick = nick;
+            Id = ObjectId.GenerateNewId();
+        }
         public ObjectId Id { get; set; }
 
         [BsonElement(UsersRepo.UserTelegramIdFieldName)]

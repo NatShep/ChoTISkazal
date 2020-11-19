@@ -2,8 +2,8 @@
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,20 +12,20 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitute";
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
 
-            var phrase = word.Phrases.GetRandomItem();
+            var phrase = word.GetRandomExample();
             
-            var replaced = phrase.PhraseRuTranslate.Replace(phrase.EnWord, "...");
-            if (replaced == phrase.PhraseRuTranslate)
+            var replaced = phrase.PhraseTranslation.Replace(phrase.WordTranslation, "...");
+            if (replaced == phrase.PhraseTranslation)
                 return ExamResult.Impossible;
 
             var sb = new StringBuilder();
             
-            sb.AppendLine($"\"{phrase.EnPhrase}\"");
+            sb.AppendLine($"\"{phrase.OriginPhrase}\"");
             sb.AppendLine($" translated as ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
@@ -36,13 +36,13 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.CompareOrdinal(phrase.EnWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
+                if (string.CompareOrdinal(phrase.OriginWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
                     await service.RegisterSuccessAsync(word);
                     return ExamResult.Passed;
                 }
 
-                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.PhraseRuTranslate}\"");
+                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.PhraseTranslation}\"");
                 await service.RegisterFailureAsync(word);
                 return ExamResult.Failed;
             }

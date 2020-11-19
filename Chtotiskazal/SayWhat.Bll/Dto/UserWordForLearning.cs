@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Chotiskazal.DAL.Services;
 
 // ReSharper disable MemberCanBePrivate.Global
 
- namespace Chotiskazal.Dal.DAL
+ namespace SayWhat.Bll.Dto
  {
      public class UserWordForLearning
      {

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.Questions
@@ -13,15 +13,15 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru Choose Phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
             
-            var targetPhrase = word.Phrases.GetRandomItem();
+            var targetPhrase = word.GetRandomExample();
 
             var other = examList.SelectMany(e => e.Phrases)
-                .Where(p => !string.IsNullOrWhiteSpace(p?.EnPhrase) && p!= targetPhrase)
+                .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p!= targetPhrase)
                 .Take(8).ToArray();
 
             if(!other.Any())
@@ -30,10 +30,10 @@ namespace Chotiskazal.Bot.Questions
             var variants = other
                 .Append(targetPhrase)
                 .Randomize()
-                .Select(e => e.EnPhrase)
+                .Select(e => e.OriginPhrase)
                 .ToArray();
             
-            var msg = $"=====>   {targetPhrase.PhraseRuTranslate}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {targetPhrase.PhraseTranslation}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
@@ -45,7 +45,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
             
-            if (variants[choice.Value] == targetPhrase.EnPhrase)
+            if (variants[choice.Value] == targetPhrase.OriginPhrase)
             {
                 await service.RegisterSuccessAsync(word);
                 return ExamResult.Passed;

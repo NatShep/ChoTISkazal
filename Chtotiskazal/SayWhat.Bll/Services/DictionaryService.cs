@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Dal.DAL;
 using MongoDB.Bson;
+using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
+using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
-namespace Chotiskazal.Dal.Services
+namespace SayWhat.Bll.Services
 {
     public class DictionaryService
     {
@@ -20,7 +21,7 @@ namespace Chotiskazal.Dal.Services
             string transcription, 
             TranslationSource sourse)
         {
-            var word = new DictionaryWord
+            var word = new MongoDAL.Dictionary.DictionaryWord
             {
                 Id = ObjectId.GenerateNewId(),
                 Language = Language.En,
@@ -29,7 +30,7 @@ namespace Chotiskazal.Dal.Services
                 Word = enword,
                 Translations = new[]
                 {
-                    new DictionaryTranslation
+                    new MongoDAL.Dictionary.DictionaryTranslation
                     {
                         Word = ruword,
                         Language = Language.Ru,
@@ -43,7 +44,7 @@ namespace Chotiskazal.Dal.Services
         public Task AddNewWordPairToDictionaryWithPhrasesAsync(string enword, string ruword,
             string transcription, TranslationSource source, List<Phrase> examples)
         {
-            var word = new DictionaryWord
+            var word = new MongoDAL.Dictionary.DictionaryWord
             {
                 Id = ObjectId.GenerateNewId(),
                 Language = Language.En,
@@ -52,7 +53,7 @@ namespace Chotiskazal.Dal.Services
                 Word = enword,
                 Translations = new[]
                 {
-                    new DictionaryTranslation
+                    new MongoDAL.Dictionary.DictionaryTranslation
                     {
                         Word = ruword,
                         Language = Language.Ru,
@@ -76,12 +77,12 @@ namespace Chotiskazal.Dal.Services
             return results.Translations.Select(t => t.Word).ToArray();
         }
 
-        public async Task<WordDictionary[]> GetAllPairsByWordWithPhrasesAsync(string enword)
+        public async Task<DictionaryTranslation[]> GetAllPairsByWordWithPhrasesAsync(string enword)
         {
             var word = await _dicRepository.GetOrDefault(enword);
             if(word==null)
-                return new WordDictionary[0];
-            return word.Translations.Select(t => new WordDictionary(
+                return new DictionaryTranslation[0];
+            return word.Translations.Select(t => new DictionaryTranslation(
                 word.Word,
                 t.Word,
                 t.Transcription,
@@ -91,5 +92,6 @@ namespace Chotiskazal.Dal.Services
         }
        // public async Task<Phrase[]> FindPhrasesBySomeIdsAsync(int[] allPhrasesIdForUser) =>
        //     await _dicRepository.FindPhrasesBySomeIdsForUserAsync(allPhrasesIdForUser);
+       public async Task AddNewWord(MongoDAL.Dictionary.DictionaryWord word) => _dicRepository.Add(word);
     }
 }

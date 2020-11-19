@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
         public ClearScreenExamDecorator(IExam origin)=> _origin = origin;
 
         public string Name => "Clean "+ _origin.Name;
-        public Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList) 
+        public Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList) 
             => _origin.Pass(chatIo, service, word, examList);
     }
 }

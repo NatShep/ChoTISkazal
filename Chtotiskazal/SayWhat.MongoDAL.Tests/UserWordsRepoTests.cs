@@ -28,7 +28,7 @@ namespace SayWhat.MongoDAL.Tests
             var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(1, allWords.Count);
             Assert.AreEqual("table", allWords[0].Word);
-            Assert.AreEqual("стол", allWords[0].Translations[0].Translation);
+            Assert.AreEqual("стол", allWords[0].Translations[0].Word);
         }
 
         [TestCase(0,0)]
@@ -67,7 +67,7 @@ namespace SayWhat.MongoDAL.Tests
                 var origin = worstOnes[i];
                 var current = allWords[i];
                 Assert.AreEqual(origin.Word, current.Word);
-                Assert.AreEqual(origin.Translations[0].Translation, current.Translations[0].Translation);
+                Assert.AreEqual(origin.Translations[0].Word, current.Translations[0].Word);
             }
         }
         
@@ -95,7 +95,7 @@ namespace SayWhat.MongoDAL.Tests
             {
                 new UserWordTranslation
                 {
-                    Translation = tranlation
+                    Word = tranlation
                 }
             }};
         }

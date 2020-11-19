@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Services;
+using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -22,19 +23,19 @@ namespace Chotiskazal.Bot.ChatFlows
             _yaService = yaService;
         }
 
-        public async Task Enter(int userId, string? word = null)
+        public async Task Enter(User user, string? word = null)
         {
             var yaStatus = _yaService.PingYandex();
 
             while (true)
             {
-                if (!await EnterSingleWordAsync(userId, yaStatus.isYaDicOnline, word))
+                if (!await EnterSingleWordAsync(user, yaStatus.isYaDicOnline, word))
                     break;
                 word = null;
             }
         }
 
-        private async Task<bool> EnterSingleWordAsync(int userId, bool isYaDicOnline, string? word = null)
+        private async Task<bool> EnterSingleWordAsync(User user, bool isYaDicOnline, string? word = null)
         {
             if (word == null)
             {
@@ -68,7 +69,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
             await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
-                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.UserTranslations)));
+                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.EnWord)));
 
             while (true)
             {
@@ -79,7 +80,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     continue;
                 
                 var selected = translations[input.Value];
-                var count = await _addWordService.AddSomeWordsToUserCollectionAsync(userId, new[] {selected});
+                var count = await _addWordService.AddSomeWordsToUserCollectionAsync(user, new[] {selected});
                 await _chatIo.SendMessageAsync($"Saved. Translations: {count}");
                 return true;
             }

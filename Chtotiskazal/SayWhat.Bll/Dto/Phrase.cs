@@ -1,4 +1,4 @@
-﻿namespace Chotiskazal.Dal.DAL
+﻿namespace SayWhat.Bll.Dto
 {
     public class Phrase
     {

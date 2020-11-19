@@ -23,5 +23,12 @@ namespace SayWhat.MongoDAL.Words
         public int PassedScore { get; set; }
         public int Examed { get; set; }
         public double AggregateScore { get; set; }
+        public UserWordType Type { get; set; }
+    }
+
+    public enum UserWordType
+    {
+        UsualWord,
+        AutoPhrase
     }
 }
