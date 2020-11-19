@@ -69,7 +69,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
             await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
-                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.EnWord)));
+                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.RuWord)));
 
             while (true)
             {

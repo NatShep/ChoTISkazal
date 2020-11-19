@@ -84,6 +84,70 @@ namespace SayWhat.MongoDAL.Tests
             var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(count, allWords.Count);
         }
+        
+        [Test]
+        public async Task TableHasNoWordsForUser_HasAnyReturnsFalse()
+        {
+            var user = new User {Id = ObjectId.GenerateNewId()};
+            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            var hasAny =  await _repo.HasAnyFor(new User{Id = ObjectId.GenerateNewId()});
+            Assert.IsFalse(hasAny);
+        }
+
+        [Test]
+        public async Task TableHasWordsForUser_HasAnyReturnsTrue()
+        {
+            var user = new User {Id = ObjectId.GenerateNewId()};
+            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            var hasAny =  await _repo.HasAnyFor(user);
+            Assert.True(hasAny);
+        }
+        
+        [Test]
+        public async Task TableHasWordForUser_GetWordReturnIt()
+        {
+            var user = new User {Id = ObjectId.GenerateNewId()};
+            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            var word =  await _repo.GetWordOrDefault(user,"table");
+            Assert.IsNotNull(word);
+            Assert.AreEqual("table",word.Word);
+            Assert.AreEqual("стол",word.Translations[0].Word);
+        }
+        
+        [Test]
+        public async Task TableHasWordForOtherUser_GetWordReturnNull()
+        {
+            var user = new User {Id = ObjectId.GenerateNewId()};
+            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            var word =  await _repo.GetWordOrDefault(new User{Id = ObjectId.GenerateNewId()}, "table");
+            Assert.IsNull(word);
+        }
+        
+        [Test]
+        public async Task Update_GetReturnsUpdated()
+        {
+            var user = new User {Id = ObjectId.GenerateNewId()};
+            var word = CreateWord(user.Id, "table", "стол");
+            await _repo.Add(word);
+            word.Translations = word.Translations.Append(new UserWordTranslation
+            {
+                Word = "таблица",
+                Examples = new[]
+                {
+                    new UserWordTranslationExample
+                    {
+                        Origin = "in the table",
+                        Translation = "в таблице"
+                    }
+                }
+            }).ToArray();
+            await _repo.Update(word);
+            var readWord =  await _repo.GetWordOrDefault(user, "table");
+            Assert.IsNotNull(readWord);
+            Assert.AreEqual(2,readWord.Translations.Length);
+            Assert.AreEqual("стол",readWord.Translations[0].Word);
+            Assert.AreEqual("таблица",readWord.Translations[1].Word);
+        }
 
         private static UserWord CreateWord(ObjectId userId, string word, string tranlation,double rate = 0 )
         {

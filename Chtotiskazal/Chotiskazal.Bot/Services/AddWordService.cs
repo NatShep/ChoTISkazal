@@ -34,8 +34,6 @@ namespace Chotiskazal.Bot.Services
         {
             englishWord = englishWord.ToLower();
             
-            var wordsForLearning = new List<UserWordForLearning>();
-            
             if (!englishWord.Contains(' '))
             {
                 var result =await _yaDicClient.TranslateAsync(englishWord);
@@ -54,6 +52,7 @@ namespace Chotiskazal.Bot.Services
                 {
                     Id = ObjectId.GenerateNewId(),
                     Language = Language.En,
+                    Word = englishWord,
                     Source = TranslationSource.Yadic,
                     Transcription = result.FirstOrDefault()?.Ts,
                     Translations = variants.Select(v => new SayWhat.MongoDAL.Dictionary.DictionaryTranslation
@@ -61,12 +60,12 @@ namespace Chotiskazal.Bot.Services
                         Id = ObjectId.GenerateNewId(),
                         Word = v.translation.Text,
                         Transcription = v.defenition.Ts,
-                        Examples = v.translation.Ex.Select(e => new DictionaryExample
+                        Examples = v.translation.Ex?.Select(e => new DictionaryExample
                         {
                             Id = ObjectId.GenerateNewId(),
                             OriginExample = e.Text,
                             TranslationExample = e.Tr.First().Text,
-                        }).ToArray()
+                        }).ToArray()?? new DictionaryExample[0]
                     }).ToArray()
                 };
                 await _dictionaryService.AddNewWord(word);
@@ -76,27 +75,6 @@ namespace Chotiskazal.Bot.Services
                     )).ToArray();
 
             }
-
-            /*try
-            {
-                var transAnsTask =  await _yaTransClient.Translate(englishWord);
-                if (!string.IsNullOrWhiteSpace(transAnsTask))
-                {
-                    //1. Заполняем бд(wordDictionary, фраз нет)
-                    var id = await _dictionaryService.AddNewWordPairToDictionaryAsync(
-                        englishWord,
-                        transAnsTask,
-                        "[]",
-                        TranslationSource.Yadic);
-                    //2. Дополняем ответ
-                    wordsForLearning.Add(UserWordForLearning.CreatePair(englishWord, transAnsTask, ""));
-                }
-            }
-            catch (Exception e)
-            {
-                return wordsForLearning;
-            }*/
-
             return null;
         }
 

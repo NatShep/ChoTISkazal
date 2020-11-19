@@ -51,13 +51,22 @@ namespace Chotiskazal.Bot
             var connectionString = "mongodb://localhost";
             var client = new MongoClient(connectionString);
             var db = client.GetDatabase("SayWhat");
+
+            var userWordRepo = new UserWordsRepo(db);
+            var dictionaryRepo = new DictionaryRepo(db);
+            var userRepo = new UsersRepo(db);
+
+            userWordRepo.UpdateDb();
+            dictionaryRepo.UpdateDb();
+            userRepo.UpdateDb();
             
-            var userWordService = new UsersWordsService(new UserWordsRepo(db));
-            var dictionaryService= new DictionaryService(new DictionaryRepo(db));
+            var userWordService = new UsersWordsService(userWordRepo);
+            var dictionaryService= new DictionaryService(dictionaryRepo);
+            _authorizeService = new AuthorizeService(new UserService(userRepo));
+
             var examsAndMetricService = new ExamsAndMetricService();
 
             _yaService = new YaService(yandexDictionaryClient,yandexTranslateApiClient);
-            _authorizeService = new AuthorizeService(new UserService(new UsersRepo(db)));
             _addWordService = new AddWordService(
                 userWordService, 
                 yandexDictionaryClient,

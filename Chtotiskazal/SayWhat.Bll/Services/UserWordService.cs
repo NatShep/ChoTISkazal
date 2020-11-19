@@ -45,13 +45,14 @@ namespace SayWhat.Bll.Services
 
         public async Task UpdateAgingAndRandomizeAsync(User user, int count)
         {
-            var words = await _userWordsRepository.GetRandowWords(user, count);
+            // not implemented
+            /*var words = await _userWordsRepository.GetRandowWords(user, count);
             foreach (var word in words)
             {
                 var model = new UserWordModel(word);
                 model.UpdateAgingAndRandomization();
                 await _userWordsRepository.Update(model.Entity);
-            }
+            }*/
         }
 
         public async Task RegisterSuccessAwait(UserWordModel model)

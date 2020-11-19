@@ -9,6 +9,7 @@ namespace SayWhat.MongoDAL.Words
         [BsonElement(UserWordsRepo.UserIdFieldName)]
         public ObjectId     UserId   { get; set; }
         public TranlationDirection Language { get; set; }
+        [BsonElement(UserWordsRepo.OriginWordFieldName)]
         public string   Word { get; set; }
         public double AbsoluteScore { get; set; }
         
