@@ -42,10 +42,11 @@ namespace SayWhat.Bll
 
          public UserWord Entity => _entity;
 
-         public bool HasAnyPhrases => _entity.Translations.Any(t => t.Examples.Any());
+         public bool HasAnyPhrases => _entity.Translations.Any(t => t.Examples?.Any()==true);
          public string Word => _entity.Word;
          public IEnumerable<WordExample> Phrases => 
-             _entity.Translations.SelectMany(t => t.Examples.Select(e=>new WordExample(Word,t.Word,e.Origin, e.Translation)));
+             _entity.Translations
+                 .SelectMany(t => t.Examples.Select(e=>new WordExample(Word,t.Word,e.Origin, e.Translation)));
          public IEnumerable<string> TranlatedPhrases => _entity.Translations.SelectMany(t => t.Examples).Select(e=>e.Translation);
          public IEnumerable<string> OriginPhrases => _entity.Translations.SelectMany(t => t.Examples).Select(e=>e.Origin);
          public int PassedScore => _entity.PassedScore;

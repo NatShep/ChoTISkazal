@@ -62,7 +62,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var translations = await _addWordService.FindInDictionaryWithPhrases(word);
             if (!translations.Any() && isYaDicOnline)
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
-            if (!translations.Any())
+            if (translations?.Any()!=true)
             {
                 await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
                 return true;
