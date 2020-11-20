@@ -2,11 +2,21 @@
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Chotiskazal.Dal.DAL
+namespace SayWhat.Bll
 {
     public class QuestionMetric
     {
-        public int MetricId { get; set; }
+        public QuestionMetric(UserWordModel pairModel, string examName)
+        {
+            Word = pairModel.Word;
+            Created = DateTime.Now;
+            AggregateScoreBefore = pairModel.AggregateScore;
+            ExamsPassed = pairModel.Examed;
+            PassedScoreBefore = pairModel.PassedScore;
+            PreviousExam = pairModel.LastExam;
+            Type = examName;
+        }
+        
         public string Word { get; set; }
         public DateTime Created { get; set; }
         public DateTime? PreviousExam { get; set; }

@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 
-namespace Chotiskazal.Bot.Services
+namespace SayWhat.Bll.Services
 {
     public class AuthorizeService
     {

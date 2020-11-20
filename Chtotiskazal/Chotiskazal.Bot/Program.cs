@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
+using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SayWhat.Bll.Services;
@@ -21,9 +21,10 @@ namespace Chotiskazal.Bot
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
+        private static DictionaryService _dictionaryService;
         private static AuthorizeService _authorizeService;
-        private static ExamService _examService;
-        private static YaService _yaService;
+        private static UsersWordsService _userWordService;
+        private static MetricService _metricService;
 
         private static void Main()
         {
@@ -60,23 +61,19 @@ namespace Chotiskazal.Bot
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
             
-            var userWordService = new UsersWordsService(userWordRepo);
-            var dictionaryService= new DictionaryService(dictionaryRepo);
+            _userWordService = new UsersWordsService(userWordRepo);
+            _dictionaryService= new DictionaryService(dictionaryRepo);
             _authorizeService = new AuthorizeService(new UserService(userRepo));
 
-            var examsAndMetricService = new ExamsAndMetricService();
-
-            _yaService = new YaService(yandexDictionaryClient,yandexTranslateApiClient);
+            _metricService = new MetricService();
             _addWordService = new AddWordService(
-                userWordService, 
+                _userWordService, 
                 yandexDictionaryClient,
                 yandexTranslateApiClient,
-                dictionaryService);
-            _examService=new ExamService(
-                examsAndMetricService,
-                dictionaryService,
-                userWordService);
-
+                _dictionaryService);
+            
+            ExamSelector.Singletone = new ExamSelector(_dictionaryService);
+            
             //DoMigration.ApplyMigrations(dbFileName);
       
             Console.WriteLine("Dic started");
@@ -103,23 +100,20 @@ namespace Chotiskazal.Bot
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
 
-            var newChat = new ChatIO(_botClient, chat);
-
-            var newChatRoom = new ChatRoomFlow(newChat,chat.FirstName)
-            {
-                ExamSrvc = _examService,
-                AddWordSrvc = _addWordService,
-                AuthorizeSrvc = _authorizeService,
-                YaSrvc = _yaService
-                
-            };
+            var newChatRoom = new ChatRoomFlow(
+                new ChatIO(_botClient, chat), 
+                chat.FirstName,
+                _addWordService,
+                _dictionaryService, 
+                _userWordService, 
+                _metricService, 
+                _authorizeService);
             
             var task = newChatRoom.Run();
 
             task.ContinueWith((t) => Botlog.Write($"faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             Chats.TryAdd(chat.Id, newChatRoom);
-         
-            return null;
+            return newChatRoom;
         }
 
         private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)

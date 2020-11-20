@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
             
@@ -27,11 +27,11 @@ namespace Chotiskazal.Bot.Questions
 
             if (word.GetTranslations().Contains(variants[choice.Value]))
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
-            await service.RegisterFailureAsync(word);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

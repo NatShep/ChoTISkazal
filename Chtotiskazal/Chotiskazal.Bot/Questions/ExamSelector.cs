@@ -2,155 +2,145 @@
 using System.Collections.Generic;
 using System.Linq;
 using SayWhat.Bll;
-using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public static class ExamSelector
+    public class ExamSelector
     {
-        private static readonly ExamAndPreferredScore EngChoose = new ExamAndPreferredScore(
+        public static ExamSelector Singletone { get; set; }
+        private readonly ExamAndPreferredScore EngChoose = new ExamAndPreferredScore(
             exam: new EngChooseExam(),
             expectedScore: 2,
             frequency: 7);
-        private static readonly ExamAndPreferredScore RuChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore RuChoose = new ExamAndPreferredScore(
             exam: new RuChooseExam(),
             expectedScore: 2,
             frequency: 7);
-        private static readonly ExamAndPreferredScore EngTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore EngTrust = new ExamAndPreferredScore(
             exam: new EnTrustExam(),
             expectedScore: 6,
             frequency: 10);
-        private static readonly ExamAndPreferredScore RuTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore RuTrust = new ExamAndPreferredScore(
             exam: new RuTrustExam(),
             expectedScore: 6,
             frequency: 10);
-        private static readonly ExamAndPreferredScore EngPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore EngPhraseChoose = new ExamAndPreferredScore(
             exam: new EngChoosePhraseExam(),
             expectedScore: 4,
             frequency: 4);
-        private static readonly ExamAndPreferredScore RuPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore RuPhraseChoose = new ExamAndPreferredScore(
             exam: new RuChoosePhraseExam(),
             expectedScore: 4,
             frequency: 4);
         
-        private static readonly ExamAndPreferredScore EngChooseWordInPhrase = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore EngChooseWordInPhrase = new ExamAndPreferredScore(
             new EngChooseWordInPhraseExam(),6,20);
 
-        private static readonly ExamAndPreferredScore ClearEngChooseWordInPhrase = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore ClearEngChooseWordInPhrase = new ExamAndPreferredScore(
             new ClearScreenExamDecorator(new EngChooseWordInPhraseExam()), 7, 20);
 
-        private static readonly ExamAndPreferredScore EngPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore EngPhraseSubstitute = new ExamAndPreferredScore(
             exam: new EngPhraseSubstituteExam(),
             expectedScore: 6,
             frequency: 12);
-        private static readonly ExamAndPreferredScore RuPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore RuPhraseSubstitute = new ExamAndPreferredScore(
             exam: new RuPhraseSubstituteExam(),
             expectedScore: 6,
             frequency: 12);
 
-        private static readonly ExamAndPreferredScore AssemblePhraseExam = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore AssemblePhraseExam = new ExamAndPreferredScore(
             new AssemblePhraseExam(), 7, 7);
 
-        private static readonly ExamAndPreferredScore ClearEngPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore ClearEngPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstituteExam()), 
             expectedScore: 8,
             frequency: 12);
 
-        private static readonly ExamAndPreferredScore ClearRuPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore ClearRuPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuPhraseSubstituteExam()),
             expectedScore: 8,
             frequency: 12);
 
-        private static readonly ExamAndPreferredScore EngWrite =
+        private ExamAndPreferredScore EngWrite(DictionaryService service) =>
             new ExamAndPreferredScore(
-                exam: new EngWriteExam(),
+                exam: new EngWriteExam(service),
                 expectedScore: 8,
                 frequency: 14);
        
-        private static readonly ExamAndPreferredScore RuWrite = new ExamAndPreferredScore(
-            exam: new RuWriteExam(),
+        private ExamAndPreferredScore RuWrite(DictionaryService service) => new ExamAndPreferredScore(
+            exam: new RuWriteExam(service),
             expectedScore: 8,
             frequency: 14);
         
-       private static readonly ExamAndPreferredScore HideousEngPhraseChoose = new ExamAndPreferredScore(
+       private readonly ExamAndPreferredScore HideousEngPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
             frequency: 10);
        
-        private static readonly ExamAndPreferredScore HideousRuPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore HideousRuPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuChoosePhraseExam()),
             expectedScore: 7,
             frequency: 10);
         
-        private static readonly ExamAndPreferredScore HideousEngTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore HideousEngTrust = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EnTrustExam()),
             expectedScore: 10,
             frequency: 2);
         
-        private static readonly ExamAndPreferredScore HideousRuTrust =
+        private readonly ExamAndPreferredScore HideousRuTrust =
             new ExamAndPreferredScore(
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
                 frequency: 3);
         
-        private static readonly ExamAndPreferredScore HideousEngWriteExam =
+        private ExamAndPreferredScore HideousEngWriteExam(DictionaryService service) =>
             new ExamAndPreferredScore(
-                exam: new ClearScreenExamDecorator(new EngWriteExam()),
+                exam: new ClearScreenExamDecorator(new EngWriteExam(service)),
                 expectedScore: 12,
                 frequency: 14);
         
-        private static readonly ExamAndPreferredScore HideousRuWriteExam =
+        private ExamAndPreferredScore HideousRuWriteExam(DictionaryService service) =>
             new ExamAndPreferredScore(
-                exam: new ClearScreenExamDecorator(new RuWriteExam()),
+                exam: new ClearScreenExamDecorator(new RuWriteExam(service)),
                 expectedScore: 12,
                 frequency: 14);
 
-        public static IExam GetNextExamFor(bool isFirstExam, UserWordModel model)
+        public ExamSelector(DictionaryService dictionaryService)
         {
-            if (isFirstExam && model.PassedScore < 7)
+            _simpleExamsList = new[]
             {
-                var list = new[]
-                {
-                    EngChoose.Exam,
-                    RuChoose.Exam,
-                    RuPhraseChoose.Exam,
-                    EngPhraseChoose.Exam,  
-                    EngChooseWordInPhrase.Exam,
-                };
-                return list.GetRandomItem();
-            }
-
-            var score = model.PassedScore - (isFirstExam ? 2 : 0);
-
-            if (model.PassedScore < 4)
+                EngChoose,
+                RuChoose,
+                RuPhraseChoose,
+                EngPhraseChoose,  
+                EngChooseWordInPhrase,
+            };
+            _intermidiateExamsList = new[]
             {
-                return ChooseExam(score, new []
-                {
-                    EngChoose,
-                    RuChoose,
-                    EngTrust, 
-                    RuTrust, 
-                    HideousRuTrust, 
-                    HideousEngTrust,
-                });
-            }
-
-            return ChooseExam(score, new []
+                EngChoose,
+                RuChoose,
+                EngTrust,
+                RuTrust,
+                HideousRuTrust,
+                HideousEngTrust,
+            };
+            _advancedExamsList = new[]
             {
                 EngChoose,
                 RuChoose,
                 EngPhraseChoose,
-                RuPhraseChoose, 
-                EngTrust, 
-                RuTrust, 
-                EngWrite, 
-                RuWrite, 
+                RuPhraseChoose,
+                EngTrust,
+                RuTrust,
+                EngWrite(dictionaryService),
+                RuWrite(dictionaryService),
                 HideousRuPhraseChoose,
-                HideousEngPhraseChoose, 
-                HideousEngTrust, 
-                HideousRuTrust, 
-                HideousEngWriteExam, 
-                HideousRuWriteExam,
+                HideousEngPhraseChoose,
+                HideousEngTrust,
+                HideousRuTrust,
+                HideousEngWriteExam(dictionaryService),
+                HideousRuWriteExam(dictionaryService),
                 ClearEngPhraseSubstitute,
                 ClearRuPhraseSubstitute,
                 EngPhraseSubstitute,
@@ -158,7 +148,24 @@ namespace Chotiskazal.Bot.Questions
                 EngChooseWordInPhrase,
                 ClearEngChooseWordInPhrase,
                 AssemblePhraseExam,
-            });
+            };
+        }
+
+        private readonly ExamAndPreferredScore[] _simpleExamsList;
+        private readonly ExamAndPreferredScore[] _intermidiateExamsList;
+        private readonly ExamAndPreferredScore[] _advancedExamsList;
+
+        public IExam GetNextExamFor(bool isFirstExam, UserWordModel model)
+        {
+            if (isFirstExam && model.PassedScore < 7)
+                return _simpleExamsList.GetRandomItem().Exam;
+
+            var score = model.PassedScore - (isFirstExam ? 2 : 0);
+
+            if (model.PassedScore < 4)
+                return ChooseExam(score, _intermidiateExamsList);
+            else
+                return ChooseExam(score,_advancedExamsList);
         }
 
         private static IExam ChooseExam(int score, ExamAndPreferredScore[] exams)

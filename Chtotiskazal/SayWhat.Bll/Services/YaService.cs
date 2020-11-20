@@ -2,8 +2,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using SayWhat.Bll.Yapi;
 
-
-namespace Chotiskazal.Bot.Services
+namespace SayWhat.Bll.Services
 {
     public class YaService
     {

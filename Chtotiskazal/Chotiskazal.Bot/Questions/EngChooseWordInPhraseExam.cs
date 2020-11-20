@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose word in phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -41,12 +41,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (variants[choice.Value] == word.Word)
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
             await chatIo.SendMessageAsync($"Origin was: \"{phrase.OriginPhrase}\"");
-            await service.RegisterFailureAsync(word);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

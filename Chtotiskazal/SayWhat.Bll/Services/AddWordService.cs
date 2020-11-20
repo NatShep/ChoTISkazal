@@ -2,9 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using SayWhat.Bll;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
@@ -12,7 +10,7 @@ using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
-namespace Chotiskazal.Bot.Services
+namespace SayWhat.Bll.Services
 {
     public class AddWordService
     {
@@ -73,7 +71,6 @@ namespace Chotiskazal.Bot.Services
                     t=> new DictionaryTranslation(word.Word,t.Word, t.Transcription, word.Source,
                             t.Examples.Select(e=>new Phrase(e.OriginExample,e.TranslationExample)).ToList()
                     )).ToArray();
-
             }
             return null;
         }

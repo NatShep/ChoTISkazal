@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitute";
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -38,12 +38,12 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (string.CompareOrdinal(phrase.OriginWord.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    await service.RegisterSuccessAsync(word);
+                    await service.RegisterSuccess(word);
                     return ExamResult.Passed;
                 }
 
                 await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.PhraseTranslation}\"");
-                await service.RegisterFailureAsync(word);
+                await service.RegisterFailure(word);
                 return ExamResult.Failed;
             }
         }

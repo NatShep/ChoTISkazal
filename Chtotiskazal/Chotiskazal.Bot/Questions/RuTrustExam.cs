@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.Questions
@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"=====>   {word.TranlationAsList}    <=====\r\nDo you know the translation?";
             var _ = chatIo.SendMessageAsync(msg,
@@ -39,12 +39,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (choice == 1)
             {
-                await  service.RegisterSuccessAsync(word);
+                await  service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
             else
             {
-               await service.RegisterFailureAsync(word);
+               await service.RegisterFailure(word);
                 return ExamResult.Failed;
             }
         }

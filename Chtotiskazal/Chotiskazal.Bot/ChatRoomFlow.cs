@@ -1,27 +1,39 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
-using Chotiskazal.Bot.Services;
+using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(ChatIO chatIo,string firstName)
+        public ChatRoomFlow(
+            ChatIO chatIo,
+            string firstName, 
+            AddWordService addWordsService, 
+            DictionaryService dictionaryService, 
+            UsersWordsService usersWordsService, 
+            MetricService metricService, 
+            AuthorizeService authorizeService)
         {
             ChatIo = chatIo;
             _userFirstName = firstName;
+            _addWordsService = addWordsService;
+            _dictionaryService = dictionaryService;
+            _usersWordsService = usersWordsService;
+            _metricService = metricService;
+            _authorizeService = authorizeService;
         }
 
         private User User { get; set; }
             
         private readonly string _userFirstName;
-        public AddWordService AddWordSrvc { get; set; }
-        public ExamService ExamSrvc { get; set; }
-        public AuthorizeService AuthorizeSrvc { get; set; }
-        public YaService YaSrvc { get; set; }
-        
+        private readonly MetricService _metricService;
+        private readonly AddWordService _addWordsService;
+        private readonly DictionaryService _dictionaryService;
+        private readonly UsersWordsService _usersWordsService;
+        private readonly AuthorizeService _authorizeService;
         public ChatIO ChatIo { get;}
 
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userFirstName}! I am ChoTiSkazal.");
@@ -31,7 +43,7 @@ namespace Chotiskazal.Bot
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
             
-            User = await AuthorizeSrvc.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
+            User = await _authorizeService.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
             
             await SayHelloAsync();
             
@@ -61,7 +73,8 @@ namespace Chotiskazal.Bot
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task DoExamine() => new ExamFlow(ChatIo, ExamSrvc).EnterAsync(User);
+        private Task DoExamine() => new ExamFlow(ChatIo,_metricService, _usersWordsService)
+            .EnterAsync(User);
         
         //TODO show stats to user here
         /*
@@ -74,7 +87,7 @@ namespace Chotiskazal.Bot
 
         private Task EnterWord(string text = null)
         {
-            var mode = new AddingWordsMode(ChatIo, AddWordSrvc,YaSrvc);
+            var mode = new AddingWordsMode(ChatIo, _addWordsService);
             return mode.Enter(User, text);
         }
 

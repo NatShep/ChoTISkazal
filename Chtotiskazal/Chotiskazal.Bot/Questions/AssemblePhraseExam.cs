@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Assemble phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList) 
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList) 
         {
             if (!word.HasAnyPhrases)
                 return ExamResult.Impossible;
@@ -43,12 +43,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (string.CompareOrdinal(targetPhrase.OriginPhrase, entry) == 0)
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
             await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.OriginPhrase}'");
-            await service.RegisterFailureAsync(word);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

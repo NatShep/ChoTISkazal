@@ -69,7 +69,7 @@ namespace SayWhat.Bll.Services
             return _dicRepository.Add(word);
         }
 
-        public async Task<string[]> GetAllTranslationsAsync(string enword)
+        public async Task<string[]> GetAllTranslations(string enword)
         {
             var results = await _dicRepository.GetOrDefault(enword);
             if(results==null)

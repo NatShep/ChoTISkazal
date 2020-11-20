@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Phrases.Any())
                 return ExamResult.Impossible;
@@ -36,7 +36,7 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (string.CompareOrdinal(word.Word.ToLower().Trim(), enter.ToLower().Trim()) == 0)
                 {
-                    await service.RegisterSuccessAsync(word);
+                    await service.RegisterSuccess(word);
                     return ExamResult.Passed;
                 }
 

@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
+using MongoDB.Bson.Serialization.Serializers;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
     public class EngWriteExam : IExam
     {
+        private readonly DictionaryService _dictionaryService;
+
+        public EngWriteExam(DictionaryService dictionaryService)
+        {
+            _dictionaryService = dictionaryService;
+        }
         public bool NeedClearScreen => false;
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.GetTranslations().ToArray();
@@ -30,11 +37,11 @@ namespace Chotiskazal.Bot.Questions
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
-            var allMeaningsOfWord = await service.GetAllMeaningOfWordForExamination(word.Word);
+            var allMeaningsOfWord = await _dictionaryService.GetAllTranslations(word.Word);
           
             if (allMeaningsOfWord
                 .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
@@ -46,7 +53,7 @@ namespace Chotiskazal.Bot.Questions
             }
 
             await chatIo.SendMessageAsync("The translation was: " + word.TranlationAsList);
-            await service.RegisterFailureAsync(word);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }
