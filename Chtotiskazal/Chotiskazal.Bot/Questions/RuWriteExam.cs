@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot.Questions
             }
             //search for other translation
             var translationCandidate = await _dictionaryService.GetAllTranslations(userEntry.ToLower());
-
+            
             if (translationCandidate.Any(t1 =>
                 word.GetTranslations().Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))
             {
@@ -50,7 +50,8 @@ namespace Chotiskazal.Bot.Questions
             }
             
             var translates = string.Join(",",translationCandidate);
-            await chatIo.SendMessageAsync($"'{userEntry}' translates as {translates}");
+            if(!string.IsNullOrWhiteSpace(translates))
+                await chatIo.SendMessageAsync($"'{userEntry}' translates as {translates}");
             await chatIo.SendMessageAsync("The right translation was: " + word.Word);
             await service.RegisterFailure(word);
             return ExamResult.Failed;

@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (input.CallbackQuery != null && input.CallbackQuery.Data == "/exit")
                         throw new ProcessInterruptedWithMenuCommand("/start");
 
-                    if (!string.IsNullOrEmpty(input.Message.Text))
+                    if (!string.IsNullOrEmpty(input.Message?.Text))
                     {
                         word = input.Message.Text;
                         break;
