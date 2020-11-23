@@ -24,9 +24,9 @@ namespace SayWhat.MongoDAL.Tests
             await _repo.Add(example);
             var read = await _repo.GetOrDefault(example.Id);
             
-            Assert.AreEqual(example.OriginExample, read.OriginExample);
+            Assert.AreEqual(example.OriginPhrase, read.OriginPhrase);
             Assert.AreEqual(example.OriginWord, read.OriginWord);
-            Assert.AreEqual(example.TranslatedExample, read.TranslatedExample);
+            Assert.AreEqual(example.TranslatedPhrase, read.TranslatedPhrase);
             Assert.AreEqual(example.TranslatedWord, read.TranslatedWord);
         }
 
@@ -38,9 +38,9 @@ namespace SayWhat.MongoDAL.Tests
             var all = await _repo.GetAll(new[]{example.Id});
             Assert.AreEqual(1,all.Count);
             var read = all.First();
-            Assert.AreEqual(example.OriginExample, read.OriginExample);
+            Assert.AreEqual(example.OriginPhrase, read.OriginPhrase);
             Assert.AreEqual(example.OriginWord, read.OriginWord);
-            Assert.AreEqual(example.TranslatedExample, read.TranslatedExample);
+            Assert.AreEqual(example.TranslatedPhrase, read.TranslatedPhrase);
             Assert.AreEqual(example.TranslatedWord, read.TranslatedWord);
         }
         
@@ -65,7 +65,7 @@ namespace SayWhat.MongoDAL.Tests
                 new Example
                 {
                     Id = ObjectId.GenerateNewId(),
-                    OriginExample = "on the table", OriginWord = originWord, TranslatedExample = "на столе",
+                    OriginPhrase = "on the table", OriginWord = originWord, TranslatedPhrase = "на столе",
                     TranslatedWord = translatedWord
                 };
        

@@ -41,7 +41,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Passed;
             }
 
-            var allMeaningsOfWord = await _dictionaryService.GetAllTranslations(word.Word);
+            var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
           
             if (allMeaningsOfWord
                 .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))

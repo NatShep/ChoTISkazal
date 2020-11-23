@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text.Json.Serialization;
 using SayWhat.Bll.Dto;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.Bll.Yapi
 {
@@ -37,18 +39,19 @@ namespace SayWhat.Bll.Yapi
         [JsonPropertyName("mean")]
         public JustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
-        public Example[] Ex { get; set; }
-        public List<Phrase> GetPhrases(string word)
+        public YaExample[] Ex { get; set; }
+        public List<Example> GetPhrases(string word)
         {
-            List<Phrase> phrases = new List<Phrase>();
+            var phrases = new List<Example>();
             if (this.Ex == null) 
                 return phrases;
-            phrases.AddRange(this.Ex.Select(example => new Phrase
+            phrases.AddRange(this.Ex.Select(example => new Example
             {
-                EnWord = word, 
-                EnPhrase = example.Text, 
-                PhraseRuTranslate = example.Tr.FirstOrDefault()?.Text, 
-                WordTranslate = this.Text,
+                OriginWord = word, 
+                OriginPhrase = example.Text, 
+                TranslatedPhrase = example.Tr.FirstOrDefault()?.Text, 
+                TranslatedWord = this.Text,
+                Direction = TranlationDirection.EnRu,
             }));
             return phrases;
         }
@@ -71,7 +74,7 @@ namespace SayWhat.Bll.Yapi
         public string Text { get; set; }
     }
 
-    public class Example
+    public class YaExample
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }

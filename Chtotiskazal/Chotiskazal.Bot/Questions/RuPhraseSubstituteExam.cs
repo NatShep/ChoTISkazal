@@ -19,8 +19,8 @@ namespace Chotiskazal.Bot.Questions
 
             var phrase = word.GetRandomExample();
             
-            var replaced = phrase.PhraseTranslation.Replace(phrase.WordTranslation, "...");
-            if (replaced == phrase.PhraseTranslation)
+            var replaced = phrase.TranslatedPhrase.Replace(phrase.TranslatedWord, "...");
+            if (replaced == phrase.TranslatedPhrase)
                 return ExamResult.Impossible;
 
             var sb = new StringBuilder();
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.Questions
                     return ExamResult.Passed;
                 }
 
-                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.PhraseTranslation}\"");
+                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.TranslatedPhrase}\"");
                 await service.RegisterFailure(word);
                 return ExamResult.Failed;
             }

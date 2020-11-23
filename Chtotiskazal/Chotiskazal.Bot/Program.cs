@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot;
@@ -22,7 +23,7 @@ namespace Chotiskazal.Bot
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
-        private static AuthorizeService _authorizeService;
+        private static AuthorizationService _authorizationService;
         private static UsersWordsService _userWordService;
         private static MetricService _metricService;
 
@@ -51,21 +52,22 @@ namespace Chotiskazal.Bot
                 
             var connectionString = "mongodb://localhost";
             var client = new MongoClient(connectionString);
-            var db = client.GetDatabase("SayWhat");
+            var db = client.GetDatabase("SayWhatEx");
 
             var userWordRepo = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);
             var userRepo = new UsersRepo(db);
-
+            var examplesRepo = new ExamplesRepo(db);
+            
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
             
-            _userWordService = new UsersWordsService(userWordRepo);
-            _dictionaryService= new DictionaryService(dictionaryRepo);
-            _authorizeService = new AuthorizeService(new UserService(userRepo));
+            _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
+            _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
+            _authorizationService = new AuthorizationService(new UserService(userRepo));
 
-            _metricService = new MetricService();
+            _metricService  = new MetricService();
             _addWordService = new AddWordService(
                 _userWordService, 
                 yandexDictionaryClient,
@@ -107,7 +109,7 @@ namespace Chotiskazal.Bot
                 _dictionaryService, 
                 _userWordService, 
                 _metricService, 
-                _authorizeService);
+                _authorizationService);
             
             var task = newChatRoom.Run();
 

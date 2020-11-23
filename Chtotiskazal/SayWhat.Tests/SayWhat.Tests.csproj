@@ -4,6 +4,8 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
         <IsPackable>false</IsPackable>
+
+        <RootNamespace>SayWhat.MongoDAL.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SayWhat.Bll\SayWhat.Bll.csproj" />
       <ProjectReference Include="..\SayWhat.MongoDAL\SayWhat.MongoDAL.csproj" />
     </ItemGroup>
 

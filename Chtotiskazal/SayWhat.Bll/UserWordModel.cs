@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Yapi;
+using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.Bll
 {
     public class UserWordModel
     {
-        private UserWord _entity;
+        private readonly UserWord _entity;
 
         public UserWordModel(UserWord entity)
         {
@@ -44,11 +44,22 @@ namespace SayWhat.Bll
 
          public bool HasAnyPhrases => _entity.Translations.Any(t => t.Examples?.Any()==true);
          public string Word => _entity.Word;
-         public IEnumerable<WordExample> Phrases => 
+         public Example GetRandomExample() =>
+             Phrases
+                 .ToList()
+                 .GetRandomItem();
+
+         public IEnumerable<Example> Phrases =>
              _entity.Translations
-                 .SelectMany(t => t.Examples.Select(e=>new WordExample(Word,t.Word,e.Origin, e.Translation)));
-         public IEnumerable<string> TranlatedPhrases => _entity.Translations.SelectMany(t => t.Examples).Select(e=>e.Translation);
-         public IEnumerable<string> OriginPhrases => _entity.Translations.SelectMany(t => t.Examples).Select(e=>e.Origin);
+                 .SelectMany(t => t.Examples)
+                 .Select(t => t.ExampleOrNull)
+                 .Where(e => e != null);
+
+         public IEnumerable<string> TranlatedPhrases =>
+             Phrases.Select(e => e.TranslatedPhrase);
+         public IEnumerable<string> OriginPhrases => 
+             Phrases.Select(e => e.OriginPhrase);
+
          public int PassedScore => _entity.PassedScore;
          public double AggregateScore => _entity.AggregateScore;
          public int Examed => _entity.Examed;
@@ -123,39 +134,12 @@ namespace SayWhat.Bll
              _entity.AggregateScore = p;
          }
 
-         public WordExample GetRandomExample()
-         {
-             var list = _entity.Translations.SelectMany(translation => translation.Examples.Select(
-                 example=>new{translation, example}))
-                 .ToList();
-             var res =  list.GetRandomItem();
-             return new WordExample(_entity.Word, res.translation.Word, res.example.Origin, res.example.Translation);
-         }
+        
 
          public void AddTranslations(List<UserWordTranslation> newTranslates)
          {
              newTranslates.AddRange(_entity.Translations);
              _entity.Translations = newTranslates.ToArray();
          }
-    }
-
-    public class WordExample
-    {
-        public string[] OriginWords => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        public int OriginWordsCount => OriginPhrase.Count(c=>c==' ');
-        public int TranslationWordsCount => OriginPhrase.Count(c=>c==' ');
-
-        public WordExample(string originWord, string wordTranslation, string originPhrase, string phraseTranslation)
-        {
-            OriginWord = originWord;
-            WordTranslation = wordTranslation;
-            OriginPhrase = originPhrase;
-            PhraseTranslation = phraseTranslation;
-        }
-
-        public string OriginWord { get; }
-        public string WordTranslation { get; }
-        public string OriginPhrase { get; }
-        public string PhraseTranslation { get; }
     }
 }

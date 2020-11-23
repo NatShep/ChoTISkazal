@@ -63,7 +63,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             //Get exam list and test words
             var examsList = ExamHelper.PrepareExamList(learningWords);
-            var testWords = await _usersWordsService.GetTestWordsAsync(user, examsList);
+            var testWords = await _usersWordsService.GetWordsForExamWithExamplesAsync(user, examsList);
             examsList.AddRange(testWords);
 
             var examsCount = 0;

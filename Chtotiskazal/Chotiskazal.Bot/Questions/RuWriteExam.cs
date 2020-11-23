@@ -38,7 +38,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Passed;
             }
             //search for other translation
-            var translationCandidate = await _dictionaryService.GetAllTranslations(userEntry.ToLower());
+            var translationCandidate = await _dictionaryService.GetAllTranslationWords(userEntry.ToLower());
             
             if (translationCandidate.Any(t1 =>
                 word.GetTranslations().Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))

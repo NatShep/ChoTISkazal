@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Impossible;
             var sb = new StringBuilder();
             
-            sb.AppendLine($"\"{phrase.PhraseTranslation}\"");
+            sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine($" translated as ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();

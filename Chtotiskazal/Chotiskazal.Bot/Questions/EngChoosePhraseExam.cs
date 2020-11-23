@@ -34,17 +34,17 @@ namespace Chotiskazal.Bot.Questions
             var variants = otherExamples
                 .Append(targetPhrase)
                 .Randomize()
-                .Select(e => e.PhraseTranslation)
+                .Select(e => e.TranslatedPhrase)
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
-            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
             
-            if (variants[choice.Value] == targetPhrase.PhraseTranslation)
+            if (variants[choice.Value] == targetPhrase.TranslatedPhrase)
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;

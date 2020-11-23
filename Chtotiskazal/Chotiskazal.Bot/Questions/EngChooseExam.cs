@@ -20,7 +20,7 @@ namespace Chotiskazal.Bot.Questions
             var msg = $"=====>   {word.Word}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
 

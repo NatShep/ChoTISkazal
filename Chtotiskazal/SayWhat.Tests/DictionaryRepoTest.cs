@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using NUnit.Framework;
 using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.MongoDAL.Tests
 {
@@ -51,9 +52,8 @@ namespace SayWhat.MongoDAL.Tests
             Assert.Catch(()=> _repo.Add(CreateWord("table", "таблица")).Wait());
         }
 
-        private DictionaryWord CreateWord(string origin, string translation)
-        {
-            return new DictionaryWord
+        private DictionaryWord CreateWord(string origin, string translation) =>
+            new DictionaryWord
             {
                 Id = ObjectId.GenerateNewId(),
                 Language = Language.Ru,
@@ -66,19 +66,15 @@ namespace SayWhat.MongoDAL.Tests
                         Id = ObjectId.GenerateNewId(),
                         Language = Language.En,
                         Word = translation,
-                        Transcription = "teibl",
                         Examples = new[]
                         {
-                            new DictionaryExample
+                            new DictionaryReferenceToExample
                             {
-                                Id = ObjectId.GenerateNewId(),
-                                OriginExample = $"Что это за {origin}?",
-                                TranslationExample = $"What the {translation}?"
+                                ExampleId = ObjectId.GenerateNewId()
                             }
                         }
                     }
                 }
             };
-        }
     }
 }

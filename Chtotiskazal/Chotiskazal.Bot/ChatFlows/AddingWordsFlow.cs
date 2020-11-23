@@ -55,7 +55,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
             //find word in local dictionary(if not, find it in Ya dictionary)
-            var translations = await _addWordService.FindInDictionaryWithPhrases(word);
+            var translations = await _addWordService.FindInDictionaryWithoutExamples(word);
             if (!translations.Any())
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
             if (translations?.Any()!=true)
@@ -69,15 +69,15 @@ namespace Chotiskazal.Bot.ChatFlows
 
             while (true)
             {
-                var input = await _chatIo.TryWaitInlineIntKeyboardInputAsync();
+                var input = await _chatIo.TryWaitInlineIntKeyboardInput();
                 if (!input.HasValue)
                     return false;
                 if (input!.Value < 0 || input.Value >= translations.Count)
                     continue;
                 
                 var selected = translations[input.Value];
-                var count = await _addWordService.AddSomeWordsToUserCollectionAsync(user, new[] {selected});
-                await _chatIo.SendMessageAsync($"Saved. Translations: {count}");
+                await _addWordService.AddWordsToUser(user, new[] {selected});
+                await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
                 return true;
             }
         }

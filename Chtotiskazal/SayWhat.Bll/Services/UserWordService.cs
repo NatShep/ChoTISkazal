@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
@@ -10,22 +12,58 @@ namespace SayWhat.Bll.Services
     public class UsersWordsService
     {
         private readonly UserWordsRepo _userWordsRepository;
+        private readonly  ExamplesRepo _examplesRepo;
 
-        public UsersWordsService(UserWordsRepo repository) => _userWordsRepository = repository;
-
-        public Task AddWordToUserCollectionAsync(User user, UserWordModel model) =>
-             _userWordsRepository.Add(model.Entity);
-
-        public async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(User user, int count)
+        public UsersWordsService(UserWordsRepo repository, ExamplesRepo examplesRepo)
         {
-            var words =await _userWordsRepository.GetWorstLearned(user, count);
+            _userWordsRepository = repository;
+            _examplesRepo = examplesRepo;
+        }
+
+        public Task AddUserWord(UserWord entity) =>
+             _userWordsRepository.Add(entity);
+
+        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(User user, int count)
+        {
+            var words = await _userWordsRepository.GetWorstLearned(user, count);
+            await IncludeExamples(words);
             return words.Select(w => new UserWordModel(w));
         }
 
-        public async Task<UserWordModel[]> GetWorstWordsForUserAsync(User user, int maxCount, int learnRate) =>
-            (await _userWordsRepository.GetWorstLearned(user,  maxCount, learnRate))
-            .Select(t=> new UserWordModel(t))
-            .ToArray();
+        private async Task IncludeExamples(IReadOnlyCollection<UserWord> words)
+        {
+            var ids = new List<ObjectId>();
+
+            foreach (var word in words)
+            {
+                foreach (var translation in word.Translations)
+                {
+                    ids.AddRange(translation.Examples.Select(e => e.ExampleId));
+                }
+            }
+
+            var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e.Id);
+
+            foreach (var word in words)
+            {
+                foreach (var translation in word.Translations)
+                {
+                    foreach (var example in translation.Examples)
+                    {
+                        example.ExampleOrNull = examples[example.ExampleId];
+                    }
+                }
+            }
+        }
+
+        private async Task<UserWordModel[]> GetWorstLearnedWordsWithExamples(User user, int maxCount, int learnRate)
+        {
+            var words = await _userWordsRepository.GetWorstLearned(user, maxCount, learnRate);
+            await IncludeExamples(words);
+            return words
+                .Select(t => new UserWordModel(t))
+                .ToArray();;
+        }
 
 
         public async Task RegisterFailure(UserWordModel userWordForLearning)
@@ -173,7 +211,7 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
         
-        public async Task<UserWordModel[]> GetTestWordsAsync(User user, List<UserWordModel> examsList)
+        public async Task<UserWordModel[]> GetWordsForExamWithExamplesAsync(User user, List<UserWordModel> examsList)
         {
             //TODO изучть по какому принципу получаем RandomRATE. связан ли он с прогрессом подбираемых слов.
             //Или тут вообще рандомные слова будут
@@ -184,7 +222,7 @@ namespace SayWhat.Bll.Services
                 return testWords;
 
             var randomRate = 8 + RandomTools.Rnd.Next(5);
-            testWords = await GetWorstWordsForUserAsync(user, delta, randomRate);
+            testWords = await GetWorstLearnedWordsWithExamples(user, delta, randomRate);
             return testWords;
         }
     }

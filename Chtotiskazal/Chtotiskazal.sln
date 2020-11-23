@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chotiskazal.Bot", "Chotiska
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.MongoDAL", "SayWhat.MongoDAL\SayWhat.MongoDAL.csproj", "{A043597E-32B7-4240-B6CB-69107498ACC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.MongoDAL.Tests", "SayWhat.MongoDAL.Tests\SayWhat.MongoDAL.Tests.csproj", "{D9E98C0F-EB45-4BA7-868F-305BD0EE3D07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.Tests", "SayWhat.Tests\SayWhat.Tests.csproj", "{D9E98C0F-EB45-4BA7-868F-305BD0EE3D07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.Bll", "SayWhat.Bll\SayWhat.Bll.csproj", "{D6FF280F-C200-483A-B619-4D5B6F0013F9}"
 EndProject

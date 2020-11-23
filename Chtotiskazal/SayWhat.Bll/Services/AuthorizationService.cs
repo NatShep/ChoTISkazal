@@ -4,11 +4,11 @@ using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.Bll.Services
 {
-    public class AuthorizeService
+    public class AuthorizationService
     {
         private readonly UserService _userService;
 
-        public AuthorizeService(UserService userService)=> _userService = userService;
+        public AuthorizationService(UserService userService)=> _userService = userService;
 
         public async Task<User> AuthorizeAsync(long telegramId,string name)
         {

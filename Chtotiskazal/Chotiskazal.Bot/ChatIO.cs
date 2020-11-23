@@ -98,7 +98,7 @@ namespace Chotiskazal.Bot
              
         }
 
-        public async Task<int?> TryWaitInlineIntKeyboardInputAsync()
+        public async Task<int?> TryWaitInlineIntKeyboardInput()
         {
             var res = await WaitUserInputAsync();
             if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))

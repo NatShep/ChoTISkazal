@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using SayWhat.Bll.Dto;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
@@ -34,19 +34,16 @@ namespace SayWhat.Bll.Services
             
             if (!englishWord.Contains(' '))
             {
+                // Go to yandex api
                 var result =await _yaDicClient.TranslateAsync(englishWord);
-
-                //Создаем из ответа(если он есть)  
                 if (result?.Any() != true) 
                     return new DictionaryTranslation[0];
                 
-                var variants = result.SelectMany(r => r.Tr.Select(tr => new
-                {
+                var variants = result.SelectMany(r => r.Tr.Select(tr => new {
                     defenition = r,
                     translation = tr,
                 }));
-
-                var word = new DictionaryWord
+                var word     = new DictionaryWord
                 {
                     Id = ObjectId.GenerateNewId(),
                     Language = Language.En,
@@ -57,83 +54,91 @@ namespace SayWhat.Bll.Services
                     {
                         Id = ObjectId.GenerateNewId(),
                         Word = v.translation.Text,
-                        Transcription = v.defenition.Ts,
-                        Examples = v.translation.Ex?.Select(e => new DictionaryExample
+                        Examples = v.translation.Ex?.Select(e =>
                         {
-                            Id = ObjectId.GenerateNewId(),
-                            OriginExample = e.Text,
-                            TranslationExample = e.Tr.First().Text,
-                        }).ToArray()?? new DictionaryExample[0]
+                            var id = ObjectId.GenerateNewId();
+                            return new DictionaryReferenceToExample
+                            {
+                                ExampleId = id,
+                                ExampleOrNull = new Example
+                                {
+                                    Id = id,
+                                    OriginWord = englishWord,
+                                    TranslatedWord = v.translation.Text,
+                                    Direction = TranlationDirection.EnRu, 
+                                    OriginPhrase = e.Text,
+                                    TranslatedPhrase = e.Tr.First().Text,
+                                }
+                            };
+                        }).ToArray()?? new DictionaryReferenceToExample[0]
                     }).ToArray()
                 };
                 await _dictionaryService.AddNewWord(word);
                 return word.Translations.Select(
-                    t=> new DictionaryTranslation(word.Word,t.Word, t.Transcription, word.Source,
-                            t.Examples.Select(e=>new Phrase(e.OriginExample,e.TranslationExample)).ToList()
+                    t=> new DictionaryTranslation(
+                        enWord: word.Word,
+                        ruWord: t.Word, 
+                        enTranscription: word.Transcription, 
+                        source: word.Source,
+                            phrases: t.Examples.Select(e=>e.ExampleOrNull).ToList()
                     )).ToArray();
             }
             return null;
         }
 
-        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithPhrases(string word) 
-            => await _dictionaryService.GetAllPairsByWordWithPhrasesAsync(word.ToLower());
+        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word) 
+            => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
+        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithoutExamples(string word) 
+            => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task<int> AddSomeWordsToUserCollectionAsync(User user, DictionaryTranslation[] results)
+        public async Task AddWordsToUser(User user, DictionaryTranslation[] words)
         {
-            var allPhrasesForUser = new List<Phrase>();
-            
-            foreach (var result in results)
-                allPhrasesForUser.AddRange(result.Phrases);
+            var originWord = words.FirstOrDefault()?.EnWord;
+            if (originWord == null) return;
 
-            var originWord = results.FirstOrDefault()?.EnWord;
-            if (originWord == null)
-                return 0;
-            var userWord = await _usersWordsService.GetWordNullByEngWord(user, originWord);
+            var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, originWord);
 
-            if (userWord == null)
+            if (alreadyExistsWord == null)
             {
-                //Word is new
-                await _usersWordsService.AddWordToUserCollectionAsync(user,
-                    new UserWordModel(new UserWord
+                //the Word is new for the user
+                await _usersWordsService.AddUserWord(
+                    new UserWord
                     {
                         UserId = user.Id,
                         Word = originWord,
                         Language = TranlationDirection.EnRu,
-                        Translations = results.Select(r => new UserWordTranslation
+                        Translations = words.Select(r => new UserWordTranslation
                         {
-                            Transcription = r.Transcription,
+                            Transcription = r.EnTranscription,
                             Word = r.RuWord,
-                            Examples = r.Phrases.Select(p => new UserWordTranslationExample
-                            {
-                                Origin = p.EnPhrase,
-                                Translation = p.PhraseRuTranslate
-                            }).ToArray()
+                            Examples = r.Examples
+                                .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                                .ToArray()
                         }).ToArray(),
-                    }));
-                return results.Length;
+                    });
             }
-            var translates = userWord.GetTranslations().ToList();
-            var newTranslations = new List<UserWordTranslation>();
-            foreach (var r in results)
+            else
             {
-                if (translates.Contains(r.RuWord))
-                    continue;
-                newTranslations.Add(new UserWordTranslation
+                // User already have the word.
+
+                var translates = alreadyExistsWord.GetTranslations().ToList();
+                var newTranslations = new List<UserWordTranslation>();
+                foreach (var r in words)
                 {
-                    Transcription = r.Transcription,
-                    Word = r.RuWord,
-                    Examples = r.Phrases.Select(p => new UserWordTranslationExample
+                    if (translates.Contains(r.RuWord))
+                        continue;
+                    newTranslations.Add(new UserWordTranslation
                     {
-                        Origin = p.EnPhrase,
-                        Translation = p.PhraseRuTranslate
-                    }).ToArray()
-                });
+                        Transcription = r.EnTranscription,
+                        Word = r.RuWord,
+                        Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
+                    });
+                }
+
+                if (newTranslations.Count == 0) return;
+                alreadyExistsWord.AddTranslations(newTranslations);
+                await _usersWordsService.UpdateWord(alreadyExistsWord);
             }
-            if(newTranslations.Count==0)
-                return 0;
-            userWord.AddTranslations(newTranslations);
-            await _usersWordsService.UpdateWord(userWord);
-            return newTranslations.Count;
         }
     }
 }

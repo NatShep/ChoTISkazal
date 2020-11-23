@@ -15,7 +15,7 @@ namespace Chotiskazal.Bot
             DictionaryService dictionaryService, 
             UsersWordsService usersWordsService, 
             MetricService metricService, 
-            AuthorizeService authorizeService)
+            AuthorizationService authorizationService)
         {
             ChatIo = chatIo;
             _userFirstName = firstName;
@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot
             _dictionaryService = dictionaryService;
             _usersWordsService = usersWordsService;
             _metricService = metricService;
-            _authorizeService = authorizeService;
+            _authorizationService = authorizationService;
         }
 
         private User User { get; set; }
@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot
         private readonly AddWordService _addWordsService;
         private readonly DictionaryService _dictionaryService;
         private readonly UsersWordsService _usersWordsService;
-        private readonly AuthorizeService _authorizeService;
+        private readonly AuthorizationService _authorizationService;
         public ChatIO ChatIo { get;}
 
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userFirstName}! I am ChoTiSkazal.");
@@ -43,7 +43,7 @@ namespace Chotiskazal.Bot
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
             
-            User = await _authorizeService.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
+            User = await _authorizationService.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
             
             await SayHelloAsync();
             

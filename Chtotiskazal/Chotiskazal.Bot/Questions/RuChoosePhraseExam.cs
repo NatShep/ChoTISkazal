@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.Questions
                 .Select(e => e.OriginPhrase)
                 .ToArray();
             
-            var msg = $"=====>   {targetPhrase.PhraseTranslation}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {targetPhrase.TranslatedPhrase}    <=====\r\nChoose the translation";
             await chatIo.SendMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
@@ -41,7 +41,7 @@ namespace Chotiskazal.Bot.Questions
                     Text = v
                 }).ToArray());
             
-            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
             

@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Impossible;
 
             var sb = new StringBuilder();
-            sb.AppendLine($"\"{phrase.PhraseTranslation}\"");
+            sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine();
             sb.AppendLine($" translated as ");
             sb.AppendLine();
@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.Questions
             var variants = examList.Randomize().Select(e => e.Word).ToArray();
             var _ =chatIo.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
 

@@ -134,11 +134,10 @@ namespace SayWhat.MongoDAL.Tests
                 Word = "таблица",
                 Examples = new[]
                 {
-                    new UserWordTranslationExample
-                    {
-                        Origin = "in the table",
-                        Translation = "в таблице"
-                    }
+                     new UserWordTranslationReferenceToExample()
+                     {
+                         ExampleId = ObjectId.GenerateNewId()
+                     } 
                 }
             }).ToArray();
             await _repo.Update(word);

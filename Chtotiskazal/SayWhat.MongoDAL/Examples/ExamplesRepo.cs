@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -7,11 +8,17 @@ namespace SayWhat.MongoDAL.Examples
 {
     public class ExamplesRepo
     {
-        private IMongoDatabase _db;
+        private readonly IMongoDatabase _db;
         public ExamplesRepo(IMongoDatabase db) => _db = db;
         
         public Task Add(Example example) => Collection.InsertOneAsync(example);
-        
+        public Task Add(IEnumerable<Example> examples)
+        {
+            if(examples.Any())
+                return Collection.InsertManyAsync(examples);
+            return Task.CompletedTask;
+        }
+
         public Task<Example> GetOrDefault(ObjectId exampleId) => 
             Collection
                 .Find(Builders<Example>.Filter.Eq("Id", exampleId))
@@ -26,7 +33,7 @@ namespace SayWhat.MongoDAL.Examples
         private IMongoCollection<Example>Collection 
             => _db.GetCollection<Example>(ExampleCollectionName);
 
-        public const string ExampleCollectionName = "Examples";
+        public const string ExampleCollectionName = "examples";
 
         public Task UpdateDb()=> Task.CompletedTask;
         /*public async Task UpdateDb()

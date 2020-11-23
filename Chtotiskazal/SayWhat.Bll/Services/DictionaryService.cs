@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Examples;
 using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
 namespace SayWhat.Bll.Services
@@ -12,10 +13,15 @@ namespace SayWhat.Bll.Services
     public class DictionaryService
     {
         private readonly DictionaryRepo _dicRepository;
+        private readonly ExamplesRepo _exampleRepository;
 
-        public DictionaryService(DictionaryRepo repository) => _dicRepository = repository;
+        public DictionaryService(DictionaryRepo repository, ExamplesRepo exampleRepository)
+        {
+            _dicRepository = repository;
+            _exampleRepository = exampleRepository;
+        }
 
-        public Task AddNewWordPairToDictionaryAsync(
+        /*public Task AddNewWordPairToDictionaryAsync(
             string enword, 
             string ruword, 
             string transcription, 
@@ -39,8 +45,9 @@ namespace SayWhat.Bll.Services
                 }
             };
             return _dicRepository.Add(word);
-        }
+        }*/
 
+        /*
         public Task AddNewWordPairToDictionaryWithPhrasesAsync(string enword, string ruword,
             string transcription, TranslationSource source, List<Phrase> examples)
         {
@@ -58,7 +65,7 @@ namespace SayWhat.Bll.Services
                         Word = ruword,
                         Language = Language.Ru,
                         Id = ObjectId.GenerateNewId(),
-                        Examples = examples.Select(p=>new DictionaryExample
+                        Examples = examples.Select(p=>new ReferenceToExample
                         {
                             OriginExample =  p.EnPhrase,
                             TranslationExample = p.PhraseRuTranslate
@@ -68,8 +75,9 @@ namespace SayWhat.Bll.Services
             };
             return _dicRepository.Add(word);
         }
+        */
 
-        public async Task<string[]> GetAllTranslations(string enword)
+        public async Task<string[]> GetAllTranslationWords(string enword)
         {
             var results = await _dicRepository.GetOrDefault(enword);
             if(results==null)
@@ -77,21 +85,55 @@ namespace SayWhat.Bll.Services
             return results.Translations.Select(t => t.Word).ToArray();
         }
 
-        public async Task<DictionaryTranslation[]> GetAllPairsByWordWithPhrasesAsync(string enword)
+        public async Task<IReadOnlyList<DictionaryTranslation>> GetTranslationsWithExamples(string enword)
         {
             var word = await _dicRepository.GetOrDefault(enword);
             if(word==null)
                 return new DictionaryTranslation[0];
-            return word.Translations.Select(t => new DictionaryTranslation(
-                word.Word,
-                t.Word,
-                t.Transcription,
-                word.Source,
-                t.Examples.Select(e => new Phrase(e.OriginExample, e.TranslationExample)).ToList()))
-                .ToArray();
+            
+            var result = new List<DictionaryTranslation>();
+            foreach (var translation in word.Translations)
+            {
+                var examples = translation.Examples.Length > 0
+                    ? await _exampleRepository.GetAll(translation.Examples.Select(e => e.ExampleId))
+                    : new List<Example>();
+                
+                result.Add(new DictionaryTranslation(
+                    word.Word,
+                    translation.Word,
+                    word.Transcription,
+                    word.Source, examples));
+            }
+
+            return result;
         }
-       // public async Task<Phrase[]> FindPhrasesBySomeIdsAsync(int[] allPhrasesIdForUser) =>
-       //     await _dicRepository.FindPhrasesBySomeIdsForUserAsync(allPhrasesIdForUser);
-       public async Task AddNewWord(MongoDAL.Dictionary.DictionaryWord word) => _dicRepository.Add(word);
+        
+        public async Task<IReadOnlyList<DictionaryTranslation>> GetTranslationsWithoutExamples(string enword)
+        {
+            var word = await _dicRepository.GetOrDefault(enword);
+            if(word==null)
+                return new DictionaryTranslation[0];
+
+            return word.Translations
+                .Select(translation => new DictionaryTranslation(
+                    word.Word, 
+                    translation.Word, 
+                    word.Transcription, 
+                    word.Source, 
+                    translation.Examples
+                        .Select(e => new Example {Id = e.ExampleId})
+                        .ToList()))
+                .ToList();
+        }
+      
+       public async Task AddNewWord(DictionaryWord word)
+       {
+           var allExamples = word.Translations
+               .SelectMany(t => t.Examples)
+               .Select(e=>e.ExampleOrNull)
+               .Where(e=>e!= null);
+           await _exampleRepository.Add(allExamples);
+           await _dicRepository.Add(word);
+       }
     }
 }

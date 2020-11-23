@@ -7,12 +7,11 @@ namespace Chotiskazal.Dal.DAL
 {
     public class WordDictionary
     {
-        public WordDictionary() { }
 
         public WordDictionary(string enWord, string translation, string transcription, TranslationSource source)
         {
             EnWord = enWord;
-            Transcription = transcription ?? "[]" ;
+            EnTranscription = transcription ?? "[]" ;
             RuWord = translation;
             Source = source;
         }
@@ -22,7 +21,7 @@ namespace Chotiskazal.Dal.DAL
         public int PairId { get; set; } 
         public string EnWord { get; }
         public string RuWord { get; }
-        public string Transcription { get; }
+        public string EnTranscription { get; }
 
         public List<Phrase> Phrases { get; set; } = new List<Phrase>();
         public TranslationSource Source { get; }

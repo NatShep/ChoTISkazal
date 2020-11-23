@@ -1,30 +1,34 @@
 ﻿using System.Collections.Generic;
 using SayWhat.MongoDAL;
-
+using SayWhat.MongoDAL.Examples;
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace SayWhat.Bll.Dto
 {
     public class DictionaryTranslation
     {
-        public DictionaryTranslation() { }
-
-        public DictionaryTranslation(string enWord, string translation, string transcription, TranslationSource source)
+        public DictionaryTranslation(
+            string enWord, 
+            string ruWord, 
+            string enTranscription,
+            TranslationSource source)
         {
             EnWord = enWord;
-            Transcription = transcription ?? "[]" ;
-            RuWord = translation;
+            EnTranscription = enTranscription ?? "" ;
+            RuWord = ruWord;
             Source = source;
         }
-        public DictionaryTranslation(string enWord, string translation, string transcription, TranslationSource source, List<Phrase> phrases)
-            :this(enWord,translation,transcription,source) => Phrases = phrases;
-
-        public int PairId { get; set; } 
+        public DictionaryTranslation(
+            string enWord, 
+            string ruWord, 
+            string enTranscription, 
+            TranslationSource source, 
+            List<Example> phrases)
+            :this(enWord,ruWord,enTranscription,source) => Examples = phrases;
         public string EnWord { get; }
         public string RuWord { get; }
-        public string Transcription { get; }
-
-        public List<Phrase> Phrases { get; set; } = new List<Phrase>();
+        public string EnTranscription { get; }
+        public List<Example> Examples { get; set; } = new List<Example>();
         public TranslationSource Source { get; }
 
     }
