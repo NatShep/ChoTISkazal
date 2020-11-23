@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chotiskazal.Dal", "Chotiskazal.Dal\Chotiskazal.Dal.csproj", "{F4306F53-5B8E-4B16-8453-0D25C70575C2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chotiskazal.Bot", "Chotiskazal.Bot\Chotiskazal.Bot.csproj", "{062FDFAD-43A8-4FAA-9A8F-E4E34048E61E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.MongoDAL", "SayWhat.MongoDAL\SayWhat.MongoDAL.csproj", "{A043597E-32B7-4240-B6CB-69107498ACC9}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4306F53-5B8E-4B16-8453-0D25C70575C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{062FDFAD-43A8-4FAA-9A8F-E4E34048E61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{062FDFAD-43A8-4FAA-9A8F-E4E34048E61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{062FDFAD-43A8-4FAA-9A8F-E4E34048E61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
