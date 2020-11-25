@@ -37,7 +37,8 @@ namespace Chotiskazal.Bot.Questions
                 .Select(e => e.TranslatedPhrase)
                 .ToArray();
             
-            var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\n" +
+                      $"Choose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();

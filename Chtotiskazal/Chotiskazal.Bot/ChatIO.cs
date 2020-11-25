@@ -33,16 +33,18 @@ namespace Chotiskazal.Bot
             {
                 if (msg[0] == '/')
                 {
-                    if (_menuItems.Contains(msg))
-                    {
-                        var textSrc = _waitMessageCompletionSource;
-                        var objSrc = _waitInputCompletionSource;
-                        _waitMessageCompletionSource = null;
-                        _waitInputCompletionSource = null;
-                        textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
-                        objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    if (!_menuItems.Contains(msg)) {
+                        SendMessageAsync($"Invalid command '{msg}'");
                         return;
                     }
+
+                    var textSrc = _waitMessageCompletionSource;
+                    var objSrc = _waitInputCompletionSource;
+                    _waitMessageCompletionSource = null;
+                    _waitInputCompletionSource = null;
+                    textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    return;
                 }
                 if (_waitMessageCompletionSource != null)
                 {
@@ -68,16 +70,6 @@ namespace Chotiskazal.Bot
         public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
 
-     
-        public Task SendMessageAsync(string message, params KeyboardButton[] buttons)
-            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
-
-        public Task SendMessageAsync(string message, IEnumerable<string> keyboard)
-            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  
-                new ReplyKeyboardMarkup(keyboard.Select(b=> new KeyboardButton(b)), 
-                    oneTimeKeyboard:true, resizeKeyboard:true));
-
-        
         public async Task<Update> WaitUserInputAsync()
         {
             _waitInputCompletionSource = new TaskCompletionSource<Update>();
@@ -95,7 +87,6 @@ namespace Chotiskazal.Bot
                 if (res.CallbackQuery != null)
                     return res.CallbackQuery.Data;
             }
-             
         }
 
         public async Task<int?> TryWaitInlineIntKeyboardInput()
@@ -117,15 +108,6 @@ namespace Chotiskazal.Bot
             }
              
         }
-        public async Task WaitInlineKeyboardInput(string expected)
-        {
-            while (true)
-            {
-                var res = await WaitUserInputAsync();
-                if (res.CallbackQuery?.Data == expected)
-                    return;
-            }
-        }
 
         public async Task<string> WaitUserTextInputAsync()
         {
@@ -136,8 +118,5 @@ namespace Chotiskazal.Bot
             Botlog.Write("Got text");
             return result;
         }
-
-        public Task SendTodo([CallerMemberName] string caller = null) =>
-            SendMessageAsync($"{caller} is not implemented yet ");
     }
 }

@@ -29,7 +29,8 @@ namespace Chotiskazal.Bot.Questions
             if (minCount > 0 && word.PassedScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\nWrite the translation... ");
+            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n" +
+                                          $"Write the translation... ");
             var translation = await chatIo.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))

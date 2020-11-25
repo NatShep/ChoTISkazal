@@ -9,55 +9,55 @@ namespace Chotiskazal.Bot.Questions
     public class ExamSelector
     {
         public static ExamSelector Singletone { get; set; }
-        private readonly ExamAndPreferredScore EngChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _engChoose = new ExamAndPreferredScore(
             exam: new EngChooseExam(),
             expectedScore: 2,
             frequency: 7);
-        private readonly ExamAndPreferredScore RuChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _ruChoose = new ExamAndPreferredScore(
             exam: new RuChooseExam(),
             expectedScore: 2,
             frequency: 7);
-        private readonly ExamAndPreferredScore EngTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _engTrust = new ExamAndPreferredScore(
             exam: new EnTrustExam(),
             expectedScore: 6,
             frequency: 10);
-        private readonly ExamAndPreferredScore RuTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _ruTrust = new ExamAndPreferredScore(
             exam: new RuTrustExam(),
             expectedScore: 6,
             frequency: 10);
-        private readonly ExamAndPreferredScore EngPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _engPhraseChoose = new ExamAndPreferredScore(
             exam: new EngChoosePhraseExam(),
             expectedScore: 4,
             frequency: 4);
-        private readonly ExamAndPreferredScore RuPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _ruPhraseChoose = new ExamAndPreferredScore(
             exam: new RuChoosePhraseExam(),
             expectedScore: 4,
             frequency: 4);
         
-        private readonly ExamAndPreferredScore EngChooseWordInPhrase = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
             new EngChooseWordInPhraseExam(),6,20);
 
-        private readonly ExamAndPreferredScore ClearEngChooseWordInPhrase = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _clearEngChooseWordInPhrase = new ExamAndPreferredScore(
             new ClearScreenExamDecorator(new EngChooseWordInPhraseExam()), 7, 20);
 
-        private readonly ExamAndPreferredScore EngPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _engPhraseSubstitute = new ExamAndPreferredScore(
             exam: new EngPhraseSubstituteExam(),
             expectedScore: 6,
             frequency: 12);
-        private readonly ExamAndPreferredScore RuPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _ruPhraseSubstitute = new ExamAndPreferredScore(
             exam: new RuPhraseSubstituteExam(),
             expectedScore: 6,
             frequency: 12);
 
-        private readonly ExamAndPreferredScore AssemblePhraseExam = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _assemblePhraseExam = new ExamAndPreferredScore(
             new AssemblePhraseExam(), 7, 7);
 
-        private readonly ExamAndPreferredScore ClearEngPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _clearEngPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstituteExam()), 
             expectedScore: 8,
             frequency: 12);
 
-        private readonly ExamAndPreferredScore ClearRuPhraseSubstitute = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _clearRuPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuPhraseSubstituteExam()),
             expectedScore: 8,
             frequency: 12);
@@ -73,22 +73,22 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 8,
             frequency: 14);
         
-       private readonly ExamAndPreferredScore HideousEngPhraseChoose = new ExamAndPreferredScore(
+       private readonly ExamAndPreferredScore _hideousEngPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
             expectedScore: 7,
             frequency: 10);
        
-        private readonly ExamAndPreferredScore HideousRuPhraseChoose = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _hideousRuPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuChoosePhraseExam()),
             expectedScore: 7,
             frequency: 10);
         
-        private readonly ExamAndPreferredScore HideousEngTrust = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _hideousEngTrust = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EnTrustExam()),
             expectedScore: 10,
             frequency: 2);
         
-        private readonly ExamAndPreferredScore HideousRuTrust =
+        private readonly ExamAndPreferredScore _hideousRuTrust =
             new ExamAndPreferredScore(
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
                 expectedScore: 10,
@@ -110,44 +110,44 @@ namespace Chotiskazal.Bot.Questions
         {
             _simpleExamsList = new[]
             {
-                EngChoose,
-                RuChoose,
-                RuPhraseChoose,
-                EngPhraseChoose,  
-                EngChooseWordInPhrase,
+                _engChoose,
+                _ruChoose,
+                _ruPhraseChoose,
+                _engPhraseChoose,  
+                _engChooseWordInPhrase,
             };
             _intermidiateExamsList = new[]
             {
-                EngChoose,
-                RuChoose,
-                EngTrust,
-                RuTrust,
-                HideousRuTrust,
-                HideousEngTrust,
+                _engChoose,
+                _ruChoose,
+                _engTrust,
+                _ruTrust,
+                _hideousRuTrust,
+                _hideousEngTrust,
             };
             _advancedExamsList = new[]
             {
-                EngChoose,
-                RuChoose,
-                EngPhraseChoose,
-                RuPhraseChoose,
-                EngTrust,
-                RuTrust,
+                _engChoose,
+                _ruChoose,
+                _engPhraseChoose,
+                _ruPhraseChoose,
+                _engTrust,
+                _ruTrust,
                 EngWrite(dictionaryService),
                 RuWrite(dictionaryService),
-                HideousRuPhraseChoose,
-                HideousEngPhraseChoose,
-                HideousEngTrust,
-                HideousRuTrust,
+                _hideousRuPhraseChoose,
+                _hideousEngPhraseChoose,
+                _hideousEngTrust,
+                _hideousRuTrust,
                 HideousEngWriteExam(dictionaryService),
                 HideousRuWriteExam(dictionaryService),
-                ClearEngPhraseSubstitute,
-                ClearRuPhraseSubstitute,
-                EngPhraseSubstitute,
-                RuPhraseSubstitute,
-                EngChooseWordInPhrase,
-                ClearEngChooseWordInPhrase,
-                AssemblePhraseExam,
+                _clearEngPhraseSubstitute,
+                _clearRuPhraseSubstitute,
+                _engPhraseSubstitute,
+                _ruPhraseSubstitute,
+                _engChooseWordInPhrase,
+                _clearEngChooseWordInPhrase,
+                _assemblePhraseExam,
             };
         }
 

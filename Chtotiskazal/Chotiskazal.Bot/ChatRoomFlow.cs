@@ -12,7 +12,6 @@ namespace Chotiskazal.Bot
             ChatIO chatIo,
             string firstName, 
             AddWordService addWordsService, 
-            DictionaryService dictionaryService, 
             UsersWordsService usersWordsService, 
             MetricService metricService, 
             AuthorizationService authorizationService)
@@ -20,7 +19,6 @@ namespace Chotiskazal.Bot
             ChatIo = chatIo;
             _userFirstName = firstName;
             _addWordsService = addWordsService;
-            _dictionaryService = dictionaryService;
             _usersWordsService = usersWordsService;
             _metricService = metricService;
             _authorizationService = authorizationService;
@@ -31,14 +29,11 @@ namespace Chotiskazal.Bot
         private readonly string _userFirstName;
         private readonly MetricService _metricService;
         private readonly AddWordService _addWordsService;
-        private readonly DictionaryService _dictionaryService;
         private readonly UsersWordsService _usersWordsService;
         private readonly AuthorizationService _authorizationService;
         public ChatIO ChatIo { get;}
 
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userFirstName}! I am ChoTiSkazal.");
-
-        public async Task SayGoodByeAsync() => await ChatIo.SendMessageAsync($"Bye-Bye, {_userFirstName}! I am OFFLINE now.");
 
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
@@ -59,14 +54,13 @@ namespace Chotiskazal.Bot
                     await ModeSelection();	
                 }
                 catch(UserAFKException){
-                    await ChatIo.SendMessageAsync("bybye");
                     return;		
                 }
                 catch(ProcessInterruptedWithMenuCommand e){
                     mainMenuCommandOrNull = e.Command;
                 }
                 catch(Exception e){
-                    Console.WriteLine($"Error: {e}, from {ChatIo}");
+                    Botlog.Error(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
                     await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
                 }
             }
@@ -76,14 +70,6 @@ namespace Chotiskazal.Bot
         private Task DoExamine() => new ExamFlow(ChatIo,_metricService, _usersWordsService)
             .EnterAsync(User);
         
-        //TODO show stats to user here
-        /*
-        Task ShowStats()
-        {
-            var statsFlow = new GraphsStatsFlow(Chat, GraphStatsSrvc);
-            return statsFlow.Enter();
-        }
-        */
 
         private Task EnterWord(string text = null)
         {
@@ -93,9 +79,9 @@ namespace Chotiskazal.Bot
 
         private Task HandleMainMenu(string command){
             switch (command){
-                case "/help": SendHelp(); break;
-                case "/add":  return EnterWord(null);
-                case "/train": return DoExamine();
+                case "/help":   return SendHelp();
+                case "/add":    return EnterWord();
+                case "/train":  return DoExamine();
                 case "/start":  break;
             }
             return Task.CompletedTask;
@@ -131,19 +117,12 @@ namespace Chotiskazal.Bot
                             await EnterWord();
                             return;
                         }
-                        else if (btn == InlineButtons.Exam.CallbackData)
+
+                        if (btn == InlineButtons.Exam.CallbackData)
                         {
                             await DoExamine();
                             return;
                         }
-
-                        //TODO ShowStats
-                        /*   else if (btn == InlineButtons.Stats.CallbackData)
-                        {
-                            await ShowStats();
-                            return;
-                        }
-                        */
                     }
 
                     await SendNotAllowedTooltip();

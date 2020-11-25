@@ -16,7 +16,8 @@ namespace Chotiskazal.Bot.Questions
         {
             var variants = examList.Randomize().Select(e => e.Word).ToArray();
 
-            var msg = $"=====>   {word.TranlationAsList}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {word.TranlationAsList}    <=====\r\n" +
+                      $"Choose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();

@@ -16,8 +16,7 @@ using Telegram.Bot.Args;
 
 namespace Chotiskazal.Bot
 {
-    static class Program
-    {
+    static class Program {
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
@@ -25,7 +24,6 @@ namespace Chotiskazal.Bot
         private static AuthorizationService _authorizationService;
         private static UsersWordsService _userWordService;
         private static MetricService _metricService;
-
         private static void Main()
         {
             TaskScheduler.UnobservedTaskException +=
@@ -43,10 +41,10 @@ namespace Chotiskazal.Bot
             var client = new MongoClient(settings.MongoConnectionString);
             var db = client.GetDatabase("SayWhatDb");
 
-            var userWordRepo = new UserWordsRepo(db);
+            var userWordRepo   = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);
-            var userRepo = new UsersRepo(db);
-            var examplesRepo = new ExamplesRepo(db);
+            var userRepo       = new UsersRepo(db);
+            var examplesRepo   = new ExamplesRepo(db);
             
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
@@ -94,32 +92,34 @@ namespace Chotiskazal.Bot
                 new ChatIO(_botClient, chat), 
                 chat.FirstName,
                 _addWordService,
-                _dictionaryService, 
                 _userWordService, 
                 _metricService, 
                 _authorizationService);
             
             var task = newChatRoom.Run();
 
-            task.ContinueWith((t) => Botlog.Write($"faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith((t) => Botlog.Error(chat.Id,  $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             Chats.TryAdd(chat.Id, newChatRoom);
             return newChatRoom;
         }
 
         private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
+            long? chatId = null;
             try
             {
                 Botlog.Write($"Got query: {e.Update.Type}");
 
                 if (e.Update.Message != null)
                 {
+                    chatId = e.Update.Message.Chat?.Id;
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
 
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
+                    chatId = e.Update.CallbackQuery.Message.Chat?.Id;
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
@@ -127,7 +127,7 @@ namespace Chotiskazal.Bot
             }
             catch (Exception error)
             {
-                Botlog.Write($"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
+                Botlog.Error(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
             }
         }
 
