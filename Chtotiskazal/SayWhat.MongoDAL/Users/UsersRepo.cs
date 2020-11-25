@@ -16,7 +16,7 @@ namespace SayWhat.MongoDAL.Users
         
         public Task Add(User user) => Collection.InsertOneAsync(user);
         
-        public Task<User> GetOrDefaultByTelegramId(long telegramId) => 
+        public Task<User> GetOrDefaultByTelegramIdOrNull(long telegramId) => 
             Collection
                 .Find(Builders<User>.Filter.Eq(UserTelegramIdFieldName, telegramId))
                 .FirstOrDefaultAsync();
@@ -31,7 +31,7 @@ namespace SayWhat.MongoDAL.Users
             };
             
             await Collection.InsertOneAsync(newUser);
-             var user = await GetOrDefaultByTelegramId(telegramId);
+             var user = await GetOrDefaultByTelegramIdOrNull(telegramId);
              return  user??throw new InvalidOperationException("Add user was failed.");
         }
 
@@ -51,5 +51,15 @@ namespace SayWhat.MongoDAL.Users
             await Collection.Indexes.CreateOneAsync(model);
         }
         public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
+
+        public Task UpdateCounters(User user)
+        {
+            var updateDef = Builders<User>.Update
+                .Set(o => o.WordsCount, user.WordsCount)
+                .Set(o => o.PairsCount, user.PairsCount)
+                .Set(o => o.ExamplesCount, user.ExamplesCount);
+
+            return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
+        }
     }
 }

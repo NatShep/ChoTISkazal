@@ -18,14 +18,18 @@ namespace SayWhat.Bll.Services
         private readonly YandexDictionaryApiClient _yaDicClient;
         private readonly YandexTranslateApiClient _yaTransClient;
         private readonly DictionaryService _dictionaryService;
+        private readonly UserService _userService;
 
         public AddWordService(UsersWordsService usersWordsService, YandexDictionaryApiClient yaDicClient,
-            YandexTranslateApiClient yaTransClient, DictionaryService dictionaryService)
+            YandexTranslateApiClient yaTransClient, 
+            DictionaryService dictionaryService, 
+            UserService userService)
         {
             _usersWordsService = usersWordsService;
             _yaDicClient = yaDicClient;
             _yaTransClient = yaTransClient;
             _dictionaryService = dictionaryService;
+            _userService = userService;
         }
 
         public async Task<IReadOnlyList<DictionaryTranslation>> TranslateAndAddToDictionary(string englishWord)
@@ -100,21 +104,27 @@ namespace SayWhat.Bll.Services
             if (alreadyExistsWord == null)
             {
                 //the Word is new for the user
-                await _usersWordsService.AddUserWord(
-                    new UserWord
+                var model = new UserWord
+                {
+                    UserId = user.Id,
+                    Word = originWord,
+                    Language = TranlationDirection.EnRu,
+                    Translations = words.Select(r => new UserWordTranslation
                     {
-                        UserId = user.Id,
-                        Word = originWord,
-                        Language = TranlationDirection.EnRu,
-                        Translations = words.Select(r => new UserWordTranslation
-                        {
-                            Transcription = r.EnTranscription,
-                            Word = r.RuWord,
-                            Examples = r.Examples
-                                .Select(p => new UserWordTranslationReferenceToExample(p.Id))
-                                .ToArray()
-                        }).ToArray(),
-                    });
+                        Transcription = r.EnTranscription,
+                        Word = r.RuWord,
+                        Examples = r.Examples
+                            .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                            .ToArray()
+                    }).ToArray(),
+                };
+                await _usersWordsService.AddUserWord(model);
+                
+                user.WordsCount++;
+                user.PairsCount += model.Translations.Length;
+                user.ExamplesCount += model.Translations.Sum(t => t.Examples?.Length ?? 0);
+                
+                await _userService.UpdateCounters(user);
             }
             else
             {
@@ -137,6 +147,10 @@ namespace SayWhat.Bll.Services
                 if (newTranslations.Count == 0) return;
                 alreadyExistsWord.AddTranslations(newTranslations);
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
+
+                user.PairsCount += newTranslations.Count;
+                user.ExamplesCount += newTranslations.Sum(t => t.Examples?.Length ?? 0);
+                await _userService.UpdateCounters(user);
             }
         }
     }

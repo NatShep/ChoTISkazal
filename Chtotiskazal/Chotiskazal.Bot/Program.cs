@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -22,9 +23,9 @@ namespace Chotiskazal.Bot
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
-        private static AuthorizationService _authorizationService;
         private static UsersWordsService _userWordService;
         private static BotSettings _settings;
+        private static UserService _userService;
 
         private static void Main()
         {
@@ -55,13 +56,15 @@ namespace Chotiskazal.Bot
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
             _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
-            _authorizationService = new AuthorizationService(new UserService(userRepo));
+            _userService          = new UserService(userRepo);
+            
 
             _addWordService = new AddWordService(
-                _userWordService, 
+                _userWordService,
                 yandexDictionaryClient,
                 yandexTranslateApiClient,
-                _dictionaryService);
+                _dictionaryService, 
+                _userService);
             
             ExamSelector.Singletone = new ExamSelector(_dictionaryService);
       
@@ -95,7 +98,7 @@ namespace Chotiskazal.Bot
                 _settings,
                 _addWordService,
                 _userWordService, 
-                _authorizationService);
+                _userService);
             
             var task = newChatRoom.Run();
 

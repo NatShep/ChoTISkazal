@@ -130,10 +130,10 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 } while (retryFlag);
                 //run asyncroniously
-                var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
                 
                 Botlog.RegisterExamAsync(user.TelegramId, started, questionsCount, questionsPassed);
-            }
+            }               
+            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
 
             var doneMessage = new StringBuilder($"Test done:  {questionsPassed}/{questionsCount}\r\n");
             foreach (var pairModel in learningWords.Concat(testWords))

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using User = SayWhat.MongoDAL.Users.User;
 
-namespace Chotiskazal.Bot
+namespace Chotiskazal.Bot.ChatFlows
 {
     public class ChatRoomFlow
     {
@@ -14,14 +13,14 @@ namespace Chotiskazal.Bot
             BotSettings settings,
             AddWordService addWordsService,
             UsersWordsService usersWordsService,
-            AuthorizationService authorizationService)
+            UserService userService)
         {
             ChatIo = chatIo;
             _userInfo = userInfo;
             _settings = settings;
             _addWordsService = addWordsService;
             _usersWordsService = usersWordsService;
-            _authorizationService = authorizationService;
+            _userService = userService;
         }
 
         private User User { get; set; }
@@ -30,13 +29,13 @@ namespace Chotiskazal.Bot
         private readonly BotSettings _settings;
         private readonly AddWordService _addWordsService;
         private readonly UsersWordsService _usersWordsService;
-        private readonly AuthorizationService _authorizationService;
+        private readonly UserService _userService;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
 
-            User = await _authorizationService.AuthorizeAsync(_userInfo);
+            User = await _userService.GetOrAddUser(_userInfo);
             
             await SayHelloAsync();
             
@@ -74,12 +73,20 @@ namespace Chotiskazal.Bot
             var mode = new AddingWordsMode(ChatIo, _addWordsService);
             return mode.Enter(User, text);
         }
-
+        private async Task ShowStats()
+        {
+            var actualInfo =  await _userService.GetOrAddUser(_userInfo);
+            await ChatIo.SendMessageAsync("Your stats: \r\n" +
+                                          $"Words: {actualInfo.WordsCount}\r\n" +
+                                          $"Translations: {actualInfo.PairsCount}\r\n" +
+                                          $"Examples: {actualInfo.ExamplesCount}");
+        }
         private Task HandleMainMenu(string command){
             switch (command){
                 case "/help":   return SendHelp();
                 case "/add":    return EnterWord();
-                case "/exam":  return DoExamine();
+                case "/exam":   return DoExamine();
+                case "/stats":  return ShowStats();
                 case "/start":  break;
             }
             return Task.CompletedTask;
@@ -121,11 +128,18 @@ namespace Chotiskazal.Bot
                             await DoExamine();
                             return;
                         }
-                    }
 
+                        if (btn == InlineButtons.Stats.CallbackData)
+                        {
+                            await ShowStats();
+                            return;
+                        }
+                    }
                     await SendNotAllowedTooltip();
                 }
             }
         }
+
+        
     }
 }

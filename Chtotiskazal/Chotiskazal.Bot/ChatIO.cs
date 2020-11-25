@@ -36,7 +36,7 @@ namespace Chotiskazal.Bot
                 if (msg[0] == '/')
                 {
                     if (!_menuItems.Contains(msg)) {
-                        SendMessageAsync($"Invalid command '{msg}'");
+                        SendMessageAsync($"Invalid command '{msg}'").Wait();
                         return;
                     }
 

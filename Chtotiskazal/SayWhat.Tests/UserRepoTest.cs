@@ -19,7 +19,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task Add_GetReturnsInt()
         {
             await _repo.AddFromTelegram(1234567, "vasa");
-            var user = await _repo.GetOrDefaultByTelegramId(1234567);
+            var user = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
             Assert.AreEqual(1234567, user.TelegramId);
             Assert.AreEqual("vasa", user.TelegramNick);
             Assert.AreEqual(UserSource.Telegram, user.Source);

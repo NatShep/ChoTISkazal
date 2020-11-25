@@ -28,6 +28,12 @@ namespace SayWhat.MongoDAL.Users
         public string TelegramNick { get; set; }
         [BsonElement("src")]
         public UserSource Source { get; set; }
+        [BsonElement("wc")]
+        public int WordsCount { get; set; }
+        [BsonElement("pc")]
+        public int PairsCount { get; set; }
+        [BsonElement("ec")]
+        public int ExamplesCount { get; set; }
     }
  
     public enum UserSource

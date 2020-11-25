@@ -37,13 +37,13 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 await _chatIo.SendMessageAsync("Enter english word", new InlineKeyboardButton
                 {
-                    CallbackData = "/exit",
+                    CallbackData = "/start",
                     Text = "Cancel"
                 });
                 while (true)
                 {
                     var input = await _chatIo.WaitUserInputAsync();
-                    if (input.CallbackQuery != null && input.CallbackQuery.Data == "/exit")
+                    if (input.CallbackQuery != null && input.CallbackQuery.Data == "/start")
                         throw new ProcessInterruptedWithMenuCommand("/start");
 
                     if (!string.IsNullOrEmpty(input.Message?.Text))
@@ -77,7 +77,10 @@ namespace Chotiskazal.Bot.ChatFlows
                 
                 var selected = translations[input.Value];
                 await _addWordService.AddWordsToUser(user, new[] {selected});
-                await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
+                if(selected.Examples.Count>0)
+                    await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
+                else
+                    await _chatIo.SendMessageAsync($"Saved.");
                 return true;
             }
         }
