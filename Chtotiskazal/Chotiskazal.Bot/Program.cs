@@ -18,7 +18,6 @@ namespace Chotiskazal.Bot
 {
     static class Program
     {
-        private const string ApiToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
@@ -35,24 +34,14 @@ namespace Chotiskazal.Bot
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
             var configuration = builder.Build();
+            
+            var settings = new BotSettings(configuration);
 
-            var dbFileName = configuration.GetSection("wordDb").Value;
-
-            if(dbFileName==null)
-               throw new Exception("No dbFileName");
-
-            var yadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
-            var yadicapiTimeout = TimeSpan.FromSeconds(5);
-
-            var yatransapiKey = configuration.GetSection("yatransapi").GetSection("key").Value;
-            var yatransapiTimeout = TimeSpan.FromSeconds(5);
-
-            var yandexDictionaryClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
-            var yandexTranslateApiClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout); 
+            var yandexDictionaryClient = new YandexDictionaryApiClient(settings.YadicapiKey, settings.YadicapiTimeout);
+            var yandexTranslateApiClient = new YandexTranslateApiClient(settings.YatransapiKey, settings.YatransapiTimeout); 
                 
-            var connectionString = "mongodb://localhost";
-            var client = new MongoClient(connectionString);
-            var db = client.GetDatabase("SayWhatEx");
+            var client = new MongoClient(settings.MongoConnectionString);
+            var db = client.GetDatabase("SayWhatDb");
 
             var userWordRepo = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);
@@ -62,6 +51,7 @@ namespace Chotiskazal.Bot
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
+            examplesRepo.UpdateDb();
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
             _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
@@ -75,12 +65,10 @@ namespace Chotiskazal.Bot
                 _dictionaryService);
             
             ExamSelector.Singletone = new ExamSelector(_dictionaryService);
-            
-            //DoMigration.ApplyMigrations(dbFileName);
       
             Console.WriteLine("Dic started");
     
-            _botClient = new TelegramBotClient(ApiToken);
+            _botClient = new TelegramBotClient(settings.TelegramToken);
             var me = _botClient.GetMeAsync().Result;
             Console.WriteLine(
                 $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
@@ -145,7 +133,6 @@ namespace Chotiskazal.Bot
 
         private static void Bot_OnMessage(object sender, MessageEventArgs e)
         {
-            
             if (e.Message.Text != null)
             {
                 Botlog.Write($"Received a text message in chat {e.Message.Chat.Id}.");

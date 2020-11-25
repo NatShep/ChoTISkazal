@@ -40,7 +40,6 @@ namespace Chotiskazal.Bot.Questions
                     return ExamResult.Passed;
                 }
 
-                Console.ForegroundColor = ConsoleColor.Red;
                 await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.OriginPhrase}\"");
                 return ExamResult.Failed;
             }
