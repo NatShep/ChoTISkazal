@@ -6,7 +6,7 @@ namespace SayWhat.MongoDAL.Words
 {
     public class UserWord {
         // ReSharper disable once InconsistentNaming
-        public ObjectId     _id       { get; set; }
+        public ObjectId     Id       { get; set; }
         [BsonElement(UserWordsRepo.UserIdFieldName)]
         public ObjectId     UserId   { get; set; }
         [BsonElement("l")]

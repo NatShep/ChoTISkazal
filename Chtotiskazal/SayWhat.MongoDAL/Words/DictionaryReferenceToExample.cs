@@ -17,7 +17,7 @@ namespace SayWhat.MongoDAL.Words
 
         public UserWordTranslationReferenceToExample(Example example)
         {
-            ExampleId = example._id;
+            ExampleId = example.Id;
             ExampleOrNull = example;
         }
         [BsonElement("eid")]

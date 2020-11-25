@@ -22,7 +22,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             var example = CreateExample("table","стол");
             await _repo.Add(example);
-            var read = await _repo.GetOrDefault(example._id);
+            var read = await _repo.GetOrDefault(example.Id);
             
             Assert.AreEqual(example.OriginPhrase, read.OriginPhrase);
             Assert.AreEqual(example.OriginWord, read.OriginWord);
@@ -35,7 +35,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             var example = CreateExample("table","стол");
             await _repo.Add(example);
-            var all = await _repo.GetAll(new[]{example._id});
+            var all = await _repo.GetAll(new[]{example.Id});
             Assert.AreEqual(1,all.Count);
             var read = all.First();
             Assert.AreEqual(example.OriginPhrase, read.OriginPhrase);
@@ -64,7 +64,7 @@ namespace SayWhat.MongoDAL.Tests
             =>
                 new Example
                 {
-                    _id = ObjectId.GenerateNewId(),
+                    Id = ObjectId.GenerateNewId(),
                     OriginPhrase = "on the table", OriginWord = originWord, TranslatedPhrase = "на столе",
                     TranslatedWord = translatedWord
                 };

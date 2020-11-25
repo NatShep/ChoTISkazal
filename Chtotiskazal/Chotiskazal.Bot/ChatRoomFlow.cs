@@ -3,40 +3,36 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using Telegram.Bot.Types;
 using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot
 {
     public class ChatRoomFlow
     {
-        public ChatRoomFlow(
-            ChatIO chatIo,
+        public ChatRoomFlow(ChatIO chatIo,
             TelegramUserInfo userInfo,
-            AddWordService addWordsService, 
-            UsersWordsService usersWordsService, 
-            MetricService metricService, 
+            BotSettings settings,
+            AddWordService addWordsService,
+            UsersWordsService usersWordsService,
             AuthorizationService authorizationService)
         {
             ChatIo = chatIo;
             _userInfo = userInfo;
+            _settings = settings;
             _addWordsService = addWordsService;
             _usersWordsService = usersWordsService;
-            _metricService = metricService;
             _authorizationService = authorizationService;
         }
 
         private User User { get; set; }
             
-        private readonly MetricService _metricService;
         private readonly TelegramUserInfo _userInfo;
+        private readonly BotSettings _settings;
         private readonly AddWordService _addWordsService;
         private readonly UsersWordsService _usersWordsService;
         private readonly AuthorizationService _authorizationService;
         public ChatIO ChatIo { get;}
-
-        private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userInfo.FirstName}! I am ChoTiSkazal.");
-
+        private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
 
@@ -69,7 +65,7 @@ namespace Chotiskazal.Bot
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task DoExamine() => new ExamFlow(ChatIo,_metricService, _usersWordsService)
+        private Task DoExamine() => new ExamFlow(ChatIo, _usersWordsService)
             .EnterAsync(User);
         
 
@@ -83,14 +79,14 @@ namespace Chotiskazal.Bot
             switch (command){
                 case "/help":   return SendHelp();
                 case "/add":    return EnterWord();
-                case "/train":  return DoExamine();
+                case "/exam":  return DoExamine();
                 case "/start":  break;
             }
             return Task.CompletedTask;
         }
         
         private  async Task SendHelp() => 
-            await ChatIo.SendMessageAsync("Call 112 for help");
+            await ChatIo.SendMessageAsync(_settings.HelpMessage);
 
         private async Task ModeSelection()
         {

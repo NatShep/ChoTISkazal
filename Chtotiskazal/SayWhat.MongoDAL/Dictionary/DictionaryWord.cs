@@ -5,7 +5,7 @@ namespace SayWhat.MongoDAL.Dictionary
 {
     public class DictionaryWord {
         // ReSharper disable once InconsistentNaming
-        public ObjectId  _id { get; set; }
+        public ObjectId  Id { get; set; }
         [BsonElement(DictionaryRepo.WordFieldBsonName)]
         public string Word { get; set; }
         [BsonElement("ts")]

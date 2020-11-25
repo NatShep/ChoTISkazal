@@ -26,9 +26,8 @@ namespace Chotiskazal.Bot
              ChatId = chat.Id;
         }
 
-        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/train"};
+        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/exam"};
        
-        
         internal void HandleUpdate(Update args)
         {
             var msg = args.Message?.Text;

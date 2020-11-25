@@ -43,7 +43,7 @@ namespace SayWhat.Bll.Services
                 }
             }
 
-            var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e._id);
+            var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e.Id);
 
             foreach (var word in words)
             {

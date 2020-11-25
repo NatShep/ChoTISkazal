@@ -27,7 +27,7 @@ namespace SayWhat.MongoDAL.Words
 
         public Task<List<UserWord>> GetWorstLearned(User user, int maxCount)
             => Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id))
+                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .SortBy(a=>a.CurrentScore)
                 .Limit(maxCount)
                 .ToListAsync();
@@ -35,7 +35,7 @@ namespace SayWhat.MongoDAL.Words
         public Task<List<UserWord>> GetWorstLearned(User user, int maxCount, int minimumLearnRate)
             => Collection
                 .Find(Builders<UserWord>.Filter.And(
-                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id),
+                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
                     Builders<UserWord>.Filter.Gt(PassedScoreFieldName, minimumLearnRate)
                 ))
                 .SortBy(a=>a.CurrentScore)
@@ -45,7 +45,7 @@ namespace SayWhat.MongoDAL.Words
 
         public Task<List<UserWord>> GetAllUserWordsAsync(User user)
             => Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id))
+                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .ToListAsync();
 
         public Task UpdateMetrics(UserWord word)
@@ -58,7 +58,7 @@ namespace SayWhat.MongoDAL.Words
                 .Set(o => o.QuestionAsked, word.QuestionAsked)
                 .Set(o => o.LastQuestionTimestamp,   word.LastQuestionTimestamp);
 
-            return Collection.UpdateOneAsync(o => o._id == word._id, updateDef);
+            return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
         }
 
         private IMongoCollection<UserWord> Collection
@@ -83,13 +83,13 @@ namespace SayWhat.MongoDAL.Words
         public Task Update(UserWord entity)
         {
             entity.ScoreUpdatedTimestamp = DateTime.Now;
-            return Collection.FindOneAndReplaceAsync(f => f._id == entity._id, entity);
+            return Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
         }
         
         public async Task<bool> HasAnyFor(User user)
         {
             var docsCount = await Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id))
+                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .CountDocumentsAsync();
             return docsCount > 0;
         }
@@ -98,7 +98,7 @@ namespace SayWhat.MongoDAL.Words
         =>
             Collection
                 .Find(Builders<UserWord>.Filter.And(
-                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id),
+                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
                     Builders<UserWord>.Filter.Eq(OriginWordFieldName, enWord)
                 )).FirstOrDefaultAsync();
 
@@ -107,7 +107,7 @@ namespace SayWhat.MongoDAL.Words
         /// </summary>
         public Task<List<UserWord>> GetOldestUpdatedWords(User user, int count) =>
             Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user._id))
+                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .SortBy(a=>a.ScoreUpdatedTimestamp)
                 .Limit(count)
                 .ToListAsync();

@@ -55,7 +55,7 @@ namespace SayWhat.MongoDAL.Tests
         private DictionaryWord CreateWord(string origin, string translation) =>
             new DictionaryWord
             {
-                _id = ObjectId.GenerateNewId(),
+                Id = ObjectId.GenerateNewId(),
                 Language = Language.Ru,
                 Word = origin,
                 Transcription = "Stol",
@@ -63,7 +63,6 @@ namespace SayWhat.MongoDAL.Tests
                 {
                     new DictionaryTranslation
                     {
-                        _id = ObjectId.GenerateNewId(),
                         Language = Language.En,
                         Word = translation,
                         Examples = new[]

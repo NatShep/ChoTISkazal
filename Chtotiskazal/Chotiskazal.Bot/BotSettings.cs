@@ -14,7 +14,11 @@ namespace Chotiskazal.Bot
             
             TelegramToken = configuration["telegramToken"];
             MongoConnectionString = configuration["dbString"];
+            HelpMessage = configuration["help-msg"];
+            WelcomeMessage = configuration["welcome-msg"];
         }
+        public string HelpMessage { get; }
+        public string WelcomeMessage { get; }
         public string YadicapiKey { get; }
         public TimeSpan YadicapiTimeout { get; }
         public string YatransapiKey { get; }

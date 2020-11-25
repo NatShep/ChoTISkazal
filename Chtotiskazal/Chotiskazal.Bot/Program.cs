@@ -24,7 +24,8 @@ namespace Chotiskazal.Bot
         private static DictionaryService _dictionaryService;
         private static AuthorizationService _authorizationService;
         private static UsersWordsService _userWordService;
-        private static MetricService _metricService;
+        private static BotSettings _settings;
+
         private static void Main()
         {
             TaskScheduler.UnobservedTaskException +=
@@ -34,12 +35,12 @@ namespace Chotiskazal.Bot
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
             var configuration = builder.Build();
             
-            var settings = new BotSettings(configuration);
+            _settings = new BotSettings(configuration);
 
-            var yandexDictionaryClient = new YandexDictionaryApiClient(settings.YadicapiKey, settings.YadicapiTimeout);
-            var yandexTranslateApiClient = new YandexTranslateApiClient(settings.YatransapiKey, settings.YatransapiTimeout); 
+            var yandexDictionaryClient = new YandexDictionaryApiClient(_settings.YadicapiKey, _settings.YadicapiTimeout);
+            var yandexTranslateApiClient = new YandexTranslateApiClient(_settings.YatransapiKey, _settings.YatransapiTimeout); 
                 
-            var client = new MongoClient(settings.MongoConnectionString);
+            var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase("SayWhatDb");
 
             var userWordRepo   = new UserWordsRepo(db);
@@ -56,7 +57,6 @@ namespace Chotiskazal.Bot
             _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
             _authorizationService = new AuthorizationService(new UserService(userRepo));
 
-            _metricService  = new MetricService();
             _addWordService = new AddWordService(
                 _userWordService, 
                 yandexDictionaryClient,
@@ -67,7 +67,7 @@ namespace Chotiskazal.Bot
       
             Console.WriteLine("Dic started");
     
-            _botClient = new TelegramBotClient(settings.TelegramToken);
+            _botClient = new TelegramBotClient(_settings.TelegramToken);
             var me = _botClient.GetMeAsync().Result;
             Console.WriteLine(
                 $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
@@ -92,9 +92,9 @@ namespace Chotiskazal.Bot
             var newChatRoom = new ChatRoomFlow(
                 new ChatIO(_botClient, chat), 
                 new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
+                _settings,
                 _addWordService,
                 _userWordService, 
-                _metricService, 
                 _authorizationService);
             
             var task = newChatRoom.Run();

@@ -13,10 +13,10 @@ namespace SayWhat.MongoDAL.Users
             TelegramNick = telegramNick;
             TelegramFirstName = firstName;
             TelegramLastName = lastName;
-            _id = ObjectId.GenerateNewId();
+            Id = ObjectId.GenerateNewId();
         }
         // ReSharper disable once InconsistentNaming
-        public ObjectId _id { get; set; }
+        public ObjectId Id { get; set; }
 
         [BsonElement(UsersRepo.UserTelegramIdFieldName)]
         public long? TelegramId { get; set; }

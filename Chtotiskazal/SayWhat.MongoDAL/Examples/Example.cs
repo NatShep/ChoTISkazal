@@ -12,8 +12,7 @@ namespace SayWhat.MongoDAL.Examples
         }
         [BsonIgnore]
         public string[] OriginWords => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        // ReSharper disable once InconsistentNaming
-        public ObjectId _id { get; set; }
+        public ObjectId Id { get; set; }
         [BsonElement("to")]
         public string OriginWord { get; set; }
         [BsonElement("tw")]

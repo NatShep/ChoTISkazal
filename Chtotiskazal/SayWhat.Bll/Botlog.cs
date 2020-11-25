@@ -19,5 +19,13 @@
         {
             Console.WriteLine($"[{userTelegramId}] [{metricId}] [{param}] {swElapsed}]");
         }
+
+        public static void SaveQuestionMetric(QuestionMetric questionMetric)
+        {
+        }
+
+        public static void RegisterExamAsync(long? userTelegramId, DateTime started, int questionsCount, int questionsPassed)
+        {
+        }
     }
 }
