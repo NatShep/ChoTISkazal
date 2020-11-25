@@ -10,13 +10,19 @@ namespace SayWhat.MongoDAL.Examples
         {
             Direction = TranlationDirection.EnRu;
         }
+        [BsonIgnore]
         public string[] OriginWords => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-        [BsonId]
-        public ObjectId Id { get; set; }
+        // ReSharper disable once InconsistentNaming
+        public ObjectId _id { get; set; }
+        [BsonElement("to")]
         public string OriginWord { get; set; }
+        [BsonElement("tw")]
         public string TranslatedWord { get; set; }
+        [BsonElement("op")]
         public string OriginPhrase { get; set; }
+        [BsonElement("tp")]
         public string TranslatedPhrase { get; set; }
+        [BsonElement("lng")]
         public TranlationDirection Direction { get; set; }
     }
 }

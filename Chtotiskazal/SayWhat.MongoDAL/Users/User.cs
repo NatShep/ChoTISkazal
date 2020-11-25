@@ -5,27 +5,31 @@ namespace SayWhat.MongoDAL.Users
 {
     public class User
     {
-        public User()
-        {
-            
-        }
+        public User() { }
 
-        public User(long telegramId, string nick)
+        public User(long telegramId,string firstName, string lastName, string telegramNick)
         {
-            this.TelegramId = telegramId;
-            this.Nick = nick;
-            Id = ObjectId.GenerateNewId();
+            TelegramId = telegramId;
+            TelegramNick = telegramNick;
+            TelegramFirstName = firstName;
+            TelegramLastName = lastName;
+            _id = ObjectId.GenerateNewId();
         }
-        public ObjectId Id { get; set; }
+        // ReSharper disable once InconsistentNaming
+        public ObjectId _id { get; set; }
 
         [BsonElement(UsersRepo.UserTelegramIdFieldName)]
         public long? TelegramId { get; set; }
-        
-        public string? Nick { get; set; }
+        [BsonElement("tfn")]
+        public string TelegramFirstName{ get; set; }
+        [BsonElement("tln")]
+        public string TelegramLastName{ get; set; }
+        [BsonElement("tn")]
+        public string TelegramNick { get; set; }
+        [BsonElement("src")]
         public UserSource Source { get; set; }
-        
     }
-
+ 
     public enum UserSource
     {
         Unknown = 0,

@@ -157,18 +157,18 @@ namespace Chotiskazal.Bot.Questions
 
         public IExam GetNextExamFor(bool isFirstExam, UserWordModel model)
         {
-            if (isFirstExam && model.PassedScore < 7)
+            if (isFirstExam && model.AbsoluteScore < 7)
                 return _simpleExamsList.GetRandomItem().Exam;
 
-            var score = model.PassedScore - (isFirstExam ? 2 : 0);
+            var score = model.AbsoluteScore - (isFirstExam ? 2 : 0);
 
-            if (model.PassedScore < 4)
+            if (model.AbsoluteScore < 4)
                 return ChooseExam(score, _intermidiateExamsList);
             else
                 return ChooseExam(score,_advancedExamsList);
         }
 
-        private static IExam ChooseExam(int score, ExamAndPreferredScore[] exams)
+        private static IExam ChooseExam(double score, ExamAndPreferredScore[] exams)
         {
             score = Math.Min(score, 14);
             var probability = new Dictionary<double, IExam>(exams.Length);

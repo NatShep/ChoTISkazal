@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.Questions
             await chatIo.WaitInlineIntKeyboardInput();
 
             _ = chatIo.SendMessageAsync($"Translation is \r\n" +
-                                        $"{word.TranlationAsList}\r\n" +
+                                        $"{word.TranslationAsList}\r\n" +
                                         $" Did you guess?",
 
                 new InlineKeyboardButton

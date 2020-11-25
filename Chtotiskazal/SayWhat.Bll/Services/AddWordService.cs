@@ -45,14 +45,14 @@ namespace SayWhat.Bll.Services
                 }));
                 var word     = new DictionaryWord
                 {
-                    Id = ObjectId.GenerateNewId(),
+                    _id = ObjectId.GenerateNewId(),
                     Language = Language.En,
                     Word = englishWord,
                     Source = TranslationSource.Yadic,
                     Transcription = result.FirstOrDefault()?.Ts,
                     Translations = variants.Select(v => new SayWhat.MongoDAL.Dictionary.DictionaryTranslation
                     {
-                        Id = ObjectId.GenerateNewId(),
+                        _id = ObjectId.GenerateNewId(),
                         Word = v.translation.Text,
                         Examples = v.translation.Ex?.Select(e =>
                         {
@@ -62,7 +62,7 @@ namespace SayWhat.Bll.Services
                                 ExampleId = id,
                                 ExampleOrNull = new Example
                                 {
-                                    Id = id,
+                                    _id = id,
                                     OriginWord = englishWord,
                                     TranslatedWord = v.translation.Text,
                                     Direction = TranlationDirection.EnRu, 
@@ -104,7 +104,7 @@ namespace SayWhat.Bll.Services
                 await _usersWordsService.AddUserWord(
                     new UserWord
                     {
-                        UserId = user.Id,
+                        UserId = user._id,
                         Word = originWord,
                         Language = TranlationDirection.EnRu,
                         Translations = words.Select(r => new UserWordTranslation
@@ -112,7 +112,7 @@ namespace SayWhat.Bll.Services
                             Transcription = r.EnTranscription,
                             Word = r.RuWord,
                             Examples = r.Examples
-                                .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                                .Select(p => new UserWordTranslationReferenceToExample(p._id))
                                 .ToArray()
                         }).ToArray(),
                     });
@@ -131,7 +131,7 @@ namespace SayWhat.Bll.Services
                     {
                         Transcription = r.EnTranscription,
                         Word = r.RuWord,
-                        Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
+                        Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p._id)).ToArray()
                     });
                 }
 

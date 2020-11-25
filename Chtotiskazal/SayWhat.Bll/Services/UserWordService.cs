@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -42,7 +43,7 @@ namespace SayWhat.Bll.Services
                 }
             }
 
-            var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e.Id);
+            var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e._id);
 
             foreach (var word in words)
             {
@@ -56,9 +57,9 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        private async Task<UserWordModel[]> GetWorstLearnedWordsWithExamples(User user, int maxCount, int learnRate)
+        private async Task<UserWordModel[]> GetWorstLearnedWordsWithExamples(User user, int maxCount, int minimumAskCount)
         {
-            var words = await _userWordsRepository.GetWorstLearned(user, maxCount, learnRate);
+            var words = await _userWordsRepository.GetWorstLearned(user, maxCount, minimumAskCount);
             await IncludeExamples(words);
             return words
                 .Select(t => new UserWordModel(t))
@@ -69,27 +70,29 @@ namespace SayWhat.Bll.Services
         public async Task RegisterFailure(UserWordModel userWordForLearning)
         {
             userWordForLearning.OnExamFailed();
-            userWordForLearning.UpdateAgingAndRandomization();
-            await _userWordsRepository.UpdateScores(userWordForLearning.Entity);
+            userWordForLearning.UpdateCurrentScore();
+            await _userWordsRepository.UpdateMetrics(userWordForLearning.Entity);
         }
-
-        public async Task UpdateAgingAndRandomizeAsync(User user, int count)
+        
+        public async Task UpdateCurrentScore(User user, int count)
         {
-            // not implemented
-            /*var words = await _userWordsRepository.GetRandowWords(user, count);
+            var sw = Stopwatch.StartNew();
+            var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
             foreach (var word in words)
             {
                 var model = new UserWordModel(word);
-                model.UpdateAgingAndRandomization();
-                await _userWordsRepository.Update(model.Entity);
-            }*/
+                model.UpdateCurrentScore();
+                await _userWordsRepository.UpdateMetrics(model.Entity);
+            }
+            sw.Stop();
+            Botlog.Metric(user.TelegramId, nameof(UpdateCurrentScore), $"{words.Count}", sw.Elapsed);
         }
 
         public async Task RegisterSuccess(UserWordModel model)
         {
             model.OnExamPassed();
-            model.UpdateAgingAndRandomization();
-            await _userWordsRepository.UpdateScores(model.Entity);
+            model.UpdateCurrentScore();
+            await _userWordsRepository.UpdateMetrics(model.Entity);
         }
 
         public Task<bool> HasWords(User user) => _userWordsRepository.HasAnyFor(user);
@@ -211,19 +214,18 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
         
-        public async Task<UserWordModel[]> GetWordsForExamWithExamplesAsync(User user, List<UserWordModel> examsList)
+        public async Task<UserWordModel[]> GetWordsForAdvancedQuestions(User user, List<UserWordModel> examsList)
         {
-            //TODO изучть по какому принципу получаем RandomRATE. связан ли он с прогрессом подбираемых слов.
-            //Или тут вообще рандомные слова будут
-            var delta = Math.Min(7, (32 - examsList.Count));
-            var testWords = new UserWordModel[0];
+            
+            var advancedExamsCount = Math.Min(7, 32 - examsList.Count);
 
-            if (delta <= 0)
-                return testWords;
-
+            //if there are already more than 32 questions in exams - skip advanced words
+            if (advancedExamsCount <= 0)
+                return new UserWordModel[0];
+            
+            //otherwise - we need to take words, that were asked more than [8-13] times
             var randomRate = 8 + RandomTools.Rnd.Next(5);
-            testWords = await GetWorstLearnedWordsWithExamples(user, delta, randomRate);
-            return testWords;
+            return await GetWorstLearnedWordsWithExamples(user, advancedExamsCount, randomRate);
         }
     }
 }

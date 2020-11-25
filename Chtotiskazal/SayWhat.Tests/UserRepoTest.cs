@@ -21,7 +21,7 @@ namespace SayWhat.MongoDAL.Tests
             await _repo.AddFromTelegram(1234567, "vasa");
             var user = await _repo.GetOrDefaultByTelegramId(1234567);
             Assert.AreEqual(1234567, user.TelegramId);
-            Assert.AreEqual("vasa", user.Nick);
+            Assert.AreEqual("vasa", user.TelegramNick);
             Assert.AreEqual(UserSource.Telegram, user.Source);
         }
 
@@ -51,7 +51,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             for (int i = 0; i < count; i++)
             {
-                _repo.Add(new User{TelegramId =  null, Nick = $"petr{count}"}).Wait();
+                _repo.Add(new User{TelegramId =  null, TelegramNick = $"petr{count}"}).Wait();
             }
             Assert.AreEqual(count, _repo.GetCount().Result);
         }

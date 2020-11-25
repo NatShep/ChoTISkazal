@@ -26,7 +26,7 @@ namespace Chotiskazal.Bot.Questions
             var translations = word.GetTranslations().ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.PassedScore < minCount * 4)
+            if (minCount > 0 && word.AbsoluteScore < minCount * 4)
                 return ExamResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n" +
@@ -49,11 +49,11 @@ namespace Chotiskazal.Bot.Questions
             {
                 await chatIo.SendMessageAsync(
                     $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
-                    word.TranlationAsList);
+                    word.TranslationAsList);
                 return ExamResult.Impossible;
             }
 
-            await chatIo.SendMessageAsync("The translation was: " + word.TranlationAsList);
+            await chatIo.SendMessageAsync("The translation was: " + word.TranslationAsList);
             await service.RegisterFailure(word);
             return ExamResult.Failed;
         }

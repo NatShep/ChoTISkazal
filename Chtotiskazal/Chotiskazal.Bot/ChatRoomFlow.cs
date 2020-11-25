@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
+using Telegram.Bot.Types;
+using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot
 {
@@ -10,14 +12,14 @@ namespace Chotiskazal.Bot
     {
         public ChatRoomFlow(
             ChatIO chatIo,
-            string firstName, 
+            TelegramUserInfo userInfo,
             AddWordService addWordsService, 
             UsersWordsService usersWordsService, 
             MetricService metricService, 
             AuthorizationService authorizationService)
         {
             ChatIo = chatIo;
-            _userFirstName = firstName;
+            _userInfo = userInfo;
             _addWordsService = addWordsService;
             _usersWordsService = usersWordsService;
             _metricService = metricService;
@@ -26,19 +28,19 @@ namespace Chotiskazal.Bot
 
         private User User { get; set; }
             
-        private readonly string _userFirstName;
         private readonly MetricService _metricService;
+        private readonly TelegramUserInfo _userInfo;
         private readonly AddWordService _addWordsService;
         private readonly UsersWordsService _usersWordsService;
         private readonly AuthorizationService _authorizationService;
         public ChatIO ChatIo { get;}
 
-        private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userFirstName}! I am ChoTiSkazal.");
+        private async Task SayHelloAsync() => await ChatIo.SendMessageAsync($"Hello, {_userInfo.FirstName}! I am ChoTiSkazal.");
 
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
-            
-            User = await _authorizationService.AuthorizeAsync(ChatIo.ChatId.Identifier, _userFirstName);
+
+            User = await _authorizationService.AuthorizeAsync(_userInfo);
             
             await SayHelloAsync();
             

@@ -10,9 +10,9 @@ namespace SayWhat.Bll
         {
             Word = pairModel.Word;
             Created = DateTime.Now;
-            AggregateScoreBefore = pairModel.AggregateScore;
-            ExamsPassed = pairModel.Examed;
-            PassedScoreBefore = pairModel.PassedScore;
+            AggregateScoreBefore = pairModel.CurrentScore;
+            ExamsPassed = pairModel.QuestionAsked;
+            PassedScoreBefore = pairModel.AbsoluteScore;
             PreviousExam = pairModel.LastExam;
             Type = examName;
         }

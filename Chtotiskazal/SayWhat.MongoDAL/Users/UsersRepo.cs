@@ -26,7 +26,7 @@ namespace SayWhat.MongoDAL.Users
             var newUser = new User
             {
                 TelegramId = telegramId,
-                Nick = nick,
+                TelegramNick = nick,
                 Source = UserSource.Telegram
             };
             

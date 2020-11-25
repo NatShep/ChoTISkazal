@@ -19,7 +19,7 @@ namespace SayWhat.MongoDAL.Tests
             var example = new Example
             {
                 Direction = TranlationDirection.EnRu,
-                Id = ObjectId.GenerateNewId(),
+                _id = ObjectId.GenerateNewId(),
                 OriginWord = "table",
                 TranslatedWord = "стол",
                 OriginPhrase = "What the table?",
@@ -27,7 +27,7 @@ namespace SayWhat.MongoDAL.Tests
             };
             var word = new DictionaryWord
             {
-                Id  = ObjectId.GenerateNewId(),
+                _id  = ObjectId.GenerateNewId(),
                 Word = "table",
                 Language = Language.En,
                 Source = TranslationSource.Yadic,
@@ -42,7 +42,7 @@ namespace SayWhat.MongoDAL.Tests
                         { 
                             new DictionaryReferenceToExample()
                             { 
-                                ExampleId = example.Id,
+                                ExampleId = example._id,
                                 ExampleOrNull =example,
                             }
                         }

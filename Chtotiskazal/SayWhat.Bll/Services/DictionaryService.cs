@@ -121,7 +121,7 @@ namespace SayWhat.Bll.Services
                     word.Transcription, 
                     word.Source, 
                     translation.Examples
-                        .Select(e => new Example {Id = e.ExampleId})
+                        .Select(e => new Example {_id = e.ExampleId})
                         .ToList()))
                 .ToList();
         }

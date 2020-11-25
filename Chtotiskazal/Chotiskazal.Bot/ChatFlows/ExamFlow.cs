@@ -31,23 +31,24 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (!await _usersWordsService.HasWords(user))
             {
-                await _chatIo.SendMessageAsync("You need to add some words before examination");
+                await _chatIo.SendMessageAsync("You need to add some more words before examination");
                 return;
             }
-
+            
             //Randomization and jobs
-            if (RandomTools.Rnd.Next() % 30 == 0)
-                await _usersWordsService.AddMutualPhrasesToVocabAsync(user, 10);
-            else
-                await _usersWordsService.UpdateAgingAndRandomizeAsync(user,50);
+            //if (RandomTools.Rnd.Next() % 30 == 0)
+            //    await _usersWordsService.AddMutualPhrasesToVocabAsync(user, 10);
+            // else
+            var _ =  _chatIo.SendTyping();
+            await _usersWordsService.UpdateCurrentScore(user,50);
             
             var sb = new StringBuilder("Examination\r\n");
             var learningWords = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, 9, 3);
-            if (learningWords.Average(w => w.PassedScore) <= 4)
+            if (learningWords.Average(w => w.AbsoluteScore) <= 4)
             {
                 foreach (var pairModel in learningWords.Randomize())
                 {
-                    sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranlationAsList}");
+                    sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranslationAsList}");
                 }
             }
 
@@ -63,7 +64,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             //Get exam list and test words
             var examsList = ExamHelper.PrepareExamList(learningWords);
-            var testWords = await _usersWordsService.GetWordsForExamWithExamplesAsync(user, examsList);
+            var testWords = await _usersWordsService.GetWordsForAdvancedQuestions(user, examsList);
             examsList.AddRange(testWords);
 
             var examsCount = 0;
@@ -139,8 +140,8 @@ namespace Chotiskazal.Bot.ChatFlows
             var doneMessage = new StringBuilder($"Test done:  {examsPassed}/{examsCount}\r\n");
             foreach (var pairModel in learningWords.Concat(testWords))
             {
-                doneMessage.Append(pairModel.Word + " - " + pairModel.TranlationAsList + "  (" +
-                                   pairModel.PassedScore + ")\r\n");
+                doneMessage.Append(pairModel.Word + " - " + pairModel.TranslationAsList + "  (" +
+                                   pairModel.AbsoluteScore + ")\r\n");
             }
 
             await _chatIo.SendMessageAsync(doneMessage.ToString());

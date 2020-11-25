@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
@@ -90,7 +91,7 @@ namespace Chotiskazal.Bot
 
             var newChatRoom = new ChatRoomFlow(
                 new ChatIO(_botClient, chat), 
-                chat.FirstName,
+                new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
                 _addWordService,
                 _userWordService, 
                 _metricService, 

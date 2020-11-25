@@ -7,7 +7,7 @@ namespace SayWhat.MongoDAL.Dictionary
     public class DictionaryRepo: IMongoRepo
     {
         public const string DictionaryCollectionName = "dictionary";
-        public const string WordFieldBsonName = "Word";
+        public const string WordFieldBsonName = "w";
         
         private readonly IMongoDatabase _db;
 

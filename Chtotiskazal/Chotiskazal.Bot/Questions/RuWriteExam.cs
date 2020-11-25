@@ -23,10 +23,10 @@ namespace Chotiskazal.Bot.Questions
         {
             var words = word.Word.Split(',').Select(s => s.Trim()).ToArray();
             var minCount = words.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.PassedScore < minCount * 4)
+            if (minCount > 0 && word.AbsoluteScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.TranlationAsList}    <=====\r\n" +
+            await chatIo.SendMessageAsync($"=====>   {word.TranslationAsList}    <=====\r\n" +
                                           $"Write the translation... ");
             var userEntry = await chatIo.WaitUserTextInputAsync();
 
@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.Questions
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(
-                    $"the translation was correct, but the question was about the word '{word.Word} - {word.TranlationAsList}'\r\nlet's try again");
+                    $"the translation was correct, but the question was about the word '{word.Word} - {word.TranslationAsList}'\r\nlet's try again");
                 return ExamResult.Retry;
             }
             

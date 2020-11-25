@@ -34,9 +34,9 @@ namespace SayWhat.Bll
          {
              get
              {
-                 if (_entity.Examed > MaxExamScore)
+                 if (_entity.AbsoluteScore > MaxExamScore)
                      return LearningState.Done;
-                 return (LearningState) (_entity.Examed / 2);
+                 return (LearningState) (_entity.AbsoluteScore / 2);
              }
          }
 
@@ -54,74 +54,50 @@ namespace SayWhat.Bll
                  .SelectMany(t => t.Examples)
                  .Select(t => t.ExampleOrNull)
                  .Where(e => e != null);
-
-         public IEnumerable<string> TranlatedPhrases =>
-             Phrases.Select(e => e.TranslatedPhrase);
-         public IEnumerable<string> OriginPhrases => 
-             Phrases.Select(e => e.OriginPhrase);
-
-         public int PassedScore => _entity.PassedScore;
-         public double AggregateScore => _entity.AggregateScore;
-         public int Examed => _entity.Examed;
-         public DateTime? LastExam => _entity.LastExam;
-         public string TranlationAsList => string.Join(", ", _entity.Translations.Select(t => t.Word));
-
-         /*public static UserWordForLearning CreatePair(
-             string originWord,
-             string translationWord,
-             string transcription,
-             List<Phrase> phrases = null,
-             int[] phrasesId=null,
-             bool isPhrase=false)
-         {
-             var ids = "";
-             if (phrasesId != null)
-                 ids = string.Join(",", phrasesId);
-             return new UserWordForLearning
-             {
-                 Created = DateTime.Now,
-                 LastExam = null,
-                 EnWord = originWord,
-                 Transcription = transcription ?? "[]",
-                 UserTranslations = translationWord,
-                 Revision = 1,
-                 PhrasesIds = ids,
-                 Phrases = phrases ?? new List<Phrase>(),
-                 IsPhrase = isPhrase
-             };
-         }*/
+         
+         public double AbsoluteScore => _entity.AbsoluteScore;
+         public double CurrentScore => _entity.CurrentScore;
+         public int QuestionPassed => _entity.QuestionPassed;
+         public int QuestionAsked => _entity.QuestionAsked;
+         public DateTime? LastExam => _entity.LastQuestionTimestamp;
+         public string TranslationAsList => string.Join(", ", _entity.Translations.Select(t => t.Word));
 
          public void OnExamPassed()
          {
-             _entity.PassedScore++;
-             _entity.LastExam = DateTime.Now;
-             _entity.Examed++;
-             _entity.AggregateScore = _entity.PassedScore;
+             _entity.AbsoluteScore++;
+             _entity.LastQuestionTimestamp = DateTime.Now;
+             _entity.QuestionAsked++;
+             _entity.QuestionPassed++;
+             _entity.ScoreUpdatedTimestamp = DateTime.Now;
+             UpdateCurrentScore();
          }
 
          public void OnExamFailed()
          {
-             if (_entity.PassedScore > PenaltyScore)
-                 _entity.PassedScore = PenaltyScore;
+             if (_entity.AbsoluteScore > PenaltyScore)
+                 _entity.AbsoluteScore = PenaltyScore;
 
-             _entity.PassedScore = (int) Math.Round(_entity.PassedScore * 0.7);
-             if (_entity.PassedScore < 0)
-                 _entity.PassedScore = 0;
+             _entity.AbsoluteScore = (int) Math.Round(_entity.AbsoluteScore * 0.7);
+             if (_entity.AbsoluteScore < 0)
+                 _entity.AbsoluteScore = 0;
 
-             _entity.LastExam = DateTime.Now;
-             _entity.Examed++;
-             _entity.AggregateScore = _entity.PassedScore;
+             _entity.LastQuestionTimestamp = DateTime.Now;
+             _entity.QuestionAsked++;
+             
+             _entity.ScoreUpdatedTimestamp = DateTime.Now;
+             UpdateCurrentScore();
          }
 
          //res reduces for 1 point per AgingFactor days
          public double AgedScore ()
          {
-             if (_entity.LastExam!=null)
-                 return Math.Max(0, _entity.PassedScore - (DateTime.Now - _entity.LastExam.Value).TotalDays / AgingFactor);
-             return 0;
+             if (_entity.LastQuestionTimestamp == null) return 0;
+             
+             return Math.Max(0, _entity.AbsoluteScore - (DateTime.Now - _entity.LastQuestionTimestamp.Value).TotalDays 
+                                / AgingFactor);
          }
 
-         public void UpdateAgingAndRandomization()
+         public void UpdateCurrentScore()
          {
              double res = AgedScore();
 
@@ -131,7 +107,8 @@ namespace SayWhat.Bll
              //Randomize
              var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
              p *= rndFactor;
-             _entity.AggregateScore = p;
+             _entity.CurrentScore = p;
+             _entity.ScoreUpdatedTimestamp = DateTime.Now;
          }
 
         
