@@ -67,7 +67,7 @@ namespace Chotiskazal.Bot
                 _userService);
             
             ExamSelector.Singletone = new ExamSelector(_dictionaryService);
-      
+            
             Console.WriteLine("Dic started");
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
@@ -80,11 +80,10 @@ namespace Chotiskazal.Bot
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
-            
-            _botClient.StopReceiving();
+             // workaround for infinity awaiting
+             new TaskCompletionSource<bool>().Task.Wait();
+             // it will never happens
+             _botClient.StopReceiving();
         }
 
         private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
