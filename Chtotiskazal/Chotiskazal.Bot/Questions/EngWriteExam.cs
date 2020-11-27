@@ -1,27 +1,36 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
+using MongoDB.Bson.Serialization.Serializers;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
     public class EngWriteExam : IExam
     {
+        private readonly DictionaryService _dictionaryService;
+
+        public EngWriteExam(DictionaryService dictionaryService)
+        {
+            _dictionaryService = dictionaryService;
+        }
         public bool NeedClearScreen => false;
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word,
-            UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
+            UserWordModel[] examList)
         {
             var translations = word.GetTranslations().ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.PassedScore < minCount * 4)
+            if (minCount > 0 && word.AbsoluteScore < minCount * 4)
                 return ExamResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.EnWord}    <=====\r\nWrite the translation... ");
+            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n" +
+                                          $"Write the translation... ");
             var translation = await chatIo.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
@@ -29,23 +38,23 @@ namespace Chotiskazal.Bot.Questions
 
             if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
-            var allMeaningsOfWord = await service.GetAllMeaningOfWordForExamination(word.EnWord);
+            var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
           
             if (allMeaningsOfWord
                 .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
             {
                 await chatIo.SendMessageAsync(
                     $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
-                    word.UserTranslations);
+                    word.TranslationAsList);
                 return ExamResult.Impossible;
             }
 
-            await chatIo.SendMessageAsync("The translation was: " + word.UserTranslations);
-            await service.RegisterFailureAsync(word);
+            await chatIo.SendMessageAsync("The translation was: " + word.TranslationAsList);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

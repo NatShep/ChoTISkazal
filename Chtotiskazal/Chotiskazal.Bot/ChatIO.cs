@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot
@@ -23,9 +26,8 @@ namespace Chotiskazal.Bot
              ChatId = chat.Id;
         }
 
-        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/train"};
+        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/exam"};
        
-        
         internal void HandleUpdate(Update args)
         {
             var msg = args.Message?.Text;
@@ -33,16 +35,18 @@ namespace Chotiskazal.Bot
             {
                 if (msg[0] == '/')
                 {
-                    if (_menuItems.Contains(msg))
-                    {
-                        var textSrc = _waitMessageCompletionSource;
-                        var objSrc = _waitInputCompletionSource;
-                        _waitMessageCompletionSource = null;
-                        _waitInputCompletionSource = null;
-                        textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
-                        objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    if (!_menuItems.Contains(msg)) {
+                        SendMessageAsync($"Invalid command '{msg}'").Wait();
                         return;
                     }
+
+                    var textSrc = _waitMessageCompletionSource;
+                    var objSrc = _waitInputCompletionSource;
+                    _waitMessageCompletionSource = null;
+                    _waitInputCompletionSource = null;
+                    textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
+                    return;
                 }
                 if (_waitMessageCompletionSource != null)
                 {
@@ -68,16 +72,6 @@ namespace Chotiskazal.Bot
         public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
 
-     
-        public Task SendMessageAsync(string message, params KeyboardButton[] buttons)
-            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new ReplyKeyboardMarkup(buttons.Select(b=>new[]{b}), oneTimeKeyboard:true));
-
-        public Task SendMessageAsync(string message, IEnumerable<string> keyboard)
-            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  
-                new ReplyKeyboardMarkup(keyboard.Select(b=> new KeyboardButton(b)), 
-                    oneTimeKeyboard:true, resizeKeyboard:true));
-
-        
         public async Task<Update> WaitUserInputAsync()
         {
             _waitInputCompletionSource = new TaskCompletionSource<Update>();
@@ -95,10 +89,9 @@ namespace Chotiskazal.Bot
                 if (res.CallbackQuery != null)
                     return res.CallbackQuery.Data;
             }
-             
         }
 
-        public async Task<int?> TryWaitInlineIntKeyboardInputAsync()
+        public async Task<int?> TryWaitInlineIntKeyboardInput()
         {
             var res = await WaitUserInputAsync();
             if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))
@@ -117,15 +110,6 @@ namespace Chotiskazal.Bot
             }
              
         }
-        public async Task WaitInlineKeyboardInput(string expected)
-        {
-            while (true)
-            {
-                var res = await WaitUserInputAsync();
-                if (res.CallbackQuery?.Data == expected)
-                    return;
-            }
-        }
 
         public async Task<string> WaitUserTextInputAsync()
         {
@@ -137,7 +121,6 @@ namespace Chotiskazal.Bot
             return result;
         }
 
-        public Task SendTodo([CallerMemberName] string caller = null) =>
-            SendMessageAsync($"{caller} is not implemented yet ");
+        public Task SendTyping() => _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
     }
 }

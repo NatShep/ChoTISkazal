@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.Migrations;
-using Chotiskazal.Dal.Repo;
-using Chotiskazal.Dal.Services;
-using Chotiskazal.Dal.yapi;
+using Chotiskazal.Bot.ChatFlows;
+using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
+using SayWhat.Bll;
+using SayWhat.Bll.Services;
+using SayWhat.Bll.Yapi;
+using SayWhat.MongoDAL.Dictionary;
+using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
 
 namespace Chotiskazal.Bot
 {
-    static class Program
-    {
-        private const string ApiToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+    static class Program {
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
-        private static AuthorizeService _authorizeService;
-        private static ExamService _examService;
-        private static YaService _yaService;
+        private static DictionaryService _dictionaryService;
+        private static UsersWordsService _userWordService;
+        private static BotSettings _settings;
+        private static UserService _userService;
 
         private static void Main()
         {
@@ -31,42 +35,42 @@ namespace Chotiskazal.Bot
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
             var configuration = builder.Build();
+            
+            _settings = new BotSettings(configuration);
 
-            var dbFileName = configuration.GetSection("wordDb").Value;
-
-            if(dbFileName==null)
-               throw new Exception("No dbFileName");
-
-            var yadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
-            var yadicapiTimeout = TimeSpan.FromSeconds(5);
-
-            var yatransapiKey = configuration.GetSection("yatransapi").GetSection("key").Value;
-            var yatransapiTimeout = TimeSpan.FromSeconds(5);
-
-            var yandexDictionaryClient = new YandexDictionaryApiClient(yadicapiKey, yadicapiTimeout);
-            var yandexTranslateApiClient = new YandexTranslateApiClient(yatransapiKey, yatransapiTimeout); 
+            var yandexDictionaryClient = new YandexDictionaryApiClient(_settings.YadicapiKey, _settings.YadicapiTimeout);
+            var yandexTranslateApiClient = new YandexTranslateApiClient(_settings.YatransapiKey, _settings.YatransapiTimeout); 
                 
-            var userWordService = new UsersWordsService(new UserWordsRepo(dbFileName));
-            var dictionaryService= new DictionaryService(new DictionaryRepository(dbFileName));
-            var examsAndMetricService = new ExamsAndMetricService(new ExamsAndMetricsRepo(dbFileName));
+            var client = new MongoClient(_settings.MongoConnectionString);
+            var db = client.GetDatabase("SayWhatDb");
 
-            _yaService = new YaService(yandexDictionaryClient,yandexTranslateApiClient);
-            _authorizeService = new AuthorizeService(new UserService(new UserRepo(dbFileName)));
+            var userWordRepo   = new UserWordsRepo(db);
+            var dictionaryRepo = new DictionaryRepo(db);
+            var userRepo       = new UsersRepo(db);
+            var examplesRepo   = new ExamplesRepo(db);
+            
+            userWordRepo.UpdateDb();
+            dictionaryRepo.UpdateDb();
+            userRepo.UpdateDb();
+            examplesRepo.UpdateDb();
+            
+            _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
+            _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
+            _userService          = new UserService(userRepo);
+            
+
             _addWordService = new AddWordService(
-                userWordService, 
+                _userWordService,
                 yandexDictionaryClient,
                 yandexTranslateApiClient,
-                dictionaryService);
-            _examService=new ExamService(
-                examsAndMetricService,
-                dictionaryService,
-                userWordService);
-
-            DoMigration.ApplyMigrations(dbFileName);
-      
+                _dictionaryService, 
+                _userService);
+            
+            ExamSelector.Singletone = new ExamSelector(_dictionaryService);
+            
             Console.WriteLine("Dic started");
     
-            _botClient = new TelegramBotClient(ApiToken);
+            _botClient = new TelegramBotClient(_settings.TelegramToken);
             var me = _botClient.GetMeAsync().Result;
             Console.WriteLine(
                 $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
@@ -76,11 +80,10 @@ namespace Chotiskazal.Bot
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
-            
-            _botClient.StopReceiving();
+             // workaround for infinity awaiting
+             new TaskCompletionSource<bool>().Task.Wait();
+             // it will never happens
+             _botClient.StopReceiving();
         }
 
         private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
@@ -88,39 +91,38 @@ namespace Chotiskazal.Bot
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
 
-            var newChat = new ChatIO(_botClient, chat);
-
-            var newChatRoom = new ChatRoomFlow(newChat,chat.FirstName)
-            {
-                ExamSrvc = _examService,
-                AddWordSrvc = _addWordService,
-                AuthorizeSrvc = _authorizeService,
-                YaSrvc = _yaService
-                
-            };
+            var newChatRoom = new ChatRoomFlow(
+                new ChatIO(_botClient, chat), 
+                new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
+                _settings,
+                _addWordService,
+                _userWordService, 
+                _userService);
             
             var task = newChatRoom.Run();
 
-            task.ContinueWith((t) => Botlog.Write($"faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith((t) => Botlog.Error(chat.Id,  $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             Chats.TryAdd(chat.Id, newChatRoom);
-         
-            return null;
+            return newChatRoom;
         }
 
         private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
+            long? chatId = null;
             try
             {
                 Botlog.Write($"Got query: {e.Update.Type}");
 
                 if (e.Update.Message != null)
                 {
+                    chatId = e.Update.Message.Chat?.Id;
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
 
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
+                    chatId = e.Update.CallbackQuery.Message.Chat?.Id;
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
@@ -128,13 +130,12 @@ namespace Chotiskazal.Bot
             }
             catch (Exception error)
             {
-                Botlog.Write($"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
+                Botlog.Error(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
             }
         }
 
         private static void Bot_OnMessage(object sender, MessageEventArgs e)
         {
-            
             if (e.Message.Text != null)
             {
                 Botlog.Write($"Received a text message in chat {e.Message.Chat.Id}.");

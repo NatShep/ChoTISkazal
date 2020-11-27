@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -8,7 +9,7 @@ namespace Chotiskazal.Bot.Questions
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList);
+        Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList);
     }
 
     public enum ExamResult

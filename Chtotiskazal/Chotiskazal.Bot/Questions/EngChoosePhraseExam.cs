@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Services;
-using Chotiskazal.Dal.DAL;
-using Chotiskazal.DAL.Services;
+using SayWhat.Bll;
+using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -12,39 +12,45 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose Phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, ExamService service, UserWordForLearning word, UserWordForLearning[] examList)
+        public async Task<ExamResult> Pass(
+            ChatIO chatIo, 
+            UsersWordsService service, 
+            UserWordModel word, 
+            UserWordModel[] examList)
         {
-            if (!word.Phrases.Any())
+            if (!word.HasAnyPhrases)
                 return ExamResult.Impossible;
             
-            var targetPhrase = word.Phrases.GetRandomItem();
+            var targetPhrase = word.GetRandomExample();
 
-            var other = examList.SelectMany(e => e.Phrases)
-                .Where(p => !string.IsNullOrWhiteSpace(p?.EnPhrase) && p != targetPhrase)
+            var otherExamples = examList
+                .SelectMany(e => e.Phrases)
+                .Where(p => p != targetPhrase)
                 .Take(8).ToArray();
 
-            if(!other.Any())
+            if(!otherExamples.Any())
                 return ExamResult.Impossible;
 
-            var variants = other
+            var variants = otherExamples
                 .Append(targetPhrase)
                 .Randomize()
-                .Select(e => e.PhraseRuTranslate)
+                .Select(e => e.TranslatedPhrase)
                 .ToArray();
             
-            var msg = $"=====>   {targetPhrase.EnPhrase}    <=====\r\nChoose the translation";
+            var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\n" +
+                      $"Choose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
-            var choice = await chatIo.TryWaitInlineIntKeyboardInputAsync();
+            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
             
-            if (variants[choice.Value] == targetPhrase.PhraseRuTranslate)
+            if (variants[choice.Value] == targetPhrase.TranslatedPhrase)
             {
-                await service.RegisterSuccessAsync(word);
+                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
-            await service.RegisterFailureAsync(word);
+            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }
