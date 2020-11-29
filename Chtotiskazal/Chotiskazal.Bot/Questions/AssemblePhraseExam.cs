@@ -34,12 +34,8 @@ namespace Chotiskazal.Bot.Questions
             }
 
             await chatIo.SendMessageAsync("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
-            string entry= null;
-            while (string.IsNullOrWhiteSpace(entry))
-            {
-                entry = await chatIo.WaitUserTextInputAsync();
-                entry = entry.Trim();
-            }
+            var entry = await chatIo.WaitUserTextInputAsync();
+            entry = entry.Trim();
 
             if (string.CompareOrdinal(targetPhrase.OriginPhrase, entry) == 0)
             {

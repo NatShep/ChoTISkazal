@@ -30,7 +30,8 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
             sb.AppendLine($"Enter missing word: ");
-            
+            await chatIo.SendMessageAsync(sb.ToString());
+
             while (true)
             {
                 var enter = await chatIo.WaitUserTextInputAsync();
