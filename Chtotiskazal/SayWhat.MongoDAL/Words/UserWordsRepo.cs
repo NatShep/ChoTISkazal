@@ -14,8 +14,8 @@ namespace SayWhat.MongoDAL.Words
         public const string UserCollectionName = "words";
         public const string CurrentScoreFieldName = "cur";
         public const string AbsoluteScoreFieldName = "abs";
+        public const string QuestionAskedFieldName = "qa";
         public const string UserIdFieldName = "uid";
-        public const string PassedScoreFieldName = "scr";
         public const string OriginWordFieldName = "w";
         public const string LastUpdateScoreTime = "updt";
 
@@ -36,12 +36,21 @@ namespace SayWhat.MongoDAL.Words
             => Collection
                 .Find(Builders<UserWord>.Filter.And(
                     Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWord>.Filter.Gt(PassedScoreFieldName, minimumLearnRate)
+                    Builders<UserWord>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
                 ))
                 .SortBy(a=>a.CurrentScore)
                 .Limit(maxCount)
                 .ToListAsync();
 
+        public Task<List<UserWord>> Get(User user, int maxCount, int minimumQuestionAsked)
+            => Collection
+                .Find(Builders<UserWord>.Filter.And(
+                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWord>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
+                ))
+                .SortBy(a=>a.ScoreUpdatedTimestamp)
+                .Limit(maxCount)
+                .ToListAsync();
 
         public Task<List<UserWord>> GetAllUserWordsAsync(User user)
             => Collection

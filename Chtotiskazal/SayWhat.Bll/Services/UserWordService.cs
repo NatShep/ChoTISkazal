@@ -57,9 +57,12 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        private async Task<UserWordModel[]> GetWorstLearnedWordsWithExamples(User user, int maxCount, int minimumAskCount)
+        public async Task<UserWordModel[]> GetWordsWithExamples(User user, int maxCount, int minimumQuestionAsked)
         {
-            var words = await _userWordsRepository.GetWorstLearned(user, maxCount, minimumAskCount);
+            if (maxCount <= 0)
+                return new UserWordModel[0];
+
+            var words = await _userWordsRepository.Get(user, maxCount, minimumQuestionAsked);
             await IncludeExamples(words);
             return words
                 .Select(t => new UserWordModel(t))
@@ -187,7 +190,9 @@ namespace SayWhat.Bll.Services
         }
 
         
-        public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(User user, int count,
+        public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(
+            User user, 
+            int count,
             int maxTranslationSize)
         {
             var wordsForLearning = await GetWorstForUserWithPhrasesAsync(user, count);
@@ -213,19 +218,33 @@ namespace SayWhat.Bll.Services
             }
             return wordsForLearning.ToArray();
         }
-        
-        public async Task<UserWordModel[]> GetWordsForAdvancedQuestions(User user, List<UserWordModel> examsList)
-        {
-            
-            var advancedExamsCount = Math.Min(7, 32 - examsList.Count);
 
-            //if there are already more than 32 questions in exams - skip advanced words
-            if (advancedExamsCount <= 0)
-                return new UserWordModel[0];
+        public async Task<IReadOnlyList<UserWordModel>> AppendAdvancedWordsToExamList(User user, UserWordModel[] learningWords, ExamSettings examSettings)
+        {
+            //Get exam list and test words
+            var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
+
+            //Every learning word appears in exam from MIN to MAX times
+            for (int i = 0; i < examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
+                examsList.AddRange(learningWords.Randomize());
+            for (int i = 0; i < examSettings.MaxTimesThatLearningWordAppearsInExam - examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
+                examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
             
-            //otherwise - we need to take words, that were asked more than [8-13] times
-            var randomRate = 8 + RandomTools.Rnd.Next(5);
-            return await GetWorstLearnedWordsWithExamples(user, advancedExamsCount, randomRate);
+            while (examsList.Count > examSettings.MaxExamSize) 
+                examsList.RemoveAt(examsList.Count - 1);
+            var advancedlistMaxCount = Math.Min(examSettings.MaxAdvancedQuestionsCount,
+                examSettings.MaxExamSize - examsList.Count);
+            if (advancedlistMaxCount <= 0)
+                return examsList;
+            
+            var minimumTimesThatWordHasToBeAsked = examSettings.MinAdvancedExamMinQuestionAskedCount +
+                                                   RandomTools.Rnd.Next(examSettings.MaxAdvancedExamMinQuestionAskedCount - examSettings.MinAdvancedExamMinQuestionAskedCount);
+            var advancedList = await GetWordsWithExamples(
+                user: user,
+                maxCount: advancedlistMaxCount,
+                minimumQuestionAsked: minimumTimesThatWordHasToBeAsked);
+            examsList.AddRange(advancedList);
+            return examsList;
         }
     }
 }

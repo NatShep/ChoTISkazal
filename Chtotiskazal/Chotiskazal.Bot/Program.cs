@@ -32,14 +32,10 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-            var configuration = builder.Build();
-            
-            _settings = new BotSettings(configuration);
+            _settings = ReadConfiguration();
 
-            var yandexDictionaryClient = new YandexDictionaryApiClient(_settings.YadicapiKey, _settings.YadicapiTimeout);
-            var yandexTranslateApiClient = new YandexTranslateApiClient(_settings.YatransapiKey, _settings.YatransapiTimeout); 
+            var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
+            var yandexTranslateApiClient = new YandexTranslateApiClient (_settings.YatransapiKey, _settings.YatransapiTimeout); 
                 
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase("SayWhatDb");
@@ -66,7 +62,7 @@ namespace Chotiskazal.Bot
                 _dictionaryService, 
                 _userService);
             
-            ExamSelector.Singletone = new ExamSelector(_dictionaryService);
+            QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
             
             Console.WriteLine("Dic started");
     
@@ -86,11 +82,29 @@ namespace Chotiskazal.Bot
              _botClient.StopReceiving();
         }
 
+        private static BotSettings ReadConfiguration()
+        {
+            try
+            {
+                var builder = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+                var configuration = builder.Build();
+
+                return new BotSettings(configuration);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+        }
+
         private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
-
+            
             var newChatRoom = new ChatRoomFlow(
                 new ChatIO(_botClient, chat), 
                 new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 

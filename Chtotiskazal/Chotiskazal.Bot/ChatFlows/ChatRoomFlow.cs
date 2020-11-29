@@ -13,7 +13,8 @@ namespace Chotiskazal.Bot.ChatFlows
             BotSettings settings,
             AddWordService addWordsService,
             UsersWordsService usersWordsService,
-            UserService userService)
+            UserService userService
+            )
         {
             ChatIo = chatIo;
             _userInfo = userInfo;
@@ -64,7 +65,7 @@ namespace Chotiskazal.Bot.ChatFlows
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task DoExamine() => new ExamFlow(ChatIo, _usersWordsService)
+        private Task DoExamine() => new ExamFlow(ChatIo, _usersWordsService,_settings.ExamSettings)
             .EnterAsync(User);
         
 

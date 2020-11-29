@@ -7,6 +7,7 @@ namespace SayWhat.Bll
     public static class RandomTools
     {
         public static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
+        
         public static T GetRandomItem<T>(this IList<T> origin)
         {
             var rnd = Rnd.Next(origin.Count - 1);

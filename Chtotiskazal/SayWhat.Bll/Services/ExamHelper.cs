@@ -1,26 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace SayWhat.Bll.Services
+﻿namespace SayWhat.Bll.Services
 {
-    public static class ExamHelper
+    public class ExamSettings
     {
-        public static List<UserWordModel> PrepareExamList(UserWordModel[] learningWords)
+        public ExamSettings()
         {
-            var examsList = new List<UserWordModel>(learningWords.Length * 4);
-
-            //Every learning word appears in test from 2 to 4 times
-            examsList.AddRange(learningWords.Randomize());
-            examsList.AddRange(learningWords.Randomize());
-            examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
-            examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
-
-            while (examsList.Count > 32)
-            {
-                examsList.RemoveAt(examsList.Count - 1);
-            }
-
-            return examsList;
+            
         }
+
+
+        public int MinAdvancedExamMinQuestionAskedCount { get; set; } = 5;
+        public int MaxAdvancedExamMinQuestionAskedCount { get; set; } = 13;
+        public int MaxAdvancedQuestionsCount     { get; set; } = 7;
+        public int LearningWordsCountInOneExam { get; set; } = 9;
+        public int MinTimesThatLearningWordAppearsInExam { get; set; } = 2;
+        public int MaxTimesThatLearningWordAppearsInExam { get; set; } = 4;
+        public int MaxExamSize { get; set; } = 32;
     }
 }

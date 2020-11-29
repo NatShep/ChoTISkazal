@@ -6,9 +6,9 @@ using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class ExamSelector
+    public class QuestionSelector
     {
-        public static ExamSelector Singletone { get; set; }
+        public static QuestionSelector Singletone { get; set; }
         private readonly ExamAndPreferredScore _engChoose = new ExamAndPreferredScore(
             exam: new EngChooseExam(),
             expectedScore: 2,
@@ -106,7 +106,7 @@ namespace Chotiskazal.Bot.Questions
                 expectedScore: 12,
                 frequency: 14);
 
-        public ExamSelector(DictionaryService dictionaryService)
+        public QuestionSelector(DictionaryService dictionaryService)
         {
             _simpleExamsList = new[]
             {
@@ -155,7 +155,7 @@ namespace Chotiskazal.Bot.Questions
         private readonly ExamAndPreferredScore[] _intermidiateExamsList;
         private readonly ExamAndPreferredScore[] _advancedExamsList;
 
-        public IExam GetNextExamFor(bool isFirstExam, UserWordModel model)
+        public IExam GetNextQuestionFor(bool isFirstExam, UserWordModel model)
         {
             if (isFirstExam && model.AbsoluteScore < 7)
                 return _simpleExamsList.GetRandomItem().Exam;

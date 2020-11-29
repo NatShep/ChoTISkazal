@@ -33,7 +33,7 @@ namespace SayWhat.MongoDAL.Words
         /// <summary>
         /// Number of asked question 
         /// </summary>
-        [BsonElement("qa")]
+        [BsonElement(UserWordsRepo.QuestionAskedFieldName)]
         public int QuestionAsked { get; set; }
         /// <summary>
         /// Last time the question was asked
