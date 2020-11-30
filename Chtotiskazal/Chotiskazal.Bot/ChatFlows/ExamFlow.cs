@@ -41,12 +41,13 @@ namespace Chotiskazal.Bot.ChatFlows
             //    await _usersWordsService.AddMutualPhrasesToVocabAsync(user, 10);
             // else
             
-            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScore(user,10);
-            var _ =  _chatIo.SendTyping();
+            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScore(user, _examSettings.MaxLearningWordsCountInOneExam*2);
+            var typing =  _chatIo.SendTyping();
 
             var c = Random.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
                 _examSettings.MaxLearningWordsCountInOneExam);
-            
+            await startupScoreUpdate;
+            await typing;
             var learningWords 
                 = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
             var learningWordsCount = learningWords.Length;
@@ -70,11 +71,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 var userInput = await _chatIo.WaitInlineKeyboardInput();
                 if (userInput != "/startExamination")
                     return;
-                
             }
             var started = DateTime.Now;
-
-
          
             var learningAndAdvancedWords 
                 = await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords,_examSettings);
@@ -83,7 +81,6 @@ namespace Chotiskazal.Bot.ChatFlows
             var questionsPassed = 0;
             var i = 0;
             ExamResult? lastExamResult = null;
-
          
             foreach (var word in learningAndAdvancedWords)
             {
@@ -110,7 +107,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     }
 
                     var result = await exam.Pass(_chatIo, _usersWordsService, word, learnList);
-
+                    
                     sw.Stop();
                     questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
                     switch (result)

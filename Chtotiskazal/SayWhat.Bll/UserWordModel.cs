@@ -89,9 +89,10 @@ namespace SayWhat.Bll
          }
 
          //res reduces for 1 point per AgingFactor days
-         public double AgedScore ()
+         private double AgedScore ()
          {
-             if (_entity.LastQuestionTimestamp == null) return 0;
+             //if there were no question yet - return some big number as if the word was asked long time ago  
+             if (_entity.LastQuestionTimestamp == null) return 30;
              
              return Math.Max(0, _entity.AbsoluteScore - (DateTime.Now - _entity.LastQuestionTimestamp.Value).TotalDays 
                                 / AgingFactor);
@@ -118,5 +119,7 @@ namespace SayWhat.Bll
              newTranslates.AddRange(_entity.Translations);
              _entity.Translations = newTranslates.ToArray();
          }
+
+         public override string ToString() => _entity.ToString();
     }
 }

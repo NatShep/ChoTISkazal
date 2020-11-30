@@ -50,6 +50,8 @@ namespace SayWhat.MongoDAL.Words
         public UserWordTranslation[] Translations { get; set; }
         [BsonElement("type")]
         public UserWordType Type { get; set; } = UserWordType.UsualWord;
+
+        public override string ToString() => $"{Word} {CurrentScore} updated {ScoreUpdatedTimestamp}";
     }
 
     public enum UserWordType
