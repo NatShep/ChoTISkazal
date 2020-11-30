@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.CompareOrdinal(word.Word.ToLower().Trim(), enter.ToLower().Trim()) == 0)
+                if (string.CompareOrdinal(word.Word, enter.ToLower().Trim()) == 0)
                 {
                     await service.RegisterSuccess(word);
                     return ExamResult.Passed;

@@ -36,7 +36,7 @@ namespace Chotiskazal.Bot.Questions
             if (string.IsNullOrEmpty(translation))
                 return ExamResult.Retry;
 
-            if (translations.Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
+            if (translations.Any(t => string.Compare(translation.Trim(), t, StringComparison.OrdinalIgnoreCase) == 0))
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;

@@ -145,7 +145,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
 
             var doneMessage = new StringBuilder($"Learning done:  {questionsPassed}/{questionsCount}\r\n");
-            foreach (var pairModel in learningAndAdvancedWords)
+            foreach (var pairModel in learningAndAdvancedWords.Distinct())
             {
                 doneMessage.Append(pairModel.Word + " - " + pairModel.TranslationAsList + "  (" +
                                    pairModel.AbsoluteScore + ")\r\n");

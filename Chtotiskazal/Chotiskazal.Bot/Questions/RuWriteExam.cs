@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.Questions
             if (string.IsNullOrEmpty(userEntry))
                 return ExamResult.Retry;
 
-            if (words.Any(t => string.Compare(userEntry, t, StringComparison.OrdinalIgnoreCase) == 0))
+            if (words.Any(t => string.Compare(userEntry.Trim(), t, StringComparison.OrdinalIgnoreCase) == 0))
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;
