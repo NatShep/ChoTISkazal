@@ -8,6 +8,7 @@ using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
+using Random = SayWhat.Bll.Random;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -42,29 +43,39 @@ namespace Chotiskazal.Bot.ChatFlows
             
             var startupScoreUpdate =  _usersWordsService.UpdateCurrentScore(user,10);
             var _ =  _chatIo.SendTyping();
-                            
-            var sb = new StringBuilder("Examination\r\n");
-            var learningWords 
-                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, _examSettings.LearningWordsCountInOneExam, 3);
 
+            var c = Random.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
+                _examSettings.MaxLearningWordsCountInOneExam);
+            
+            var learningWords 
+                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
+            var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= 4)
             {
+                var sb = new StringBuilder("Examination\r\n");
+
                 foreach (var pairModel in learningWords.Randomize())
                 {
                     sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranslationAsList}");
                 }
+                await _chatIo.SendMessageAsync(sb.ToString(), new InlineKeyboardButton
+                {
+                    CallbackData = "/startExamination",
+                    Text = "Start"
+                }, new InlineKeyboardButton
+                {
+                    CallbackData = "/start",
+                    Text = "Cancel",
+                });
+                var userInput = await _chatIo.WaitInlineKeyboardInput();
+                if (userInput != "/startExamination")
+                    return;
+                
             }
+            var started = DateTime.Now;
 
-            var startMessageSending = _chatIo.SendMessageAsync(sb.ToString(), new InlineKeyboardButton
-            {
-                CallbackData = "/startExamination",
-                Text = "Start"
-            }, new InlineKeyboardButton
-            {
-                CallbackData = "/start",
-                Text = "Cancel",
-            });
 
+         
             var learningAndAdvancedWords 
                 = await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords,_examSettings);
 
@@ -73,14 +84,10 @@ namespace Chotiskazal.Bot.ChatFlows
             var i = 0;
             ExamResult? lastExamResult = null;
 
-            await startMessageSending;
-            var started = DateTime.Now;
-            var userInput = await _chatIo.WaitInlineKeyboardInput();
-            if (userInput != "/startExamination")
-                return;
+         
             foreach (var word in learningAndAdvancedWords)
             {
-                var allLearningWordsWereShowedAtLeastOneTime = i < _examSettings.LearningWordsCountInOneExam;
+                var allLearningWordsWereShowedAtLeastOneTime = i < learningWordsCount;
                 var exam = QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
                 i++;
                 var retryFlag = false;
@@ -95,7 +102,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (!learningWords.Contains(word))
                         learnList = learningWords.Append(word).ToArray();
 
-                    if (exam.NeedClearScreen && lastExamResult != ExamResult.Impossible)
+                    if (i>1 && exam.NeedClearScreen && lastExamResult != ExamResult.Impossible)
                     {
                         await WriteDontPeakMessage();
                         if (lastExamResult == ExamResult.Passed)

@@ -34,6 +34,8 @@ namespace SayWhat.MongoDAL.Users
         public int PairsCount { get; set; }
         [BsonElement("ec")]
         public int ExamplesCount { get; set; }
+        [BsonElement("en_wtc")]
+        public int EnglishWordTranlationRequestsCount { get; set; }
     }
  
     public enum UserSource

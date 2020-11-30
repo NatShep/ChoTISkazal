@@ -57,7 +57,8 @@ namespace SayWhat.MongoDAL.Users
             var updateDef = Builders<User>.Update
                 .Set(o => o.WordsCount, user.WordsCount)
                 .Set(o => o.PairsCount, user.PairsCount)
-                .Set(o => o.ExamplesCount, user.ExamplesCount);
+                .Set(o => o.ExamplesCount, user.ExamplesCount)
+                .Set(o => o.EnglishWordTranlationRequestsCount, user.EnglishWordTranlationRequestsCount);
 
             return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
         }

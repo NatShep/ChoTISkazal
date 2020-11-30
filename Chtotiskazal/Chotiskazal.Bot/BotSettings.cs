@@ -12,8 +12,7 @@ namespace Chotiskazal.Bot
             YadicapiTimeout = TimeSpan.FromSeconds(5);
             YatransapiKey = configuration.GetSection("yatransapi").GetSection("key").Value;
             YatransapiTimeout = TimeSpan.FromSeconds(5);
-
-
+            
             ExamSettings = ReadExamSettings(configuration.GetSection("examSettings")); 
             TelegramToken = configuration["telegramToken"];
             MongoConnectionString = configuration["dbString"];
@@ -27,7 +26,8 @@ namespace Chotiskazal.Bot
                 MinAdvancedExamMinQuestionAskedCount = int.Parse(configuration["MinAdvancedExamMinQuestionAskedCount"]),
                 MaxAdvancedExamMinQuestionAskedCount = int.Parse(configuration["MaxAdvancedExamMinQuestionAskedCount"]),
                 MaxAdvancedQuestionsCount = int.Parse(configuration["MaxAdvancedQuestionsCount"]),
-                LearningWordsCountInOneExam = int.Parse(configuration["LearningWordsCountInOneExam"]),
+                MinLearningWordsCountInOneExam = int.Parse(configuration["MinLearningWordsCountInOneExam"]),
+                MaxLearningWordsCountInOneExam = int.Parse(configuration["MaxLearningWordsCountInOneExam"]),
                 MinTimesThatLearningWordAppearsInExam = int.Parse(configuration["MinTimesThatLearningWordAppearsInExam"]),
                 MaxTimesThatLearningWordAppearsInExam = int.Parse(configuration["MaxTimesThatLearningWordAppearsInExam"]),
                 MaxExamSize = int.Parse(configuration["MaxExamSize"]),

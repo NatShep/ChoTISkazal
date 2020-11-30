@@ -66,7 +66,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
                 InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.RuWord)));
-
+            await _addWordService.RegistrateTranslationRequest(user);
             while (true)
             {
                 var input = await _chatIo.TryWaitInlineIntKeyboardInput();

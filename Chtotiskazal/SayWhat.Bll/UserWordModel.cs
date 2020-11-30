@@ -105,7 +105,7 @@ namespace SayWhat.Bll
              var p = 100 / Math.Pow(ReducingPerPointFactor, res);
 
              //Randomize
-             var rndFactor = Math.Pow(1.5, RandomTools.RandomNormal(0, 1));
+             var rndFactor = Math.Pow(1.5, Random.RandomNormal(0, 1));
              p *= rndFactor;
              _entity.CurrentScore = p;
              _entity.ScoreUpdatedTimestamp = DateTime.Now;

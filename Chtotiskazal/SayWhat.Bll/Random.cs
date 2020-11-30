@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace SayWhat.Bll
 {
-    public static class RandomTools
+    public static class Random
     {
-        public static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
+        public static readonly System.Random Rnd = new System.Random(DateTime.Now.Millisecond);
         
         public static T GetRandomItem<T>(this IList<T> origin)
         {
@@ -35,5 +35,11 @@ namespace SayWhat.Bll
                 mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
             return randNormal;
         }
+
+        public static int RandomIn(in int examSettingsMinLearningWordsCountInOneExam, in int examSettingsMaxLearningWordsCountInOneExam)
+        => Rnd.Next(examSettingsMinLearningWordsCountInOneExam, examSettingsMaxLearningWordsCountInOneExam);
+
+        public static int UpTo(in int examSettingsMaxAdvancedQuestionsCount)
+            => Rnd.Next(examSettingsMaxAdvancedQuestionsCount);
     }
 }

@@ -153,5 +153,11 @@ namespace SayWhat.Bll.Services
                 await _userService.UpdateCounters(user);
             }
         }
+
+        public Task RegistrateTranslationRequest(User user)
+        {
+            user.EnglishWordTranlationRequestsCount++;
+            return _userService.UpdateCounters(user);
+        }
     }
 }

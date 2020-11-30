@@ -228,17 +228,19 @@ namespace SayWhat.Bll.Services
             for (int i = 0; i < examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
                 examsList.AddRange(learningWords.Randomize());
             for (int i = 0; i < examSettings.MaxTimesThatLearningWordAppearsInExam - examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Randomize().Where(w => RandomTools.Rnd.Next() % 2 == 0));
+                examsList.AddRange(learningWords.Randomize().Where(w => Random.Rnd.Next() % 2 == 0));
             
             while (examsList.Count > examSettings.MaxExamSize) 
                 examsList.RemoveAt(examsList.Count - 1);
-            var advancedlistMaxCount = Math.Min(examSettings.MaxAdvancedQuestionsCount,
+            var advancedlistMaxCount = Math.Min(Random.UpTo(examSettings.MaxAdvancedQuestionsCount),
                 examSettings.MaxExamSize - examsList.Count);
             if (advancedlistMaxCount <= 0)
                 return examsList;
+
+            var minimumTimesThatWordHasToBeAsked =
+                Random.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedCount,
+                    examSettings.MaxAdvancedExamMinQuestionAskedCount);
             
-            var minimumTimesThatWordHasToBeAsked = examSettings.MinAdvancedExamMinQuestionAskedCount +
-                                                   RandomTools.Rnd.Next(examSettings.MaxAdvancedExamMinQuestionAskedCount - examSettings.MinAdvancedExamMinQuestionAskedCount);
             var advancedList = await GetWordsWithExamples(
                 user: user,
                 maxCount: advancedlistMaxCount,
