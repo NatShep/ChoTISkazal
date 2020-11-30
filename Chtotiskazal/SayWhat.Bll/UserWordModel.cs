@@ -89,21 +89,20 @@ namespace SayWhat.Bll
          }
 
          //res reduces for 1 point per AgingFactor days
-         private double AgedScore ()
+         private double GetAgedScore ()
          {
              //if there were no question yet - return some big number as if the word was asked long time ago  
-             if (_entity.LastQuestionTimestamp == null) return 30;
-             
+             if (_entity.LastQuestionTimestamp == null) return 0;
              return Math.Max(0, _entity.AbsoluteScore - (DateTime.Now - _entity.LastQuestionTimestamp.Value).TotalDays 
                                 / AgingFactor);
          }
 
          public void UpdateCurrentScore()
          {
-             double res = AgedScore();
+             double res = GetAgedScore();
 
              //probability reduces by reducingPerPointFactor for every res point
-             var p = 100 / Math.Pow(ReducingPerPointFactor, res);
+             var p = Math.Pow(ReducingPerPointFactor, res);
 
              //Randomize
              var rndFactor = Math.Pow(1.5, Random.RandomNormal(0, 1));
