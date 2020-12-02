@@ -50,7 +50,7 @@ namespace Chotiskazal.Bot
                 }
                 if (_waitMessageCompletionSource != null)
                 {
-                    Botlog.Write("Set text result");
+                    Botlog.WriteInfo($"Set text result", ChatId);
                     var src = _waitMessageCompletionSource;
                     _waitMessageCompletionSource = null;
                     src?.SetResult(args.Message.Text);
@@ -60,7 +60,7 @@ namespace Chotiskazal.Bot
 
             if (_waitInputCompletionSource != null)
             {
-                Botlog.Write("Set any result");
+                Botlog.WriteInfo($"Set any result",ChatId);
                 var src = _waitInputCompletionSource;
                 _waitInputCompletionSource = null;
                 src?.SetResult(args);
@@ -75,9 +75,9 @@ namespace Chotiskazal.Bot
         public async Task<Update> WaitUserInputAsync()
         {
             _waitInputCompletionSource = new TaskCompletionSource<Update>();
-            Botlog.Write("Wait for any");
+            Botlog.WriteInfo($"Wait for any",ChatId);
             var result = await _waitInputCompletionSource.Task;
-            Botlog.Write("Got any");
+            Botlog.WriteInfo($"Got any",ChatId);
             return result;
         }
         
@@ -113,11 +113,11 @@ namespace Chotiskazal.Bot
 
         public async Task<string> WaitUserTextInputAsync()
         {
-            Botlog.Write("Wait for text");
+            Botlog.WriteInfo($"Wait for text",ChatId);
             _waitMessageCompletionSource = new TaskCompletionSource<string>();
 
             var result = await _waitMessageCompletionSource.Task;
-            Botlog.Write("Got text");
+            Botlog.WriteInfo($"Got text",ChatId);
             return result;
         }
 

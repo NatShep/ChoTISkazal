@@ -88,7 +88,7 @@ namespace SayWhat.Bll.Services
                 await _userWordsRepository.UpdateMetrics(model.Entity);
             }
             sw.Stop();
-            Botlog.Metric(user.TelegramId, nameof(UpdateCurrentScore), $"{words.Count}", sw.Elapsed);
+            Botlog.UpdateMetricInfo(user.TelegramId, nameof(UpdateCurrentScore), $"{words.Count}", sw.Elapsed);
         }
 
         public async Task RegisterSuccess(UserWordModel model)

@@ -17,8 +17,10 @@ namespace SayWhat.Bll.Services
             var user = await _repository.GetOrDefaultByTelegramIdOrNull(telegramUserInfo.TelegramId);
             // ReSharper disable once ConvertToNullCoalescingCompoundAssignment
             user = user ?? await AddUser(telegramUserInfo);
-            if(user==null)
-                throw  new Exception("I can't add user!");
+            if (user == null)
+            {
+                throw new Exception("I can't add user!");
+            }
             return user;
         }
         
@@ -28,10 +30,12 @@ namespace SayWhat.Bll.Services
             {
                 var user = new User(info.TelegramId, info.FirstName, info.LastName, info.UserNick);
                 await _repository.Add(user);
+                Botlog.WriteInfo($"Register new user - {user.TelegramNick}",user.TelegramId.ToString());
                 return user;
             }
             catch
             {
+                Botlog.WriteError(info.TelegramId,$"Can't add new user {info.TelegramId}");
                 return null;
             }
         }

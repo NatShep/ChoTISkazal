@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using Serilog;
+using Serilog.Events;
 using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -25,7 +27,7 @@ namespace Chotiskazal.Bot.ChatFlows
         }
 
         private User User { get; set; }
-            
+
         private readonly TelegramUserInfo _userInfo;
         private readonly BotSettings _settings;
         private readonly AddWordService _addWordsService;
@@ -38,6 +40,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             User = await _userService.GetOrAddUser(_userInfo);
             
+            Botlog.WriteInfo($"User {User.TelegramNick} сonnect with ChoTiSkazal", User.TelegramId.ToString());
             await SayHelloAsync();
             
             while(true)
@@ -58,7 +61,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     mainMenuCommandOrNull = e.Command;
                 }
                 catch(Exception e){
-                    Botlog.Error(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
+                    Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
                     await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
                 }
             }

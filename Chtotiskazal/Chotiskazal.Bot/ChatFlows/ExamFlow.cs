@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using Random = SayWhat.Bll.Random;
+using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -118,14 +119,14 @@ namespace Chotiskazal.Bot.ChatFlows
                             break;
                         case ExamResult.Passed:
                             await WritePassed();
-                            Botlog.SaveQuestionMetric(questionMetric);
+                            Botlog.SaveQuestionMetricInfo(questionMetric,_chatIo.ChatId );
                             questionsCount++;
                             questionsPassed++;
                             break;
                         case ExamResult.Failed:
                             await WriteFailed();
                             questionMetric.Result = 0;
-                            Botlog.SaveQuestionMetric(questionMetric);
+                            Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
                             break;
                         case ExamResult.Retry:
@@ -137,7 +138,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     lastExamResult = result;
 
                 } while (retryFlag);
-                Botlog.RegisterExamAsync(user.TelegramId, started, questionsCount, questionsPassed);
+                Botlog.RegisterExamInfo(user.TelegramId, started, questionsCount, questionsPassed);
             }               
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
 

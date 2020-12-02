@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Questions;
@@ -12,8 +13,14 @@ using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
+using Serilog;
+using Serilog.Core.Enrichers;
+using Serilog.Formatting.Json;
+using Serilog.Sinks.RollingFile;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Exceptions;
+using Telegram.Bot.Types;
 
 
 namespace Chotiskazal.Bot
@@ -53,7 +60,6 @@ namespace Chotiskazal.Bot
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
             _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
             _userService          = new UserService(userRepo);
-            
 
             _addWordService = new AddWordService(
                 _userWordService,
@@ -63,11 +69,12 @@ namespace Chotiskazal.Bot
                 _userService);
             
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
-            
-            Console.WriteLine("Dic started");
+
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
             var me = _botClient.GetMeAsync().Result;
+    
+            Botlog.WriteInfo($"WhatYouSay started. I am user {me.Id}");
             Console.WriteLine(
                 $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
             );
@@ -80,6 +87,8 @@ namespace Chotiskazal.Bot
              new TaskCompletionSource<bool>().Task.Wait();
              // it will never happens
              _botClient.StopReceiving();
+             
+
         }
 
         private static BotSettings ReadConfiguration()
@@ -115,7 +124,7 @@ namespace Chotiskazal.Bot
             
             var task = newChatRoom.Run();
 
-            task.ContinueWith((t) => Botlog.Error(chat.Id,  $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith((t) => Botlog.WriteError(chat.Id,  $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             Chats.TryAdd(chat.Id, newChatRoom);
             return newChatRoom;
         }
@@ -125,11 +134,12 @@ namespace Chotiskazal.Bot
             long? chatId = null;
             try
             {
-                Botlog.Write($"Got query: {e.Update.Type}");
+                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...");
 
                 if (e.Update.Message != null)
                 {
                     chatId = e.Update.Message.Chat?.Id;
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
 
@@ -137,6 +147,8 @@ namespace Chotiskazal.Bot
                 else if (e.Update.CallbackQuery != null)
                 {
                     chatId = e.Update.CallbackQuery.Message.Chat?.Id;
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
+
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.HandleUpdate(e.Update);
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
@@ -144,7 +156,7 @@ namespace Chotiskazal.Bot
             }
             catch (Exception error)
             {
-                Botlog.Error(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type} {error}");
+                Botlog.WriteError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}");
             }
         }
 
@@ -152,7 +164,7 @@ namespace Chotiskazal.Bot
         {
             if (e.Message.Text != null)
             {
-                Botlog.Write($"Received a text message in chat {e.Message.Chat.Id}.");
+                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
             }
         }
     }

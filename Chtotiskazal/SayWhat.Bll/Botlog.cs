@@ -1,31 +1,52 @@
 ﻿﻿using System;
+ using Serilog;
+ using Serilog.Events;
+ using Serilog.Formatting.Json;
+ using Serilog.Sinks.RollingFile;
 
  namespace SayWhat.Bll
 {
     public static class Botlog{
-        public static void Error(long? chatId, string msg)
+        
+        
+        private static ILogger _log = Log.Logger = new LoggerConfiguration()
+            .Enrich.WithProperty("Version", "1.0.0")
+            .WriteTo.Sink(new RollingFileSink(
+                @"C:\Apps\Chotiskazal\Chotiskazal\Chtotiskazal\Chotiskazal.Bot\bin\Debug\netcoreapp3.1\Logs\log-ChoTiSkazal.json", 
+                new JsonFormatter(), 2147483648, 5))
+            .WriteTo.File(@"C:\Apps\Chotiskazal\Chotiskazal\Chtotiskazal\Chotiskazal.Bot\bin\Debug\netcoreapp3.1\Logs\log-ChoTiSkazal-.txt", rollingInterval:RollingInterval.Day)
+            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+            .CreateLogger();
+        
+        public static void WriteError(long? chatId, string msg)
         {
-            var now = DateTime.Now;
-            Console.WriteLine($"[{now.Hour}:{now.Minute}:{now.Second}.{now.Millisecond}] [{chatId}] {msg}");
+            _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId});
         }
-        public static void Write(string msg)
+        public static void WriteInfo(string msg)
         {
-            var now = DateTime.Now;
-            Console.WriteLine($"[{now.Hour}:{now.Minute}:{now.Second}.{now.Millisecond}] {msg}");
+            _log.Information(msg);
+        }
+        
+        public static void WriteInfo(string msg, string chatId)
+        {
+            _log.Information(msg+" {@ChatInfo}", new {ChatInfo = chatId});
         }
 
-        public static void Metric(long? userTelegramId, string metricId, string param,
+        public static void UpdateMetricInfo(long? userTelegramId, string metricId, string param,
             TimeSpan swElapsed)
         {
-            Console.WriteLine($"[{userTelegramId}] [{metricId}] [{param}] {swElapsed}]");
+            _log.Information("Update metric info: {@metricInfo} ", new {UserTelegramId = userTelegramId, MetricId=metricId,Param=param,SwElapsed=swElapsed});
         }
 
-        public static void SaveQuestionMetric(QuestionMetric questionMetric)
+        public static void SaveQuestionMetricInfo(QuestionMetric questionMetric, string chatId)
         {
+            _log.Information("Save question metric {@ChatInfo} {@questionMetric}", new {ChatInfo=chatId}, questionMetric);
         }
 
-        public static void RegisterExamAsync(long? userTelegramId, DateTime started, int questionsCount, int questionsPassed)
+        public static void RegisterExamInfo(long? userTelegramId, DateTime started, int questionsCount, int questionsPassed)
         {
+            _log.Information("Register Exam {@ChatInfo} {@Exam}", new {ChatInfo=userTelegramId},
+                new {Started=started,QuestionsCount=questionsCount,QuestionPassed=questionsPassed});
         }
     }
 }
