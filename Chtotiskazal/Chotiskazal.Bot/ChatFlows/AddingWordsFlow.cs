@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await _chatIo.SendMessageAsync("Enter english word", new InlineKeyboardButton
+                await _chatIo.SendMessageAsync("Enter english or russian word", new InlineKeyboardButton
                 {
                     CallbackData = "/start",
                     Text = "Cancel"
@@ -53,7 +53,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     }
                 }
             }
-
+            
             //find word in local dictionary(if not, find it in Ya dictionary)
             var translations = await _addWordService.FindInDictionaryWithoutExamples(word);
             if (!translations.Any())

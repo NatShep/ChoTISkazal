@@ -18,8 +18,8 @@ namespace SayWhat.Bll.Yapi
             _timeout = timeout;
         }
 
-        private string MakeQuery(string word) =>
-            $@"https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key={_key}&lang=en-ru&text={HttpUtility.UrlEncode(word)}";
+        private string MakeQuery(string word, string langFrom, string langTo) =>
+            $@"https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key={_key}&lang={langFrom}-{langTo}&text={HttpUtility.UrlEncode(word)}";
 
         public async Task<bool> Ping()
         {
@@ -39,13 +39,16 @@ namespace SayWhat.Bll.Yapi
             }
         }
 
-        public async Task<YaDefenition[]> TranslateAsync(string word)
+        public Task<YaDefenition[]> EnRuTranslateAsync(string word) => TranslateAsync(word,"en","ru");
+        public Task<YaDefenition[]> RuEnTranslateAsync(string word) => TranslateAsync(word,"ru","en");
+
+        private async Task<YaDefenition[]> TranslateAsync(string word,string langFrom, string langTo)
         {
             using var client = new HttpClient(){Timeout = _timeout};
             
             try
             {
-                var query = MakeQuery(word);
+                var query = MakeQuery(word,langFrom,langTo);
                 var ans = await client.GetStringAsync(query);
                 IsOnline = true;
                 var deserialized = JsonSerializer.Deserialize<YapiDicAnswer>(ans);
