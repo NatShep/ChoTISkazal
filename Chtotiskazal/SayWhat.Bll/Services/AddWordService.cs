@@ -77,10 +77,11 @@ namespace SayWhat.Bll.Services
           {
               return word.Translations.Select(
                   t => new DictionaryTranslation(
-                      enWord: word.Word,
-                      ruWord: t.Word,
-                      enTranscription: word.Transcription,
+                      originText: word.Word,
+                      translatedText: t.Word,
+                      originTranscription: word.Transcription,
                       source: word.Source,
+                      tranlationDirection: word.Language == Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
                       phrases: t.Examples.Select(e => e.ExampleOrNull).ToList()
                   )).ToArray();
           }
@@ -137,12 +138,13 @@ namespace SayWhat.Bll.Services
         public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithoutExamples(string word) 
             => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task AddWordsToUser(User user, DictionaryTranslation[] words)
+        public async Task AddWordsToUser(User user, DictionaryTranslation translation)
         {
-            var originWord = words.FirstOrDefault()?.EnWord;
-            if (originWord == null) return;
-
-            var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, originWord);
+            if (translation == null) return;
+            if(translation.TranlationDirection!= TranlationDirection.EnRu)
+                throw new InvalidOperationException("Only enru dirrection is supported");
+            
+            var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
 
             if (alreadyExistsWord == null)
             {
@@ -150,18 +152,21 @@ namespace SayWhat.Bll.Services
                 var model = new UserWord
                 {
                     UserId = user.Id,
-                    Word = originWord,
+                    Word = translation.OriginText,
                     Language = TranlationDirection.EnRu,
-                    Translations = words.Select(r => new UserWordTranslation
+                    Translations = new[]
                     {
-                        Transcription = r.EnTranscription,
-                        Word = r.RuWord,
-                        Examples = r.Examples
-                            .Select(p => new UserWordTranslationReferenceToExample(p.Id))
-                            .ToArray()
-                    }).ToArray(),
+                        new UserWordTranslation
+                        {
+                            Transcription = translation.EnTranscription,
+                            Word = translation.TranslatedText,
+                            Examples = translation.Examples
+                                .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                                .ToArray()
+                        }
+                    }
                 };
-                await _usersWordsService.AddUserWord(model);
+            await _usersWordsService.AddUserWord(model);
                 
                 user.WordsCount++;
                 user.PairsCount += model.Translations.Length;
@@ -175,17 +180,14 @@ namespace SayWhat.Bll.Services
 
                 var translates = alreadyExistsWord.GetTranslations().ToList();
                 var newTranslations = new List<UserWordTranslation>();
-                foreach (var r in words)
-                {
-                    if (translates.Contains(r.RuWord))
-                        continue;
+                var r = translation;
+                if (!translates.Contains(r.TranslatedText))
                     newTranslations.Add(new UserWordTranslation
                     {
                         Transcription = r.EnTranscription,
-                        Word = r.RuWord,
+                        Word = r.TranslatedText,
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
                     });
-                }
 
                 if (newTranslations.Count == 0) return;
                 alreadyExistsWord.AddTranslations(newTranslations);

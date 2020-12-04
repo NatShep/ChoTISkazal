@@ -102,6 +102,7 @@ namespace SayWhat.Bll.Services
                     word.Word,
                     translation.Word,
                     word.Transcription,
+                    word.Language== Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
                     word.Source, examples));
             }
 
@@ -116,10 +117,11 @@ namespace SayWhat.Bll.Services
 
             return word.Translations
                 .Select(translation => new DictionaryTranslation(
-                    word.Word, 
-                    translation.Word, 
-                    word.Transcription, 
-                    word.Source, 
+                    originText: word.Word, 
+                    translatedText: translation.Word, 
+                    originTranscription: word.Transcription, 
+                    tranlationDirection: word.Language== Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
+                    source: word.Source, 
                     translation.Examples
                         .Select(e => new Example {Id = e.ExampleId})
                         .ToList()))

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -63,9 +64,9 @@ namespace Chotiskazal.Bot.ChatFlows
                 await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
                 return true;
             }
-
+            
             await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
-                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.RuWord)));
+                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.TranslatedText)));
             await _addWordService.RegistrateTranslationRequest(user);
             while (true)
             {
@@ -76,7 +77,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     continue;
                 
                 var selected = translations[input.Value];
-                await _addWordService.AddWordsToUser(user, new[] {selected});
+                if (selected.TranlationDirection == TranlationDirection.RuEn)
+                    selected = selected.GetReversed(); //Reverse direction
+                
+                await _addWordService.AddWordsToUser(user,  selected);
                 if(selected.Examples.Count>0)
                     await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
                 else

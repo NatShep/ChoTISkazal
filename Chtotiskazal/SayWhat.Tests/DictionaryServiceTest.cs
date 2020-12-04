@@ -56,8 +56,8 @@ namespace SayWhat.MongoDAL.Tests
             var translation = translations[0];
             Assert.AreEqual(word.Source, translation.Source);
             Assert.AreEqual(word.Transcription, translation.EnTranscription);
-            Assert.AreEqual(word.Word, translation.EnWord);
-            Assert.AreEqual(word.Translations[0].Word, translation.RuWord);
+            Assert.AreEqual(word.Word, translation.OriginText);
+            Assert.AreEqual(word.Translations[0].Word, translation.TranslatedText);
 
             Assert.AreEqual(example.OriginWord, translation.Examples[0].OriginWord);
             Assert.AreEqual(example.OriginPhrase, translation.Examples[0].OriginPhrase);
