@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GoogleTranslateFreeApi;
 using MongoDB.Bson;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
@@ -10,6 +11,7 @@ using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
+using Language = SayWhat.MongoDAL.Language;
 
 namespace SayWhat.Bll.Services
 {
@@ -17,18 +19,17 @@ namespace SayWhat.Bll.Services
     {
         private readonly UsersWordsService _usersWordsService;
         private readonly YandexDictionaryApiClient _yaDicClient;
-        private readonly YandexTranslateApiClient _yaTransClient;
         private readonly DictionaryService _dictionaryService;
         private readonly UserService _userService;
 
-        public AddWordService(UsersWordsService usersWordsService, YandexDictionaryApiClient yaDicClient,
-            YandexTranslateApiClient yaTransClient, 
+        public AddWordService(
+            UsersWordsService usersWordsService, 
+            YandexDictionaryApiClient yaDicClient,
             DictionaryService dictionaryService, 
             UserService userService)
         {
             _usersWordsService = usersWordsService;
             _yaDicClient = yaDicClient;
-            _yaTransClient = yaTransClient;
             _dictionaryService = dictionaryService;
             _userService = userService;
         }
@@ -36,20 +37,23 @@ namespace SayWhat.Bll.Services
         public async Task<IReadOnlyList<DictionaryTranslation>> TranslateAndAddToDictionary(string originWord)
         {
             originWord = originWord.ToLower();
-
-            if (originWord.Count(e => e == ' ') < 3)
+            
+            if (originWord.Count(e => e == ' ') < 4)
             {
-                if (IsRussian(originWord))
-                    return await TranslateRuEnWordAndAddItToDictionary(originWord);
+                IReadOnlyList<DictionaryTranslation> res = null;
+                if (originWord.IsRussian())
+                    res = await TranslateRuEnWordAndAddItToDictionary(originWord);
                 else
-                    return await TranlateEnRuWordAndAddItToDictionary(originWord);
-            }
+                    res =  await TranlateEnRuWordAndAddItToDictionary(originWord);
 
+                if (res != null)
+                    return res;
+            }
+            
             //todo go to translate api
             return null;
         }
 
-        private static bool IsRussian(string englishWord) => englishWord.Count(e => e >= 'А' && e <= 'я') > 1;
 
         private async Task<IReadOnlyList<DictionaryTranslation>> TranlateEnRuWordAndAddItToDictionary(string englishWord)
         {
@@ -62,7 +66,7 @@ namespace SayWhat.Bll.Services
             return ToDictionaryTranslations(word);
         }
         
-          private async Task<IReadOnlyList<DictionaryTranslation>> TranslateRuEnWordAndAddItToDictionary(string russianWord)
+        private async Task<IReadOnlyList<DictionaryTranslation>> TranslateRuEnWordAndAddItToDictionary(string russianWord)
         {
             // Go to yandex api
             var yaResponse = await _yaDicClient.RuEnTranslateAsync(russianWord);
@@ -199,9 +203,15 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public Task RegistrateTranslationRequest(User user)
+        public Task RegistrateEnTranslationRequest(User user)
         {
             user.EnglishWordTranlationRequestsCount++;
+            return _userService.UpdateCounters(user);
+        }
+        
+        public Task RegistrateRuTranslationRequest(User user)
+        {
+            user.RussianWordTranlationRequestsCount++;
             return _userService.UpdateCounters(user);
         }
     }

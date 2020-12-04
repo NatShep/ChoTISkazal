@@ -54,13 +54,16 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= 4)
             {
-                var sb = new StringBuilder("Examination\r\n");
+                var sb = new StringBuilder("*Learning*\r\n\r\n" +
+                                           "Carefully study the words in the list below:\r\n\r\n" +
+                                           "```\r\n");
 
                 foreach (var pairModel in learningWords.Randomize())
                 {
                     sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranslationAsList}");
                 }
-                await _chatIo.SendMessageAsync(sb.ToString(), new InlineKeyboardButton
+                sb.AppendLine("\r\n```\r\n\\.\\.\\. then click start");
+                await _chatIo.SendMarkdownMessageAsync(sb.ToString(),new[]{ new[]{ new InlineKeyboardButton
                 {
                     CallbackData = "/startExamination",
                     Text = "Start"
@@ -68,7 +71,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 {
                     CallbackData = "/start",
                     Text = "Cancel",
-                });
+                }}});
                 var userInput = await _chatIo.WaitInlineKeyboardInput();
                 if (userInput != "/startExamination")
                     return;
@@ -142,14 +145,15 @@ namespace Chotiskazal.Bot.ChatFlows
             }               
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
 
-            var doneMessage = new StringBuilder($"Learning done:  {questionsPassed}/{questionsCount}\r\n");
+            var doneMessage = new StringBuilder($"*Learning done:  {questionsPassed}/{questionsCount}*\r\n\r\n```\r\n");
             foreach (var pairModel in learningAndAdvancedWords.Distinct())
             {
-                doneMessage.Append(pairModel.Word + " - " + pairModel.TranslationAsList + "  (" +
+                doneMessage.Append(pairModel.Word + "  -  " + pairModel.TranslationAsList + "  (" +
                                    pairModel.AbsoluteScore + ")\r\n");
             }
 
-            await _chatIo.SendMessageAsync(doneMessage.ToString());
+            doneMessage.Append("```\r\n\r\nEnter new word to translate or /start to return to main menu");
+            await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
         }
 
         private async Task WriteDontPeakMessage()

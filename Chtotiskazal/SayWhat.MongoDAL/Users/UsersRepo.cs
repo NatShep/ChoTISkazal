@@ -58,7 +58,9 @@ namespace SayWhat.MongoDAL.Users
                 .Set(o => o.WordsCount, user.WordsCount)
                 .Set(o => o.PairsCount, user.PairsCount)
                 .Set(o => o.ExamplesCount, user.ExamplesCount)
-                .Set(o => o.EnglishWordTranlationRequestsCount, user.EnglishWordTranlationRequestsCount);
+                .Set(o => o.EnglishWordTranlationRequestsCount, user.EnglishWordTranlationRequestsCount)
+                .Set(o => o.RussianWordTranlationRequestsCount, user.RussianWordTranlationRequestsCount);
+
 
             return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
         }

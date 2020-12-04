@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace SayWhat.MongoDAL.Users
 {
+    [BsonIgnoreExtraElements]
     public class User
     {
         public User() { }
@@ -36,6 +37,8 @@ namespace SayWhat.MongoDAL.Users
         public int ExamplesCount { get; set; }
         [BsonElement("en_wtc")]
         public int EnglishWordTranlationRequestsCount { get; set; }
+        [BsonElement("ru_wtc")]
+        public int RussianWordTranlationRequestsCount { get; set; }
     }
  
     public enum UserSource

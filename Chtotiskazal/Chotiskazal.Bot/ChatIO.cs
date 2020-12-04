@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using Telegram.Bot;
@@ -15,70 +15,52 @@ namespace Chotiskazal.Bot
     {
         private readonly TelegramBotClient _client;
         public readonly ChatId ChatId;
-
-        private TaskCompletionSource<Update> _waitInputCompletionSource   = null;
-        private TaskCompletionSource<string> _waitMessageCompletionSource = null;
-
+        private readonly Channel<Update> _senderChannel;
         
         public ChatIO(TelegramBotClient client, Chat chat)
         {
             _client = client;
              ChatId = chat.Id;
+             _senderChannel = Channel.CreateBounded<Update>(
+                 new BoundedChannelOptions(3)
+                     {SingleReader = true, SingleWriter = true});
         }
 
-        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/exam"};
+        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/learn"};
        
-        internal void HandleUpdate(Update args)
+        internal void OnUpdate(Update args)
         {
-            var msg = args.Message?.Text;
-            if (!string.IsNullOrWhiteSpace(msg))
-            {
-                if (msg[0] == '/')
-                {
-                    if (!_menuItems.Contains(msg)) {
-                        SendMessageAsync($"Invalid command '{msg}'").Wait();
-                        return;
-                    }
-
-                    var textSrc = _waitMessageCompletionSource;
-                    var objSrc = _waitInputCompletionSource;
-                    _waitMessageCompletionSource = null;
-                    _waitInputCompletionSource = null;
-                    textSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
-                    objSrc?.SetException(new ProcessInterruptedWithMenuCommand(msg));
-                    return;
-                }
-                if (_waitMessageCompletionSource != null)
-                {
-                    Botlog.WriteInfo($"Set text result", ChatId);
-                    var src = _waitMessageCompletionSource;
-                    _waitMessageCompletionSource = null;
-                    src?.SetResult(args.Message.Text);
-                    return;
-                }
-            }
-
-            if (_waitInputCompletionSource != null)
-            {
-                Botlog.WriteInfo($"Set any result",ChatId);
-                var src = _waitInputCompletionSource;
-                _waitInputCompletionSource = null;
-                src?.SetResult(args);
-            }   
+            Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}");
+            _senderChannel.Writer.TryWrite(args);
         }
 
         public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);
         public Task SendMessageAsync(string message)=> _client.SendTextMessageAsync(ChatId, message);
         public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons)
             => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
+        public Task SendMessageAsync(string message,  InlineKeyboardButton[][] buttons)
+            => _client.SendTextMessageAsync(ChatId, message, replyMarkup:  new InlineKeyboardMarkup(buttons));
+
+        public Task SendMarkdownMessageAsync(string message, params InlineKeyboardButton[] buttons)
+            => _client.SendTextMessageAsync(ChatId, message, 
+                replyMarkup:  new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})),
+                parseMode: ParseMode.MarkdownV2);
+        public Task SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
+            => _client.SendTextMessageAsync(ChatId, message, 
+                replyMarkup:  new InlineKeyboardMarkup(buttons),
+                parseMode: ParseMode.MarkdownV2);
 
         public async Task<Update> WaitUserInputAsync()
         {
-            _waitInputCompletionSource = new TaskCompletionSource<Update>();
-            Botlog.WriteInfo($"Wait for any",ChatId);
-            var result = await _waitInputCompletionSource.Task;
-            Botlog.WriteInfo($"Got any",ChatId);
-            return result;
+            Botlog.WriteInfo($"Wait for update",ChatId);
+            var upd = await _senderChannel.Reader.ReadAsync();
+            var txt = upd.Message?.Text ?? upd.CallbackQuery?.Data;
+            
+            if(_menuItems.Contains(txt))
+                throw new ProcessInterruptedWithMenuCommand(txt);
+
+            Botlog.WriteInfo($"Got update",ChatId);
+            return upd;
         }
         
         public async Task<string> WaitInlineKeyboardInput()
@@ -113,12 +95,15 @@ namespace Chotiskazal.Bot
 
         public async Task<string> WaitUserTextInputAsync()
         {
-            Botlog.WriteInfo($"Wait for text",ChatId);
-            _waitMessageCompletionSource = new TaskCompletionSource<string>();
-
-            var result = await _waitMessageCompletionSource.Task;
-            Botlog.WriteInfo($"Got text",ChatId);
-            return result;
+            while (true)
+            {
+                var res = await WaitUserInputAsync();
+                var txt = res.Message?.Text;
+                if (!string.IsNullOrWhiteSpace(txt))
+                {
+                    return txt;
+                }    
+            }
         }
 
         public Task SendTyping() => _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);

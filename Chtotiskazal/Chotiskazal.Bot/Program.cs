@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Questions;
@@ -64,26 +65,32 @@ namespace Chotiskazal.Bot
             _addWordService = new AddWordService(
                 _userWordService,
                 yandexDictionaryClient,
-                yandexTranslateApiClient,
                 _dictionaryService, 
                 _userService);
             
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
-
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
             var me = _botClient.GetMeAsync().Result;
-    
-            Botlog.WriteInfo($"WhatYouSay started. I am user {me.Id}");
-            Console.WriteLine(
-                $"Hello, World! I am user {me.Id} and my name is {me.FirstName}."
-            );
+            
+            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ");
 
+            var allUpdates =_botClient.GetUpdatesAsync().Result;
+            Botlog.WriteInfo($"{allUpdates.Length} messages were missed");
+
+            foreach (var update in allUpdates) 
+                OnBotWokeUp(update);
+            if (allUpdates.Any())
+            {
+                _botClient.MessageOffset = allUpdates.Last().Id + 1;
+                Botlog.WriteInfo($"{Chats.Count} users were waitig for us");
+            }
             _botClient.OnUpdate+= BotClientOnOnUpdate;
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-             // workaround for infinity awaiting
+            Botlog.WriteInfo($"... and here i go!");
+            // workaround for infinity awaiting
              new TaskCompletionSource<bool>().Task.Wait();
              // it will never happens
              _botClient.StopReceiving();
@@ -108,27 +115,57 @@ namespace Chotiskazal.Bot
             }
             
         }
+        private static void OnBotWokeUp(Update update)
+        {
+            Telegram.Bot.Types.Chat chat = null;
+            Telegram.Bot.Types.User user = null;
+            if (update?.Message != null)
+            {
+                chat = update.Message.Chat;
+                user = update.Message.From;
+            }
+            else if (update?.CallbackQuery != null)
+            {
+                chat = update.CallbackQuery.Message.Chat;
+                user = update.CallbackQuery.From;
+            }
+            else
+                return;
 
+            if (Chats.TryGetValue(chat.Id, out _))
+                return;
+            
+            var chatRoom = CreateChatRoom(chat);
+            if (chatRoom == null)
+            {
+                return;
+            }
+            chatRoom.ChatIo.SendMessageAsync("Did you write something? I was asleep the whole time...");
+            chatRoom.ChatIo.OnUpdate(
+                new Update {Message = new Message {Text = "/start", From = user}});
+                
+            RunChatRoom(chat, chatRoom);
+        }
         private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
             
-            var newChatRoom = new ChatRoomFlow(
-                new ChatIO(_botClient, chat), 
-                new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
-                _settings,
-                _addWordService,
-                _userWordService, 
-                _userService);
-            
-            var task = newChatRoom.Run();
-
-            task.ContinueWith((t) => Botlog.WriteError(chat.Id,  $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
-            Chats.TryAdd(chat.Id, newChatRoom);
+            var newChatRoom = CreateChatRoom(chat);
+            if (newChatRoom == null)
+            {
+                Console.WriteLine($"Chat {chat.Id} rejected");
+                return null;
+            }
+            Console.WriteLine($"Chat {chat.Id} joined");
+            RunChatRoom(chat, newChatRoom);
             return newChatRoom;
         }
-
+        private static void RunChatRoom(Chat chat, ChatRoomFlow newChatRoom)
+        {
+            var task = newChatRoom.Run();
+            task.ContinueWith((t) => Botlog.WriteError(chat.Id, $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
+        }
         private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
             long? chatId = null;
@@ -141,7 +178,7 @@ namespace Chotiskazal.Bot
                     chatId = e.Update.Message.Chat?.Id;
                     Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
-                    chatRoom?.ChatIo.HandleUpdate(e.Update);
+                    chatRoom?.ChatIo.OnUpdate(e.Update);
 
                 }
                 else if (e.Update.CallbackQuery != null)
@@ -150,7 +187,7 @@ namespace Chotiskazal.Bot
                     Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
 
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
-                    chatRoom?.ChatIo.HandleUpdate(e.Update);
+                    chatRoom?.ChatIo.OnUpdate(e.Update);
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
                 }
             }
@@ -166,6 +203,19 @@ namespace Chotiskazal.Bot
             {
                 Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
             }
+        }
+        
+        private static ChatRoomFlow CreateChatRoom(Chat chat)
+        {
+            var newChatRoom = new ChatRoomFlow(
+                new ChatIO(_botClient, chat), 
+                new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
+                _settings,
+                _addWordService,
+                _userWordService, 
+                _userService);
+            Chats.TryAdd(chat.Id, newChatRoom);
+            return newChatRoom;
         }
     }
 }

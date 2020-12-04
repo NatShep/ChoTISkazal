@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
@@ -36,23 +37,8 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await _chatIo.SendMessageAsync("Enter english or russian word", new InlineKeyboardButton
-                {
-                    CallbackData = "/start",
-                    Text = "Cancel"
-                });
-                while (true)
-                {
-                    var input = await _chatIo.WaitUserInputAsync();
-                    if (input.CallbackQuery != null && input.CallbackQuery.Data == "/start")
-                        throw new ProcessInterruptedWithMenuCommand("/start");
-
-                    if (!string.IsNullOrEmpty(input.Message?.Text))
-                    {
-                        word = input.Message.Text;
-                        break;
-                    }
-                }
+                await _chatIo.SendMessageAsync("Enter english or russian word to translate or /start to open main menu ");
+                word = await _chatIo.WaitUserTextInputAsync();
             }
             
             //find word in local dictionary(if not, find it in Ya dictionary)
@@ -64,10 +50,20 @@ namespace Chotiskazal.Bot.ChatFlows
                 await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
                 return true;
             }
-            
-            await _chatIo.SendMessageAsync($"Choose translation for '{word}'",
-                InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.TranslatedText)));
-            await _addWordService.RegistrateTranslationRequest(user);
+
+            var tr = translations.FirstOrDefault(t =>!string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
+
+
+            await _chatIo.SendMarkdownMessageAsync(
+                $"_Here are the translations\\._ \r\n" +
+                $"_Choose one of them to learn them in the future_\r\n\r\n" +
+                $"*{word.Capitalize()}*" +
+                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr}]\r\n```")}",
+                    InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.TranslatedText)));
+            if(word.IsRussian())
+                await _addWordService.RegistrateRuTranslationRequest(user);
+            else
+                await _addWordService.RegistrateEnTranslationRequest(user);
             while (true)
             {
                 var input = await _chatIo.TryWaitInlineIntKeyboardInput();

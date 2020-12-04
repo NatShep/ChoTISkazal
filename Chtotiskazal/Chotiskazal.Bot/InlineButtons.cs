@@ -7,10 +7,10 @@ namespace Chotiskazal.Bot
     public static class InlineButtons
     {
         public static readonly InlineKeyboardButton EnterWords = new InlineKeyboardButton
-            {CallbackData = "~EnterWords", Text = "Enter words"};
+            {CallbackData = "~EnterWords", Text = "Translate"};
 
         public static readonly InlineKeyboardButton Exam = new InlineKeyboardButton
-            {CallbackData = "~Exam", Text = "Examination"};
+            {CallbackData = "~Exam", Text = "Learn"};
 
         public static readonly InlineKeyboardButton Stats = new InlineKeyboardButton
             {CallbackData = "~Stats", Text = "Stats"};

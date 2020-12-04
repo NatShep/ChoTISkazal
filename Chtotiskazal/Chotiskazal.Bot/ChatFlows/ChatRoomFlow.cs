@@ -38,21 +38,21 @@ namespace Chotiskazal.Bot.ChatFlows
         public async Task Run(){ 
             string mainMenuCommandOrNull = null;
 
-            User = await _userService.GetOrAddUser(_userInfo);
-            
-            Botlog.WriteInfo($"User {User.TelegramNick} сonnect with ChoTiSkazal", User.TelegramId.ToString());
-            await SayHelloAsync();
-            
+            User = await _userService.GetUserOrNull(_userInfo);
+            if (User == null)
+            {
+                var addUserTask = _userService.AddUser(_userInfo);
+                Botlog.WriteInfo($"New user {User.TelegramNick}", User.TelegramId.ToString());
+                await SayHelloAsync();
+                await addUserTask;
+            }
+
             while(true)
             {
                 try
                 {
-                    if(mainMenuCommandOrNull!=null)
-                    {
-                        await HandleMainMenu(mainMenuCommandOrNull); 
-                        mainMenuCommandOrNull = null;
-                    }
-                    await ModeSelection();	
+                    await HandleMainScenario(mainMenuCommandOrNull);
+                    mainMenuCommandOrNull = null;
                 }
                 catch(UserAFKException){
                     return;		
@@ -64,6 +64,22 @@ namespace Chotiskazal.Bot.ChatFlows
                     Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
                     await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
                 }
+            }
+        }
+
+        private async Task HandleMainScenario(string mainMenuCommandOrNull)
+        {
+            if (mainMenuCommandOrNull != null)
+            {
+                await HandleMainMenu(mainMenuCommandOrNull);
+            }
+            else
+            {
+                var message = await ChatIo.WaitUserInputAsync();
+                if (message.Message?.Text != null)
+                    await EnterWord(message.Message?.Text);
+                else
+                   await ChatIo.SendMessageAsync("Enter your word to translate or /start");
             }
         }
 
@@ -89,9 +105,9 @@ namespace Chotiskazal.Bot.ChatFlows
             switch (command){
                 case "/help":   return SendHelp();
                 case "/add":    return EnterWord();
-                case "/exam":   return DoExamine();
+                case "/learn":   return DoExamine();
                 case "/stats":  return ShowStats();
-                case "/start":  break;
+                case "/start":  return ShowMainMenu();
             }
             return Task.CompletedTask;
         }
@@ -99,14 +115,14 @@ namespace Chotiskazal.Bot.ChatFlows
         private  async Task SendHelp() => 
             await ChatIo.SendMessageAsync(_settings.HelpMessage);
 
-        private async Task ModeSelection()
+        private async Task ShowMainMenu()
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync("Select mode, or enter a word to translate",
-                    InlineButtons.EnterWords,
-                    InlineButtons.Exam,
-                    InlineButtons.Stats);
+                var _  = ChatIo.SendMessageAsync("I am a translator and teacher. First you use me as a regular translator. Then, when you have time and mood, click on the \"Learn\" button or the /learn command and start learning these words.",
+                    new[]{new[]{
+                        InlineButtons.Exam, InlineButtons.Stats}, 
+                        new[]{ InlineButtons.EnterWords}});
 
                 while (true)
                 {
