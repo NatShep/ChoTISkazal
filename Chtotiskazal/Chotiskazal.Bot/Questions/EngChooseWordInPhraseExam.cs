@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SayWhat.Bll;
@@ -39,7 +40,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (variants[choice.Value] == word.Word)
+            if (string.Equals(variants[choice.Value],word.Word, StringComparison.InvariantCultureIgnoreCase))
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;

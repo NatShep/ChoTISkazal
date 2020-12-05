@@ -142,22 +142,23 @@ namespace SayWhat.Bll.Services
         public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithoutExamples(string word) 
             => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task AddWordsToUser(User user, DictionaryTranslation translation)
+        public async Task AddWordsToUser(User user, DictionaryTranslation translation, int? wordRating = null )
         {
             if (translation == null) return;
             if(translation.TranlationDirection!= TranlationDirection.EnRu)
-                throw new InvalidOperationException("Only enru dirrection is supported");
+                throw new InvalidOperationException("Only en-ru dirrection is supported");
             
             var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
 
             if (alreadyExistsWord == null)
             {
                 //the Word is new for the user
-                var model = new UserWord
+                var model = new UserWordModel(new UserWord
                 {
                     UserId = user.Id,
                     Word = translation.OriginText,
                     Language = TranlationDirection.EnRu,
+                    AbsoluteScore = wordRating??0,
                     Translations = new[]
                     {
                         new UserWordTranslation
@@ -169,12 +170,13 @@ namespace SayWhat.Bll.Services
                                 .ToArray()
                         }
                     }
-                };
-            await _usersWordsService.AddUserWord(model);
+                });
+                model.UpdateCurrentScore();
+                await _usersWordsService.AddUserWord(model.Entity);
                 
                 user.WordsCount++;
-                user.PairsCount += model.Translations.Length;
-                user.ExamplesCount += model.Translations.Sum(t => t.Examples?.Length ?? 0);
+                user.PairsCount    += model.Entity.Translations.Length;
+                user.ExamplesCount += model.Entity.Translations.Sum(t => t.Examples?.Length ?? 0);
                 
                 await _userService.UpdateCounters(user);
             }
@@ -192,8 +194,15 @@ namespace SayWhat.Bll.Services
                         Word = r.TranslatedText,
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
                     });
+                alreadyExistsWord.OnExamFailed();
+                alreadyExistsWord.UpdateCurrentScore();
 
-                if (newTranslations.Count == 0) return;
+                if (newTranslations.Count == 0)
+                {
+                    await _usersWordsService.UpdateWordMetrics(alreadyExistsWord);
+                    return;
+                }
+                
                 alreadyExistsWord.AddTranslations(newTranslations);
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
 

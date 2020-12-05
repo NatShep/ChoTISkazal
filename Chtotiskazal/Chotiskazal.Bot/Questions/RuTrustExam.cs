@@ -27,19 +27,21 @@ namespace Chotiskazal.Bot.Questions
             _= chatIo.SendMessageAsync($"Translation is \r\n" +
                                        $"{word.Word}\r\n" +
                                        $" Did you guess?",
-                
-                new InlineKeyboardButton
-                {
-                    CallbackData = "1",
-                    Text = "Yes"
-                },
-                new InlineKeyboardButton{
-                    CallbackData = "0",
-                    Text = "No"
-                });
-            
-            var choice = await chatIo.WaitInlineIntKeyboardInput();
+                                new[]{
+                                    new[]{
+                                        new InlineKeyboardButton {
+                                            CallbackData = "1",
+                                            Text = "Yes"
+                                        },
+                                        new InlineKeyboardButton {
+                                            CallbackData = "0",
+                                            Text = "No"
+                                        }
+                                    }
+                                }
+                            );
 
+            var choice = await chatIo.WaitInlineIntKeyboardInput();
             if (choice == 1)
             {
                 await  service.RegisterSuccess(word);

@@ -102,6 +102,9 @@ namespace SayWhat.Bll.Services
         public Task UpdateWord(UserWordModel model) =>
              _userWordsRepository.Update(model.Entity);
 
+        public Task UpdateWordMetrics(UserWordModel model) =>
+            _userWordsRepository.UpdateMetrics(model.Entity);
+        
         public async Task<UserWordModel> GetWordNullByEngWord(User user, string enWord)
         {
             var word = await _userWordsRepository.GetWordOrDefault(user, enWord);

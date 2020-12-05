@@ -1,7 +1,10 @@
 ﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
@@ -25,15 +28,12 @@ namespace Chotiskazal.Bot.ChatFlows
 
         public async Task Enter(User user, string? word = null)
         {
-            while (true)
-            {
-                if (!await EnterSingleWordAsync(user,  word))
-                    break;
-                word = null;
-            }
+            do {
+                word = await EnterSingleWordAsync(user, word);
+            } while (!string.IsNullOrWhiteSpace(word));
         }
 
-        private async Task<bool> EnterSingleWordAsync(User user,  string? word = null)
+        private async Task<string?> EnterSingleWordAsync(User user,  string? word = null)
         {
             if (word == null)
             {
@@ -48,7 +48,7 @@ namespace Chotiskazal.Bot.ChatFlows
             if (translations?.Any()!=true)
             {
                 await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
-                return true;
+                return null;
             }
 
             var tr = translations.FirstOrDefault(t =>!string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
@@ -66,23 +66,48 @@ namespace Chotiskazal.Bot.ChatFlows
                 await _addWordService.RegistrateEnTranslationRequest(user);
             while (true)
             {
-                var input = await _chatIo.TryWaitInlineIntKeyboardInput();
-                if (!input.HasValue)
-                    return false;
-                if (input!.Value < 0 || input.Value >= translations.Count)
+                var update = await _chatIo.WaitUserInputAsync();
+                var input = update.CallbackQuery?.Data;
+                if (input == null)
+                {
+                    await SaveFirstTranslationBecauseOfCancel(user, translations);
+                    // user start to translate next word
+                    return update.Message?.Text;
+                }
+                    
+                if(!int.TryParse(input, out var selectedIndex))
                     continue;
                 
-                var selected = translations[input.Value];
-                if (selected.TranlationDirection == TranlationDirection.RuEn)
-                    selected = selected.GetReversed(); //Reverse direction
-                
+                if (selectedIndex < 0 || selectedIndex >= translations.Count)
+                    continue;
+                    
+                var selected = GetSelectedTranslation(translations, selectedIndex);
                 await _addWordService.AddWordsToUser(user,  selected);
+                    
                 if(selected.Examples.Count>0)
                     await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
                 else
                     await _chatIo.SendMessageAsync($"Saved.");
-                return true;
+                return null;
             }
+        }
+
+        private async Task SaveFirstTranslationBecauseOfCancel(User user, IReadOnlyList<DictionaryTranslation> translations)
+        {
+            // if user did not select the word before next choose
+            // than we automaticly add first translation
+            // but we can not be sure that it is new word for user
+            // so we give score '9' to that pair, witch means 'familiar word'
+            var selected = GetSelectedTranslation(translations, 0);
+            await _addWordService.AddWordsToUser(user, selected, 9);
+        }
+
+        private static DictionaryTranslation GetSelectedTranslation(IReadOnlyList<DictionaryTranslation> translations, int value)
+        {
+            var selected = translations[value];
+            if (selected.TranlationDirection == TranlationDirection.RuEn)
+                selected = selected.GetReversed(); //Reverse translate direction, to store all pairs in one dirrection
+            return selected;
         }
     }
 }
