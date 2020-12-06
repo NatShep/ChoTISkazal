@@ -120,5 +120,25 @@ namespace SayWhat.MongoDAL.Words
                 .SortBy(a=>a.ScoreUpdatedTimestamp)
                 .Limit(count)
                 .ToListAsync();
+
+        
+        //DELETE This after
+        public IReadOnlyCollection<UserWord> GetTestWords(User user)
+        {
+            var learningWords = new List<UserWord>();
+            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
+                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"bother"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
+                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"disturb"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
+                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"enable"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
+                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"statment"))).ToList());
+            return learningWords;
+        }
     }
 }

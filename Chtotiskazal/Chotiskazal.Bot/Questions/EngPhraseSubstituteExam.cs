@@ -18,9 +18,17 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Impossible;
 
             var phrase   =  word.GetRandomExample();
+            
+            var allWordsWithPhraseOfSimilarTranslate = examList
+                .SelectMany(e => e.Phrases)
+                .Where(p => string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
+                .Select(e=>e.OriginWord)
+                .ToList();
+            
             var replaced =  phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
             if (replaced == phrase.OriginPhrase)
                 return ExamResult.Impossible;
+            
             var sb = new StringBuilder();
             
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
@@ -34,7 +42,7 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.CompareOrdinal(word.Word, enter.ToLower().Trim()) == 0)
+                if (allWordsWithPhraseOfSimilarTranslate.Contains(enter.ToLower().Trim()))
                 {
                     await service.RegisterSuccess(word);
                     return ExamResult.Passed;

@@ -11,7 +11,7 @@ namespace SayWhat.MongoDAL.Examples
             Direction = TranlationDirection.EnRu;
         }
         [BsonIgnore]
-        public string[] OriginWords => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        public string[] SplitWordsOfPhrase => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
         public ObjectId Id { get; set; }
         [BsonElement("to")]
         public string OriginWord { get; set; }

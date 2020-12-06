@@ -14,7 +14,12 @@ namespace Chotiskazal.Bot.Questions
 
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
-            var variants = examList.Randomize().Select(e => e.Word).ToArray();
+            var variants = examList.Where(e=>e.TranslationAsList!=word.TranslationAsList)
+                .Select(e => e.Word)
+                .Append(word.Word)
+                .Where(e => word.TranslationAsList!=e)
+                .Randomize()
+                .ToArray();
 
             var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
                       $"Choose the translation";

@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.Compare(phrase.OriginWord, enter.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(phrase.TranslatedWord, enter.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     await service.RegisterSuccess(word);
                     return ExamResult.Passed;

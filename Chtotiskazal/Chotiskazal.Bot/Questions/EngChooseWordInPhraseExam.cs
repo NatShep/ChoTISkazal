@@ -22,9 +22,18 @@ namespace Chotiskazal.Bot.Questions
             var phrase = word.GetRandomExample();
             
             var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
+           
             if (replaced == phrase.OriginPhrase)
                 return ExamResult.Impossible;
 
+            var otherExamples = examList
+                .SelectMany(e => e.Phrases)
+                .Where(p => !string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
+                .Take(8).ToArray();
+
+            if(!otherExamples.Any())
+                return ExamResult.Impossible;
+            
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine();
@@ -33,7 +42,12 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine($"Choose missing word...");
 
-            var variants = examList.Randomize().Select(e => e.Word).ToArray();
+            var variants = otherExamples
+                .Append(phrase)
+                .Randomize()
+                .Select(e => e.OriginWord)
+                .ToArray();
+            
             var _ =chatIo.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();

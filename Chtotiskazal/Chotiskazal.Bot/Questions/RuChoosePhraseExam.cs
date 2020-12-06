@@ -21,7 +21,7 @@ namespace Chotiskazal.Bot.Questions
             var targetPhrase = word.GetRandomExample();
 
             var other = examList.SelectMany(e => e.Phrases)
-                .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p!= targetPhrase)
+                .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p.TranslatedPhrase!= targetPhrase.TranslatedPhrase)
                 .Take(8).ToArray();
 
             if(!other.Any())

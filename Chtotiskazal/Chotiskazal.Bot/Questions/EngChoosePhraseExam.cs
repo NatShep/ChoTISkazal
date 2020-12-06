@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
@@ -25,12 +26,12 @@ namespace Chotiskazal.Bot.Questions
 
             var otherExamples = examList
                 .SelectMany(e => e.Phrases)
-                .Where(p => p != targetPhrase)
+                .Where(p => !string.Equals(p.TranslatedPhrase, targetPhrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
                 .Take(8).ToArray();
 
             if(!otherExamples.Any())
                 return ExamResult.Impossible;
-
+            
             var variants = otherExamples
                 .Append(targetPhrase)
                 .Randomize()

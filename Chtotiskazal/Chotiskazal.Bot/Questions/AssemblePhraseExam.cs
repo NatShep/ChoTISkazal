@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.Questions
             string shuffled;
             while (true)
             {
-                var wordsInExample = targetPhrase.OriginWords;
+                var wordsInExample = targetPhrase.SplitWordsOfPhrase;
                 
                 if (wordsInExample.Length < 2)
                     return ExamResult.Impossible;

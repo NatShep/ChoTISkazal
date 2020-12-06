@@ -252,5 +252,14 @@ namespace SayWhat.Bll.Services
             examsList.AddRange(advancedList);
             return examsList;
         }
+        
+        //DELETE THIS AFTER
+        public async Task<UserWordModel[]> GetTestingFords(User user)
+        {
+            var words =  _userWordsRepository.GetTestWords(user);
+            await IncludeExamples(words);
+            return words.Select(w => new UserWordModel(w)).ToArray();
+            
+        }
     }
 }
