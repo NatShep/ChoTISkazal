@@ -179,7 +179,6 @@ namespace Chotiskazal.Bot
                     Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
-
                 }
                 else if (e.Update.CallbackQuery != null)
                 {

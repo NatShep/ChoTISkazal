@@ -35,35 +35,48 @@ namespace Chotiskazal.Bot.ChatFlows
         private readonly UserService _userService;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
-        public async Task Run(){ 
-            string mainMenuCommandOrNull = null;
 
-            User = await _userService.GetUserOrNull(_userInfo);
-            if (User == null)
+        public async Task Run()
+        {
+            try
             {
-                var addUserTask = _userService.AddUser(_userInfo);
-                Botlog.WriteInfo($"New user {User.TelegramNick}", User.TelegramId.ToString());
-                await SayHelloAsync();
-                await addUserTask;
-            }
+                string mainMenuCommandOrNull = null;
 
-            while(true)
-            {
-                try
+                User = await _userService.GetUserOrNull(_userInfo);
+                if (User == null)
                 {
-                    await HandleMainScenario(mainMenuCommandOrNull);
-                    mainMenuCommandOrNull = null;
+                    var addUserTask = _userService.AddUser(_userInfo);
+                    await SayHelloAsync();
+                    User = await addUserTask;
+                    Botlog.WriteInfo($"New user {User.TelegramNick}", User.TelegramId.ToString());
                 }
-                catch(UserAFKException){
-                    return;		
+
+                while (true)
+                {
+                    try
+                    {
+                        await HandleMainScenario(mainMenuCommandOrNull);
+                        mainMenuCommandOrNull = null;
+                    }
+                    catch (UserAFKException)
+                    {
+                        return;
+                    }
+                    catch (ProcessInterruptedWithMenuCommand e)
+                    {
+                        mainMenuCommandOrNull = e.Command;
+                    }
+                    catch (Exception e)
+                    {
+                        Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
+                        await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
+                    }
                 }
-                catch(ProcessInterruptedWithMenuCommand e){
-                    mainMenuCommandOrNull = e.Command;
-                }
-                catch(Exception e){
-                    Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
-                    await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
-                }
+            }
+            catch (Exception e)
+            {
+                Botlog.WriteError(this.ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}");
+                throw;
             }
         }
 
