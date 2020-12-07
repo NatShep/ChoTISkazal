@@ -25,11 +25,11 @@ namespace Chotiskazal.Bot.Questions
            
             if (replaced == phrase.OriginPhrase)
                 return ExamResult.Impossible;
-
+            
             var otherExamples = examList
                 .SelectMany(e => e.Phrases)
                 .Where(p => !string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
-                .Take(8).ToArray();
+                .ToArray();
 
             if(!otherExamples.Any())
                 return ExamResult.Impossible;
@@ -43,9 +43,12 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Choose missing word...");
 
             var variants = otherExamples
-                .Append(phrase)
+                .Select(e => e.OriginWord).Where(e=>e!=phrase.OriginWord)
+                .Distinct()
                 .Randomize()
-                .Select(e => e.OriginWord)
+                .Take(5)
+                .Append(phrase.OriginWord)
+                .Randomize()
                 .ToArray();
             
             var _ =chatIo.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
