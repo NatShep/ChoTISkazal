@@ -22,7 +22,9 @@ namespace Chotiskazal.Bot.Questions
 
             var other = examList.SelectMany(e => e.Phrases)
                 .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p.TranslatedPhrase!= targetPhrase.TranslatedPhrase)
-                .Take(8).ToArray();
+                .Randomize()
+                .Take(5)
+                .ToArray();
 
             if(!other.Any())
                 return ExamResult.Impossible;
