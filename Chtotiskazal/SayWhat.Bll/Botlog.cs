@@ -10,11 +10,11 @@
         
         
         private static ILogger _log = Log.Logger = new LoggerConfiguration()
-            .Enrich.WithProperty("Version", "1.0.0")
+            .Enrich.WithProperty("Version", "6.0.0")
             .WriteTo.Sink(new RollingFileSink(
-                @"C:\Apps\Chotiskazal\Chotiskazal\Chtotiskazal\Chotiskazal.Bot\bin\Debug\netcoreapp3.1\Logs\log-ChoTiSkazal.json", 
+                @"log-ChoTiSkazal.json", 
                 new JsonFormatter(), 2147483648, 5))
-            .WriteTo.File(@"C:\Apps\Chotiskazal\Chotiskazal\Chtotiskazal\Chotiskazal.Bot\bin\Debug\netcoreapp3.1\Logs\log-ChoTiSkazal-.txt", rollingInterval:RollingInterval.Day)
+            .WriteTo.File(@"log-ChoTiSkazal-.txt", rollingInterval:RollingInterval.Day)
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();
         
