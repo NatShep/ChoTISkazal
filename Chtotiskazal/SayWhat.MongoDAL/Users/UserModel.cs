@@ -140,10 +140,10 @@ namespace SayWhat.MongoDAL.Users
 
             var (today, month) = FixStatsAndGetCurrent();
 
-            today.NewPairsSelected+= pairsCount;
+            today.PairsAdded+= pairsCount;
             today.ExamplesAdded+= examplesCount;
 
-            month.NewPairsSelected+= pairsCount;
+            month.PairsAdded+= pairsCount;
             month.ExamplesAdded+= examplesCount;
 
             OnAnyActivity();

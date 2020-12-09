@@ -20,22 +20,21 @@ namespace SayWhat.MongoDAL.Users
         [BsonIgnoreIfDefault]
         public int WordsLearnt { get; set; }
         
-        [BsonElement("tc")]
-        [BsonDefaultValue(0)]
-        [BsonIgnoreIfDefault]
-        public int TranslationRequests { get; set; }
         [BsonElement("pc")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
-        public int NewPairsSelected { get; set; }
+        public int PairsAdded { get; set; }
+        
         [BsonElement("qp")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int QuestionsPassed { get; set; }
+        
         [BsonElement("qf")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int QuestionsFailed { get; set; }
+        
         [BsonElement("ld")]
         [BsonIgnoreIfDefault]
         public int LearningDone { get; set; }

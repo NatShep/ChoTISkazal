@@ -105,8 +105,16 @@ namespace Chotiskazal.Bot
                 var builder = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
                 var configuration = builder.Build();
+                
+                var set = new BotSettings(configuration);
+                if (true)
+                {
+                    Console.WriteLine("DEBUG SETTINGS APPLIED");
+                    set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
+                    set.MongoConnectionString = "mongodb://localhost:27017/";
+                }
 
-                return new BotSettings(configuration);
+                return set;
             }
             catch (Exception e)
             {
