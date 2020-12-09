@@ -170,7 +170,6 @@ namespace SayWhat.Bll.Services
                 user.OnNewWordAdded(
                     pairsCount:    model.Translations.Length,
                     examplesCount: model.Translations.Sum(t => t.Examples?.Length ?? 0));
-                await _userService.Update(user);
             }
             else
             {
@@ -198,8 +197,8 @@ namespace SayWhat.Bll.Services
                 alreadyExistsWord.AddTranslations(newTranslations);
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
                 user.OnPairsAdded(newTranslations.Count,newTranslations.Sum(t => t.Examples?.Length ?? 0));
-                await _userService.UpdateCounters(user);
             }
+            await _userService.Update(user);
         }
     }
 }

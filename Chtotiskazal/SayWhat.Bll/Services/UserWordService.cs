@@ -75,7 +75,7 @@ namespace SayWhat.Bll.Services
             await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
         }
         
-        public async Task UpdateCurrentScore(UserModel user, int count)
+        public async Task UpdateCurrentScoreForRandomWords(UserModel user, int count)
         {
             var sw = Stopwatch.StartNew();
             var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
@@ -85,7 +85,7 @@ namespace SayWhat.Bll.Services
                 await _userWordsRepository.UpdateMetrics(word);
             }
             sw.Stop();
-            Botlog.UpdateMetricInfo(user.TelegramId, nameof(UpdateCurrentScore), $"{words.Count}", sw.Elapsed);
+            Botlog.UpdateMetricInfo(user.TelegramId, nameof(UpdateCurrentScoreForRandomWords), $"{words.Count}", sw.Elapsed);
         }
 
         public async Task RegisterSuccess(UserWordModel model)

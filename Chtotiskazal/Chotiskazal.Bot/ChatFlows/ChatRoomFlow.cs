@@ -28,11 +28,11 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private UserModel UserModel { get; set; }
 
-        private readonly TelegramUserInfo _userInfo;
         private readonly BotSettings _settings;
         private readonly AddWordService _addWordsService;
         private readonly UsersWordsService _usersWordsService;
         private readonly UserService _userService;
+        private readonly TelegramUserInfo _userInfo;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
 
@@ -82,6 +82,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private async Task HandleMainScenario(string mainMenuCommandOrNull)
         {
+            UserModel.OnAnyActivity();
             if (mainMenuCommandOrNull != null)
             {
                 await HandleMainMenu(mainMenuCommandOrNull);
@@ -90,35 +91,30 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 var message = await ChatIo.WaitUserInputAsync();
                 if (message.Message?.Text != null)
-                    await EnterWord(message.Message?.Text);
+                    await StartToAddNewWords(message.Message?.Text);
                 else
                    await ChatIo.SendMessageAsync("Enter your word to translate or /start");
             }
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task DoExamine() => new ExamFlow(ChatIo, _usersWordsService,_settings.ExamSettings)
+        private Task StartLearning() => new ExamFlow(ChatIo, _usersWordsService,_settings.ExamSettings)
             .EnterAsync(UserModel);
-        
 
-        private Task EnterWord(string text = null)
-        {
-            var mode = new AddingWordsMode(ChatIo, _addWordsService);
-            return mode.Enter(UserModel, text);
-        }
-        private async Task ShowStats()
-        {
-            var actualInfo =  await _userService.GetOrAddUser(_userInfo);
+        private Task StartToAddNewWords(string text = null) 
+            => new AddingWordsMode(ChatIo, _addWordsService).Enter(UserModel, text);
+
+        private async Task ShowStats() =>
             await ChatIo.SendMessageAsync("Your stats: \r\n" +
-                                          $"Words: {actualInfo.WordsCount}\r\n" +
-                                          $"Translations: {actualInfo.PairsCount}\r\n" +
-                                          $"Examples: {actualInfo.ExamplesCount}");
-        }
+                                          $"Words: {UserModel.WordsCount}\r\n" +
+                                          $"Translations: {UserModel.PairsCount}\r\n" +
+                                          $"Examples: {UserModel.ExamplesCount}");
+
         private Task HandleMainMenu(string command){
             switch (command){
                 case "/help":   return SendHelp();
-                case "/add":    return EnterWord();
-                case "/learn":  return DoExamine();
+                case "/add":    return StartToAddNewWords();
+                case "/learn":  return StartLearning();
                 case "/stats":  return ShowStats();
                 case "/start":  return ShowMainMenu();
             }
@@ -143,27 +139,22 @@ namespace Chotiskazal.Bot.ChatFlows
 
                     if (action.Message!=null)
                     {
-                        await EnterWord(action.Message.Text);
+                        await StartToAddNewWords(action.Message.Text);
                         return;
                     }
 
                     if (action.CallbackQuery!=null)
                     {
                         var btn = action.CallbackQuery.Data;
-                        if (btn == InlineButtons.EnterWords.CallbackData)
-                        {
-                            await EnterWord();
+                        if (btn == InlineButtons.EnterWords.CallbackData) {
+                            await StartToAddNewWords();
                             return;
                         }
-
-                        if (btn == InlineButtons.Exam.CallbackData)
-                        {
-                            await DoExamine();
+                        if (btn == InlineButtons.Exam.CallbackData) {
+                            await StartLearning();
                             return;
                         }
-
-                        if (btn == InlineButtons.Stats.CallbackData)
-                        {
+                        if (btn == InlineButtons.Stats.CallbackData) {
                             await ShowStats();
                             return;
                         }

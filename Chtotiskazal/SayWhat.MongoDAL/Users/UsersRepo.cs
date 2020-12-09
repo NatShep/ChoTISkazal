@@ -51,7 +51,7 @@ namespace SayWhat.MongoDAL.Users
             await Collection.Indexes.CreateOneAsync(model);
         }
         public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
-        public Task Replace(UserModel user) => Collection.ReplaceOneAsync(o => o.Id == user.Id, user);
+        public Task Update(UserModel user) => Collection.ReplaceOneAsync(o => o.Id == user.Id, user);
 
         public Task UpdateCounters(UserModel user)
         {

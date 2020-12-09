@@ -21,7 +21,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.AllTranslations.ToArray();

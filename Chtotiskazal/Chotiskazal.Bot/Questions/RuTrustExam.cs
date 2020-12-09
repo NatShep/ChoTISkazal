@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -13,7 +12,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
                       $"Do you know the translation?";

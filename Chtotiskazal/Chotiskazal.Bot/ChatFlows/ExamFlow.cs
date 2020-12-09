@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ChatFlows
             //    await _usersWordsService.AddMutualPhrasesToVocabAsync(user, 10);
             // else
             
-            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScore(user, _examSettings.MaxLearningWordsCountInOneExam*2);
+            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(user, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  _chatIo.SendTyping();
 
             var c = Rand.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
@@ -111,8 +111,8 @@ namespace Chotiskazal.Bot.ChatFlows
                         if (lastExamResult == ExamResult.Passed)
                             await WritePassed();
                     }
-                    user.RegistrateActivity();
-                    var result = await exam.Pass(_chatIo, _usersWordsService, word, learnList);
+                    user.OnAnyActivity();
+                    var result = await exam.Pass(_chatIo, word, learnList);
                     
                     sw.Stop();
                     questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
@@ -150,8 +150,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 
                 Botlog.RegisterExamInfo(user.TelegramId, started, questionsCount, questionsPassed);
             }              
-            user.OnExamPassed();
-            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
+            user.OnLearningDone();
+            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(user,10);
 
             var doneMessage = new StringBuilder($"*Learning done:  {questionsPassed}/{questionsCount}*\r\n\r\n```\r\n");
             foreach (var pairModel in learningAndAdvancedWords.Distinct())

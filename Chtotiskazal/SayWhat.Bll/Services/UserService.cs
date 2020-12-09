@@ -13,23 +13,11 @@ namespace SayWhat.Bll.Services
             _repository.UpdateCounters(user);
         
         public Task Update(UserModel user) =>
-            _repository.Replace(user);
+            _repository.Update(user);
         
         public async Task<UserModel> GetUserOrNull(TelegramUserInfo telegramUserInfo) 
             => await _repository.GetOrDefaultByTelegramIdOrNull(telegramUserInfo.TelegramId);
 
-        public async Task<UserModel> GetOrAddUser(TelegramUserInfo telegramUserInfo)
-        {
-            var user = await GetUserOrNull(telegramUserInfo);
-            // ReSharper disable once ConvertToNullCoalescingCompoundAssignment
-            user = user ?? await AddUserFromTelegram(telegramUserInfo);
-            if (user == null)
-            {
-                throw new Exception("I can't add user!");
-            }
-            return user;
-        }
-        
         public async Task<UserModel> AddUserFromTelegram(TelegramUserInfo info)
         {
             try
@@ -50,7 +38,5 @@ namespace SayWhat.Bll.Services
                 return null;
             }
         }
-        
-
     }
 }

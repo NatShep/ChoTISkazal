@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -12,7 +11,7 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var msg = $"=====>   {word.Word}    <=====\r\n" +

@@ -38,7 +38,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 await _chatIo.SendMessageAsync("Enter english or russian word to translate or /start to open main menu ");
                 word = await _chatIo.WaitUserTextInputAsync();
             }
-            user.RegistrateActivity();
+            user.OnAnyActivity();
 
             //find word in local dictionary(if not, find it in Ya dictionary)
             var translations = await _addWordService.FindInDictionaryWithExamples(word);
@@ -64,7 +64,7 @@ namespace Chotiskazal.Bot.ChatFlows
             if(word.IsRussian())
                 user.OnRussianWordTranlationRequest();
             else
-                user.OnEnglishWordTranslationRequests();
+                user.OnEnglishWordTranslationRequest();
             
             while (true)
             {

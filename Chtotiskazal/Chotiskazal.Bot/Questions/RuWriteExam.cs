@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var words = word.Word.Split(',').Select(s => s.Trim()).ToArray();

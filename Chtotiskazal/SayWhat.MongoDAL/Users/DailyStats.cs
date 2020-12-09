@@ -5,6 +5,16 @@ namespace SayWhat.MongoDAL.Users
 {
     public class StatsBase
     {
+        [BsonElement("wa")]
+        [BsonDefaultValue(0)]
+        [BsonIgnoreIfDefault]
+        public int WordsAdded { get; set; }
+
+        [BsonElement("ec")]
+        [BsonDefaultValue(0)]
+        [BsonIgnoreIfDefault]
+        public int ExamplesAdded { get; set; }
+
         [BsonElement("w")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
@@ -26,9 +36,10 @@ namespace SayWhat.MongoDAL.Users
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int QuestionsFailed { get; set; }
-        [BsonElement("ec")]
+        [BsonElement("ld")]
         [BsonIgnoreIfDefault]
-        public int ExamsPassed { get; set; }
+        public int LearningDone { get; set; }
+        
         [BsonElement("s")]
         [BsonIgnoreIfDefault]
         public int TotalScore { get; set; }
@@ -52,7 +63,8 @@ namespace SayWhat.MongoDAL.Users
         {
             get => DayCountStarts.AddDays(Day);
             set => Day = (ushort) (value - DayCountStarts).TotalDays;
-        } 
+        }
+
     }
 
     public class MonthsStats : StatsBase
@@ -67,7 +79,9 @@ namespace SayWhat.MongoDAL.Users
         public DateTime Date
         {
             get => DayCountStarts.AddMonths(Months);
-            set => Months = (ushort) (value - DayCountStarts).TotalDays;
+            set => Months = (ushort) MonthDifference(value,DayCountStarts);
         } 
+        private static int MonthDifference(DateTime lValue, DateTime rValue) 
+            => (lValue.Month - rValue.Month) + 12 * (lValue.Year - rValue.Year);
     }
 }

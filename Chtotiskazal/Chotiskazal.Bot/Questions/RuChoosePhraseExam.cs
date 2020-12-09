@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -16,7 +15,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru Choose Phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Examples.Any())
                 return ExamResult.Impossible;

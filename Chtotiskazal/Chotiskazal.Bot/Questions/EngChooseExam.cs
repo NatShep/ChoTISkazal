@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
-using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -15,7 +14,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
+        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var variants = examList.SelectMany(e => e.AllTranslations)
