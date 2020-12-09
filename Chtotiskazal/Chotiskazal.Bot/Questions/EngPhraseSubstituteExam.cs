@@ -44,7 +44,6 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (allWordsWithPhraseOfSimilarTranslate.Contains(enter.ToLower().Trim()))
                 {
-                    await service.RegisterSuccess(word);
                     return ExamResult.Passed;
                 }
 

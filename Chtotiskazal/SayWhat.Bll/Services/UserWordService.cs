@@ -24,7 +24,7 @@ namespace SayWhat.Bll.Services
         public Task AddUserWord(UserWord entity) =>
              _userWordsRepository.Add(entity);
 
-        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(User user, int count)
+        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(UserModel user, int count)
         {
             var words = await _userWordsRepository.GetWorstLearned(user, count);
             await IncludeExamples(words);
@@ -57,7 +57,7 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public async Task<UserWordModel[]> GetWordsWithExamples(User user, int maxCount, int minimumQuestionAsked)
+        public async Task<UserWordModel[]> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked)
         {
             if (maxCount <= 0)
                 return new UserWordModel[0];
@@ -72,12 +72,12 @@ namespace SayWhat.Bll.Services
 
         public async Task RegisterFailure(UserWordModel userWordForLearning)
         {
-            userWordForLearning.OnExamFailed();
+            userWordForLearning.OnQuestionFailed();
             userWordForLearning.UpdateCurrentScore();
             await _userWordsRepository.UpdateMetrics(userWordForLearning.Entity);
         }
         
-        public async Task UpdateCurrentScore(User user, int count)
+        public async Task UpdateCurrentScore(UserModel user, int count)
         {
             var sw = Stopwatch.StartNew();
             var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
@@ -93,19 +93,19 @@ namespace SayWhat.Bll.Services
 
         public async Task RegisterSuccess(UserWordModel model)
         {
-            model.OnExamPassed();
+            model.OnQuestionPassed();
             model.UpdateCurrentScore();
             await _userWordsRepository.UpdateMetrics(model.Entity);
         }
 
-        public Task<bool> HasWords(User user) => _userWordsRepository.HasAnyFor(user);
+        public Task<bool> HasWords(UserModel user) => _userWordsRepository.HasAnyFor(user);
         public Task UpdateWord(UserWordModel model) =>
              _userWordsRepository.Update(model.Entity);
 
         public Task UpdateWordMetrics(UserWordModel model) =>
             _userWordsRepository.UpdateMetrics(model.Entity);
         
-        public async Task<UserWordModel> GetWordNullByEngWord(User user, string enWord)
+        public async Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord)
         {
             var word = await _userWordsRepository.GetWordOrDefault(user, enWord);
             if (word == null)
@@ -113,7 +113,7 @@ namespace SayWhat.Bll.Services
             return new UserWordModel(word);
         }
         
-        public  Task AddMutualPhrasesToVocabAsync(User user, int maxCount)
+        public  Task AddMutualPhrasesToVocabAsync(UserModel user, int maxCount)
         {
             return Task.CompletedTask;
             /*
@@ -194,7 +194,7 @@ namespace SayWhat.Bll.Services
 
         
         public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(
-            User user, 
+            UserModel user, 
             int count,
             int maxTranslationSize)
         {
@@ -223,7 +223,7 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
 
-        public async Task<IReadOnlyList<UserWordModel>> AppendAdvancedWordsToExamList(User user, UserWordModel[] learningWords, ExamSettings examSettings)
+        public async Task<IReadOnlyList<UserWordModel>> AppendAdvancedWordsToExamList(UserModel user, UserWordModel[] learningWords, ExamSettings examSettings)
         {
             //Get exam list and test words
             var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
@@ -254,7 +254,7 @@ namespace SayWhat.Bll.Services
         }
         
         //DELETE THIS AFTER
-        public async Task<UserWordModel[]> GetTestingFords(User user)
+        public async Task<UserWordModel[]> GetTestingFords(UserModel user)
         {
             var words =  _userWordsRepository.GetTestWords(user);
             await IncludeExamples(words);

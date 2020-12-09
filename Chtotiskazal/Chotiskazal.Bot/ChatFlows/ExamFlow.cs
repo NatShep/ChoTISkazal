@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using Random = SayWhat.Bll.Random;
-using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ChatFlows
             _examSettings = examSettings;
         }
 
-        public async Task EnterAsync(User user)
+        public async Task EnterAsync(UserModel user)
         {
             if (!await _usersWordsService.HasWords(user))
             {
@@ -111,7 +111,7 @@ namespace Chotiskazal.Bot.ChatFlows
                         if (lastExamResult == ExamResult.Passed)
                             await WritePassed();
                     }
-
+                    user.RegistrateActivity();
                     var result = await exam.Pass(_chatIo, _usersWordsService, word, learnList);
                     
                     sw.Stop();
@@ -123,12 +123,16 @@ namespace Chotiskazal.Bot.ChatFlows
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:
+                            user.OnQuestionPassed();
+                            await _usersWordsService.RegisterSuccess(word);
                             await WritePassed();
                             Botlog.SaveQuestionMetricInfo(questionMetric,_chatIo.ChatId );
                             questionsCount++;
                             questionsPassed++;
                             break;
                         case ExamResult.Failed:
+                            user.OnQuestionFailed();
+                            await _usersWordsService.RegisterFailure(word);
                             await WriteFailed();
                             questionMetric.Result = 0;
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
@@ -143,8 +147,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     lastExamResult = result;
 
                 } while (retryFlag);
+                
                 Botlog.RegisterExamInfo(user.TelegramId, started, questionsCount, questionsPassed);
-            }               
+            }              
+            user.OnExamPassed();
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScore(user,10);
 
             var doneMessage = new StringBuilder($"*Learning done:  {questionsPassed}/{questionsCount}*\r\n\r\n```\r\n");

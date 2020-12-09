@@ -46,13 +46,12 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
             
-            if (variants[choice.Value] == targetPhrase.TranslatedPhrase)
-            {
-                await service.RegisterSuccess(word);
-                return ExamResult.Passed;
-            }
-            await service.RegisterFailure(word);
-            return ExamResult.Failed;
+            return string.Equals(
+                    variants[choice.Value], 
+                    targetPhrase.TranslatedPhrase, 
+                    StringComparison.InvariantCultureIgnoreCase) 
+                ? ExamResult.Passed 
+                : ExamResult.Failed;
         }
     }
 }

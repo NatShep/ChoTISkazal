@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
 using Serilog;
 using Serilog.Events;
-using User = SayWhat.MongoDAL.Users.User;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -26,7 +26,7 @@ namespace Chotiskazal.Bot.ChatFlows
             _userService = userService;
         }
 
-        private User User { get; set; }
+        private UserModel UserModel { get; set; }
 
         private readonly TelegramUserInfo _userInfo;
         private readonly BotSettings _settings;
@@ -42,13 +42,13 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 string mainMenuCommandOrNull = null;
 
-                User = await _userService.GetUserOrNull(_userInfo);
-                if (User == null)
+                UserModel = await _userService.GetUserOrNull(_userInfo);
+                if (UserModel == null)
                 {
-                    var addUserTask = _userService.AddUser(_userInfo);
+                    var addUserTask = _userService.AddUserFromTelegram(_userInfo);
                     await SayHelloAsync();
-                    User = await addUserTask;
-                    Botlog.WriteInfo($"New user {User.TelegramNick}", User.TelegramId.ToString());
+                    UserModel = await addUserTask;
+                    Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString());
                 }
 
                 while (true)
@@ -98,13 +98,13 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
         private Task DoExamine() => new ExamFlow(ChatIo, _usersWordsService,_settings.ExamSettings)
-            .EnterAsync(User);
+            .EnterAsync(UserModel);
         
 
         private Task EnterWord(string text = null)
         {
             var mode = new AddingWordsMode(ChatIo, _addWordsService);
-            return mode.Enter(User, text);
+            return mode.Enter(UserModel, text);
         }
         private async Task ShowStats()
         {
@@ -118,7 +118,7 @@ namespace Chotiskazal.Bot.ChatFlows
             switch (command){
                 case "/help":   return SendHelp();
                 case "/add":    return EnterWord();
-                case "/learn":   return DoExamine();
+                case "/learn":  return DoExamine();
                 case "/stats":  return ShowStats();
                 case "/start":  return ShowMainMenu();
             }

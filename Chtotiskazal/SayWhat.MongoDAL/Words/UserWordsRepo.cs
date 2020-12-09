@@ -25,14 +25,14 @@ namespace SayWhat.MongoDAL.Words
 
         public Task Add(UserWord word) => Collection.InsertOneAsync(word);
 
-        public Task<List<UserWord>> GetWorstLearned(User user, int maxCount)
+        public Task<List<UserWord>> GetWorstLearned(UserModel user, int maxCount)
             => Collection
                 .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .SortBy(a=>a.CurrentScore)
                 .Limit(maxCount)
                 .ToListAsync();
          
-        public Task<List<UserWord>> GetWorstLearned(User user, int maxCount, int minimumLearnRate)
+        public Task<List<UserWord>> GetWorstLearned(UserModel user, int maxCount, int minimumLearnRate)
             => Collection
                 .Find(Builders<UserWord>.Filter.And(
                     Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
@@ -42,7 +42,7 @@ namespace SayWhat.MongoDAL.Words
                 .Limit(maxCount)
                 .ToListAsync();
 
-        public Task<List<UserWord>> Get(User user, int maxCount, int minimumQuestionAsked)
+        public Task<List<UserWord>> Get(UserModel user, int maxCount, int minimumQuestionAsked)
             => Collection
                 .Find(Builders<UserWord>.Filter.And(
                     Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
@@ -52,7 +52,7 @@ namespace SayWhat.MongoDAL.Words
                 .Limit(maxCount)
                 .ToListAsync();
 
-        public Task<List<UserWord>> GetAllUserWordsAsync(User user)
+        public Task<List<UserWord>> GetAllUserWordsAsync(UserModel user)
             => Collection
                 .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .ToListAsync();
@@ -95,7 +95,7 @@ namespace SayWhat.MongoDAL.Words
             return Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
         }
         
-        public async Task<bool> HasAnyFor(User user)
+        public async Task<bool> HasAnyFor(UserModel user)
         {
             var docsCount = await Collection
                 .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
@@ -103,7 +103,7 @@ namespace SayWhat.MongoDAL.Words
             return docsCount > 0;
         }
 
-        public Task<UserWord> GetWordOrDefault(User user, string enWord)
+        public Task<UserWord> GetWordOrDefault(UserModel user, string enWord)
         =>
             Collection
                 .Find(Builders<UserWord>.Filter.And(
@@ -114,7 +114,7 @@ namespace SayWhat.MongoDAL.Words
         /// <summary>
         /// Returns users words that was updated oldest
         /// </summary>
-        public Task<List<UserWord>> GetOldestUpdatedWords(User user, int count) =>
+        public Task<List<UserWord>> GetOldestUpdatedWords(UserModel user, int count) =>
             Collection
                 .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
                 .SortBy(a=>a.ScoreUpdatedTimestamp)
@@ -123,7 +123,7 @@ namespace SayWhat.MongoDAL.Words
 
         
         //DELETE This after
-        public IReadOnlyCollection<UserWord> GetTestWords(User user)
+        public IReadOnlyCollection<UserWord> GetTestWords(UserModel user)
         {
             var learningWords = new List<UserWord>();
             learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(

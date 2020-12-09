@@ -38,7 +38,6 @@ namespace Chotiskazal.Bot.Questions
 
             if (translations.Any(t => string.Compare(translation.Trim(), t, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
@@ -54,7 +53,6 @@ namespace Chotiskazal.Bot.Questions
             }
 
             await chatIo.SendMessageAsync("The translation was: " + word.TranslationAsList);
-            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

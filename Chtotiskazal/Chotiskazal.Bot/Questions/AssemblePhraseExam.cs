@@ -39,12 +39,10 @@ namespace Chotiskazal.Bot.Questions
 
             if (string.Compare(targetPhrase.OriginPhrase, entry.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
             {
-                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
             await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.OriginPhrase}'");
-            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

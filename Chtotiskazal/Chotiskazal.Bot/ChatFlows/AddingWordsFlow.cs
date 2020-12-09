@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -26,23 +24,24 @@ namespace Chotiskazal.Bot.ChatFlows
             _addWordService = addWordService;
         }
 
-        public async Task Enter(User user, string? word = null)
+        public async Task Enter(UserModel user, string? word = null)
         {
             do {
                 word = await EnterSingleWordAsync(user, word);
             } while (!string.IsNullOrWhiteSpace(word));
         }
 
-        private async Task<string?> EnterSingleWordAsync(User user,  string? word = null)
+        private async Task<string?> EnterSingleWordAsync(UserModel user,  string? word = null)
         {
             if (word == null)
             {
                 await _chatIo.SendMessageAsync("Enter english or russian word to translate or /start to open main menu ");
                 word = await _chatIo.WaitUserTextInputAsync();
             }
-            
+            user.RegistrateActivity();
+
             //find word in local dictionary(if not, find it in Ya dictionary)
-            var translations = await _addWordService.FindInDictionaryWithoutExamples(word);
+            var translations = await _addWordService.FindInDictionaryWithExamples(word);
             if (!translations.Any())
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
             if (translations?.Any()!=true)
@@ -60,10 +59,13 @@ namespace Chotiskazal.Bot.ChatFlows
                 $"*{word.Capitalize()}*" +
                 $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr}]\r\n```")}",
                     InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.TranslatedText)));
+            
+            
             if(word.IsRussian())
-                await _addWordService.RegistrateRuTranslationRequest(user);
+                user.IncrementRussianWordTranlationRequestsCount();
             else
-                await _addWordService.RegistrateEnTranslationRequest(user);
+                user.IncrementEnglishWordTranlationRequestsCount();
+            
             while (true)
             {
                 var update = await _chatIo.WaitUserInputAsync();
@@ -92,14 +94,15 @@ namespace Chotiskazal.Bot.ChatFlows
             }
         }
 
-        private async Task SaveFirstTranslationBecauseOfCancel(User user, IReadOnlyList<DictionaryTranslation> translations)
+        private async Task SaveFirstTranslationBecauseOfCancel(UserModel user, IReadOnlyList<DictionaryTranslation> translations)
         {
             // if user did not select the word before next choose
             // than we automaticly add first translation
             // but we can not be sure that it is new word for user
-            // so we give score '9' to that pair, witch means 'familiar word'
+            // so we give score '8' to that pair, witch means 'familiar word'
+            // and user needs at least one or two exams to pass the word
             var selected = GetSelectedTranslation(translations, 0);
-            await _addWordService.AddWordsToUser(user, selected, 9);
+            await _addWordService.AddWordsToUser(user, selected, 8);
         }
 
         private static DictionaryTranslation GetSelectedTranslation(IReadOnlyList<DictionaryTranslation> translations, int value)

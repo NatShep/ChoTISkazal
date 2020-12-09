@@ -52,12 +52,10 @@ namespace Chotiskazal.Bot.Questions
 
             if (string.Equals(variants[choice.Value], word.Word, StringComparison.InvariantCultureIgnoreCase))
             {
-                await service.RegisterSuccess(word);
                 return ExamResult.Passed;
             }
 
             await chatIo.SendMessageAsync($"Origin was: \"{phrase.OriginPhrase}\"");
-            await service.RegisterFailure(word);
             return ExamResult.Failed;
         }
     }

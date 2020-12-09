@@ -41,12 +41,10 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 if (string.Compare(phrase.TranslatedWord, enter.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    await service.RegisterSuccess(word);
                     return ExamResult.Passed;
                 }
 
                 await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.TranslatedPhrase}\"");
-                await service.RegisterFailure(word);
                 return ExamResult.Failed;
             }
         }

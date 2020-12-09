@@ -137,12 +137,10 @@ namespace SayWhat.Bll.Services
               return word;
           }
 
-          public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word) 
-            => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
-        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithoutExamples(string word) 
+        public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word) 
             => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task AddWordsToUser(User user, DictionaryTranslation translation, int? wordRating = null )
+        public async Task AddWordsToUser(UserModel user, DictionaryTranslation translation, int? wordRating = null )
         {
             if (translation == null) return;
             if(translation.TranlationDirection!= TranlationDirection.EnRu)
@@ -174,11 +172,10 @@ namespace SayWhat.Bll.Services
                 model.UpdateCurrentScore();
                 await _usersWordsService.AddUserWord(model.Entity);
                 
-                user.WordsCount++;
-                user.PairsCount    += model.Entity.Translations.Length;
-                user.ExamplesCount += model.Entity.Translations.Sum(t => t.Examples?.Length ?? 0);
-                
-                await _userService.UpdateCounters(user);
+                user.OnNewWordAdded(
+                    pairsCount:    model.Entity.Translations.Length,
+                    examplesCount: model.Entity.Translations.Sum(t => t.Examples?.Length ?? 0));
+                await _userService.Update(user);
             }
             else
             {
@@ -194,9 +191,9 @@ namespace SayWhat.Bll.Services
                         Word = r.TranslatedText,
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
                     });
-                alreadyExistsWord.OnExamFailed();
+                alreadyExistsWord.OnQuestionFailed();
                 alreadyExistsWord.UpdateCurrentScore();
-
+                
                 if (newTranslations.Count == 0)
                 {
                     await _usersWordsService.UpdateWordMetrics(alreadyExistsWord);
@@ -205,23 +202,9 @@ namespace SayWhat.Bll.Services
                 
                 alreadyExistsWord.AddTranslations(newTranslations);
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
-
-                user.PairsCount += newTranslations.Count;
-                user.ExamplesCount += newTranslations.Sum(t => t.Examples?.Length ?? 0);
+                user.OnPairsAdded(newTranslations.Count,newTranslations.Sum(t => t.Examples?.Length ?? 0));
                 await _userService.UpdateCounters(user);
             }
-        }
-
-        public Task RegistrateEnTranslationRequest(User user)
-        {
-            user.EnglishWordTranlationRequestsCount++;
-            return _userService.UpdateCounters(user);
-        }
-        
-        public Task RegistrateRuTranslationRequest(User user)
-        {
-            user.RussianWordTranlationRequestsCount++;
-            return _userService.UpdateCounters(user);
         }
     }
 }

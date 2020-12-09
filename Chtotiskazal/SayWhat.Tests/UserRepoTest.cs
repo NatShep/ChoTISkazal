@@ -18,10 +18,12 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public async Task Add_GetReturnsInt()
         {
-            await _repo.AddFromTelegram(1234567, "vasa");
+            await _repo.AddFromTelegram(1234567, "vasa","popov","vasa97");
             var user = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
             Assert.AreEqual(1234567, user.TelegramId);
-            Assert.AreEqual("vasa", user.TelegramNick);
+            Assert.AreEqual("vasa97", user.TelegramNick);
+            Assert.AreEqual("vasa", user.TelegramFirstName);
+            Assert.AreEqual("popov", user.TelegramLastName);
             Assert.AreEqual(UserSource.Telegram, user.Source);
         }
 
@@ -33,7 +35,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             for (int i = 0; i < count; i++)
             {
-                _repo.AddFromTelegram(i, "vasa").Wait();
+                _repo.AddFromTelegram(i, "vasa","","").Wait();
             }
             Assert.AreEqual(count, _repo.GetCount().Result);
         }
@@ -41,8 +43,8 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public void AddSameTelegramId_Throws()
         {
-            _repo.AddFromTelegram(123, "x").Wait();
-            Assert.Catch(() => _repo.AddFromTelegram(123, "y").Wait());
+            _repo.AddFromTelegram(123, "x","","").Wait();
+            Assert.Catch(() => _repo.AddFromTelegram(123, "y","","").Wait());
         }
         [TestCase(1)]
         [TestCase(2)]
@@ -51,7 +53,12 @@ namespace SayWhat.MongoDAL.Tests
         {
             for (int i = 0; i < count; i++)
             {
-                _repo.Add(new User{TelegramId =  null, TelegramNick = $"petr{count}"}).Wait();
+                _repo.Add(new UserModel(
+                    telegramId: null,
+                    lastName: "",
+                    firstName:"",
+                    telegramNick: $"petr{count}",
+                    source: UserSource.Telegram)).Wait();
             }
             Assert.AreEqual(count, _repo.GetCount().Result);
         }

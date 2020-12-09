@@ -23,7 +23,7 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public async Task Add_GetAllForUserReturnsIt()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             await _repo.Add(CreateWord(user.Id,"table", "стол" ));
             var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(1, allWords.Count);
@@ -42,7 +42,7 @@ namespace SayWhat.MongoDAL.Tests
         [TestCase(10,10)]
         public async Task AddSeveral_GetWorstReturnWorstOnes(int worstCount, int bestCount)
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             var worstOnes = new List<UserWord>();
             for (int i = 0; i < worstCount; i++)
             {
@@ -77,7 +77,7 @@ namespace SayWhat.MongoDAL.Tests
         [TestCase(42)]
         public async Task AddSeveral_GetAllForUserReturnsThem(int count)
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             for (int i = 0; i < count; i++) 
                 await _repo.Add(CreateWord(user.Id,$"table{i}", "стол{i}" ));
             
@@ -88,16 +88,16 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public async Task TableHasNoWordsForUser_HasAnyReturnsFalse()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             await _repo.Add(CreateWord(user.Id,"table", "стол" ));
-            var hasAny =  await _repo.HasAnyFor(new User{Id = ObjectId.GenerateNewId()});
+            var hasAny =  await _repo.HasAnyFor(new UserModel{Id = ObjectId.GenerateNewId()});
             Assert.IsFalse(hasAny);
         }
 
         [Test]
         public async Task TableHasWordsForUser_HasAnyReturnsTrue()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             await _repo.Add(CreateWord(user.Id,"table", "стол" ));
             var hasAny =  await _repo.HasAnyFor(user);
             Assert.True(hasAny);
@@ -106,7 +106,7 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public async Task TableHasWordForUser_GetWordReturnIt()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             await _repo.Add(CreateWord(user.Id,"table", "стол" ));
             var word =  await _repo.GetWordOrDefault(user,"table");
             Assert.IsNotNull(word);
@@ -117,16 +117,16 @@ namespace SayWhat.MongoDAL.Tests
         [Test]
         public async Task TableHasWordForOtherUser_GetWordReturnNull()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             await _repo.Add(CreateWord(user.Id,"table", "стол" ));
-            var word =  await _repo.GetWordOrDefault(new User{Id = ObjectId.GenerateNewId()}, "table");
+            var word =  await _repo.GetWordOrDefault(new UserModel{Id = ObjectId.GenerateNewId()}, "table");
             Assert.IsNull(word);
         }
         
         [Test]
         public async Task Update_GetReturnsUpdated()
         {
-            var user = new User {Id = ObjectId.GenerateNewId()};
+            var user = new UserModel {Id = ObjectId.GenerateNewId()};
             var word = CreateWord(user.Id, "table", "стол");
             await _repo.Add(word);
             word.Translations = word.Translations.Append(new UserWordTranslation

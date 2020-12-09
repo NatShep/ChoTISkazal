@@ -42,16 +42,9 @@ namespace Chotiskazal.Bot.Questions
                             );
 
             var choice = await chatIo.WaitInlineIntKeyboardInput();
-            if (choice == 1)
-            {
-                await  service.RegisterSuccess(word);
-                return ExamResult.Passed;
-            }
-            else
-            {
-               await service.RegisterFailure(word);
-                return ExamResult.Failed;
-            }
+            return choice == 1 
+                ? ExamResult.Passed 
+                : ExamResult.Failed;
         }
     }
 }

@@ -62,7 +62,7 @@ namespace SayWhat.Bll
          public DateTime? LastExam => _entity.LastQuestionTimestamp;
          public string TranslationAsList => string.Join(", ", _entity.Translations.Select(t => t.Word));
 
-         public void OnExamPassed()
+         public void OnQuestionPassed()
          {
              _entity.AbsoluteScore++;
              _entity.LastQuestionTimestamp = DateTime.Now;
@@ -72,7 +72,7 @@ namespace SayWhat.Bll
              UpdateCurrentScore();
          }
 
-         public void OnExamFailed()
+         public void OnQuestionFailed()
          {
              if (_entity.AbsoluteScore > PenaltyScore)
                  _entity.AbsoluteScore = PenaltyScore;

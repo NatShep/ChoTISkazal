@@ -14,52 +14,53 @@ namespace SayWhat.MongoDAL.Users
 
         public UsersRepo(IMongoDatabase db) => _db = db;
         
-        public Task Add(User user) => Collection.InsertOneAsync(user);
+        public Task Add(UserModel user) => Collection.InsertOneAsync(user);
         
-        public Task<User> GetOrDefaultByTelegramIdOrNull(long telegramId) => 
+        public Task<UserModel> GetOrDefaultByTelegramIdOrNull(long telegramId) => 
             Collection
-                .Find(Builders<User>.Filter.Eq(UserTelegramIdFieldName, telegramId))
+                .Find(Builders<UserModel>.Filter.Eq(UserTelegramIdFieldName, telegramId))
                 .FirstOrDefaultAsync();
 
-        public async Task<User> AddFromTelegram(long telegramId, string? nick)
+        public async Task<UserModel> AddFromTelegram(long telegramId,string firstName, string lastName, string? nick)
         {
-            var newUser = new User
-            {
-                TelegramId = telegramId,
-                TelegramNick = nick,
-                Source = UserSource.Telegram
-            };
+            var newUser = new UserModel(
+                telegramId: telegramId, 
+                firstName: firstName, 
+                lastName: lastName, 
+                telegramNick: nick, 
+                source: UserSource.Telegram);
             
             await Collection.InsertOneAsync(newUser);
              var user = await GetOrDefaultByTelegramIdOrNull(telegramId);
              return  user??throw new InvalidOperationException("Add user was failed.");
         }
 
-        private IMongoCollection<User> Collection 
-            => _db.GetCollection<User>(UserCollectionName);
+        private IMongoCollection<UserModel> Collection 
+            => _db.GetCollection<UserModel>(UserCollectionName);
         
         public async Task UpdateDb()
         {
             await Collection.Indexes.DropAllAsync();
-            var keys = Builders<User>.IndexKeys.Ascending(UserTelegramIdFieldName);
-            var indexOptions = new CreateIndexOptions<User>
+            var keys = Builders<UserModel>.IndexKeys.Ascending(UserTelegramIdFieldName);
+            var indexOptions = new CreateIndexOptions<UserModel>
             {
                 Unique = true ,
-                PartialFilterExpression = Builders<User>.Filter.Type(u=>u.TelegramId, BsonType.Int64)
+                PartialFilterExpression = Builders<UserModel>.Filter.Type(UserTelegramIdFieldName, BsonType.Int64)
             };
-            var model = new CreateIndexModel<User>(keys, indexOptions);
+            var model = new CreateIndexModel<UserModel>(keys, indexOptions);
             await Collection.Indexes.CreateOneAsync(model);
         }
         public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
+        public Task Replace(UserModel user) => Collection.ReplaceOneAsync(o => o.Id == user.Id, user);
 
-        public Task UpdateCounters(User user)
+        public Task UpdateCounters(UserModel user)
         {
-            var updateDef = Builders<User>.Update
+            var updateDef = Builders<UserModel>.Update
                 .Set(o => o.WordsCount, user.WordsCount)
                 .Set(o => o.PairsCount, user.PairsCount)
                 .Set(o => o.ExamplesCount, user.ExamplesCount)
-                .Set(o => o.EnglishWordTranlationRequestsCount, user.EnglishWordTranlationRequestsCount)
-                .Set(o => o.RussianWordTranlationRequestsCount, user.RussianWordTranlationRequestsCount);
+                .Set(o => o.EnglishWordTranslationRequestsCount, user.EnglishWordTranslationRequestsCount)
+                .Set(o => o.RussianWordTranslationRequestsCount, user.RussianWordTranslationRequestsCount);
 
 
             return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
