@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -17,7 +19,7 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            if (!word.Phrases.Any())
+            if (!word.Examples.Any())
                 return ExamResult.Impossible;
 
             var phrase = word.GetRandomExample();
@@ -36,7 +38,7 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Choose missing word...");
 
             var variants = examList
-                .Where(e => !e.Phrases.Select(p => p.TranslatedPhrase).ToList().Contains(phrase.TranslatedPhrase))
+                .Where(e => !e.Examples.Select(p => p.TranslatedPhrase).ToList().Contains(phrase.TranslatedPhrase))
                 .Select(w => w.Word)
                 .Randomize()
                 .Take(5)

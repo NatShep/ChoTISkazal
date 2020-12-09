@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.Questions
@@ -16,12 +18,12 @@ namespace Chotiskazal.Bot.Questions
 
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
-            if (!word.Phrases.Any())
+            if (!word.Examples.Any())
                 return ExamResult.Impossible;
             
             var targetPhrase = word.GetRandomExample();
 
-            var other = examList.SelectMany(e => e.Phrases)
+            var other = examList.SelectMany(e => e.Examples)
                 .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p.TranslatedPhrase!= targetPhrase.TranslatedPhrase)
                 .Take(8).ToArray();
 

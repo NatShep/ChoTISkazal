@@ -11,7 +11,7 @@ namespace SayWhat.Bll.Dto
             string originText, 
             string translatedText, 
             string originTranscription,
-            TranlationDirection tranlationDirection,
+            TranslationDirection tranlationDirection,
             TranslationSource source)
         {
             OriginText = originText;
@@ -24,13 +24,13 @@ namespace SayWhat.Bll.Dto
             string originText, 
             string translatedText, 
             string originTranscription, 
-            TranlationDirection tranlationDirection,
+            TranslationDirection tranlationDirection,
             TranslationSource source, 
             List<Example> phrases)
             :this(originText,translatedText,originTranscription, tranlationDirection, source) => Examples = phrases;
         public string OriginText { get; }
         public string TranslatedText { get; }
-        public TranlationDirection TranlationDirection { get; }
+        public TranslationDirection TranlationDirection { get; }
         public string EnTranscription { get; }
         public List<Example> Examples { get; set; } = new List<Example>();
         public TranslationSource Source { get; }
@@ -38,7 +38,7 @@ namespace SayWhat.Bll.Dto
         public DictionaryTranslation GetReversed()
         {
             return new DictionaryTranslation(TranslatedText, OriginText, "", 
-                TranlationDirection== TranlationDirection.EnRu? TranlationDirection.RuEn: TranlationDirection.EnRu, Source );
+                TranlationDirection== TranslationDirection.EnRu? TranslationDirection.RuEn: TranslationDirection.EnRu, Source );
         }
 
     }

@@ -8,7 +8,7 @@ namespace SayWhat.MongoDAL.Examples
     {
         public Example()
         {
-            Direction = TranlationDirection.EnRu;
+            Direction = TranslationDirection.EnRu;
         }
         [BsonIgnore]
         public string[] SplitWordsOfPhrase => OriginPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries);
@@ -22,6 +22,6 @@ namespace SayWhat.MongoDAL.Examples
         [BsonElement("tp")]
         public string TranslatedPhrase { get; set; }
         [BsonElement("lng")]
-        public TranlationDirection Direction { get; set; }
+        public TranslationDirection Direction { get; set; }
     }
 }

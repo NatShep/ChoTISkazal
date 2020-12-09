@@ -51,7 +51,7 @@ namespace SayWhat.Bll.Yapi
                 OriginPhrase = example.Text, 
                 TranslatedPhrase = example.Tr.FirstOrDefault()?.Text, 
                 TranslatedWord = this.Text,
-                Direction = TranlationDirection.EnRu,
+                Direction = TranslationDirection.EnRu,
             }));
             return phrases;
         }

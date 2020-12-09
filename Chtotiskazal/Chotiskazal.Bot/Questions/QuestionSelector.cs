@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using Random = SayWhat.Bll.Random;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -181,7 +181,7 @@ namespace Chotiskazal.Bot.Questions
                 probability.Add(accumulator, e.Exam);
             }
 
-            var randomValue = Random.Rnd.NextDouble() * accumulator;
+            var randomValue = Rand.NextDouble() * accumulator;
             var choice = (probability.FirstOrDefault(p => p.Key >= randomValue).Value);
             return choice ?? probability.Last().Value;
         }

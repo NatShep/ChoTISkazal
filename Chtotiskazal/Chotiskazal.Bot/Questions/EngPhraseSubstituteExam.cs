@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -14,13 +15,13 @@ namespace Chotiskazal.Bot.Questions
         public string Name => "Eng phrase substitute";
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList)
         {
-            if (!word.Phrases.Any())
+            if (!word.Examples.Any())
                 return ExamResult.Impossible;
 
             var phrase   =  word.GetRandomExample();
             
             var allWordsWithPhraseOfSimilarTranslate = examList
-                .SelectMany(e => e.Phrases)
+                .SelectMany(e => e.Examples)
                 .Where(p => string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
                 .Select(e=>e.OriginWord)
                 .ToList();

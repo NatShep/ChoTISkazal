@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -16,9 +18,9 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var variants = examList.SelectMany(e => e.GetTranslations())
-                .Where(e => !word.GetTranslations().ToList().Contains(e))
-                .Union(word.GetTranslations())
+            var variants = examList.SelectMany(e => e.AllTranslations)
+                .Where(e => !word.AllTranslations.ToList().Contains(e))
+                .Union(word.AllTranslations)
                 .Randomize()
                 .ToList();
           
@@ -32,7 +34,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Retry;
 
             var selected = variants[choice.Value];
-            return word.GetTranslations().Any(t=>string.Equals(t,selected, StringComparison.InvariantCultureIgnoreCase)) 
+            return word.AllTranslations.Any(t=>string.Equals(t,selected, StringComparison.InvariantCultureIgnoreCase)) 
                 ? ExamResult.Passed 
                 : ExamResult.Failed;
         }

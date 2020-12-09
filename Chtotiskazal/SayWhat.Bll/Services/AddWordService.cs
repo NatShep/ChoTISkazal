@@ -85,7 +85,7 @@ namespace SayWhat.Bll.Services
                       translatedText: t.Word,
                       originTranscription: word.Transcription,
                       source: word.Source,
-                      tranlationDirection: word.Language == Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
+                      tranlationDirection: word.Language == Language.En? TranslationDirection.EnRu: TranslationDirection.RuEn,
                       phrases: t.Examples.Select(e => e.ExampleOrNull).ToList()
                   )).ToArray();
           }
@@ -126,7 +126,7 @@ namespace SayWhat.Bll.Services
                                   Id = id,
                                   OriginWord = originText,
                                   TranslatedWord = v.translation.Text,
-                                  Direction = langFrom== Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
+                                  Direction = langFrom== Language.En? TranslationDirection.EnRu: TranslationDirection.RuEn,
                                   OriginPhrase = e.Text,
                                   TranslatedPhrase = e.Tr.First().Text,
                               }
@@ -143,7 +143,7 @@ namespace SayWhat.Bll.Services
         public async Task AddWordsToUser(UserModel user, DictionaryTranslation translation, int? wordRating = null )
         {
             if (translation == null) return;
-            if(translation.TranlationDirection!= TranlationDirection.EnRu)
+            if(translation.TranlationDirection!= TranslationDirection.EnRu)
                 throw new InvalidOperationException("Only en-ru dirrection is supported");
             
             var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
@@ -151,37 +151,32 @@ namespace SayWhat.Bll.Services
             if (alreadyExistsWord == null)
             {
                 //the Word is new for the user
-                var model = new UserWordModel(new UserWord
-                {
-                    UserId = user.Id,
-                    Word = translation.OriginText,
-                    Language = TranlationDirection.EnRu,
-                    AbsoluteScore = wordRating??0,
-                    Translations = new[]
+                var model = new UserWordModel(
+                    id:          user.Id, 
+                    word:        translation.OriginText, 
+                    direction:   TranslationDirection.EnRu,
+                    absScore:    wordRating ?? 0, 
+                    translation: new UserWordTranslation
                     {
-                        new UserWordTranslation
-                        {
-                            Transcription = translation.EnTranscription,
-                            Word = translation.TranslatedText,
-                            Examples = translation.Examples
-                                .Select(p => new UserWordTranslationReferenceToExample(p.Id))
-                                .ToArray()
-                        }
-                    }
-                });
+                        Transcription = translation.EnTranscription,
+                        Word = translation.TranslatedText,
+                        Examples = translation.Examples
+                            .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                            .ToArray()
+                    });
                 model.UpdateCurrentScore();
-                await _usersWordsService.AddUserWord(model.Entity);
+                await _usersWordsService.AddUserWord(model);
                 
                 user.OnNewWordAdded(
-                    pairsCount:    model.Entity.Translations.Length,
-                    examplesCount: model.Entity.Translations.Sum(t => t.Examples?.Length ?? 0));
+                    pairsCount:    model.Translations.Length,
+                    examplesCount: model.Translations.Sum(t => t.Examples?.Length ?? 0));
                 await _userService.Update(user);
             }
             else
             {
                 // User already have the word.
 
-                var translates = alreadyExistsWord.GetTranslations().ToList();
+                var translates = alreadyExistsWord.AllTranslations.ToList();
                 var newTranslations = new List<UserWordTranslation>();
                 var r = translation;
                 if (!translates.Contains(r.TranslatedText))

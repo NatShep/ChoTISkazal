@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -15,7 +17,7 @@ namespace Chotiskazal.Bot.Questions
 
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word, UserWordModel[] examList) 
         {
-            if (!word.HasAnyPhrases)
+            if (!word.HasAnyExamples)
                 return ExamResult.Impossible;
 
             var targetPhrase = word.GetRandomExample();

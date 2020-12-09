@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -23,7 +24,7 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.GetTranslations().ToArray();
+            var translations = word.AllTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.AbsoluteScore < minCount * 4)

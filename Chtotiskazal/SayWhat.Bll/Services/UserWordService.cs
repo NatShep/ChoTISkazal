@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
@@ -21,17 +22,17 @@ namespace SayWhat.Bll.Services
             _examplesRepo = examplesRepo;
         }
 
-        public Task AddUserWord(UserWord entity) =>
+        public Task AddUserWord(UserWordModel entity) =>
              _userWordsRepository.Add(entity);
 
         private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(UserModel user, int count)
         {
             var words = await _userWordsRepository.GetWorstLearned(user, count);
             await IncludeExamples(words);
-            return words.Select(w => new UserWordModel(w));
+            return words;
         }
 
-        private async Task IncludeExamples(IReadOnlyCollection<UserWord> words)
+        private async Task IncludeExamples(IReadOnlyCollection<UserWordModel> words)
         {
             var ids = new List<ObjectId>();
 
@@ -57,24 +58,21 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public async Task<UserWordModel[]> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked)
+        public async Task<IReadOnlyList<UserWordModel>> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked)
         {
             if (maxCount <= 0)
                 return new UserWordModel[0];
 
             var words = await _userWordsRepository.Get(user, maxCount, minimumQuestionAsked);
             await IncludeExamples(words);
-            return words
-                .Select(t => new UserWordModel(t))
-                .ToArray();;
+            return words;
         }
 
 
-        public async Task RegisterFailure(UserWordModel userWordForLearning)
+        public async Task RegisterFailure(UserWordModel userWordModelForLearning)
         {
-            userWordForLearning.OnQuestionFailed();
-            userWordForLearning.UpdateCurrentScore();
-            await _userWordsRepository.UpdateMetrics(userWordForLearning.Entity);
+            userWordModelForLearning.OnQuestionFailed();
+            await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
         }
         
         public async Task UpdateCurrentScore(UserModel user, int count)
@@ -83,9 +81,8 @@ namespace SayWhat.Bll.Services
             var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
             foreach (var word in words)
             {
-                var model = new UserWordModel(word);
-                model.UpdateCurrentScore();
-                await _userWordsRepository.UpdateMetrics(model.Entity);
+                word.UpdateCurrentScore();
+                await _userWordsRepository.UpdateMetrics(word);
             }
             sw.Stop();
             Botlog.UpdateMetricInfo(user.TelegramId, nameof(UpdateCurrentScore), $"{words.Count}", sw.Elapsed);
@@ -94,24 +91,19 @@ namespace SayWhat.Bll.Services
         public async Task RegisterSuccess(UserWordModel model)
         {
             model.OnQuestionPassed();
-            await _userWordsRepository.UpdateMetrics(model.Entity);
+            await _userWordsRepository.UpdateMetrics(model);
         }
 
         public Task<bool> HasWords(UserModel user) => _userWordsRepository.HasAnyFor(user);
         public Task UpdateWord(UserWordModel model) =>
-             _userWordsRepository.Update(model.Entity);
+             _userWordsRepository.Update(model);
 
         public Task UpdateWordMetrics(UserWordModel model) =>
-            _userWordsRepository.UpdateMetrics(model.Entity);
+            _userWordsRepository.UpdateMetrics(model);
         
-        public async Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord)
-        {
-            var word = await _userWordsRepository.GetWordOrDefault(user, enWord);
-            if (word == null)
-                return null;
-            return new UserWordModel(word);
-        }
-        
+        public async Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord) 
+            => await _userWordsRepository.GetWordOrDefault(user, enWord);
+
         public  Task AddMutualPhrasesToVocabAsync(UserModel user, int maxCount)
         {
             return Task.CompletedTask;
@@ -202,12 +194,12 @@ namespace SayWhat.Bll.Services
             foreach (var wordForLearning in wordsForLearning)
             {
                 
-                var translations = wordForLearning.GetTranslations().ToArray();
+                var translations = wordForLearning.AllTranslations.ToArray();
                 if (translations.Length <= maxTranslationSize)
                     continue;
 
                 var usedTranslations = translations.Randomize().Take(maxTranslationSize).ToArray();
-                wordForLearning.SetTranslation(usedTranslations);
+                wordForLearning.Translations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
 
                 // Remove Phrases added as learning word 
                 /*
@@ -231,17 +223,17 @@ namespace SayWhat.Bll.Services
             for (int i = 0; i < examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
                 examsList.AddRange(learningWords.Randomize());
             for (int i = 0; i < examSettings.MaxTimesThatLearningWordAppearsInExam - examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Randomize().Where(w => Random.Rnd.Next() % 2 == 0));
+                examsList.AddRange(learningWords.Randomize().Where(w => Rand.Next() % 2 == 0));
             
             while (examsList.Count > examSettings.MaxExamSize) 
                 examsList.RemoveAt(examsList.Count - 1);
-            var advancedlistMaxCount = Math.Min(Random.UpTo(examSettings.MaxAdvancedQuestionsCount),
+            var advancedlistMaxCount = Math.Min(Rand.UpTo(examSettings.MaxAdvancedQuestionsCount),
                 examSettings.MaxExamSize - examsList.Count);
             if (advancedlistMaxCount <= 0)
                 return examsList;
 
             var minimumTimesThatWordHasToBeAsked =
-                Random.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedCount,
+                Rand.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedCount,
                     examSettings.MaxAdvancedExamMinQuestionAskedCount);
             
             var advancedList = await GetWordsWithExamples(
@@ -257,7 +249,7 @@ namespace SayWhat.Bll.Services
         {
             var words =  _userWordsRepository.GetTestWords(user);
             await IncludeExamples(words);
-            return words.Select(w => new UserWordModel(w)).ToArray();
+            return words.ToArray();
             
         }
     }

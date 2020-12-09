@@ -108,7 +108,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private static DictionaryTranslation GetSelectedTranslation(IReadOnlyList<DictionaryTranslation> translations, int value)
         {
             var selected = translations[value];
-            if (selected.TranlationDirection == TranlationDirection.RuEn)
+            if (selected.TranlationDirection == TranslationDirection.RuEn)
                 selected = selected.GetReversed(); //Reverse translate direction, to store all pairs in one dirrection
             return selected;
         }

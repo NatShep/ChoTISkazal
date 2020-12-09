@@ -1,6 +1,6 @@
 ﻿namespace SayWhat.MongoDAL
 {
-    public enum TranlationDirection {
+    public enum TranslationDirection {
         EnRu =  1,
         RuEn =  2,
     }

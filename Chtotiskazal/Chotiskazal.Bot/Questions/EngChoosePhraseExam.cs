@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -19,13 +21,13 @@ namespace Chotiskazal.Bot.Questions
             UserWordModel word, 
             UserWordModel[] examList)
         {
-            if (!word.HasAnyPhrases)
+            if (!word.HasAnyExamples)
                 return ExamResult.Impossible;
             
             var targetPhrase = word.GetRandomExample();
 
             var otherExamples = examList
-                .SelectMany(e => e.Phrases)
+                .SelectMany(e => e.Examples)
                 .Where(p => !string.Equals(p.TranslatedPhrase, targetPhrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
                 .Take(8).ToArray();
 

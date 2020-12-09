@@ -9,8 +9,6 @@ namespace SayWhat.MongoDAL.Words
 {
     public class UserWordsRepo : IMongoRepo
     {
-        private static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
-
         public const string UserCollectionName = "words";
         public const string CurrentScoreFieldName = "cur";
         public const string AbsoluteScoreFieldName = "abs";
@@ -23,43 +21,43 @@ namespace SayWhat.MongoDAL.Words
 
         public UserWordsRepo(IMongoDatabase db) => _db = db;
 
-        public Task Add(UserWord word) => Collection.InsertOneAsync(word);
+        public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
 
-        public Task<List<UserWord>> GetWorstLearned(UserModel user, int maxCount)
+        public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount)
             => Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
-                .SortBy(a=>a.CurrentScore)
+                .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
+                .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}:1}}" )
                 .Limit(maxCount)
                 .ToListAsync();
          
-        public Task<List<UserWord>> GetWorstLearned(UserModel user, int maxCount, int minimumLearnRate)
+        public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount, int minimumLearnRate)
             => Collection
-                .Find(Builders<UserWord>.Filter.And(
-                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWord>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
+                .Find(Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
                 ))
                 .SortBy(a=>a.CurrentScore)
                 .Limit(maxCount)
                 .ToListAsync();
 
-        public Task<List<UserWord>> Get(UserModel user, int maxCount, int minimumQuestionAsked)
+        public Task<List<UserWordModel>> Get(UserModel user, int maxCount, int minimumQuestionAsked)
             => Collection
-                .Find(Builders<UserWord>.Filter.And(
-                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWord>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
+                .Find(Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
                 ))
                 .SortBy(a=>a.ScoreUpdatedTimestamp)
                 .Limit(maxCount)
                 .ToListAsync();
 
-        public Task<List<UserWord>> GetAllUserWordsAsync(UserModel user)
+        public Task<List<UserWordModel>> GetAllUserWordsAsync(UserModel user)
             => Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
+                .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
                 .ToListAsync();
 
-        public Task UpdateMetrics(UserWord word)
+        public Task UpdateMetrics(UserWordModel word)
         {
-            var updateDef = Builders<UserWord>.Update
+            var updateDef = Builders<UserWordModel>.Update
                 .Set(o => o.ScoreUpdatedTimestamp,   DateTime.Now)
                 .Set(o => o.AbsoluteScore,   word.AbsoluteScore)
                 .Set(o => o.CurrentScore,   word.CurrentScore)
@@ -70,74 +68,74 @@ namespace SayWhat.MongoDAL.Words
             return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
         }
 
-        private IMongoCollection<UserWord> Collection
-            => _db.GetCollection<UserWord>(UserCollectionName);
+        private IMongoCollection<UserWordModel> Collection
+            => _db.GetCollection<UserWordModel>(UserCollectionName);
         public async Task UpdateDb()
         {
             await Collection.Indexes.DropAllAsync();
-            var csKeys = Builders<UserWord>.IndexKeys.Ascending(CurrentScoreFieldName);
-            var csIndexOptions = new CreateIndexOptions<UserWord> {
+            var csKeys = Builders<UserWordModel>.IndexKeys.Ascending(CurrentScoreFieldName);
+            var csIndexOptions = new CreateIndexOptions<UserWordModel> {
                 Unique = false 
             };
-            var currentScoreIndex = new CreateIndexModel<UserWord>(csKeys, csIndexOptions);
+            var currentScoreIndex = new CreateIndexModel<UserWordModel>(csKeys, csIndexOptions);
             
-            var rndKeys = Builders<UserWord>.IndexKeys.Ascending(LastUpdateScoreTime);
-            var rndIndexOptions = new CreateIndexOptions<UserWord> {Unique = false};
-            var rndScoreIndex = new CreateIndexModel<UserWord>(rndKeys, rndIndexOptions);
+            var rndKeys = Builders<UserWordModel>.IndexKeys.Ascending(LastUpdateScoreTime);
+            var rndIndexOptions = new CreateIndexOptions<UserWordModel> {Unique = false};
+            var rndScoreIndex = new CreateIndexModel<UserWordModel>(rndKeys, rndIndexOptions);
             
             await Collection.Indexes.CreateManyAsync(new[]{currentScoreIndex, rndScoreIndex});
         }
 
 
-        public Task Update(UserWord entity)
+        public Task Update(UserWordModel entity)
         {
-            entity.ScoreUpdatedTimestamp = DateTime.Now;
+            entity.UpdateCurrentScore();
             return Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
         }
         
         public async Task<bool> HasAnyFor(UserModel user)
         {
             var docsCount = await Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
+                .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
                 .CountDocumentsAsync();
             return docsCount > 0;
         }
 
-        public Task<UserWord> GetWordOrDefault(UserModel user, string enWord)
+        public Task<UserWordModel> GetWordOrDefault(UserModel user, string enWord)
         =>
             Collection
-                .Find(Builders<UserWord>.Filter.And(
-                    Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWord>.Filter.Eq(OriginWordFieldName, enWord)
+                .Find(Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Eq(OriginWordFieldName, enWord)
                 )).FirstOrDefaultAsync();
 
         /// <summary>
         /// Returns users words that was updated oldest
         /// </summary>
-        public Task<List<UserWord>> GetOldestUpdatedWords(UserModel user, int count) =>
+        public Task<List<UserWordModel>> GetOldestUpdatedWords(UserModel user, int count) =>
             Collection
-                .Find(Builders<UserWord>.Filter.Eq(UserIdFieldName, user.Id))
+                .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
                 .SortBy(a=>a.ScoreUpdatedTimestamp)
                 .Limit(count)
                 .ToListAsync();
 
         
         //DELETE This after
-        public IReadOnlyCollection<UserWord> GetTestWords(UserModel user)
+        public IReadOnlyCollection<UserWordModel> GetTestWords(UserModel user)
         {
-            var learningWords = new List<UserWord>();
-            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
-                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
-                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"bother"))).ToList());
-            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
-                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
-                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"disturb"))).ToList());
-            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
-                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
-                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"enable"))).ToList());
-            learningWords.AddRange(Collection.Find(Builders<UserWord>.Filter.And(
-                Builders<UserWord>.Filter.Eq(UserIdFieldName,user.Id),
-                Builders<UserWord>.Filter.Eq(OriginWordFieldName,"statment"))).ToList());
+            var learningWords = new List<UserWordModel>();
+            learningWords.AddRange(Collection.Find(Builders<UserWordModel>.Filter.And(
+                Builders<UserWordModel>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWordModel>.Filter.Eq(OriginWordFieldName,"bother"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWordModel>.Filter.And(
+                Builders<UserWordModel>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWordModel>.Filter.Eq(OriginWordFieldName,"disturb"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWordModel>.Filter.And(
+                Builders<UserWordModel>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWordModel>.Filter.Eq(OriginWordFieldName,"enable"))).ToList());
+            learningWords.AddRange(Collection.Find(Builders<UserWordModel>.Filter.And(
+                Builders<UserWordModel>.Filter.Eq(UserIdFieldName,user.Id),
+                Builders<UserWordModel>.Filter.Eq(OriginWordFieldName,"statment"))).ToList());
             return learningWords;
         }
     }

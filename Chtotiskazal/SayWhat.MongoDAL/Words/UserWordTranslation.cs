@@ -4,6 +4,12 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace SayWhat.MongoDAL.Words
 {
     public class UserWordTranslation {
+        public UserWordTranslation(string word)
+        {
+            Word = word;
+            Examples = new UserWordTranslationReferenceToExample[0];
+            
+        }
         public UserWordTranslation()
         {
             Examples = new UserWordTranslationReferenceToExample[0];

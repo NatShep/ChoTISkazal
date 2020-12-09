@@ -18,7 +18,7 @@ namespace SayWhat.MongoDAL.Tests
             var service = new DictionaryService(dictionaryRepo, examplesRepo);
             var example = new Example
             {
-                Direction = TranlationDirection.EnRu,
+                Direction = TranslationDirection.EnRu,
                 Id = ObjectId.GenerateNewId(),
                 OriginWord = "table",
                 TranslatedWord = "стол",

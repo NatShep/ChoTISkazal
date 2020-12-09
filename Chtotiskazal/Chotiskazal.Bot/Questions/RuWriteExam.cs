@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -41,7 +42,7 @@ namespace Chotiskazal.Bot.Questions
             var translationCandidate = await _dictionaryService.GetAllTranslationWords(userEntry.ToLower());
             
             if (translationCandidate.Any(t1 =>
-                word.GetTranslations().Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))
+                word.AllTranslations.Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using Random = SayWhat.Bll.Random;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -45,7 +45,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var startupScoreUpdate =  _usersWordsService.UpdateCurrentScore(user, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  _chatIo.SendTyping();
 
-            var c = Random.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
+            var c = Rand.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
                 _examSettings.MaxLearningWordsCountInOneExam);
             await startupScoreUpdate;
             await typing;

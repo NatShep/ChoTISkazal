@@ -24,7 +24,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task Add_GetAllForUserReturnsIt()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
             var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(1, allWords.Count);
             Assert.AreEqual("table", allWords[0].Word);
@@ -43,14 +43,15 @@ namespace SayWhat.MongoDAL.Tests
         public async Task AddSeveral_GetWorstReturnWorstOnes(int worstCount, int bestCount)
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            var worstOnes = new List<UserWord>();
+            var worstOnes = new List<UserWordModel>();
             for (int i = 0; i < worstCount; i++)
             {
-                var word = CreateWord(user.Id, $"table{i}", $"стол{i}", i);
+                string word1 = $"table{i}";
+                string tranlation = $"стол{i}";
+                var word = new UserWordModel(user.Id, word1, tranlation, i);
                 worstOnes.Add(word);
             }
-            var rand = new Random();
-            var randomList = worstOnes.OrderBy (x => rand.Next()).ToList();
+            var randomList = worstOnes.OrderBy (x => Rand.Next()).ToList();
             
             foreach (var word in randomList)
             {
@@ -58,7 +59,12 @@ namespace SayWhat.MongoDAL.Tests
             }
 
             for (int i = 0; i < bestCount; i++)
-                await _repo.Add(CreateWord(user.Id,$"table{i}", $"стол{i}", i+worstCount ));
+            {
+                string word = $"table{i}";
+                string tranlation = $"стол{i}";
+                double rate = i+worstCount;
+                await _repo.Add(new UserWordModel(user.Id, word, tranlation, rate));
+            }
 
             var allWords =  await _repo.GetWorstLearned(user,worstCount);
             
@@ -78,9 +84,12 @@ namespace SayWhat.MongoDAL.Tests
         public async Task AddSeveral_GetAllForUserReturnsThem(int count)
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            for (int i = 0; i < count; i++) 
-                await _repo.Add(CreateWord(user.Id,$"table{i}", "стол{i}" ));
-            
+            for (int i = 0; i < count; i++)
+            {
+                string word = $"table{i}";
+                await _repo.Add(new UserWordModel(user.Id, word, "стол{i}", 0));
+            }
+
             var allWords =  await _repo.GetAllUserWordsAsync(user);
             Assert.AreEqual(count, allWords.Count);
         }
@@ -89,7 +98,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task TableHasNoWordsForUser_HasAnyReturnsFalse()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
             var hasAny =  await _repo.HasAnyFor(new UserModel{Id = ObjectId.GenerateNewId()});
             Assert.IsFalse(hasAny);
         }
@@ -98,7 +107,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task TableHasWordsForUser_HasAnyReturnsTrue()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
             var hasAny =  await _repo.HasAnyFor(user);
             Assert.True(hasAny);
         }
@@ -107,7 +116,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task TableHasWordForUser_GetWordReturnIt()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
             var word =  await _repo.GetWordOrDefault(user,"table");
             Assert.IsNotNull(word);
             Assert.AreEqual("table",word.Word);
@@ -118,7 +127,7 @@ namespace SayWhat.MongoDAL.Tests
         public async Task TableHasWordForOtherUser_GetWordReturnNull()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            await _repo.Add(CreateWord(user.Id,"table", "стол" ));
+            await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
             var word =  await _repo.GetWordOrDefault(new UserModel{Id = ObjectId.GenerateNewId()}, "table");
             Assert.IsNull(word);
         }
@@ -127,41 +136,25 @@ namespace SayWhat.MongoDAL.Tests
         public async Task Update_GetReturnsUpdated()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
-            var word = CreateWord(user.Id, "table", "стол");
+            var word = new UserWordModel(user.Id, "table", "стол");
             await _repo.Add(word);
-            word.Translations = word.Translations.Append(new UserWordTranslation
+            word.AddTranslations(new List<UserWordTranslation>{
+                new UserWordTranslation
             {
                 Word = "таблица",
                 Examples = new[]
                 {
-                     new UserWordTranslationReferenceToExample()
-                     {
+                     new UserWordTranslationReferenceToExample() {
                          ExampleId = ObjectId.GenerateNewId()
                      } 
                 }
-            }).ToArray();
+            }});
             await _repo.Update(word);
             var readWord =  await _repo.GetWordOrDefault(user, "table");
             Assert.IsNotNull(readWord);
             Assert.AreEqual(2,readWord.Translations.Length);
-            Assert.AreEqual("стол",readWord.Translations[0].Word);
-            Assert.AreEqual("таблица",readWord.Translations[1].Word);
-        }
-
-        private static UserWord CreateWord(ObjectId userId, string word, string tranlation,double rate = 0 )
-        {
-            return new UserWord{
-                UserId = userId, 
-                Word = word, 
-                CurrentScore = rate,
-                AbsoluteScore = rate,
-                Translations = new[]
-            {
-                new UserWordTranslation
-                {
-                    Word = tranlation
-                }
-            }};
+            Assert.AreEqual("стол",readWord.Translations[1].Word);
+            Assert.AreEqual("таблица",readWord.Translations[0].Word);
         }
     }
 }

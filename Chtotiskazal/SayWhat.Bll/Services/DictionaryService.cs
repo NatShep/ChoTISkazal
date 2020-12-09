@@ -102,7 +102,7 @@ namespace SayWhat.Bll.Services
                     word.Word,
                     translation.Word,
                     word.Transcription,
-                    word.Language== Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
+                    word.Language== Language.En? TranslationDirection.EnRu: TranslationDirection.RuEn,
                     word.Source, examples));
             }
 
@@ -120,7 +120,7 @@ namespace SayWhat.Bll.Services
                     originText: word.Word, 
                     translatedText: translation.Word, 
                     originTranscription: word.Transcription, 
-                    tranlationDirection: word.Language== Language.En? TranlationDirection.EnRu: TranlationDirection.RuEn,
+                    tranlationDirection: word.Language== Language.En? TranslationDirection.EnRu: TranslationDirection.RuEn,
                     source: word.Source, 
                     translation.Examples
                         .Select(e => new Example {Id = e.ExampleId})
