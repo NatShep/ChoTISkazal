@@ -62,9 +62,9 @@ namespace Chotiskazal.Bot.ChatFlows
             
             
             if(word.IsRussian())
-                user.IncrementRussianWordTranlationRequestsCount();
+                user.OnRussianWordTranlationRequest();
             else
-                user.IncrementEnglishWordTranlationRequestsCount();
+                user.OnEnglishWordTranslationRequests();
             
             while (true)
             {

@@ -94,7 +94,6 @@ namespace SayWhat.Bll.Services
         public async Task RegisterSuccess(UserWordModel model)
         {
             model.OnQuestionPassed();
-            model.UpdateCurrentScore();
             await _userWordsRepository.UpdateMetrics(model.Entity);
         }
 

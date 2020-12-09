@@ -191,8 +191,8 @@ namespace SayWhat.Bll.Services
                         Word = r.TranslatedText,
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
                     });
+                
                 alreadyExistsWord.OnQuestionFailed();
-                alreadyExistsWord.UpdateCurrentScore();
                 
                 if (newTranslations.Count == 0)
                 {
