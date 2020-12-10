@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Examples;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -26,14 +27,6 @@ namespace Chotiskazal.Bot.Questions
 
             if (replaced == phrase.OriginPhrase)
                 return ExamResult.Impossible;
-
-            var otherExamples = examList
-                .SelectMany(e => e.Phrases)
-                .Where(p => !string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
-                .ToArray();
-
-            if(!otherExamples.Any())
-                return ExamResult.Impossible;
             
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
@@ -44,9 +37,9 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"Choose missing word...");
 
 
-            var variants = otherExamples
-                .Select(e => e.OriginWord).Where(e=>e!=phrase.OriginWord)
-                .Distinct()
+            var variants = examList
+                .Where(p => !p.Phrases.Select(e=>e.TranslatedPhrase.ToLower()).Contains(phrase.TranslatedPhrase.ToLower()))
+                .Select(e => e.Word)
                 .Randomize()
                 .Take(5)
                 .Append(phrase.OriginWord)

@@ -49,9 +49,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 _examSettings.MaxLearningWordsCountInOneExam);
             await startupScoreUpdate;
             await typing;
-            var learningWords
-                  = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
-           
+            var learningWords 
+                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
             
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= 4)
