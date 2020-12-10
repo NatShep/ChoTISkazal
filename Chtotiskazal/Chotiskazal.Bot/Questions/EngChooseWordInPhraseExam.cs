@@ -38,7 +38,8 @@ namespace Chotiskazal.Bot.Questions
 
 
             var variants = examList
-                .Where(p => !p.Phrases.Select(e=>e.TranslatedPhrase.ToLower()).Contains(phrase.TranslatedPhrase.ToLower()))
+                .Where(p => !p.Phrases.Select(e=>e.TranslatedPhrase)
+                    .Any(t=>string.Equals(t,phrase.TranslatedPhrase.ToLower(),StringComparison.OrdinalIgnoreCase)))
                 .Select(e => e.Word)
                 .Randomize()
                 .Take(5)
