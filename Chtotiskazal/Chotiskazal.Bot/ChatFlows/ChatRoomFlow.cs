@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
-using Serilog;
-using Serilog.Events;
 
 namespace Chotiskazal.Bot.ChatFlows
 {

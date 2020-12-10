@@ -151,7 +151,7 @@ namespace SayWhat.Bll.Services
             if (alreadyExistsWord == null)
             {
                 //the Word is new for the user
-                var model = new UserWordModel(
+                var word = new UserWordModel(
                     id:          user.Id, 
                     word:        translation.OriginText, 
                     direction:   TranslationDirection.EnRu,
@@ -164,17 +164,18 @@ namespace SayWhat.Bll.Services
                             .Select(p => new UserWordTranslationReferenceToExample(p.Id))
                             .ToArray()
                     });
-                model.UpdateCurrentScore();
-                await _usersWordsService.AddUserWord(model);
+                word.UpdateCurrentScore();
+                await _usersWordsService.AddUserWord(word);
                 
                 user.OnNewWordAdded(
-                    pairsCount:    model.Translations.Length,
-                    examplesCount: model.Translations.Sum(t => t.Examples?.Length ?? 0));
+                    statsChanging: WordStatsChanging.CreateForNewWord(word.AbsoluteScore), 
+                    pairsCount:    word.Translations.Length,
+                    examplesCount: word.Translations.Sum(t => t.Examples?.Length ?? 0));
             }
             else
             {
                 // User already have the word.
-
+                var originRate = alreadyExistsWord.Score;
                 var translates = alreadyExistsWord.AllTranslations.ToList();
                 var newTranslations = new List<UserWordTranslation>();
                 var r = translation;
@@ -196,7 +197,10 @@ namespace SayWhat.Bll.Services
                 
                 alreadyExistsWord.AddTranslations(newTranslations);
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
-                user.OnPairsAdded(newTranslations.Count,newTranslations.Sum(t => t.Examples?.Length ?? 0));
+                user.OnPairsAdded(
+                    statsChanging: alreadyExistsWord.Score - originRate,
+                    newTranslations.Count,
+                    newTranslations.Sum(t => t.Examples?.Length ?? 0));
             }
             await _userService.Update(user);
         }

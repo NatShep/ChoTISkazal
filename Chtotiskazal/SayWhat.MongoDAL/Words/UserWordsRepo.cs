@@ -36,7 +36,7 @@ namespace SayWhat.MongoDAL.Words
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
                     Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
                 ))
-                .SortBy(a=>a.CurrentScore)
+                .SortBy(a=>a.CurrentOrderScore)
                 .Limit(maxCount)
                 .ToListAsync();
 
@@ -60,7 +60,7 @@ namespace SayWhat.MongoDAL.Words
             var updateDef = Builders<UserWordModel>.Update
                 .Set(o => o.ScoreUpdatedTimestamp,   DateTime.Now)
                 .Set(o => o.AbsoluteScore,   word.AbsoluteScore)
-                .Set(o => o.CurrentScore,   word.CurrentScore)
+                .Set(o => o.CurrentOrderScore,   word.CurrentOrderScore)
                 .Set(o => o.QuestionPassed,   word.QuestionPassed)
                 .Set(o => o.QuestionAsked, word.QuestionAsked)
                 .Set(o => o.LastQuestionTimestamp,   word.LastQuestionTimestamp);

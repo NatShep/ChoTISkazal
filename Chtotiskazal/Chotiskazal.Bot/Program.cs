@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
@@ -14,13 +13,8 @@ using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
-using Serilog;
-using Serilog.Core.Enrichers;
-using Serilog.Formatting.Json;
-using Serilog.Sinks.RollingFile;
 using Telegram.Bot;
 using Telegram.Bot.Args;
-using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 
 
@@ -43,10 +37,9 @@ namespace Chotiskazal.Bot
             _settings = ReadConfiguration();
 
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
-            var yandexTranslateApiClient = new YandexTranslateApiClient (_settings.YatransapiKey, _settings.YatransapiTimeout); 
                 
             var client = new MongoClient(_settings.MongoConnectionString);
-            var db = client.GetDatabase("SayWhatDb");
+            var db = client.GetDatabase("swdumbp"/*"SayWhatDb"*/);
 
             var userWordRepo   = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);

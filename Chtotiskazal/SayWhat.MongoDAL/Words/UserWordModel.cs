@@ -15,7 +15,6 @@ namespace SayWhat.MongoDAL.Words
     [BsonIgnoreExtraElements]
     public class UserWordModel
     {
-        public const int MaxExamScore = 10;
         public const int PenaltyScore = 9;
         public const double AgingFactor = 1;
         public const double ReducingPerPointFactor = 1.7;
@@ -24,7 +23,7 @@ namespace SayWhat.MongoDAL.Words
         {
             _userId = userId;
             _word = word;
-            _currentScore = rate;
+            _currentOrderScore = rate;
             _absoluteScore = rate;
             _translations = new[]
             {
@@ -42,9 +41,7 @@ namespace SayWhat.MongoDAL.Words
             _translations = new[] {translation};
         }
 
-        public UserWordModel()
-        {
-        }
+        public UserWordModel() { }
 
         #region mongo fields
 
@@ -68,7 +65,7 @@ namespace SayWhat.MongoDAL.Words
         /// Index for exam selecting
         /// </summary>
         [BsonElement(UserWordsRepo.CurrentScoreFieldName)]
-        private double _currentScore;
+        private double _currentOrderScore;
 
         /// <summary>
         /// Absolute words score.
@@ -101,7 +98,7 @@ namespace SayWhat.MongoDAL.Words
         #endregion
 
         public string Word => _word;
-        public double CurrentScore => _currentScore;
+        public double CurrentOrderScore => _currentOrderScore;
         public double AbsoluteScore => _absoluteScore;
         public int QuestionPassed => _questionPassed;
         public int QuestionAsked => _questionAsked;
@@ -113,7 +110,7 @@ namespace SayWhat.MongoDAL.Words
             get => _translations;
             set => _translations = value;
         }
-
+        public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionTimestamp??DateTime.Now);
         public bool HasAnyExamples => Translations.Any(t => t.Examples?.Any() == true);
         public DateTime? LastExam => LastQuestionTimestamp;
         public string TranslationAsList => string.Join(", ", Translations.Select(t => t.Word));
@@ -149,10 +146,9 @@ namespace SayWhat.MongoDAL.Words
             if (_absoluteScore < 0)
                 _absoluteScore = 0;
 
-            _lastQuestionTimestamp = DateTime.Now;
             _questionAsked++;
+            _lastQuestionTimestamp =_scoreUpdatedTimestamp = DateTime.Now;
 
-            _scoreUpdatedTimestamp = DateTime.Now;
             UpdateCurrentScore();
         }
 
@@ -175,7 +171,7 @@ namespace SayWhat.MongoDAL.Words
             //Randomize
             var rndFactor = Math.Pow(1.5, Rand.RandomNormal(0, 1));
             p *= rndFactor;
-            _currentScore = p;
+            _currentOrderScore = p;
             _scoreUpdatedTimestamp = DateTime.Now;
         }
 
@@ -185,6 +181,6 @@ namespace SayWhat.MongoDAL.Words
             _translations = newTranslates.ToArray();
         }
 
-        public override string ToString() => $"{Word} {CurrentScore} updated {ScoreUpdatedTimestamp}";
+        public override string ToString() => $"{Word} {CurrentOrderScore} updated {ScoreUpdatedTimestamp}";
     }
 }

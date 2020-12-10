@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SayWhat.Bll;
-using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions

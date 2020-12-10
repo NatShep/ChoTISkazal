@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.MongoDAL.Tests
 {
@@ -95,7 +96,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
             for (int i = 0; i < updateCount; i++)
-                model.OnPairsAdded(1,1);
+                model.OnPairsAdded(WordStatsChanging.Zero,  1,1);
             await _repo.Update(model);
 
             var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -109,7 +110,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
             for (int i = 0; i < updateCount; i++)
-                model.OnQuestionPassed();
+                model.OnQuestionPassed(WordStatsChanging.Zero);
             await _repo.Update(model);
 
             var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -123,7 +124,7 @@ namespace SayWhat.MongoDAL.Tests
         {
             var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
             for (int i = 0; i < updateCount; i++)
-                model.OnQuestionFailed();
+                model.OnQuestionFailed(WordStatsChanging.Zero);
             await _repo.Update(model);
 
             var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -139,7 +140,7 @@ namespace SayWhat.MongoDAL.Tests
             model.OnLearningDone();
             model.OnLearningDone();
             
-            model.OnNewWordAdded(24,124);
+            model.OnNewWordAdded(WordStatsChanging.CreateForNewWord(0) , 24,124);
             model.OnEnglishWordTranslationRequest();
             model.OnEnglishWordTranslationRequest();
             model.OnEnglishWordTranslationRequest();

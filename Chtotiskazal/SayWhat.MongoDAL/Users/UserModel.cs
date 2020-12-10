@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using SayWhat.MongoDAL.Words;
+#pragma warning disable 169
+
 // ReSharper disable FieldCanBeMadeReadOnly.Local
 // ReSharper disable ConvertToAutoProperty
 #pragma warning disable 649
@@ -58,8 +61,24 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("ldc")] private int _learningDone; 
         [BsonElement("qpc")] private int _questionPassed; 
         [BsonElement("qfc")] private int _questionFailed; 
+        
+        [BsonElement("a0c")] 
+        [BsonIgnoreIfDefault]
+        private int _a0WordCount;
+        [BsonElement("a1c")]
+        [BsonIgnoreIfDefault]
+        private int _a1WordCount;
+        [BsonElement("a2c")] 
+        [BsonIgnoreIfDefault]
+        private int _a2WordCount;
+        [BsonElement("a3c")] 
+        [BsonIgnoreIfDefault]
+        private int _a3WordCount;
+        [BsonElement("l2a2c")] 
+        private double _leftToA2;
         #endregion
-         public DateTime LastActivity => _lastActivity;
+
+        public DateTime LastActivity => _lastActivity;
          public long? TelegramId => _telegramId;
          public string TelegramFirstName => _telegramFirstName;
          public string TelegramLastName => _telegramLastName;
@@ -76,14 +95,19 @@ namespace SayWhat.MongoDAL.Users
         {
             _lastActivity = DateTime.Now;
         }
-        public void OnNewWordAdded(int pairsCount, int examplesCount)
+        
+        public void OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
         {
             _wordsCount++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.WordsAdded++;
             month.WordsAdded++;
-            OnPairsAdded(pairsCount, examplesCount);
+            
+            OnPairsAdded(
+                statsChanging:     statsChanging, 
+                pairsCount:        pairsCount, 
+                examplesCount:     examplesCount);
         }
 
         private (DailyStats, MonthsStats) FixStatsAndGetCurrent()
@@ -133,22 +157,31 @@ namespace SayWhat.MongoDAL.Users
             return (daily, monthly);
         }
 
-        public void OnPairsAdded(int pairsCount, int examplesCount)
+        public void OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
         {
             _pairsCount    += pairsCount;
             _examplesCount += examplesCount;
-
+            
             var (today, month) = FixStatsAndGetCurrent();
-
             today.PairsAdded+= pairsCount;
             today.ExamplesAdded+= examplesCount;
-
             month.PairsAdded+= pairsCount;
             month.ExamplesAdded+= examplesCount;
-
+            
+            AppendChangingsToStats(statsChanging, today, month);
             OnAnyActivity();
         }
 
+        private void AppendChangingsToStats(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats)
+        {
+            dailyStats.AppendStats(statsChanging);
+            monthsStats.AppendStats(statsChanging);
+            _a0WordCount += statsChanging.A0WordsCountChanging;
+            _a1WordCount += statsChanging.A1WordsCountChanging;
+            _a2WordCount += statsChanging.A2WordsCountChanging;
+            _a3WordCount += statsChanging.A3WordsCountChanging;
+            _leftToA2    += statsChanging.LeftToA2Changing;
+        }
         public void OnEnglishWordTranslationRequest()
         {
             _englishWordTranslationRequestsCount++;
@@ -159,22 +192,25 @@ namespace SayWhat.MongoDAL.Users
             _russianWordTranslationRequestsCount++;
             OnAnyActivity();
         }
-        public void OnQuestionPassed()
+        public void OnQuestionPassed(WordStatsChanging statsChanging)
         {
             _questionPassed++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.QuestionsPassed++;
             month.QuestionsPassed++;
+            AppendChangingsToStats(statsChanging, today, month);
             OnAnyActivity();
         }
-        public void OnQuestionFailed()
+        public void OnQuestionFailed(WordStatsChanging statsChanging)
         {
             _questionFailed++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.QuestionsFailed++;
             month.QuestionsFailed++;
+            
+            AppendChangingsToStats(statsChanging, today, month);
             OnAnyActivity();
         }
         public void OnLearningDone()
@@ -186,22 +222,5 @@ namespace SayWhat.MongoDAL.Users
             month.LearningDone++;
             OnAnyActivity();
         }
-        public void UpdateScore(int newScore)
-        {
-            _totalScore = newScore;
-            var(today, month) = FixStatsAndGetCurrent();
-
-            today.TotalScore = newScore;
-            month.TotalScore =  newScore;
-            
-            OnAnyActivity();
-        }
-
-    }
- 
-    public enum UserSource
-    {
-        Unknown = 0,
-        Telegram = 1,
     }
 }

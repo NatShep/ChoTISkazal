@@ -11,7 +11,7 @@ namespace SayWhat.Bll
         {
             Word = pairModel.Word;
             Created = DateTime.Now;
-            AggregateScoreBefore = pairModel.CurrentScore;
+            AggregateScoreBefore = pairModel.CurrentOrderScore;
             ExamsPassed = pairModel.QuestionAsked;
             PassedScoreBefore = pairModel.AbsoluteScore;
             PreviousExam = pairModel.LastExam;

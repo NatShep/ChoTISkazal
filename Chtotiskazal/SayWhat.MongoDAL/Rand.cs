@@ -10,7 +10,7 @@ namespace SayWhat.MongoDAL
         
         public static T GetRandomItem<T>(this IList<T> origin)
         {
-            var rnd = Rnd.Next(origin.Count - 1);
+            var rnd = Rnd.Next(origin.Count);
             return origin[rnd];
         }
         public static IEnumerable<T> Randomize<T>(this IEnumerable<T> origin)
@@ -36,11 +36,11 @@ namespace SayWhat.MongoDAL
             return randNormal;
         }
 
-        public static int RandomIn(in int examSettingsMinLearningWordsCountInOneExam, in int examSettingsMaxLearningWordsCountInOneExam)
-            => Rnd.Next(examSettingsMinLearningWordsCountInOneExam, examSettingsMaxLearningWordsCountInOneExam);
+        public static int RandomIn(int inclusiveMin, int inclusiveMax)
+            => Rnd.Next(inclusiveMin, inclusiveMax+1);
 
-        public static int UpTo(in int examSettingsMaxAdvancedQuestionsCount)
-            => Rnd.Next(examSettingsMaxAdvancedQuestionsCount);
+        public static int UpTo(in int inclusiveMax)
+            => Rnd.Next(inclusiveMax+1);
 
         public static int Next()
             => Rnd.Next();

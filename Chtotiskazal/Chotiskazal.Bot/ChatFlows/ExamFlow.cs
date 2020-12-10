@@ -8,7 +8,6 @@ using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -116,6 +115,8 @@ namespace Chotiskazal.Bot.ChatFlows
                     
                     sw.Stop();
                     questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
+                    var originRate =word.Score;
+                    
                     switch (result)
                     {
                         case ExamResult.Impossible:
@@ -123,15 +124,17 @@ namespace Chotiskazal.Bot.ChatFlows
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:
-                            user.OnQuestionPassed();
+                                                        
                             await _usersWordsService.RegisterSuccess(word);
+                            user.OnQuestionPassed(word.Score - originRate);
+
                             await WritePassed();
                             Botlog.SaveQuestionMetricInfo(questionMetric,_chatIo.ChatId );
                             questionsCount++;
                             questionsPassed++;
                             break;
                         case ExamResult.Failed:
-                            user.OnQuestionFailed();
+                            user.OnQuestionFailed(word.Score - originRate);
                             await _usersWordsService.RegisterFailure(word);
                             await WriteFailed();
                             questionMetric.Result = 0;

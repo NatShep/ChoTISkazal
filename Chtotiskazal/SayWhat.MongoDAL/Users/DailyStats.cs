@@ -1,10 +1,36 @@
 ﻿using System;
 using MongoDB.Bson.Serialization.Attributes;
+using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.MongoDAL.Users
 {
     public class StatsBase
     {
+        [BsonElement("a0c")] 
+        [BsonIgnoreIfDefault]
+        private int _a0WordCount;
+        [BsonElement("a1c")]
+        [BsonIgnoreIfDefault]
+        private int _a1WordCount;
+        [BsonElement("a2c")] 
+        [BsonIgnoreIfDefault]
+        private int _a2WordCount;
+        [BsonElement("a3c")] 
+        [BsonIgnoreIfDefault]
+        private int _a3WordCount;
+        [BsonElement("l2a2c")] 
+        private double _leftToA2;
+        public WordStatsChanging CummulativeStatsChanging 
+            => new WordStatsChanging(_a0WordCount, _a1WordCount, _a2WordCount, _a3WordCount, _leftToA2);
+        public void AppendStats(WordStatsChanging statsChanging)
+        {
+            _a0WordCount += statsChanging.A0WordsCountChanging;
+            _a1WordCount += statsChanging.A1WordsCountChanging;
+            _a2WordCount += statsChanging.A2WordsCountChanging;
+            _a3WordCount += statsChanging.A3WordsCountChanging;
+            _leftToA2+= statsChanging.LeftToA2Changing;
+        }
+        
         [BsonElement("wa")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
@@ -64,6 +90,7 @@ namespace SayWhat.MongoDAL.Users
             set => Day = (ushort) (value - DayCountStarts).TotalDays;
         }
 
+        
     }
 
     public class MonthsStats : StatsBase
