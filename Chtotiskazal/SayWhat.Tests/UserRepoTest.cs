@@ -104,6 +104,45 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual(1,read.LastMonthStats.Count);
         }
         
+        [TestCase(1,0,0,0,0)]
+        [TestCase(1,1,0,0,0)]
+        [TestCase(1,0,1,0,0)]
+        [TestCase(1,0,0,1,0)]
+        [TestCase(1,0,0,0,2)]
+        [TestCase(0,3,1,5,9)]
+        public async Task OnChangingsApplied_UpdatedModelContainsA0123AndZenIndex(int a0Count,int a1Count,int a2Count,int a3Count, double zenIndex)
+        {
+            var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
+            model.OnPairsAdded(new WordStatsChanging(a0Count,0,0,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,a1Count,0,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,a2Count,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,0,a3Count,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,0,0,zenIndex),  1,1);
+
+            await _repo.Update(model);
+
+            var userRead = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
+            Assert.AreEqual(a0Count,userRead.A0WordCount);
+            Assert.AreEqual(a1Count,userRead.A1WordCount);
+            Assert.AreEqual(a2Count,userRead.A2WordCount);
+            Assert.AreEqual(a3Count,userRead.A3WordCount);
+            Assert.AreEqual(zenIndex,userRead.LeftToA2);
+
+            var lastDay = userRead.GetToday();
+            Assert.AreEqual(a0Count,lastDay.CummulativeStatsChanging.A0WordsCountChanging);
+            Assert.AreEqual(a1Count,lastDay.CummulativeStatsChanging.A1WordsCountChanging);
+            Assert.AreEqual(a2Count,lastDay.CummulativeStatsChanging.A2WordsCountChanging);
+            Assert.AreEqual(a3Count,lastDay.CummulativeStatsChanging.A3WordsCountChanging);
+            Assert.AreEqual(zenIndex,lastDay.CummulativeStatsChanging.LeftToA2Changing);
+            
+            var lastMonth = userRead.GetLastMonth();
+            Assert.AreEqual(a0Count, lastMonth.CummulativeStatsChanging.A0WordsCountChanging);
+            Assert.AreEqual(a1Count, lastMonth.CummulativeStatsChanging.A1WordsCountChanging);
+            Assert.AreEqual(a2Count, lastMonth.CummulativeStatsChanging.A2WordsCountChanging);
+            Assert.AreEqual(a3Count, lastMonth.CummulativeStatsChanging.A3WordsCountChanging);
+            Assert.AreEqual(zenIndex,lastMonth.CummulativeStatsChanging.LeftToA2Changing);
+        }
+        
         [TestCase(1)]
         [TestCase(42)]
         public async Task OnQuestionPassed_UpdatedModelContainsMothlyAndDailyStats(int updateCount)

@@ -20,6 +20,8 @@ namespace SayWhat.MongoDAL.Users
         private int _a3WordCount;
         [BsonElement("l2a2c")] 
         private double _leftToA2;
+
+        public int WordsLearnt => Math.Max(0, _a2WordCount) + Math.Max(0, _a3WordCount);
         public WordStatsChanging CummulativeStatsChanging 
             => new WordStatsChanging(_a0WordCount, _a1WordCount, _a2WordCount, _a3WordCount, _leftToA2);
         public void AppendStats(WordStatsChanging statsChanging)
@@ -41,10 +43,7 @@ namespace SayWhat.MongoDAL.Users
         [BsonIgnoreIfDefault]
         public int ExamplesAdded { get; set; }
 
-        [BsonElement("w")]
-        [BsonDefaultValue(0)]
-        [BsonIgnoreIfDefault]
-        public int WordsLearnt { get; set; }
+       
         
         [BsonElement("pc")]
         [BsonDefaultValue(0)]
@@ -64,10 +63,6 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("ld")]
         [BsonIgnoreIfDefault]
         public int LearningDone { get; set; }
-        
-        [BsonElement("s")]
-        [BsonIgnoreIfDefault]
-        public int TotalScore { get; set; }
     }
     [BsonIgnoreExtraElements]
     public class TotalStats : StatsBase

@@ -47,15 +47,13 @@ namespace SayWhat.MongoDAL.Users
         [BsonDefaultValue(null)]
         [BsonIgnoreIfDefault]
         [BsonElement("lds")]
-        public Queue<DailyStats> LastDaysStats { get; set; }
+        public List<DailyStats> LastDaysStats { get; set; }
         
         [BsonDefaultValue(null)]
         [BsonIgnoreIfDefault]
         [BsonElement("lms")]
         public List<MonthsStats> LastMonthStats { get; set; }
         
-        [BsonElement("stats")]
-        public TotalStats TotalStats { get; set; }
 
         [BsonElement("scr")] private int _totalScore; 
         [BsonElement("ldc")] private int _learningDone; 
@@ -76,9 +74,10 @@ namespace SayWhat.MongoDAL.Users
         private int _a3WordCount;
         [BsonElement("l2a2c")] 
         private double _leftToA2;
+        
         #endregion
 
-        public DateTime LastActivity => _lastActivity;
+         public DateTime LastActivity => _lastActivity;
          public long? TelegramId => _telegramId;
          public string TelegramFirstName => _telegramFirstName;
          public string TelegramLastName => _telegramLastName;
@@ -89,12 +88,20 @@ namespace SayWhat.MongoDAL.Users
          public int ExamplesCount => _examplesCount;
          public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
          public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
+         public int WordsLearned => _a2WordCount + _a3WordCount;
+            
+         public int A0WordCount => _a0WordCount;
+         public int A1WordCount => _a1WordCount;
+         public int A2WordCount => _a2WordCount;
+         public int A3WordCount => _a3WordCount;
 
-         
-        public void OnAnyActivity()
-        {
+         public double LeftToA2 => _leftToA2;
+
+
+         public void OnAnyActivity()
+         {
             _lastActivity = DateTime.Now;
-        }
+         }
         
         public void OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
         {
@@ -112,31 +119,18 @@ namespace SayWhat.MongoDAL.Users
 
         private (DailyStats, MonthsStats) FixStatsAndGetCurrent()
         {
-            var today = DateTime.Today;
-            DailyStats daily;
+            var daily = GetToday();
+
+            var monthly = GetLastMonth();
+
+            return (daily, monthly);
+        }
+
+        public MonthsStats GetLastMonth()
+        {
             MonthsStats monthly;
-            if (LastDaysStats == null || LastDaysStats.Count == 0)
-            {
-                daily = new DailyStats {Date = today};
-                LastDaysStats = new Queue<DailyStats>();
-                LastDaysStats.Enqueue(daily);
-            }
-            else
-            {
-                var oldest = LastDaysStats.Peek();
-                var oldestDelta = (today - oldest.Date);
-                if(oldestDelta.TotalDays>30)
-                    LastDaysStats.Dequeue();
-                var lastDay = LastDaysStats.Last();
-                if (lastDay.Date != today)
-                {
-                    daily = new DailyStats {Date = today};
-                    LastDaysStats.Enqueue(daily);
-                }
-                else
-                    daily = lastDay;
-            }
-            
+            var today = DateTime.Today;
+
             var thisMonth = new DateTime(today.Year, today.Month, 1);
             if (LastMonthStats == null || LastMonthStats.Count == 0)
             {
@@ -154,7 +148,36 @@ namespace SayWhat.MongoDAL.Users
                 }
             }
 
-            return (daily, monthly);
+            return monthly;
+        }
+
+        public DailyStats GetToday()
+        {
+            var today = DateTime.Today;
+            DailyStats daily;
+            if (LastDaysStats == null || LastDaysStats.Count == 0)
+            {
+                daily = new DailyStats {Date = today};
+                LastDaysStats = new List<DailyStats>();
+                LastDaysStats.Add(daily);
+            }
+            else
+            {
+                var oldest = LastDaysStats[0];
+                var oldestDelta = (today - oldest.Date);
+                if (oldestDelta.TotalDays > 30)
+                    LastDaysStats.RemoveAt(0);
+                var lastDay = LastDaysStats.Last();
+                if (lastDay.Date != today)
+                {
+                    daily = new DailyStats {Date = today};
+                    LastDaysStats.Add(daily);
+                }
+                else
+                    daily = lastDay;
+            }
+
+            return daily;
         }
 
         public void OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
@@ -181,6 +204,12 @@ namespace SayWhat.MongoDAL.Users
             _a2WordCount += statsChanging.A2WordsCountChanging;
             _a3WordCount += statsChanging.A3WordsCountChanging;
             _leftToA2    += statsChanging.LeftToA2Changing;
+
+            if (_a0WordCount < 0) _a0WordCount = 0;
+            if (_a1WordCount < 0) _a1WordCount = 0;
+            if (_a2WordCount < 0) _a2WordCount = 0;
+            if (_a3WordCount < 0) _a3WordCount = 0;
+
         }
         public void OnEnglishWordTranslationRequest()
         {
@@ -222,5 +251,22 @@ namespace SayWhat.MongoDAL.Users
             month.LearningDone++;
             OnAnyActivity();
         }
+
+        
+        public IReadOnlyList<DailyStats> GetLastWeek()
+        {
+            var today = GetToday();
+            var dailyStats = new List<DailyStats>(7);
+            dailyStats.Add(today);
+            for (int i = 1; i < LastDaysStats.Count-1; i++)
+            {
+                var stats = LastDaysStats[^i];
+                if ((today.Date - stats.Date).TotalDays>7)
+                    break;
+                dailyStats.Add(stats);
+            }
+            return dailyStats;
+        }
+        
     }
 }

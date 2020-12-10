@@ -133,7 +133,7 @@ namespace SayWhat.MongoDAL.Tests
         }
         
         [Test]
-        public async Task Update_GetReturnsUpdated()
+        public async Task AddTranslations_Update_GetReturnsUpdated()
         {
             var user = new UserModel {Id = ObjectId.GenerateNewId()};
             var word = new UserWordModel(user.Id, "table", "стол");
@@ -156,5 +156,6 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual("стол",readWord.Translations[1].Word);
             Assert.AreEqual("таблица",readWord.Translations[0].Word);
         }
+        
     }
 }

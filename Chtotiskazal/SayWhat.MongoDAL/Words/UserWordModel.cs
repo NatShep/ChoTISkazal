@@ -48,7 +48,8 @@ namespace SayWhat.MongoDAL.Words
         /// <summary>
         /// Last time the question was asked
         /// </summary>
-        [BsonElement("askt")] private DateTime? _lastQuestionTimestamp;
+        [BsonElement(UserWordsRepo.LastQuestionAskedTimestampFieldName)] 
+        private DateTime? _lastQuestionTimestamp;
 
         public ObjectId Id { get; set; }
 
@@ -76,7 +77,7 @@ namespace SayWhat.MongoDAL.Words
         /// <summary>
         /// Number of correctly answered questions 
         /// </summary>
-        [BsonElement("qp")] private int _questionPassed;
+        [BsonElement(UserWordsRepo.QuestionPassedFieldName)] private int _questionPassed;
 
         /// <summary>
         /// Number of asked question 

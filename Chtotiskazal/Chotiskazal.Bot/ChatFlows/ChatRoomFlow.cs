@@ -96,24 +96,19 @@ namespace Chotiskazal.Bot.ChatFlows
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task StartLearning() => new ExamFlow(ChatIo, _usersWordsService,_settings.ExamSettings)
+        private Task StartLearning() => new ExamFlow(ChatIo, _userService,_usersWordsService, _settings.ExamSettings)
             .EnterAsync(UserModel);
 
         private Task StartToAddNewWords(string text = null) 
             => new AddingWordsMode(ChatIo, _addWordsService).Enter(UserModel, text);
 
-        private async Task ShowStats() =>
-            await ChatIo.SendMessageAsync("Your stats: \r\n" +
-                                          $"Words: {UserModel.WordsCount}\r\n" +
-                                          $"Translations: {UserModel.PairsCount}\r\n" +
-                                          $"Examples: {UserModel.ExamplesCount}");
-
+      
         private Task HandleMainMenu(string command){
             switch (command){
                 case "/help":   return SendHelp();
                 case "/add":    return StartToAddNewWords();
                 case "/learn":  return StartLearning();
-                case "/stats":  return ShowStats();
+                case "/stats":  return ChatProcedures.ShowStats(ChatIo, UserModel);
                 case "/start":  return ShowMainMenu();
             }
             return Task.CompletedTask;
@@ -153,7 +148,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             return;
                         }
                         if (btn == InlineButtons.Stats.CallbackData) {
-                            await ShowStats();
+                            await ChatProcedures.ShowStats(ChatIo, UserModel);;
                             return;
                         }
                     }

@@ -16,14 +16,17 @@ namespace Chotiskazal.Bot.ChatFlows
     {
         private readonly ExamSettings _examSettings;
         private readonly ChatIO _chatIo;
+        private readonly UserService _userService;
         private readonly UsersWordsService _usersWordsService;
 
         public ExamFlow(
             ChatIO chatIo, 
+            UserService userService,
             UsersWordsService usersWordsService, 
             ExamSettings examSettings)
         {
             _chatIo = chatIo;
+            _userService = userService;
             _usersWordsService = usersWordsService;
             _examSettings = examSettings;
         }
@@ -154,6 +157,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 Botlog.RegisterExamInfo(user.TelegramId, started, questionsCount, questionsPassed);
             }              
             user.OnLearningDone();
+            var updateUserTask = _userService.Update(user);
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(user,10);
 
             var doneMessage = new StringBuilder($"*Learning done:  {questionsPassed}/{questionsCount}*\r\n\r\n```\r\n");
@@ -165,6 +169,8 @@ namespace Chotiskazal.Bot.ChatFlows
 
             doneMessage.Append("```\r\n\r\nEnter new word to translate or /start to return to main menu");
             await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
+            await updateUserTask;
+            await finializeScoreUpdateTask;
         }
 
         private async Task WriteDontPeakMessage()

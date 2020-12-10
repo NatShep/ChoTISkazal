@@ -13,10 +13,11 @@ namespace SayWhat.MongoDAL.Words
         public const string CurrentScoreFieldName = "cur";
         public const string AbsoluteScoreFieldName = "abs";
         public const string QuestionAskedFieldName = "qa";
+        public const string QuestionPassedFieldName = "qp";
         public const string UserIdFieldName = "uid";
         public const string OriginWordFieldName = "w";
         public const string LastUpdateScoreTime = "updt";
-
+        public const string LastQuestionAskedTimestampFieldName = "askt";
         private readonly IMongoDatabase _db;
 
         public UserWordsRepo(IMongoDatabase db) => _db = db;
@@ -36,7 +37,7 @@ namespace SayWhat.MongoDAL.Words
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
                     Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
                 ))
-                .SortBy(a=>a.CurrentOrderScore)
+                .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
                 .Limit(maxCount)
                 .ToListAsync();
 
@@ -46,7 +47,7 @@ namespace SayWhat.MongoDAL.Words
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
                     Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
                 ))
-                .SortBy(a=>a.ScoreUpdatedTimestamp)
+                .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:1}}")
                 .Limit(maxCount)
                 .ToListAsync();
 
@@ -58,12 +59,12 @@ namespace SayWhat.MongoDAL.Words
         public Task UpdateMetrics(UserWordModel word)
         {
             var updateDef = Builders<UserWordModel>.Update
-                .Set(o => o.ScoreUpdatedTimestamp,   DateTime.Now)
-                .Set(o => o.AbsoluteScore,   word.AbsoluteScore)
-                .Set(o => o.CurrentOrderScore,   word.CurrentOrderScore)
-                .Set(o => o.QuestionPassed,   word.QuestionPassed)
-                .Set(o => o.QuestionAsked, word.QuestionAsked)
-                .Set(o => o.LastQuestionTimestamp,   word.LastQuestionTimestamp);
+                .Set(LastUpdateScoreTime,   DateTime.Now)
+                .Set(AbsoluteScoreFieldName,   word.AbsoluteScore)
+                .Set(CurrentScoreFieldName,   word.CurrentOrderScore)
+                .Set(QuestionPassedFieldName,   word.QuestionPassed)
+                .Set(QuestionAskedFieldName, word.QuestionAsked)
+                .Set(LastQuestionAskedTimestampFieldName,   word.LastQuestionTimestamp);
 
             return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
         }
@@ -115,7 +116,7 @@ namespace SayWhat.MongoDAL.Words
         public Task<List<UserWordModel>> GetOldestUpdatedWords(UserModel user, int count) =>
             Collection
                 .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-                .SortBy(a=>a.ScoreUpdatedTimestamp)
+                .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:1}}")
                 .Limit(count)
                 .ToListAsync();
 

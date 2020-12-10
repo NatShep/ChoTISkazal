@@ -16,7 +16,7 @@ namespace SayWhat.MongoDAL.Words
             _lastAskTime = lastAskTime;
         }
 
-        public static WordStatsChanging operator -(UserWordScore earlierScore, UserWordScore laterScore) 
+        public static WordStatsChanging operator -(UserWordScore laterScore,UserWordScore earlierScore) 
             => WordStatsChanging.Create(earlierScore._absoluteRate, laterScore._absoluteRate);
     }
 }
