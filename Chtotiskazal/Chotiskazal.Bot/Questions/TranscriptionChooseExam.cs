@@ -15,9 +15,14 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var variants = examList.SelectMany(e => e.GetTranscription())
-                .Where(e => !word.GetTranscription().ToList().Contains(e))
-                .Union(word.GetTranscription())
+            var transcription = word.GetTranscriptions().ToList().GetRandomItem();
+
+            if (string.IsNullOrWhiteSpace(transcription) || transcription!="")
+                return ExamResult.Impossible;
+            
+            var variants = examList.SelectMany(e => e.GetTranscriptions())
+                .Where(e => !word.GetTranscriptions().ToList().Contains(e))
+                .Append(transcription)
                 .Randomize()
                 .ToList();
 
@@ -30,7 +35,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (word.GetTranscription().Contains(variants[choice.Value]))
+            if (word.GetTranscriptions().Contains(variants[choice.Value]))
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;

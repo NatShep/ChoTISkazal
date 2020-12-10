@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
@@ -5,37 +6,37 @@ using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class RuChooseByTranscriptionExam:IExam
+    public class EngChooseMultipleTranslationsExam:IExam
     {
         public bool NeedClearScreen => false;
 
-        public string Name => "Ru Choose By Transcription";
+        public string Name => "Eng Choose";
 
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translation = word.GetUserWordTranslations().ToList().GetRandomItem();
+            var translations = word.TranslationAsList;
             
-            if (string.IsNullOrWhiteSpace(translation.Transcription) || translation.Transcription!="")
-                return ExamResult.Impossible;
-            
-            var variants = examList.Where(e=>!e.GetTranscriptions().ToList().Contains(translation.Transcription))
-                .SelectMany(e => e.GetTranslations())
-                .Take(5)
-                .Append(translation.Word)
+            var variants = examList
+                .Where(e => e.TranslationAsList != word.TranslationAsList)
+                .Select(e => e.TranslationAsList)
                 .Randomize()
+                .Take(5)
+                .Append(translations)
                 .ToList();
 
-
-            var msg = $"=====>   {translation.Transcription}    <=====\r\n" +
-                      $"Choose which word has this transcription";
+            var msg = $"=====>   {word.Word}    <=====\r\n" +
+                      $"Choose the translation";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (word.GetTranslations().Contains(variants[choice.Value]))
+            var answer = variants[choice.Value].Split(",")
+                .Select(e => e.Trim()).ToList();
+            
+            if (!answer.Except(word.GetTranslations()).Any())
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;
@@ -43,8 +44,6 @@ namespace Chotiskazal.Bot.Questions
 
             await service.RegisterFailure(word);
             return ExamResult.Failed;
-
         }
-        
     }
 }

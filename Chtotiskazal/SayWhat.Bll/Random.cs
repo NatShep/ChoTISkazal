@@ -10,7 +10,7 @@ namespace SayWhat.Bll
         
         public static T GetRandomItem<T>(this IList<T> origin)
         {
-            var rnd = Rnd.Next(origin.Count - 1);
+            var rnd = Rnd.Next(origin.Count);
             return origin[rnd];
         }
         public static IEnumerable<T> Randomize<T>(this IEnumerable<T> origin)

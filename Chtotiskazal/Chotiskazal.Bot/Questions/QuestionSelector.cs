@@ -118,13 +118,43 @@ namespace Chotiskazal.Bot.Questions
             exam: new TranscriptionChooseExam(),
             expectedScore: 5,
             frequency:10);
+        
+        private readonly ExamAndPreferredScore _hideousTranscriptionExam = new ExamAndPreferredScore(
+            exam: new ClearScreenExamDecorator(new TranscriptionChooseExam()),
+            expectedScore: 8,
+            frequency:10);
 
 
-        private readonly ExamAndPreferredScore _RuChooseByTranscriptionExam = new ExamAndPreferredScore(
+        private readonly ExamAndPreferredScore _ruChooseByTranscriptionExam = new ExamAndPreferredScore(
             exam: new RuChooseByTranscriptionExam(),
             expectedScore: 10,
             frequency: 10);
         
+        private readonly ExamAndPreferredScore _hideousRuChooseByTranscriptionExam = new ExamAndPreferredScore(
+            exam: new ClearScreenExamDecorator(new RuChooseByTranscriptionExam()),
+            expectedScore: 12,
+            frequency: 10);
+        
+        private readonly ExamAndPreferredScore _isItRightTranslationExam = new ExamAndPreferredScore(
+            exam:new IsItRightTranslationExam(), 
+            expectedScore:5,
+            frequency:10);
+        
+        private readonly ExamAndPreferredScore _hideousIsItRightTranslationExam = new ExamAndPreferredScore(
+            exam: new ClearScreenExamDecorator(new IsItRightTranslationExam()), 
+            expectedScore:7,
+            frequency:10);
+        
+        private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new ExamAndPreferredScore(
+            exam:new EngChooseMultipleTranslationsExam(),  
+            expectedScore:5,
+            frequency:500);
+
+        private readonly ExamAndPreferredScore _hideousEngChooseMultipleTranslationExam = new ExamAndPreferredScore(
+            exam: new ClearScreenExamDecorator(new EngChooseMultipleTranslationsExam()),
+            expectedScore: 8,
+            frequency: 10);
+
         public QuestionSelector(DictionaryService dictionaryService)
         {
             _simpleExamsList = new[]
@@ -134,21 +164,25 @@ namespace Chotiskazal.Bot.Questions
                 _ruPhraseChoose,
                 _engPhraseChoose,
                 _engChooseWordInPhrase,
-             //
-                _RuChooseByTranscriptionExam,
-                _transcriptionExam
+                _transcriptionExam,
+                _isItRightTranslationExam,
+                _engChooseMultipleTranslationExam,
             };
             _intermidiateExamsList = new[]
             {
                 _engChoose,
                 _ruChoose,
+                _ruPhraseChoose,
+                _engPhraseChoose,
                 _engTrust,
                 _ruTrust,
                 _hideousRuTrust,
                 _hideousEngTrust,
-                //
-                _RuChooseByTranscriptionExam,
-                _transcriptionExam
+                _ruChooseByTranscriptionExam,
+                _transcriptionExam,
+                _isItRightTranslationExam,
+                _engChooseMultipleTranslationExam,
+                _hideousEngChooseMultipleTranslationExam,
             };
             _advancedExamsList = new[]
             {
@@ -173,9 +207,14 @@ namespace Chotiskazal.Bot.Questions
                 _engChooseWordInPhrase,
                 _clearEngChooseWordInPhrase,
                 _assemblePhraseExam,
-                //
-                _RuChooseByTranscriptionExam,
-                _transcriptionExam
+               _ruChooseByTranscriptionExam,
+               _hideousRuChooseByTranscriptionExam,
+               _hideousTranscriptionExam,
+               _hideousIsItRightTranslationExam,
+                _transcriptionExam,
+                _isItRightTranslationExam,
+                _engChooseMultipleTranslationExam,
+                _hideousEngChooseMultipleTranslationExam,
             };
         }
 

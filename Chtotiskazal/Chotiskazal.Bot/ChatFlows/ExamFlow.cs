@@ -50,8 +50,8 @@ namespace Chotiskazal.Bot.ChatFlows
             await startupScoreUpdate;
             await typing;
             var learningWords
-                    = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
-
+                  = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
+           
             
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= 4)

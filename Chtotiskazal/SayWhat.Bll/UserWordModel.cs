@@ -24,7 +24,7 @@ namespace SayWhat.Bll
 
          public IEnumerable<string> GetTranslations() => _entity.Translations.Select(t => t.Word);
 
-         public IEnumerable<string> GetTranscription() => _entity.Translations.Select(t => t.Transcription);
+         public IEnumerable<string> GetTranscriptions() => _entity.Translations.Select(t => t.Transcription);
 
          public IEnumerable<UserWordTranslation> GetUserWordTranslations() => _entity.Translations;
 
