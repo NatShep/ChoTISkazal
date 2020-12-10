@@ -1,32 +1,34 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
-using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class EngChooseExam:IExam
+    public class RuChooseByTranscriptionExam:IExam
     {
         public bool NeedClearScreen => false;
 
-        public string Name => "Eng Choose";
+        public string Name => "Ru Choose By Transcription";
 
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.GetTranslations().ToList().GetRandomItem();
-           
-            var variants = examList.SelectMany(e => e.GetTranslations())
-                .Where(e => !word.GetTranslations().ToList().Contains(e))
-                .Randomize()
-                .Take(6-1)
-                .Append(translations)
+            var translation = word.GetUserWordTranslations().ToList().GetRandomItem();
+            
+            if (string.IsNullOrWhiteSpace(translation.Transcription) || translation.Transcription!="")
+                return ExamResult.Impossible;
+            
+            var variants = examList.Where(e=>!e.GetTranscriptions().ToList().Contains(translation.Transcription))
+                .SelectMany(e => e.GetTranslations())
+                .Take(5)
+                .Append(translation.Word)
                 .Randomize()
                 .ToList();
 
-            var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      $"Choose the translation";
+
+            var msg = $"=====>   {translation.Transcription}    <=====\r\n" +
+                      $"Choose which word has this transcription";
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
@@ -41,6 +43,8 @@ namespace Chotiskazal.Bot.Questions
 
             await service.RegisterFailure(word);
             return ExamResult.Failed;
+
         }
+        
     }
 }

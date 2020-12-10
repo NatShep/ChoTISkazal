@@ -1,12 +1,12 @@
-﻿using System.Linq;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
-using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class EngChooseExam:IExam
+    public class EngChooseMultipleTranslationsExam:IExam
     {
         public bool NeedClearScreen => false;
 
@@ -15,14 +15,14 @@ namespace Chotiskazal.Bot.Questions
         public async Task<ExamResult> Pass(ChatIO chatIo, UsersWordsService service, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.GetTranslations().ToList().GetRandomItem();
-           
-            var variants = examList.SelectMany(e => e.GetTranslations())
-                .Where(e => !word.GetTranslations().ToList().Contains(e))
+            var translations = word.TranslationAsList;
+            
+            var variants = examList
+                .Where(e => e.TranslationAsList != word.TranslationAsList)
+                .Select(e => e.TranslationAsList)
                 .Randomize()
-                .Take(6-1)
+                .Take(5)
                 .Append(translations)
-                .Randomize()
                 .ToList();
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
@@ -33,7 +33,10 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (word.GetTranslations().Contains(variants[choice.Value]))
+            var answer = variants[choice.Value].Split(",")
+                .Select(e => e.Trim()).ToList();
+            
+            if (!answer.Except(word.GetTranslations()).Any())
             {
                 await service.RegisterSuccess(word);
                 return ExamResult.Passed;

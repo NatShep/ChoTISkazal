@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Words;
 
@@ -22,6 +23,10 @@ namespace SayWhat.Bll
          public const double ReducingPerPointFactor = 1.7;
 
          public IEnumerable<string> GetTranslations() => _entity.Translations.Select(t => t.Word);
+
+         public IEnumerable<string> GetTranscriptions() => _entity.Translations.Select(t => t.Transcription);
+
+         public IEnumerable<UserWordTranslation> GetUserWordTranslations() => _entity.Translations;
 
          public void SetTranslation(string[] translations) =>
              _entity.Translations = translations
@@ -44,6 +49,7 @@ namespace SayWhat.Bll
 
          public bool HasAnyPhrases => _entity.Translations.Any(t => t.Examples?.Any()==true);
          public string Word => _entity.Word;
+         
          public Example GetRandomExample() =>
              Phrases
                  .ToList()

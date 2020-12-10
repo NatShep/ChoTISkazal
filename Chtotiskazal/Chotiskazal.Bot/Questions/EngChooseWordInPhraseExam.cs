@@ -27,6 +27,14 @@ namespace Chotiskazal.Bot.Questions
             if (replaced == phrase.OriginPhrase)
                 return ExamResult.Impossible;
 
+            var otherExamples = examList
+                .SelectMany(e => e.Phrases)
+                .Where(p => !string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
+                .ToArray();
+
+            if(!otherExamples.Any())
+                return ExamResult.Impossible;
+            
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine();
@@ -35,9 +43,10 @@ namespace Chotiskazal.Bot.Questions
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine($"Choose missing word...");
 
-            var variants = examList
-                .Where(e => !e.Phrases.Select(p => p.TranslatedPhrase).ToList().Contains(phrase.TranslatedPhrase))
-                .Select(w => w.Word)
+
+            var variants = otherExamples
+                .Select(e => e.OriginWord).Where(e=>e!=phrase.OriginWord)
+                .Distinct()
                 .Randomize()
                 .Take(5)
                 .Append(phrase.OriginWord)
