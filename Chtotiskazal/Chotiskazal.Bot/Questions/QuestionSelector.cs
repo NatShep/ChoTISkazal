@@ -148,7 +148,7 @@ namespace Chotiskazal.Bot.Questions
         private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new ExamAndPreferredScore(
             exam:new EngChooseMultipleTranslationsExam(),  
             expectedScore:5,
-            frequency:500);
+            frequency:10);
 
         private readonly ExamAndPreferredScore _hideousEngChooseMultipleTranslationExam = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngChooseMultipleTranslationsExam()),
