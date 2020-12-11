@@ -8,36 +8,28 @@ namespace SayWhat.MongoDAL.Users
     {
         [BsonElement("sc")] 
         private int[] _scoreChangings;
-        
-        [BsonElement("a0c")] 
-        [BsonIgnoreIfDefault]
-        private int _a0WordCount;
-        [BsonElement("a1c")]
-        [BsonIgnoreIfDefault]
-        private int _a1WordCount;
-        [BsonElement("a2c")] 
-        [BsonIgnoreIfDefault]
-        private int _a2WordCount;
-        [BsonElement("a3c")] 
-        [BsonIgnoreIfDefault]
-        private int _a3WordCount;
-        [BsonElement("l2a2c")]
-        [BsonIgnoreIfDefault]
-        private double _leftToA2Changing;
         [BsonElement("sd")] 
         [BsonIgnoreIfDefault]
         private double _absoluteScoreChanging;
-        
         [BsonElement("oc")] 
         [BsonIgnoreIfDefault]
         private int _outdatedChanging;
 
-        public int WordsLearnt => Math.Max(0, _a2WordCount) + Math.Max(0, _a3WordCount);
+        public int CountOf(int minLearnCategory, int maxLearnCategory)
+        {
+            var acc = 0;
+            for (int i = minLearnCategory; i < _scoreChangings.Length && i< maxLearnCategory; i++)
+            {
+                acc += _scoreChangings[i];
+            }
+
+            return acc;
+        }
+        public int WordsLearnt => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore,10);
         public WordStatsChanging CummulativeStatsChanging 
             => new WordStatsChanging(
                 _scoreChangings,
                 _absoluteScoreChanging,
-                _leftToA2Changing,
                 _outdatedChanging);
         public void AppendStats(WordStatsChanging statsChanging)
         {
@@ -46,7 +38,6 @@ namespace SayWhat.MongoDAL.Users
             else
                 _scoreChangings.AddValuesInplace(statsChanging.WordScoreChangings);
             
-            _leftToA2Changing      += statsChanging.LeftToA2Changing;
             _absoluteScoreChanging += statsChanging.AbsoluteScoreChanging;
             _outdatedChanging      += statsChanging.OutdatedChanging;
         }
@@ -99,7 +90,7 @@ namespace SayWhat.MongoDAL.Users
 
         
     }
-
+    [BsonIgnoreExtraElements]
     public class MonthsStats : StatsBase
     {
         [BsonElement("m")]

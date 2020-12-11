@@ -19,7 +19,7 @@ namespace SayWhat.MongoDAL.Words
         {
             var changings = new int[MaxObservingScore+1];
             changings[CategorizedScore(absoluteScore)]++;
-            return new WordStatsChanging(changings,absoluteScore,WordLeaningGlobalSettings.LearnedWordMinScore,0);
+            return new WordStatsChanging(changings,absoluteScore,0);
         }
 
         public static WordStatsChanging operator +(WordStatsChanging lstats, WordStatsChanging rstats)
@@ -31,7 +31,6 @@ namespace SayWhat.MongoDAL.Words
             return new WordStatsChanging(
                 lstats.WordScoreChangings.Sum(rstats.WordScoreChangings),
                 lstats.AbsoluteScoreChanging + rstats.AbsoluteScoreChanging,
-                lstats.LeftToA2Changing + rstats.LeftToA2Changing,
                 lstats.OutdatedChanging + rstats.OutdatedChanging);
         }
 
@@ -42,42 +41,13 @@ namespace SayWhat.MongoDAL.Words
         public WordStatsChanging(
             int[] wordScoreChangings,
             double absoluteScoreChanging, 
-            double leftLeftToA2, 
             int outdatedChanging)
         {
             WordScoreChangings = wordScoreChangings;
             AbsoluteScoreChanging = absoluteScoreChanging;
             OutdatedChanging = outdatedChanging;
-            LeftToA2Changing = leftLeftToA2;
         }
-        public int[] WordScoreChangings { get; private set; }
-        /*/// <summary>
-        /// How many words appears in A0 (new word) zone
-        /// </summary>
-        public int A0WordsCountChanging { get; private set; }
-        /// <summary>
-        /// How many words appears in A1 (familiar word) zone
-        /// </summary>
-        public int A1WordsCountChanging { get; private set; }
-        /// <summary>
-        /// How many words appears in A2 (learned word) zone
-        /// </summary>
-        public int A2WordsCountChanging { get; private set; }
-        /// <summary>
-        /// How many words appears in A3 (well-done) zone
-        /// </summary>
-        public int A3WordsCountChanging { get; private set; }
-       
-        /// <summary>
-        /// Absolute score changings for words, that below A2 zone.
-        ///
-      */
-        /// <summary>
-        /// Changing of absolute score
-        /// </summary>
-        /// It equals to -{A2LearnScore} for new words
-        /// </summary>
-        public double LeftToA2Changing { get; }
+        public int[] WordScoreChangings { get; }
         public double AbsoluteScoreChanging { get; }
 
         public int CountOf(int minimumScoreCategory, int maximumScoreCategory)

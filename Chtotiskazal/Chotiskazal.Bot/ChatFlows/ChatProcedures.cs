@@ -128,19 +128,7 @@ namespace Chotiskazal.Bot.ChatFlows
                           + d.QuestionsFailed * (-20)
                           + d.LearningDone * 100
                           + d.WordsAdded * 100)).ToArray()) +
-                      /*"\r\n -------------------------" +
-                    
-                      "\r\n   december|  " +
-                      $"\r\n mon {g + d + d + g + d + d + r + g}" +
-                      $"\r\n tue {d + d + d + d + d + d + r + g}" +
-                      $"\r\n wed {d + d + d + d + d + d + r + g}" +
-                      $"\r\n thu {d + d + d + d + d + d + r + r}" +
-                      $"\r\n fri {d + d + o + d + d + o + r + "-"}" +
-                      $"\r\n sat {d + d + o + d + d + o + r + s}" +
-                      $"\r\n sun {d + d + o + d + d + o + r + s}" +
-
-                      "\r\n -------------------------" +*/
-
+                      
                       $"```\r\n" +
                       $"Words learned:\r\n" +
                       $"Total: {userModel.WordsLearned}\r\n" +
@@ -164,7 +152,7 @@ namespace Chotiskazal.Bot.ChatFlows
                       $"a1: {userModel.CountOf(2, 4)}\r\n" +
                       $"a2: {userModel.CountOf(4, 6)}\r\n" +
                       $"a3: {userModel.CountOf(6, 9)}\r\n" +
-                      $"Zento: {userModel.LeftToA2}";
+                      $"Zento: {(userModel.CountOf(0,1) *4 + userModel.CountOf(1,2) *3+userModel.CountOf(2,3) *2+ userModel.CountOf(3,4) *1)}";
             await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-"));
         }
     }

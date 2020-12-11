@@ -73,8 +73,7 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("a3c")] 
         [BsonIgnoreIfDefault]
         private int _a3WordCount;
-        [BsonElement("l2a2c")] 
-        private double _leftToA2;
+      
         [BsonElement("oc")] 
         private int _outdatedWordsCount;
         #endregion
@@ -107,15 +106,6 @@ namespace SayWhat.MongoDAL.Users
              return acc;
          }
          
-         /*public int A0WordCount => _a0WordCount;
-         public int A1WordCount => _a1WordCount;
-         public int A2WordCount => _a2WordCount;
-         public int A3WordCount => _a3WordCount;
-         */
-
-         public double LeftToA2 => _leftToA2;
-
-
          public void OnAnyActivity()
          {
             _lastActivity = DateTime.Now;
@@ -228,9 +218,7 @@ namespace SayWhat.MongoDAL.Users
             else
                 _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
             _countByCategoryScores.SetLowLimitInplace(0);
-
             
-            _leftToA2    += statsChanging.LeftToA2Changing;
             _outdatedWordsCount    += statsChanging.OutdatedChanging;
             
             if (_outdatedWordsCount < 0)    _outdatedWordsCount = 0;
