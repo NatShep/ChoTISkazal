@@ -15,9 +15,7 @@ namespace SayWhat.MongoDAL.Words
     [BsonIgnoreExtraElements]
     public class UserWordModel
     {
-        public const int PenaltyScore = 9;
-        public const double AgingFactor = 1;
-        public const double ReducingPerPointFactor = 1.7;
+        
 
         public UserWordModel(ObjectId userId, string word, string translation, double rate = 0)
         {
@@ -140,8 +138,8 @@ namespace SayWhat.MongoDAL.Words
 
         public void OnQuestionFailed()
         {
-            if (_absoluteScore > PenaltyScore)
-                _absoluteScore = PenaltyScore;
+            if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
+                _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
 
             _absoluteScore = (int) Math.Round(AbsoluteScore * 0.7);
             if (_absoluteScore < 0)
@@ -153,26 +151,17 @@ namespace SayWhat.MongoDAL.Words
             UpdateCurrentScore();
         }
 
-        //res reduces for 1 point per AgingFactor days
-        private double GetAgedScore()
-        {
-            //if there were no question yet - return some big number as if the word was asked long time ago  
-            if (LastQuestionTimestamp == null) return 0;
-            return Math.Max(0, AbsoluteScore - (DateTime.Now - LastQuestionTimestamp.Value).TotalDays
-                / AgingFactor);
-        }
-
         public void UpdateCurrentScore()
         {
-            double res = GetAgedScore();
+            var probability = Math.Pow(
+                WordLeaningGlobalSettings.ReducingPerPointFactor, 
+                Score.AgedScore);
 
-            //probability reduces by reducingPerPointFactor for every res point
-            var p = Math.Pow(ReducingPerPointFactor, res);
-
-            //Randomize
+            //normal randomize the probability 
             var rndFactor = Math.Pow(1.5, Rand.RandomNormal(0, 1));
-            p *= rndFactor;
-            _currentOrderScore = p;
+            probability *= rndFactor;
+
+            _currentOrderScore = probability;
             _scoreUpdatedTimestamp = DateTime.Now;
         }
 

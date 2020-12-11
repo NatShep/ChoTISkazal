@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
@@ -74,10 +73,13 @@ namespace SayWhat.MongoDAL.Users
         private int _a3WordCount;
         [BsonElement("l2a2c")] 
         private double _leftToA2;
-        
+        [BsonElement("oc")] 
+        private int _outdatedWordsCount;
         #endregion
 
          public DateTime LastActivity => _lastActivity;
+
+         public int OutdatedWordsCount => _outdatedWordsCount;
          public long? TelegramId => _telegramId;
          public string TelegramFirstName => _telegramFirstName;
          public string TelegramLastName => _telegramLastName;
@@ -195,21 +197,31 @@ namespace SayWhat.MongoDAL.Users
             OnAnyActivity();
         }
 
+        public void OnStatsChangings(WordStatsChanging changing)
+        {
+            var (today, month) = FixStatsAndGetCurrent();
+            AppendChangingsToStats(changing, today, month);
+        }
+        
         private void AppendChangingsToStats(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats)
         {
             dailyStats.AppendStats(statsChanging);
             monthsStats.AppendStats(statsChanging);
+            
             _a0WordCount += statsChanging.A0WordsCountChanging;
             _a1WordCount += statsChanging.A1WordsCountChanging;
             _a2WordCount += statsChanging.A2WordsCountChanging;
             _a3WordCount += statsChanging.A3WordsCountChanging;
+            
             _leftToA2    += statsChanging.LeftToA2Changing;
-
+            
+            _outdatedWordsCount    += statsChanging.OutdatedChanging;
+            
             if (_a0WordCount < 0) _a0WordCount = 0;
             if (_a1WordCount < 0) _a1WordCount = 0;
             if (_a2WordCount < 0) _a2WordCount = 0;
             if (_a3WordCount < 0) _a3WordCount = 0;
-
+            if (_outdatedWordsCount < 0)    _outdatedWordsCount = 0;
         }
         public void OnEnglishWordTranslationRequest()
         {

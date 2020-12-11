@@ -22,45 +22,15 @@ namespace SayWhat.MongoDAL.Words
             return result;
         }
 
-        public static WordStatsChanging Create(double originAbsoluteScore, double resultAbsoluteScore)
-        {
-            int a0 = 0;
-            int a1 = 0;
-            int a2 = 0;
-            int a3 = 0;
-            
-            if (originAbsoluteScore >= A3LearnScore)      a3--;
-            else if (originAbsoluteScore >= A2LearnScore) a2--;
-            else if (originAbsoluteScore >= A1LearnScore) a1--;
-            else a0--;
-            
-            if (resultAbsoluteScore >= A3LearnScore)      a3++;
-            else if (resultAbsoluteScore >= A2LearnScore) a2++;
-            else if (resultAbsoluteScore >= A1LearnScore) a1++;
-            else a0++;
-
-
-            var originA2Score = Math.Min(A2LearnScore, originAbsoluteScore);
-            var resultA2Score = Math.Min(A2LearnScore, resultAbsoluteScore);
-            
-            return new WordStatsChanging
-            {
-                A0WordsCountChanging = a0,
-                A1WordsCountChanging = a1,
-                A2WordsCountChanging = a2,
-                A3WordsCountChanging = a3,
-                AbsoluteScoreChanging = resultAbsoluteScore - originAbsoluteScore,
-                LeftToA2Changing = resultA2Score-originA2Score
-            };
-            
-        }
-
         private WordStatsChanging()
         {
-            
         }
 
-        public WordStatsChanging(int a0, int a1, int a2, int a3, double absoluteScoreChanging, double leftLeftToA2)
+        public WordStatsChanging(
+            int a0, int a1, int a2, int a3, 
+            double absoluteScoreChanging, 
+            double leftLeftToA2, 
+            int outdatedChanging)
         {
             A0WordsCountChanging = a0;
             A1WordsCountChanging = a1;
@@ -68,6 +38,7 @@ namespace SayWhat.MongoDAL.Words
             A3WordsCountChanging = a3;
             LeftToA2Changing = leftLeftToA2;
             AbsoluteScoreChanging = absoluteScoreChanging;
+            OutdatedChanging = outdatedChanging;
         }
         /// <summary>
         /// How many words appears in A0 (new word) zone
@@ -95,5 +66,13 @@ namespace SayWhat.MongoDAL.Words
         /// It equals to -{A2LearnScore} for new words
         /// </summary>
         public double LeftToA2Changing { get; private set; }
+        
+        /// <summary>
+        /// Number of outdated word
+        ///
+        /// Positive: Means that {OutdatedChanging}  become outdated (Score > A2 scores, but Score-time become less than A2)
+        /// Negative: Means that {-OutdatedChanging} become fresh(Score > A2 scores, and Score-time become more than A2)
+        /// </summary>
+        public int OutdatedChanging { get; private set; }
     }
 }

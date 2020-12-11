@@ -7,16 +7,66 @@ namespace SayWhat.MongoDAL.Words
     /// </summary>
     public class UserWordScore
     {
-        private readonly double _absoluteRate;
-        private readonly DateTime _lastAskTime;
-        public static UserWordScore Zero => new UserWordScore(0, DateTime.Now); 
-        public UserWordScore(double absoluteRate, DateTime lastAskTime)
+        private readonly DateTime? _lastAskTime;
+        public static UserWordScore Zero => new UserWordScore(0, DateTime.Now);
+
+        public double AbsoluteScore { get; }
+
+        //res reduces for 1 point per AgingFactor days
+        public double AgedScore
         {
-            _absoluteRate = absoluteRate;
+            get
+            {
+                //if there were no asked question yet - return 0, as lowest possible probability  
+                if (_lastAskTime == null) return 0;
+                return Math.Max(0, AbsoluteScore - (DateTime.Now - _lastAskTime.Value).TotalDays
+                    / WordLeaningGlobalSettings.AgingFactor);
+            }
+        }
+
+        public UserWordScore(double absoluteScore, DateTime? lastAskTime)
+        {
+            AbsoluteScore = absoluteScore;
             _lastAskTime = lastAskTime;
         }
 
-        public static WordStatsChanging operator -(UserWordScore laterScore,UserWordScore earlierScore) 
-            => WordStatsChanging.Create(earlierScore._absoluteRate, laterScore._absoluteRate);
+        public static WordStatsChanging operator - (UserWordScore laterScore,UserWordScore earlierScore)
+        {
+            int a0 = 0;
+            int a1 = 0;
+            int a2 = 0;
+            int a3 = 0;
+            
+            if (earlierScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3--;
+            else if (earlierScore.AbsoluteScore >= WordStatsChanging.A2LearnScore) a2--;
+            else if (earlierScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1--;
+            else a0--;
+            
+            if (laterScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3++;
+            else if (laterScore.AbsoluteScore >= WordStatsChanging.A2LearnScore) a2++;
+            else if (laterScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1++;
+            else a0++;
+
+            var originA2Score = Math.Min(WordStatsChanging.A2LearnScore, earlierScore.AbsoluteScore);
+            var resultA2Score = Math.Min(WordStatsChanging.A2LearnScore, laterScore.AbsoluteScore);
+
+            int outdatedChanging = 0;
+            var agedScoreBefore = earlierScore.AgedScore;
+            var agedScoreAfter  = laterScore.AgedScore;
+            if (agedScoreBefore < WordStatsChanging.A2LearnScore)
+                outdatedChanging--;
+            if (agedScoreAfter < WordStatsChanging.A2LearnScore)
+                outdatedChanging++;
+
+            
+            return new WordStatsChanging(
+                a0: a0,
+                a1: a1,
+                a2: a2,
+                a3: a3,
+                absoluteScoreChanging: laterScore.AbsoluteScore - earlierScore.AbsoluteScore,
+                leftLeftToA2: resultA2Score - originA2Score, 
+                outdatedChanging: outdatedChanging);
+        }
     }
 }

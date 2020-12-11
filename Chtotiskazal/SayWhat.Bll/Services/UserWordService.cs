@@ -81,8 +81,10 @@ namespace SayWhat.Bll.Services
             var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
             foreach (var word in words)
             {
+                var scoreBefore = word.Score;
                 word.UpdateCurrentScore();
                 await _userWordsRepository.UpdateMetrics(word);
+                user.OnStatsChangings(word.Score - scoreBefore);
             }
             sw.Stop();
             Botlog.UpdateMetricInfo(user.TelegramId, nameof(UpdateCurrentScoreForRandomWords), $"{words.Count}", sw.Elapsed);

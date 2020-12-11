@@ -44,7 +44,7 @@ namespace SayWhat.Bll.Yapi
 
         private async Task<YaDefenition[]> TranslateAsync(string word,string langFrom, string langTo)
         {
-            using var client = new HttpClient(){Timeout = _timeout};
+            using var client = new HttpClient {Timeout = _timeout};
             
             try
             {
