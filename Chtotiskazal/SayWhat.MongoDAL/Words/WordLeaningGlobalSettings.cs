@@ -17,14 +17,19 @@
         /// for {ReducingPerPointFactor} times for each AgedScore
         /// </summary>
         public const double ReducingPerDayPowFactor = 1.7;
-
         public const double ReduceRateWhenQuestionFailed = 0.7;
-        
-        public const double ScoresForPassedQuestion = 0.33;
+        public const double ScoresForPassedQuestion = 0.4;
         public const double WellDoneWordMinScore = 8.0;
         public const double LearnedWordMinScore = 4.0;
         public const double IncompleteWordMinScore = 2.66;
         public const double FamiliarWordMinScore = 1.33;
-        
+
+
+
+        public static int NewWordGamingScore { get; set; } = 100;
+        public static int NewPairGamingScore { get; set; } = 10;
+        public static int QuestionPassedGamingScore { get; set; } = 5;
+        public static int QuestionFailedGamingScore { get; set; } = -5;
+        public static int LearningDoneGamingScore { get; set; } = 50;
     }
 }

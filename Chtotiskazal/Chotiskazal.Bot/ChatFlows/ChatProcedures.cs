@@ -128,15 +128,15 @@ namespace Chotiskazal.Bot.ChatFlows
                           + d.QuestionsFailed * (-20)
                           + d.LearningDone * 100
                           + d.WordsAdded * 100)).ToArray()) +
-                      
+
                       $"```\r\n" +
                       $"Words learned:\r\n" +
                       $"Total: {userModel.WordsLearned}\r\n" +
-                      $"total bycl: {userModel.CountOf(4,10)}\r\n" +
+                      $"total bycl: {userModel.CountOf(4, 10)}\r\n" +
                       $"Last month: {userModel.GetLastMonth().WordsLearnt}\r\n" +
                       $"Last week : {userModel.GetLastWeek().Sum(s => s.WordsLearnt)}\r\n" +
                       $"Today     : {userModel.GetToday().WordsLearnt}\r\n" +
-                      $"Today bycl: {userModel.GetToday().CummulativeStatsChanging.CountOf(4,10)}\r\n" +
+                      $"Today bycl: {userModel.GetToday().CummulativeStatsChanging.CountOf(4, 10)}\r\n" +
 
                       $"Score changing:\r\n" +
                       $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
@@ -152,8 +152,22 @@ namespace Chotiskazal.Bot.ChatFlows
                       $"a1: {userModel.CountOf(2, 4)}\r\n" +
                       $"a2: {userModel.CountOf(4, 6)}\r\n" +
                       $"a3: {userModel.CountOf(6, 9)}\r\n" +
-                      $"Zento: {(userModel.CountOf(0,1) *4 + userModel.CountOf(1,2) *3+userModel.CountOf(2,3) *2+ userModel.CountOf(3,4) *1)}";
-            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-"));
+                      $"Zento: {(userModel.CountOf(0, 1) * 4 + userModel.CountOf(1, 2) * 3 + userModel.CountOf(2, 3) * 2 + userModel.CountOf(3, 4) * 1)}\r\n" +
+                      $"\r\n" +
+                      $"Zen.rat: {userModel.Zen.Rate}\r\n" +
+                      $"Zen.needAdd: {userModel.Zen.CountOfWordsNeedToBeAdded}\r\n" +
+                      $"Zen.needLearn: {userModel.Zen.CountOfLearningNeedToBeDone}\r\n" +
+                      $"Zen.AddBonus: {userModel.Zen.AddWordsBonusRate}\r\n" +
+                      $"Zen.LearnBonus: {userModel.Zen.LearnWordsBonusRate}\r\n";
+            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\."));
+
+            var msg2 = $"GameScores:  {userModel.GamingScore}\r\n" +
+                       $"```" +
+                       Render7WeeksCalendar(userModel.LastDaysStats
+                           .Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray()) +
+                       "```";
+            await chatIo.SendMarkdownMessageAsync(msg2.Replace("-", "\\-").Replace(".","\\."));
+
         }
     }
 }

@@ -4,7 +4,9 @@
     {
         public static void AddValuesInplace(this int[] targetArray, int[] other)
         {
-            for (int i = 0; i < targetArray.Length; i++) 
+            if(other==null)
+                return;
+            for (int i = 0; i < targetArray.Length && i< other.Length; i++) 
                 targetArray[i] += other[i];
         }
         

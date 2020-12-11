@@ -32,8 +32,7 @@ namespace SayWhat.MongoDAL.Users
         
         [BsonElement(UsersRepo.UserTelegramIdFieldName)]
         private long? _telegramId = null;
-        [BsonElement("sc")] 
-        private int[] _countByCategoryScores;
+        [BsonElement("sc")]     private int[] _countByCategoryScores;
         [BsonElement("a")]      private DateTime _lastActivity;
         [BsonElement("tfn")]    private string _telegramFirstName;
         [BsonElement("tln")]    private string _telegramLastName;
@@ -61,21 +60,10 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("qpc")] private int _questionPassed; 
         [BsonElement("qfc")] private int _questionFailed; 
         
-        [BsonElement("a0c")] 
-        [BsonIgnoreIfDefault]
-        private int _a0WordCount;
-        [BsonElement("a1c")]
-        [BsonIgnoreIfDefault]
-        private int _a1WordCount;
-        [BsonElement("a2c")] 
-        [BsonIgnoreIfDefault]
-        private int _a2WordCount;
-        [BsonElement("a3c")] 
-        [BsonIgnoreIfDefault]
-        private int _a3WordCount;
-      
         [BsonElement("oc")] 
         private int _outdatedWordsCount;
+        [BsonElement("gc")]
+        private int _gamingScore;
         #endregion
 
          public DateTime LastActivity => _lastActivity;
@@ -91,7 +79,9 @@ namespace SayWhat.MongoDAL.Users
          public int ExamplesCount => _examplesCount;
          public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
          public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
-         public int WordsLearned => _a2WordCount + _a3WordCount;
+         public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore,10);
+         public Zen Zen => new Zen(_countByCategoryScores,_outdatedWordsCount);
+         public int GamingScore => _gamingScore;
 
          public int CountOf(int minScoreCategory, int maxScoreCategory)
          {
@@ -111,18 +101,24 @@ namespace SayWhat.MongoDAL.Users
             _lastActivity = DateTime.Now;
          }
         
-        public void OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+        public int OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
         {
             _wordsCount++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.WordsAdded++;
             month.WordsAdded++;
+
+            var gamingScore = WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+            today.OnGameScoreIncreased(gamingScore);
+            month.OnGameScoreIncreased(gamingScore);
+            _gamingScore += gamingScore;
             
-            OnPairsAdded(
+            return gamingScore + OnPairsAdded(
                 statsChanging:     statsChanging, 
                 pairsCount:        pairsCount, 
                 examplesCount:     examplesCount);
+            
         }
 
         private (DailyStats, MonthsStats) FixStatsAndGetCurrent()
@@ -188,7 +184,7 @@ namespace SayWhat.MongoDAL.Users
             return daily;
         }
 
-        public void OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+        public int OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
         {
             _pairsCount    += pairsCount;
             _examplesCount += examplesCount;
@@ -198,21 +194,36 @@ namespace SayWhat.MongoDAL.Users
             today.ExamplesAdded+= examplesCount;
             month.PairsAdded+= pairsCount;
             month.ExamplesAdded+= examplesCount;
-            
-            AppendChangingsToStats(statsChanging, today, month);
+            var gamingScore =pairsCount * WordLeaningGlobalSettings.NewPairGamingScore* Zen.AddWordsBonusRate ;
+            AppendChangingsToStats(statsChanging, today, month, gamingScore);
             OnAnyActivity();
+            return gamingScore;
         }
 
         public void OnStatsChangings(WordStatsChanging changing)
         {
             var (today, month) = FixStatsAndGetCurrent();
-            AppendChangingsToStats(changing, today, month);
+            AppendChangingsToStats(changing, today, month,0);
         }
+
+        /*public void OnGameScoreIncreased(int count)
+        {
+            _gamingScore += count;
+            if (_gamingScore <= 0) _gamingScore = 0;
+            var (today, month) = FixStatsAndGetCurrent();
+            today.OnGameScoreIncreased(count);
+            month.OnGameScoreIncreased(count);
+        }*/
         
-        private void AppendChangingsToStats(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats)
+        private void AppendChangingsToStats(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, int gamingScore)
         {
             dailyStats.AppendStats(statsChanging);
             monthsStats.AppendStats(statsChanging);
+            dailyStats.OnGameScoreIncreased(gamingScore);
+            monthsStats.OnGameScoreIncreased(gamingScore);
+            _gamingScore += gamingScore;
+            if (_gamingScore <= 0) _gamingScore = 0;
+            
             if (_countByCategoryScores == null)
                 _countByCategoryScores = statsChanging.WordScoreChangings;
             else
@@ -233,35 +244,46 @@ namespace SayWhat.MongoDAL.Users
             _russianWordTranslationRequestsCount++;
             OnAnyActivity();
         }
-        public void OnQuestionPassed(WordStatsChanging statsChanging)
+        public int OnQuestionPassed(WordStatsChanging statsChanging)
         {
             _questionPassed++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.QuestionsPassed++;
             month.QuestionsPassed++;
-            AppendChangingsToStats(statsChanging, today, month);
+
             OnAnyActivity();
+
+            var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore * Zen.LearnWordsBonusRate;
+            AppendChangingsToStats(statsChanging, today, month, gamingScore);
+            return gamingScore;
         }
-        public void OnQuestionFailed(WordStatsChanging statsChanging)
+        public int OnQuestionFailed(WordStatsChanging statsChanging)
         {
             _questionFailed++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.QuestionsFailed++;
             month.QuestionsFailed++;
-            
-            AppendChangingsToStats(statsChanging, today, month);
+
             OnAnyActivity();
+
+            AppendChangingsToStats(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
+            return WordLeaningGlobalSettings.QuestionFailedGamingScore;
         }
-        public void OnLearningDone()
+        public int OnLearningDone()
         {
             _learningDone++;
             var(today, month) = FixStatsAndGetCurrent();
 
             today.LearningDone++;
             month.LearningDone++;
+
+            var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore* Zen.LearnWordsBonusRate;
+            AppendChangingsToStats(WordStatsChanging.Zero, today, month, gamingScore);
             OnAnyActivity();
+
+            return gamingScore;
         }
 
         

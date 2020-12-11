@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -64,6 +65,11 @@ namespace SayWhat.MongoDAL.Users
 
 
             return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
+        }
+
+        public List<UserModel> GetAll()
+        {
+            return Collection.AsQueryable().ToList();
         }
     }
 }

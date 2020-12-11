@@ -14,16 +14,17 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("oc")] 
         [BsonIgnoreIfDefault]
         private int _outdatedChanging;
+        [BsonElement("gc")]
+        [BsonIgnoreIfDefault]
+        private int _gameScoreChanging;
 
         public int CountOf(int minLearnCategory, int maxLearnCategory)
+        =>
+            CummulativeStatsChanging.CountOf(minLearnCategory, maxLearnCategory);
+        
+        public void OnGameScoreIncreased(in int gameScoreChanging)
         {
-            var acc = 0;
-            for (int i = minLearnCategory; i < _scoreChangings.Length && i< maxLearnCategory; i++)
-            {
-                acc += _scoreChangings[i];
-            }
-
-            return acc;
+            _gameScoreChanging += gameScoreChanging;
         }
         public int WordsLearnt => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore,10);
         public WordStatsChanging CummulativeStatsChanging 
@@ -66,6 +67,7 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("ld")]
         [BsonIgnoreIfDefault]
         public int LearningDone { get; set; }
+        public int GameScoreChanging => _gameScoreChanging;
     }
     [BsonIgnoreExtraElements]
     public class TotalStats : StatsBase
@@ -88,7 +90,8 @@ namespace SayWhat.MongoDAL.Users
             set => Day = (ushort) (value - DayCountStarts).TotalDays;
         }
 
-        
+
+
     }
     [BsonIgnoreExtraElements]
     public class MonthsStats : StatsBase
