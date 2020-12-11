@@ -27,9 +27,11 @@ namespace Chotiskazal.Bot.Questions
                 .Select(e=>e.Transcription)
                 .Where(e => word.Translations.All(t => t.Transcription != e))
                 .Append(originalTranslation.Transcription)
+                .Where(w=>w!=null)
                 .Randomize()
                 .ToList();
-
+            if (variants.Count == 0)
+                return ExamResult.Impossible;
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
                       $"Choose the transcription";

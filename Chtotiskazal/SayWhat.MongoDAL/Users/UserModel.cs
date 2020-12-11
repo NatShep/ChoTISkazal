@@ -32,6 +32,8 @@ namespace SayWhat.MongoDAL.Users
         
         [BsonElement(UsersRepo.UserTelegramIdFieldName)]
         private long? _telegramId = null;
+        [BsonElement("sc")] 
+        private int[] _countByCategoryScores;
         [BsonElement("a")]      private DateTime _lastActivity;
         [BsonElement("tfn")]    private string _telegramFirstName;
         [BsonElement("tln")]    private string _telegramLastName;
@@ -91,11 +93,25 @@ namespace SayWhat.MongoDAL.Users
          public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
          public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
          public int WordsLearned => _a2WordCount + _a3WordCount;
-            
-         public int A0WordCount => _a0WordCount;
+
+         public int CountOf(int minScoreCategory, int maxScoreCategory)
+         {
+             if (_countByCategoryScores == null)
+                 return 0;
+             int acc = 0;
+             for (int i = minScoreCategory; i < maxScoreCategory && i<_countByCategoryScores.Length; i++)
+             {
+                 acc+= _countByCategoryScores[i];
+             }
+
+             return acc;
+         }
+         
+         /*public int A0WordCount => _a0WordCount;
          public int A1WordCount => _a1WordCount;
          public int A2WordCount => _a2WordCount;
          public int A3WordCount => _a3WordCount;
+         */
 
          public double LeftToA2 => _leftToA2;
 
@@ -207,20 +223,16 @@ namespace SayWhat.MongoDAL.Users
         {
             dailyStats.AppendStats(statsChanging);
             monthsStats.AppendStats(statsChanging);
-            
-            _a0WordCount += statsChanging.A0WordsCountChanging;
-            _a1WordCount += statsChanging.A1WordsCountChanging;
-            _a2WordCount += statsChanging.A2WordsCountChanging;
-            _a3WordCount += statsChanging.A3WordsCountChanging;
+            if (_countByCategoryScores == null)
+                _countByCategoryScores = statsChanging.WordScoreChangings;
+            else
+                _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
+            _countByCategoryScores.SetLowLimitInplace(0);
+
             
             _leftToA2    += statsChanging.LeftToA2Changing;
-            
             _outdatedWordsCount    += statsChanging.OutdatedChanging;
             
-            if (_a0WordCount < 0) _a0WordCount = 0;
-            if (_a1WordCount < 0) _a1WordCount = 0;
-            if (_a2WordCount < 0) _a2WordCount = 0;
-            if (_a3WordCount < 0) _a3WordCount = 0;
             if (_outdatedWordsCount < 0)    _outdatedWordsCount = 0;
         }
         public void OnEnglishWordTranslationRequest()

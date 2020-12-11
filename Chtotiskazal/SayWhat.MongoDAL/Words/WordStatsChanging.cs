@@ -5,20 +5,34 @@ namespace SayWhat.MongoDAL.Words
     public class WordStatsChanging
     {
         public static readonly WordStatsChanging Zero = new WordStatsChanging(); 
+        private const int MaxObservingScore = 7;
 
-        public const int A1LearnScore = 7;
-        public const int A3LearnScore = 22;
+        public static int CategorizedScore(double absoluteScore)
+        {
+            int normalizedAbsScore = (int) absoluteScore;
+            return normalizedAbsScore >= MaxObservingScore 
+                ? MaxObservingScore 
+                : normalizedAbsScore;
+        }
 
         public static WordStatsChanging CreateForNewWord(double absoluteScore)
         {
-            var result = new WordStatsChanging();
-            if (absoluteScore >= A3LearnScore)      result.A3WordsCountChanging++;
-            else if (absoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) result.A2WordsCountChanging++;
-            else if (absoluteScore >= A1LearnScore) result.A1WordsCountChanging++;
-            else result.A0WordsCountChanging++;
-            
-            result.LeftToA2Changing  = Math.Min(0, absoluteScore-WordLeaningGlobalSettings.LearnedWordMinScore);
-            return result;
+            var changings = new int[MaxObservingScore+1];
+            changings[CategorizedScore(absoluteScore)]++;
+            return new WordStatsChanging(changings,absoluteScore,WordLeaningGlobalSettings.LearnedWordMinScore,0);
+        }
+
+        public static WordStatsChanging operator +(WordStatsChanging lstats, WordStatsChanging rstats)
+        {
+            if (lstats == null)
+                return rstats;
+            if (rstats == null)
+                return lstats;
+            return new WordStatsChanging(
+                lstats.WordScoreChangings.Sum(rstats.WordScoreChangings),
+                lstats.AbsoluteScoreChanging + rstats.AbsoluteScoreChanging,
+                lstats.LeftToA2Changing + rstats.LeftToA2Changing,
+                lstats.OutdatedChanging + rstats.OutdatedChanging);
         }
 
         private WordStatsChanging()
@@ -26,20 +40,18 @@ namespace SayWhat.MongoDAL.Words
         }
 
         public WordStatsChanging(
-            int a0, int a1, int a2, int a3, 
+            int[] wordScoreChangings,
             double absoluteScoreChanging, 
             double leftLeftToA2, 
             int outdatedChanging)
         {
-            A0WordsCountChanging = a0;
-            A1WordsCountChanging = a1;
-            A2WordsCountChanging = a2;
-            A3WordsCountChanging = a3;
-            LeftToA2Changing = leftLeftToA2;
+            WordScoreChangings = wordScoreChangings;
             AbsoluteScoreChanging = absoluteScoreChanging;
             OutdatedChanging = outdatedChanging;
+            LeftToA2Changing = leftLeftToA2;
         }
-        /// <summary>
+        public int[] WordScoreChangings { get; private set; }
+        /*/// <summary>
         /// How many words appears in A0 (new word) zone
         /// </summary>
         public int A0WordsCountChanging { get; private set; }
@@ -55,23 +67,34 @@ namespace SayWhat.MongoDAL.Words
         /// How many words appears in A3 (well-done) zone
         /// </summary>
         public int A3WordsCountChanging { get; private set; }
-        /// <summary>
-        /// Changing of absolute score
-        /// </summary>
-        public double AbsoluteScoreChanging { get; private set; }
+       
         /// <summary>
         /// Absolute score changings for words, that below A2 zone.
         ///
+      */
+        /// <summary>
+        /// Changing of absolute score
+        /// </summary>
         /// It equals to -{A2LearnScore} for new words
         /// </summary>
-        public double LeftToA2Changing { get; private set; }
-        
+        public double LeftToA2Changing { get; }
+        public double AbsoluteScoreChanging { get; }
+
+        public int CountOf(int minimumScoreCategory, int maximumScoreCategory)
+        {
+            var acc = 0;
+            for (int i = minimumScoreCategory; i < WordScoreChangings.Length && i< maximumScoreCategory; i++)
+            {
+                acc+=WordScoreChangings[i];
+            }
+            return acc;
+        }
         /// <summary>
         /// Number of outdated word
         ///
         /// Positive: Means that {OutdatedChanging}  become outdated (Score > A2 scores, but Score-time become less than A2)
         /// Negative: Means that {-OutdatedChanging} become fresh(Score > A2 scores, and Score-time become more than A2)
         /// </summary>
-        public int OutdatedChanging { get; private set; }
+        public int OutdatedChanging { get; }
     }
 }

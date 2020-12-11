@@ -6,6 +6,9 @@ namespace SayWhat.MongoDAL.Users
 {
     public class StatsBase
     {
+        [BsonElement("sc")] 
+        private int[] _scoreChangings;
+        
         [BsonElement("a0c")] 
         [BsonIgnoreIfDefault]
         private int _a0WordCount;
@@ -32,19 +35,17 @@ namespace SayWhat.MongoDAL.Users
         public int WordsLearnt => Math.Max(0, _a2WordCount) + Math.Max(0, _a3WordCount);
         public WordStatsChanging CummulativeStatsChanging 
             => new WordStatsChanging(
-                _a0WordCount, 
-                _a1WordCount, 
-                _a2WordCount, 
-                _a3WordCount,
+                _scoreChangings,
                 _absoluteScoreChanging,
                 _leftToA2Changing,
                 _outdatedChanging);
         public void AppendStats(WordStatsChanging statsChanging)
         {
-            _a0WordCount           += statsChanging.A0WordsCountChanging;
-            _a1WordCount           += statsChanging.A1WordsCountChanging;
-            _a2WordCount           += statsChanging.A2WordsCountChanging;
-            _a3WordCount           += statsChanging.A3WordsCountChanging;
+            if (_scoreChangings == null)
+                _scoreChangings = statsChanging.WordScoreChangings;
+            else
+                _scoreChangings.AddValuesInplace(statsChanging.WordScoreChangings);
+            
             _leftToA2Changing      += statsChanging.LeftToA2Changing;
             _absoluteScoreChanging += statsChanging.AbsoluteScoreChanging;
             _outdatedChanging      += statsChanging.OutdatedChanging;

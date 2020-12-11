@@ -27,7 +27,7 @@ namespace SayWhat.MongoDAL.Words
         public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount)
             => Collection
                 .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-                .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}:1}}" )
+                .Sort($"{{{CurrentScoreFieldName}:1}}" )
                 .Limit(maxCount)
                 .ToListAsync();
          
@@ -64,7 +64,7 @@ namespace SayWhat.MongoDAL.Words
                 .Set(CurrentScoreFieldName,     word.CurrentOrderScore)
                 .Set(QuestionPassedFieldName,   word.QuestionPassed)
                 .Set(QuestionAskedFieldName,    word.QuestionAsked)
-                .Set(LastQuestionAskedTimestampFieldName,   word.LastQuestionTimestamp);
+                .Set(LastQuestionAskedTimestampFieldName,   word.LastQuestionAskedTimestamp);
 
             return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
         }

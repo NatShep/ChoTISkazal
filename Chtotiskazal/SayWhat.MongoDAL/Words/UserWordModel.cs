@@ -45,7 +45,7 @@ namespace SayWhat.MongoDAL.Words
         /// Last time the question was asked
         /// </summary>
         [BsonElement(UserWordsRepo.LastQuestionAskedTimestampFieldName)] 
-        private DateTime? _lastQuestionTimestamp;
+        private DateTime? _lastQuestionAskedTimestamp;
 
         public ObjectId Id { get; set; }
 
@@ -99,7 +99,7 @@ namespace SayWhat.MongoDAL.Words
         public double AbsoluteScore => _absoluteScore;
         public int QuestionPassed => _questionPassed;
         public int QuestionAsked => _questionAsked;
-        public DateTime? LastQuestionTimestamp => _lastQuestionTimestamp;
+        public DateTime? LastQuestionAskedTimestamp => _lastQuestionAskedTimestamp;
         public DateTime ScoreUpdatedTimestamp => _scoreUpdatedTimestamp;
 
         public UserWordTranslation[] Translations
@@ -107,9 +107,9 @@ namespace SayWhat.MongoDAL.Words
             get => _translations;
             set => _translations = value;
         }
-        public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionTimestamp??DateTime.Now);
+        public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionAskedTimestamp??DateTime.Now);
         public bool HasAnyExamples => Translations.Any(t => t.Examples?.Any() == true);
-        public DateTime? LastExam => LastQuestionTimestamp;
+        public DateTime? LastExam => LastQuestionAskedTimestamp;
         public string TranslationAsList => string.Join(", ", Translations.Select(t => t.Word));
         public IEnumerable<string> AllTranslations => Translations.Select(t => t.Word);
 
@@ -127,7 +127,7 @@ namespace SayWhat.MongoDAL.Words
         public void OnQuestionPassed()
         {
             _absoluteScore += WordLeaningGlobalSettings.ScoresForPassedQuestion;
-            _lastQuestionTimestamp = DateTime.Now;
+            _lastQuestionAskedTimestamp = DateTime.Now;
             _questionAsked++;
             _questionPassed++;
             _scoreUpdatedTimestamp = DateTime.Now;
@@ -144,7 +144,7 @@ namespace SayWhat.MongoDAL.Words
                 _absoluteScore = 0;
 
             _questionAsked++;
-            _lastQuestionTimestamp =_scoreUpdatedTimestamp = DateTime.Now;
+            _lastQuestionAskedTimestamp =_scoreUpdatedTimestamp = DateTime.Now;
 
             UpdateCurrentScore();
         }
@@ -152,7 +152,7 @@ namespace SayWhat.MongoDAL.Words
         public void UpdateCurrentScore()
         {
             var probability = Math.Pow(
-                WordLeaningGlobalSettings.ReducingPerPointFactor, 
+                WordLeaningGlobalSettings.ReducingPerDayPowFactor, 
                 Score.AgedScore);
 
             //normal randomize the probability 

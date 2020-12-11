@@ -10,7 +10,6 @@ namespace SayWhat.MongoDAL.Words
         private readonly DateTime? _lastAskTime;
         public static UserWordScore Zero => new UserWordScore(0, DateTime.Now);
         public double AbsoluteScore { get; }
-
         public bool IsOutdated => IsLearned &&
                                   AgedScore < WordLeaningGlobalSettings.LearnedWordMinScore;
         public bool IsLearned => AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore;
@@ -35,20 +34,9 @@ namespace SayWhat.MongoDAL.Words
 
         public static WordStatsChanging operator - (UserWordScore laterScore,UserWordScore earlierScore)
         {
-            int a0 = 0;
-            int a1 = 0;
-            int a2 = 0;
-            int a3 = 0;
-            
-            if (earlierScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3--;
-            else if (earlierScore.AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) a2--;
-            else if (earlierScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1--;
-            else a0--;
-            
-            if (laterScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3++;
-            else if (laterScore.AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) a2++;
-            else if (laterScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1++;
-            else a0++;
+            var scores = new int[8];
+            scores[WordStatsChanging.CategorizedScore(earlierScore.AbsoluteScore)]--;
+            scores[WordStatsChanging.CategorizedScore(laterScore.AbsoluteScore)]++;
 
             var originA2Score = Math.Min(WordLeaningGlobalSettings.LearnedWordMinScore, earlierScore.AbsoluteScore);
             var resultA2Score = Math.Min(WordLeaningGlobalSettings.LearnedWordMinScore, laterScore.AbsoluteScore);
@@ -61,12 +49,8 @@ namespace SayWhat.MongoDAL.Words
             if (agedScoreAfter < WordLeaningGlobalSettings.LearnedWordMinScore)
                 outdatedChanging++;
 
-            
             return new WordStatsChanging(
-                a0: a0,
-                a1: a1,
-                a2: a2,
-                a3: a3,
+                scores,
                 absoluteScoreChanging: laterScore.AbsoluteScore - earlierScore.AbsoluteScore,
                 leftLeftToA2: resultA2Score - originA2Score, 
                 outdatedChanging: outdatedChanging);

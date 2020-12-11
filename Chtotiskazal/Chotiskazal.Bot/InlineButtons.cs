@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -19,7 +20,7 @@ namespace Chotiskazal.Bot
             => variants.Select((v, i) => new InlineKeyboardButton
             {
                 CallbackData = i.ToString(),
-                Text = v
+                Text = v?? throw new InvalidDataException("Keyboard text cannot be null")
             }).ToArray();
         
         public static InlineKeyboardButton[] CreateVariantsWithCancel(IEnumerable<string> variants)

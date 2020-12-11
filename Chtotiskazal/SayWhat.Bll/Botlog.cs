@@ -20,7 +20,7 @@
         
         public static void WriteError(long? chatId, string msg)
         {
-            _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId});
+            _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
         }
         public static void WriteInfo(string msg)
         {

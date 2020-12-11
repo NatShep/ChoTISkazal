@@ -116,51 +116,56 @@ namespace Chotiskazal.Bot.ChatFlows
         public static async Task ShowStats(ChatIO chatIo, UserModel userModel)
         {
 
-            await chatIo.SendMarkdownMessageAsync("Your stats: \r\n" +
-                                                  $"Words: {userModel.WordsCount}\r\n" +
-                                                  $"Translations: {userModel.PairsCount}\r\n" +
-                                                  $"Examples: {userModel.ExamplesCount}" +
-                                                  $"\r\n" +
-                                                  $"```" +
-                                                  Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date,
-                                                      d.WordsLearnt * 100
-                                                      + d.QuestionsPassed * 10
-                                                      + d.QuestionsFailed * (-20)
-                                                      + d.LearningDone * 100
-                                                      + d.WordsAdded * 100)).ToArray())+
-                                                  /*"\r\n -------------------------" +
-                                                
-                                                  "\r\n   december|  " +
-                                                  $"\r\n mon {g + d + d + g + d + d + r + g}" +
-                                                  $"\r\n tue {d + d + d + d + d + d + r + g}" +
-                                                  $"\r\n wed {d + d + d + d + d + d + r + g}" +
-                                                  $"\r\n thu {d + d + d + d + d + d + r + r}" +
-                                                  $"\r\n fri {d + d + o + d + d + o + r + "-"}" +
-                                                  $"\r\n sat {d + d + o + d + d + o + r + s}" +
-                                                  $"\r\n sun {d + d + o + d + d + o + r + s}" +
+            var msg = "Your stats: \r\n" +
+                      $"Words: {userModel.WordsCount}\r\n" +
+                      $"Translations: {userModel.PairsCount}\r\n" +
+                      $"Examples: {userModel.ExamplesCount}" +
+                      $"\r\n" +
+                      $"```" +
+                      Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date,
+                          d.WordsLearnt * 100
+                          + d.QuestionsPassed * 10
+                          + d.QuestionsFailed * (-20)
+                          + d.LearningDone * 100
+                          + d.WordsAdded * 100)).ToArray()) +
+                      /*"\r\n -------------------------" +
+                    
+                      "\r\n   december|  " +
+                      $"\r\n mon {g + d + d + g + d + d + r + g}" +
+                      $"\r\n tue {d + d + d + d + d + d + r + g}" +
+                      $"\r\n wed {d + d + d + d + d + d + r + g}" +
+                      $"\r\n thu {d + d + d + d + d + d + r + r}" +
+                      $"\r\n fri {d + d + o + d + d + o + r + "-"}" +
+                      $"\r\n sat {d + d + o + d + d + o + r + s}" +
+                      $"\r\n sun {d + d + o + d + d + o + r + s}" +
 
-                                                  "\r\n -------------------------" +*/
+                      "\r\n -------------------------" +*/
 
-                                                  $"```\r\n" +
-                                                  $"Words learned:\r\n" +
-                                                  $"Total: {userModel.WordsLearned}\r\n" +
-                                                  $"Last month: {userModel.GetLastMonth().WordsLearnt}\r\n" +
-                                                  $"Last week : {userModel.GetLastWeek().Sum(s => s.WordsLearnt)}\r\n" +
-                                                  $"Today     : {userModel.GetToday().WordsLearnt}\r\n" +
-                                                  $"Score changing:\r\n" +
-                                                  $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
-                                                  $"Last week : {userModel.GetLastWeek().Sum(s => s.CummulativeStatsChanging.AbsoluteScoreChanging)}\r\n" +
-                                                  $"Today     : {userModel.GetToday().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
-                                                  $"\r\n" +
-                                                  $"Outdated:\r\n" +
-                                                  $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.OutdatedChanging}\r\n" +
-                                                  $"Last week : {userModel.GetLastWeek().Sum(s => s.CummulativeStatsChanging.OutdatedChanging)}\r\n" +
-                                                  $"Today     : {userModel.GetToday().CummulativeStatsChanging.OutdatedChanging}\r\n" +
-                                                  $"a0: {userModel.A0WordCount}\r\n" +
-                                                  $"a1: {userModel.A1WordCount}\r\n" +
-                                                  $"a2: {userModel.A2WordCount}\r\n" +
-                                                  $"a3: {userModel.A3WordCount}\r\n" +
-                                                  $"Zento: {userModel.LeftToA2}");
+                      $"```\r\n" +
+                      $"Words learned:\r\n" +
+                      $"Total: {userModel.WordsLearned}\r\n" +
+                      $"total bycl: {userModel.CountOf(4,10)}\r\n" +
+                      $"Last month: {userModel.GetLastMonth().WordsLearnt}\r\n" +
+                      $"Last week : {userModel.GetLastWeek().Sum(s => s.WordsLearnt)}\r\n" +
+                      $"Today     : {userModel.GetToday().WordsLearnt}\r\n" +
+                      $"Today bycl: {userModel.GetToday().CummulativeStatsChanging.CountOf(4,10)}\r\n" +
+
+                      $"Score changing:\r\n" +
+                      $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
+                      $"Last week : {userModel.GetLastWeek().Sum(s => s.CummulativeStatsChanging.AbsoluteScoreChanging)}\r\n" +
+                      $"Today     : {userModel.GetToday().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
+                      $"\r\n" +
+                      $"Outdated:\r\n" +
+                      $"Total: {userModel.OutdatedWordsCount}\r\n" +
+                      $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.OutdatedChanging}\r\n" +
+                      $"Last week : {userModel.GetLastWeek().Sum(s => s.CummulativeStatsChanging.OutdatedChanging)}\r\n" +
+                      $"Today     : {userModel.GetToday().CummulativeStatsChanging.OutdatedChanging}\r\n" +
+                      $"a0: {userModel.CountOf(0, 2)}\r\n" +
+                      $"a1: {userModel.CountOf(2, 4)}\r\n" +
+                      $"a2: {userModel.CountOf(4, 6)}\r\n" +
+                      $"a3: {userModel.CountOf(6, 9)}\r\n" +
+                      $"Zento: {userModel.LeftToA2}";
+            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-"));
         }
     }
 }

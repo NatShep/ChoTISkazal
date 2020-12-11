@@ -104,20 +104,16 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual(1,read.LastMonthStats.Count);
         }
         
-        [TestCase(1,0,0,0,0)]
+        /*[TestCase(1,0,0,0,0)]
         [TestCase(1,1,0,0,0)]
         [TestCase(1,0,1,0,0)]
         [TestCase(1,0,0,1,0)]
         [TestCase(1,0,0,0,2)]
         [TestCase(0,3,1,5,9)]
-        public async Task OnChangingsApplied_UpdatedModelContainsA0123AndZenIndex(int a0Count,int a1Count,int a2Count,int a3Count, double zenIndex)
+        public async Task OnChangingsApplied_UpdatedModelContainsA0123AndZenIndex(int[] deltascores, double zenIndex)
         {
             var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
-            model.OnPairsAdded(new WordStatsChanging(a0Count,0,0,0,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,a1Count,0,0,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,a2Count,0,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,0,a3Count,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,0,0,0,zenIndex,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(deltascores,zenIndex,0,0),  1,1);
 
             await _repo.Update(model);
 
@@ -141,7 +137,7 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual(a2Count, lastMonth.CummulativeStatsChanging.A2WordsCountChanging);
             Assert.AreEqual(a3Count, lastMonth.CummulativeStatsChanging.A3WordsCountChanging);
             Assert.AreEqual(zenIndex,lastMonth.CummulativeStatsChanging.LeftToA2Changing);
-        }
+        }*/
         
         [TestCase(1)]
         [TestCase(42)]
