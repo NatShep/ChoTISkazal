@@ -59,11 +59,11 @@ namespace SayWhat.MongoDAL.Words
         public Task UpdateMetrics(UserWordModel word)
         {
             var updateDef = Builders<UserWordModel>.Update
-                .Set(LastUpdateScoreTime,   DateTime.Now)
-                .Set(AbsoluteScoreFieldName,   word.AbsoluteScore)
-                .Set(CurrentScoreFieldName,   word.CurrentOrderScore)
+                .Set(LastUpdateScoreTime,       DateTime.Now)
+                .Set(AbsoluteScoreFieldName,    word.AbsoluteScore)
+                .Set(CurrentScoreFieldName,     word.CurrentOrderScore)
                 .Set(QuestionPassedFieldName,   word.QuestionPassed)
-                .Set(QuestionAskedFieldName, word.QuestionAsked)
+                .Set(QuestionAskedFieldName,    word.QuestionAsked)
                 .Set(LastQuestionAskedTimestampFieldName,   word.LastQuestionTimestamp);
 
             return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);

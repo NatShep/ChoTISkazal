@@ -8,6 +8,7 @@ using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
@@ -55,7 +56,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
             
             var learningWordsCount = learningWords.Length;
-            if (learningWords.Average(w => w.AbsoluteScore) <= 4)
+            if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
                 var sb = new StringBuilder("*Learning*\r\n\r\n" +
                                            "Carefully study the words in the list below:\r\n\r\n" +

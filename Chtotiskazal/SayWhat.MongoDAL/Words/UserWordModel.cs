@@ -15,8 +15,6 @@ namespace SayWhat.MongoDAL.Words
     [BsonIgnoreExtraElements]
     public class UserWordModel
     {
-        
-
         public UserWordModel(ObjectId userId, string word, string translation, double rate = 0)
         {
             _userId = userId;
@@ -128,7 +126,7 @@ namespace SayWhat.MongoDAL.Words
 
         public void OnQuestionPassed()
         {
-            _absoluteScore++;
+            _absoluteScore += WordLeaningGlobalSettings.ScoresForPassedQuestion;
             _lastQuestionTimestamp = DateTime.Now;
             _questionAsked++;
             _questionPassed++;
@@ -141,7 +139,7 @@ namespace SayWhat.MongoDAL.Words
             if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
                 _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
 
-            _absoluteScore = (int) Math.Round(AbsoluteScore * 0.7);
+            _absoluteScore = (int) Math.Round(AbsoluteScore * WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed);
             if (_absoluteScore < 0)
                 _absoluteScore = 0;
 

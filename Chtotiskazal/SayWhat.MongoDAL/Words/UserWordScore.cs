@@ -9,9 +9,12 @@ namespace SayWhat.MongoDAL.Words
     {
         private readonly DateTime? _lastAskTime;
         public static UserWordScore Zero => new UserWordScore(0, DateTime.Now);
-
         public double AbsoluteScore { get; }
 
+        public bool IsOutdated => IsLearned &&
+                                  AgedScore < WordLeaningGlobalSettings.LearnedWordMinScore;
+        public bool IsLearned => AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore;
+        
         //res reduces for 1 point per AgingFactor days
         public double AgedScore
         {
@@ -38,24 +41,24 @@ namespace SayWhat.MongoDAL.Words
             int a3 = 0;
             
             if (earlierScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3--;
-            else if (earlierScore.AbsoluteScore >= WordStatsChanging.A2LearnScore) a2--;
+            else if (earlierScore.AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) a2--;
             else if (earlierScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1--;
             else a0--;
             
             if (laterScore.AbsoluteScore >= WordStatsChanging.A3LearnScore)      a3++;
-            else if (laterScore.AbsoluteScore >= WordStatsChanging.A2LearnScore) a2++;
+            else if (laterScore.AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) a2++;
             else if (laterScore.AbsoluteScore >= WordStatsChanging.A1LearnScore) a1++;
             else a0++;
 
-            var originA2Score = Math.Min(WordStatsChanging.A2LearnScore, earlierScore.AbsoluteScore);
-            var resultA2Score = Math.Min(WordStatsChanging.A2LearnScore, laterScore.AbsoluteScore);
+            var originA2Score = Math.Min(WordLeaningGlobalSettings.LearnedWordMinScore, earlierScore.AbsoluteScore);
+            var resultA2Score = Math.Min(WordLeaningGlobalSettings.LearnedWordMinScore, laterScore.AbsoluteScore);
 
             int outdatedChanging = 0;
             var agedScoreBefore = earlierScore.AgedScore;
             var agedScoreAfter  = laterScore.AgedScore;
-            if (agedScoreBefore < WordStatsChanging.A2LearnScore)
+            if (agedScoreBefore < WordLeaningGlobalSettings.LearnedWordMinScore)
                 outdatedChanging--;
-            if (agedScoreAfter < WordStatsChanging.A2LearnScore)
+            if (agedScoreAfter < WordLeaningGlobalSettings.LearnedWordMinScore)
                 outdatedChanging++;
 
             

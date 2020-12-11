@@ -7,18 +7,17 @@ namespace SayWhat.MongoDAL.Words
         public static readonly WordStatsChanging Zero = new WordStatsChanging(); 
 
         public const int A1LearnScore = 7;
-        public const int A2LearnScore = 12;
         public const int A3LearnScore = 22;
 
         public static WordStatsChanging CreateForNewWord(double absoluteScore)
         {
             var result = new WordStatsChanging();
             if (absoluteScore >= A3LearnScore)      result.A3WordsCountChanging++;
-            else if (absoluteScore >= A2LearnScore) result.A2WordsCountChanging++;
+            else if (absoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore) result.A2WordsCountChanging++;
             else if (absoluteScore >= A1LearnScore) result.A1WordsCountChanging++;
             else result.A0WordsCountChanging++;
             
-            result.LeftToA2Changing  = Math.Min(0, absoluteScore-A2LearnScore);
+            result.LeftToA2Changing  = Math.Min(0, absoluteScore-WordLeaningGlobalSettings.LearnedWordMinScore);
             return result;
         }
 

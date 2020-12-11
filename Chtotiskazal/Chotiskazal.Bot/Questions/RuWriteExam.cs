@@ -22,7 +22,7 @@ namespace Chotiskazal.Bot.Questions
         {
             var words = word.Word.Split(',').Select(s => s.Trim()).ToArray();
             var minCount = words.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.AbsoluteScore < minCount * 4)
+            if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return ExamResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.TranslationAsList}    <=====\r\n" +

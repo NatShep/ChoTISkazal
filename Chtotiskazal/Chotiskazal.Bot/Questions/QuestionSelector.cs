@@ -224,12 +224,12 @@ namespace Chotiskazal.Bot.Questions
 
         public IExam GetNextQuestionFor(bool isFirstExam, UserWordModel model)
         {
-            if (isFirstExam && model.AbsoluteScore < 7)
+            if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.IncompleteWordMinScore)
                 return _simpleExamsList.GetRandomItem().Exam;
 
-            var score = model.AbsoluteScore - (isFirstExam ? 2 : 0);
+            var score = model.AbsoluteScore - (isFirstExam ? (WordLeaningGlobalSettings.LearnedWordMinScore/6) : 0);
 
-            if (model.AbsoluteScore < 4)
+            if (model.AbsoluteScore < WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return ChooseExam(score, _intermidiateExamsList);
             else
                 return ChooseExam(score, _advancedExamsList);
