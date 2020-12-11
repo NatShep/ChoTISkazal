@@ -54,7 +54,7 @@ namespace SayWhat.Bll.Yapi
                 var deserialized = JsonSerializer.Deserialize<YapiDicAnswer>(ans);
                 return deserialized.Defenitions;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 IsOnline = false;
                 return null;

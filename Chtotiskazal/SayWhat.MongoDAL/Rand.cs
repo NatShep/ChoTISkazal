@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+ using System;
+using System.Collections.Generic;
 
 namespace SayWhat.MongoDAL
 {
     public static class Rand
     {
-        public static readonly System.Random Rnd = new System.Random(DateTime.Now.Millisecond);
+        public static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
         
         public static T GetRandomItem<T>(this IList<T> origin)
         {
@@ -49,3 +49,4 @@ namespace SayWhat.MongoDAL
             => Rnd.NextDouble();
     }
 }
+

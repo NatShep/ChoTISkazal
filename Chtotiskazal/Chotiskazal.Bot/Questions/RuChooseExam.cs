@@ -16,8 +16,8 @@ namespace Chotiskazal.Bot.Questions
         {
             var variants = examList.Where(e=>e.TranslationAsList!=word.TranslationAsList)
                 .Select(e => e.Word)
+                .Take(5)
                 .Append(word.Word)
-                .Where(e => word.TranslationAsList!=e)
                 .Randomize()
                 .ToArray();
 

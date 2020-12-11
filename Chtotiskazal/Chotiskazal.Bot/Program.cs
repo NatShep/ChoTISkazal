@@ -191,7 +191,7 @@ namespace Chotiskazal.Bot
                     await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
                 }
             }
-            catch (Exception error)
+            catch (Exception)
             {
                 Botlog.WriteError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}");
             }

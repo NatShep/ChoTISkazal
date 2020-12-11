@@ -16,6 +16,8 @@ namespace SayWhat.MongoDAL.Words
         }
         [BsonElement("w")]
         public string Word   { get; set; }
+
+        public bool HasTranscription => !string.IsNullOrWhiteSpace(Transcription);
         [BsonElement("ts")]
         public string Transcription   { get; set; }
         [BsonElement("e")]

@@ -25,15 +25,17 @@ namespace Chotiskazal.Bot.Questions
             var otherExamples = examList
                 .SelectMany(e => e.Examples)
                 .Where(p => !string.Equals(p.TranslatedPhrase, targetPhrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
-                .Take(8).ToArray();
+                .Randomize()
+                .Take(5)
+                .ToArray();
 
             if(!otherExamples.Any())
                 return ExamResult.Impossible;
             
             var variants = otherExamples
                 .Append(targetPhrase)
-                .Randomize()
                 .Select(e => e.TranslatedPhrase)
+                .Randomize()
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\n" +
