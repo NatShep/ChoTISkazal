@@ -18,19 +18,30 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("a3c")] 
         [BsonIgnoreIfDefault]
         private int _a3WordCount;
-        [BsonElement("l2a2c")] 
-        private double _leftToA2;
+        [BsonElement("l2a2c")]
+        [BsonIgnoreIfDefault]
+        private double _leftToA2Changing;
+        [BsonElement("sd")] 
+        [BsonIgnoreIfDefault]
+        private double _absoluteScoreChanging;
 
         public int WordsLearnt => Math.Max(0, _a2WordCount) + Math.Max(0, _a3WordCount);
         public WordStatsChanging CummulativeStatsChanging 
-            => new WordStatsChanging(_a0WordCount, _a1WordCount, _a2WordCount, _a3WordCount, _leftToA2);
+            => new WordStatsChanging(
+                _a0WordCount, 
+                _a1WordCount, 
+                _a2WordCount, 
+                _a3WordCount,
+                _absoluteScoreChanging,
+                _leftToA2Changing);
         public void AppendStats(WordStatsChanging statsChanging)
         {
-            _a0WordCount += statsChanging.A0WordsCountChanging;
-            _a1WordCount += statsChanging.A1WordsCountChanging;
-            _a2WordCount += statsChanging.A2WordsCountChanging;
-            _a3WordCount += statsChanging.A3WordsCountChanging;
-            _leftToA2+= statsChanging.LeftToA2Changing;
+            _a0WordCount           += statsChanging.A0WordsCountChanging;
+            _a1WordCount           += statsChanging.A1WordsCountChanging;
+            _a2WordCount           += statsChanging.A2WordsCountChanging;
+            _a3WordCount           += statsChanging.A3WordsCountChanging;
+            _leftToA2Changing      += statsChanging.LeftToA2Changing;
+            _absoluteScoreChanging += statsChanging.AbsoluteScoreChanging;
         }
         
         [BsonElement("wa")]
@@ -42,24 +53,18 @@ namespace SayWhat.MongoDAL.Users
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int ExamplesAdded { get; set; }
-
-       
-        
         [BsonElement("pc")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int PairsAdded { get; set; }
-        
         [BsonElement("qp")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int QuestionsPassed { get; set; }
-        
         [BsonElement("qf")]
         [BsonDefaultValue(0)]
         [BsonIgnoreIfDefault]
         public int QuestionsFailed { get; set; }
-        
         [BsonElement("ld")]
         [BsonIgnoreIfDefault]
         public int LearningDone { get; set; }

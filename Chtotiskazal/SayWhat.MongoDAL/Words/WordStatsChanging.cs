@@ -60,13 +60,14 @@ namespace SayWhat.MongoDAL.Words
             
         }
 
-        public WordStatsChanging(int a0, int a1, int a2, int a3, double leftLeftToA2)
+        public WordStatsChanging(int a0, int a1, int a2, int a3, double absoluteScoreChanging, double leftLeftToA2)
         {
             A0WordsCountChanging = a0;
             A1WordsCountChanging = a1;
             A2WordsCountChanging = a2;
             A3WordsCountChanging = a3;
             LeftToA2Changing = leftLeftToA2;
+            AbsoluteScoreChanging = absoluteScoreChanging;
         }
         /// <summary>
         /// How many words appears in A0 (new word) zone

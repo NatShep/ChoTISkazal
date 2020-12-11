@@ -54,6 +54,10 @@ namespace Chotiskazal.Bot.ChatFlows
                                                   $"Last month: {userModel.GetLastMonth().WordsLearnt}\r\n" +
                                                   $"Last week : {userModel.GetLastWeek().Sum(s => s.WordsLearnt)}\r\n" +
                                                   $"Today     : {userModel.GetToday().WordsLearnt}\r\n" +
+                                                  $"Score changing:\r\n" +
+                                                  $"Last month: {userModel.GetLastMonth().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
+                                                  $"Last week : {userModel.GetLastWeek().Sum(s => s.CummulativeStatsChanging.AbsoluteScoreChanging)}\r\n" +
+                                                  $"Today     : {userModel.GetToday().CummulativeStatsChanging.AbsoluteScoreChanging}\r\n" +
                                                   $"\r\n" +
                                                   $"a0: {userModel.A0WordCount}\r\n" +
                                                   $"a1: {userModel.A1WordCount}\r\n" +

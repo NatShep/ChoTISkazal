@@ -113,11 +113,11 @@ namespace SayWhat.MongoDAL.Tests
         public async Task OnChangingsApplied_UpdatedModelContainsA0123AndZenIndex(int a0Count,int a1Count,int a2Count,int a3Count, double zenIndex)
         {
             var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
-            model.OnPairsAdded(new WordStatsChanging(a0Count,0,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,a1Count,0,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,a2Count,0,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,0,a3Count,0),  1,1);
-            model.OnPairsAdded(new WordStatsChanging(0,0,0,0,zenIndex),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(a0Count,0,0,0,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,a1Count,0,0,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,a2Count,0,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,0,a3Count,0,0),  1,1);
+            model.OnPairsAdded(new WordStatsChanging(0,0,0,0,0,zenIndex),  1,1);
 
             await _repo.Update(model);
 

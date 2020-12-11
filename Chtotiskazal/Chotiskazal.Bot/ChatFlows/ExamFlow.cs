@@ -128,21 +128,26 @@ namespace Chotiskazal.Bot.ChatFlows
                             break;
                         case ExamResult.Passed:
                                                         
-                            await _usersWordsService.RegisterSuccess(word);
-                            user.OnQuestionPassed(word.Score - originRate);
+                           var succTask = _usersWordsService.RegisterSuccess(word);
 
                             await WritePassed();
                             Botlog.SaveQuestionMetricInfo(questionMetric,_chatIo.ChatId );
                             questionsCount++;
                             questionsPassed++;
-                            break;
+                           
+                            await succTask;
+                            user.OnQuestionPassed(word.Score - originRate);
+                           break;
                         case ExamResult.Failed:
-                            user.OnQuestionFailed(word.Score - originRate);
-                            await _usersWordsService.RegisterFailure(word);
+                            var failureTask = _usersWordsService.RegisterFailure(word);
                             await WriteFailed();
                             questionMetric.Result = 0;
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
+
+                            await failureTask;
+                            user.OnQuestionFailed(word.Score - originRate);
+
                             break;
                         case ExamResult.Retry:
                             retryFlag = true;
