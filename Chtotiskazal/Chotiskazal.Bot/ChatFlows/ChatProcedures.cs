@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.ChatFlows
         public const string y = "◻️";//"🟨";
         public const string g = "⬜️";//"🟩";
         public const string best = "🟩";//"🟩";
-        public const string d = "➖";//"▪️";//"✖";//"◾";//"✖";//"⬛";
+        public const string d = "➖";//"▪️"; //"➖"//"✖";//"◾";//"✖";//"⬛";
         public const string n = "✖";//"◾";
 
 
@@ -87,8 +87,8 @@ namespace Chotiskazal.Bot.ChatFlows
             var weeksLastMonthStarts =  today.Day / 7;
             // char position
             var monthName = monthNames[today.Month-1];
-            var monthTitleOffset = 4 + (7 - weeksLastMonthStarts) * 2.5 - monthName.Length-2;
-            sb.Append(new string(' ', (int)monthTitleOffset) + monthName + "\r\n");
+     //       var monthTitleOffset = 4 + (7 - weeksLastMonthStarts) * 2.5 - monthName.Length-2;
+    //        sb.Append(new string(' ', (int)monthTitleOffset) + monthName + "\r\n");
             for (int day = 0; day < 7; day++)
             {
                 sb.Append(dayNames[day] + " ");
@@ -113,6 +113,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 sb.Append("\r\n");
             }
             sb.Append("-------------------------\r\n ");
+            sb.Append("less " + r + o + y + g + best + " more\r\n");
             return sb.ToString();
         }
 
@@ -160,8 +161,9 @@ namespace Chotiskazal.Bot.ChatFlows
                 $"  Learned well: {lastDay.WordsLearnt}\r\n" +
                 $"  Exams passed: {lastDay.LearningDone}\r\n" +
                 $"  Score: {lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" Last activity:\r\n" +
+                $" Activity during last 7 weeks:\r\n" +
                 $"```" +
+                $"-------------------------\r\n "+
                 Render7WeeksCalendar(userModel.LastDaysStats
                     .Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray()) +
                 "```\r\n" +
