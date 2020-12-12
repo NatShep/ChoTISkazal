@@ -26,10 +26,14 @@ namespace Chotiskazal.Bot.Questions
                 .SelectMany(e => e.Translations)
                 .Select(e=>e.Transcription)
                 .Where(e => word.Translations.All(t => t.Transcription != e))
+                .Distinct()
+                .Randomize()
+                .Take(5)
                 .Append(originalTranslation.Transcription)
                 .Where(w=>w!=null)
                 .Randomize()
                 .ToList();
+            
             if (variants.Count == 0)
                 return ExamResult.Impossible;
 
