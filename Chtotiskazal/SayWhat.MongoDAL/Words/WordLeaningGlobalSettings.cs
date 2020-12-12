@@ -26,10 +26,10 @@
 
 
 
-        public static int NewWordGamingScore { get; set; } = 100;
-        public static int NewPairGamingScore { get; set; } = 10;
-        public static int QuestionPassedGamingScore { get; set; } = 5;
-        public static int QuestionFailedGamingScore { get; set; } = -5;
-        public static int LearningDoneGamingScore { get; set; } = 50;
+        public static int NewWordGamingScore { get; set; } = 20;
+        public static int NewPairGamingScore { get; set; } = 3;
+        public static int QuestionPassedGamingScore { get; set; } = 3;
+        public static int QuestionFailedGamingScore { get; set; } = -9;
+        public static int LearningDoneGamingScore { get; set; } = 15;
     }
 }

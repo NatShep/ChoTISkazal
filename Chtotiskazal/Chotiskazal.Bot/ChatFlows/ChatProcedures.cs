@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SayWhat.MongoDAL.Users;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -23,19 +24,20 @@ namespace Chotiskazal.Bot.ChatFlows
         
         public const string b = "🟦";
         public const string v = "🟪";
-        
-        public const string r = "🟥";
-        public const string y = "🟨";
-        public const string g = "🟩";
-        public const string o = "🟧";
         public const string w = "⬜";
-        public const string d = "✖";//"◾";//"✖";//"⬛";
-        public const string n = "◾";
         public const string s = " ";
         public const string td = "👉";
 
+        public const string r = "▫️";//"🟥";
+        public const string o = "◽️";//"🟧";
+        public const string y = "◻️";//"🟨";
+        public const string g = "⬜️";//"🟩";
+        public const string best = "🟩";//"🟩";
+        public const string d = "➖";//"▪️";//"✖";//"◾";//"✖";//"⬛";
+        public const string n = "✖";//"◾";
 
-        public static string Render7WeeksCalendar(CalendarItem[] items)
+
+        private static string Render7WeeksCalendar(CalendarItem[] items)
         {
             var today = DateTime.Today;
             double minVal = double.MaxValue;
@@ -97,10 +99,11 @@ namespace Chotiskazal.Bot.ChatFlows
                         sb.Append(n);
                     else if (offsets.TryGetValue(offset, out var v))
                     {
-                        var symbol = v <= 0.25 ? r
-                            : v <= 0.5 ? o
-                            : v <= 0.75 ? y
-                            : g;
+                        var symbol = v <= 0.1 ? r
+                            : v <= 0.2 ? o
+                            : v <= 0.5 ? y
+                            : v<= 0.9? g
+                            : best;
                         sb.Append(symbol);
                     }
                     else
@@ -112,8 +115,61 @@ namespace Chotiskazal.Bot.ChatFlows
             sb.Append("-------------------------\r\n ");
             return sb.ToString();
         }
-        
+
         public static async Task ShowStats(ChatIO chatIo, UserModel userModel)
+        {
+
+            string recomendation = "";
+            if (userModel.Zen.Rate < -15)
+                recomendation += $"We need more words! You have to add at least {userModel.Zen.CountOfWordsNeedToBeAdded} more words.";
+            else if (userModel.Zen.Rate < -10)
+                recomendation += $"Add {userModel.Zen.CountOfWordsNeedToBeAdded} words.";
+            else if (userModel.Zen.Rate < -5)
+                recomendation += $"Add {userModel.Zen.CountOfWordsNeedToBeAdded} words and pass {userModel.Zen.CountOfLearningNeedToBeDone} exams.";
+            else if (userModel.Zen.Rate < 5)
+                recomendation += $"Everything is perfect! " +
+                                 $"\r\nAdd {userModel.Zen.CountOfWordsNeedToBeAdded} words and pass {userModel.Zen.CountOfLearningNeedToBeDone} exams.";
+            else if (userModel.Zen.Rate < 10)
+                recomendation += $"Pass {userModel.Zen.CountOfLearningNeedToBeDone} exams and add {userModel.Zen.CountOfWordsNeedToBeAdded} words.";
+            else if (userModel.Zen.Rate < 15)
+                recomendation += $"Pass {userModel.Zen.CountOfLearningNeedToBeDone} exams";
+            else 
+                recomendation += $"Learning learning learning! You have to pass at least {userModel.Zen.CountOfLearningNeedToBeDone} more exams";
+
+            var weekStart = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek);
+            var lastWeek = userModel.LastDaysStats.Where(w => w.Date >= weekStart).ToArray();
+            var lastMonth = userModel.GetLastMonth();
+            var lastDay = userModel.GetToday();
+
+            var msg = "Your stats: \r\n```\r\n" +
+                $"  Words added: {userModel.WordsCount}\r\n" +
+                $"  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                $"  Score: {userModel.GamingScore}\r\n```\r\n" +
+                $"This month:\r\n```" +
+                $"  New words: {lastMonth.WordsAdded}\r\n" +
+                $"  Learned well: {lastMonth.WordsLearnt}\r\n" +
+                $"  Exams passed: {lastMonth.LearningDone}\r\n" +
+                $"  Score: {lastMonth.GameScoreChanging}\r\n```\r\n" +
+                $"This week:\r\n```" +
+                $"  New words: {lastWeek.Sum(l=>l.WordsAdded)}\r\n" +
+                $"  Learned well: {lastWeek.Sum(l=>l.WordsLearnt)}\r\n" +
+                $"  Exams passed: {lastWeek.Sum(l=>l.LearningDone)}\r\n" +
+                $"  Score: {lastWeek.Sum(l=>l.GameScoreChanging)}\r\n```\r\n" +
+                $"This day:\r\n```" +
+                $"  New words: {lastDay.WordsAdded}\r\n" +
+                $"  Learned well: {lastDay.WordsLearnt}\r\n" +
+                $"  Exams passed: {lastDay.LearningDone}\r\n" +
+                $"  Score: {lastDay.GameScoreChanging}\r\n```\r\n" +
+                $" Last activity:\r\n" +
+                $"```" +
+                Render7WeeksCalendar(userModel.LastDaysStats
+                    .Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray()) +
+                "```\r\n" +
+                "Recomendation: \r\n"+recomendation;
+            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"));
+        }
+
+        public static async Task ShowStats3(ChatIO chatIo, UserModel userModel)
         {
 
             var msg = "Your stats: \r\n" +

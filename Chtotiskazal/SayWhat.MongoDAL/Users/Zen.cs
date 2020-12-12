@@ -39,12 +39,15 @@ public class Zen
         Rate = CountOfLearningNeedToBeDone - CountOfWordsNeedToBeAdded;
         if (Rate >= 20) Rate = 20;
         //if zen = 20  rate = 1
-        //if zen = 0   rate ~ 5
-        //if zen = -20 rate = 8
-        AddWordsBonusRate = (int)Math.Round(-0.16 * Rate + 4.5);
-        LearnWordsBonusRate = (8 - AddWordsBonusRate) + 1;
+        //if zen = 0   rate ~ 2
+        //if zen = -20 rate = 3
+        AddWordsBonusRate = (int)Math.Round(-0.05 * Rate + 2);
+        LearnWordsBonusRate = (3 - AddWordsBonusRate) + 1;
     }
-    
+    /// <summary>
+    /// if rate is negative - user should add words
+    /// if rate is positive - user should learn words
+    /// </summary>
     public double Rate { get; }
     public int CountOfLearningNeedToBeDone { get; }
     public int CountOfWordsNeedToBeAdded { get; }

@@ -85,7 +85,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningAndAdvancedWords 
                 = await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords,_examSettings);
 
-            var scoresBefore = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
+            //var scoresBefore = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
             
             
             var questionsCount = 0;
@@ -147,10 +147,8 @@ namespace Chotiskazal.Bot.ChatFlows
                             questionMetric.Result = 0;
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
-
                             await failureTask;
                             user.OnQuestionFailed(word.Score - originRate);
-
                             break;
                         case ExamResult.Retry:
                             retryFlag = true;
@@ -172,22 +170,22 @@ namespace Chotiskazal.Bot.ChatFlows
             foreach (var pairModel in learningAndAdvancedWords.Distinct())
             {
                 doneMessage.Append(pairModel.Word + "  -  " + pairModel.TranslationAsList + "  (" +
-                                   pairModel.AbsoluteScore + ")\r\n");
+                                   (int)pairModel.AbsoluteScore + ")\r\n");
             }
 
             
             await updateUserTask;
             await finializeScoreUpdateTask;
-            var scoresAfter = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
+            /*var scoresAfter = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
             var changing = WordStatsChanging.Zero;
             for (int j = 0; j < scoresBefore.Length; j++)
             {
                 changing += scoresAfter[j] - scoresBefore[j];
-            }
+            }*/
 
-            doneMessage.Append(
-                $"Changings. as:{(int) changing.AbsoluteScoreChanging} od:{changing.OutdatedChanging}\r\ncat: {string.Join(",", changing.WordScoreChangings)}\r\n"
-                    .Replace("-", "\\-"));
+            //doneMessage.Append(
+            //    $"Changings. as:{(int) changing.AbsoluteScoreChanging} od:{changing.OutdatedChanging}\r\ncat: {string.Join(",", changing.WordScoreChangings)}\r\n"
+            //        .Replace("-", "\\-"));
             doneMessage.Append("```\r\n\r\nEnter new word to translate or /start to return to main menu");
             await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
 
