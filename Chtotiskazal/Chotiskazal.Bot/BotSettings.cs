@@ -16,6 +16,7 @@ namespace Chotiskazal.Bot
             ExamSettings = ReadExamSettings(configuration.GetSection("examSettings")); 
             TelegramToken = configuration["telegramToken"];
             MongoConnectionString = configuration["dbString"];
+            MongoDbName = configuration["dbName"];
             HelpMessage = configuration["help-msg"];
             WelcomeMessage = configuration["welcome-msg"];
         }
@@ -43,5 +44,7 @@ namespace Chotiskazal.Bot
         public TimeSpan YatransapiTimeout { get; }
         public string TelegramToken { get; set; }
         public string MongoConnectionString { get; set; }
+        public string MongoDbName { get; set; }
+
     }
 }

@@ -34,12 +34,11 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration();
+            _settings = ReadConfiguration(false);
 
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
-                
             var client = new MongoClient(_settings.MongoConnectionString);
-            var db = client.GetDatabase("swdumbp"/*"SayWhatDb"*/);
+            var db = client.GetDatabase(_settings.MongoDbName);
             StatsMigrator.Do(db).Wait();
             var userWordRepo   = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);
@@ -91,7 +90,7 @@ namespace Chotiskazal.Bot
 
         }
 
-        private static BotSettings ReadConfiguration()
+        private static BotSettings ReadConfiguration(bool substitudeDebugConfig)
         {
             try
             {
@@ -100,11 +99,12 @@ namespace Chotiskazal.Bot
                 var configuration = builder.Build();
                 
                 var set = new BotSettings(configuration);
-                if (true)
+                if (substitudeDebugConfig)
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
                     set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
                     set.MongoConnectionString = "mongodb://localhost:27017/";
+                    set.MongoDbName = "swdumbp";
                 }
 
                 return set;
