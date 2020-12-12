@@ -52,6 +52,9 @@ namespace SayWhat.MongoDAL.Words
 
         public int CountOf(int minimumScoreCategory, int maximumScoreCategory)
         {
+            if (WordScoreChangings == null)
+                return 0;
+            
             var acc = 0;
             for (int i = minimumScoreCategory; i < WordScoreChangings.Length && i< maximumScoreCategory; i++)
             {

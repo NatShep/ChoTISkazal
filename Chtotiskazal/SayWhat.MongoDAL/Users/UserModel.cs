@@ -168,9 +168,10 @@ namespace SayWhat.MongoDAL.Users
             else
             {
                 var oldest = LastDaysStats[0];
-                var oldestDelta = (today - oldest.Date);
-                if (oldestDelta.TotalDays > 30)
+                while ((today - LastDaysStats[0].Date).TotalDays>49)
+                {
                     LastDaysStats.RemoveAt(0);
+                }
                 var lastDay = LastDaysStats.Last();
                 if (lastDay.Date != today)
                 {
@@ -195,7 +196,7 @@ namespace SayWhat.MongoDAL.Users
             month.PairsAdded+= pairsCount;
             month.ExamplesAdded+= examplesCount;
             var gamingScore =pairsCount * WordLeaningGlobalSettings.NewPairGamingScore* Zen.AddWordsBonusRate ;
-            AppendChangingsToStats(statsChanging, today, month, gamingScore);
+            ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
             OnAnyActivity();
             return gamingScore;
         }
@@ -203,19 +204,12 @@ namespace SayWhat.MongoDAL.Users
         public void OnStatsChangings(WordStatsChanging changing)
         {
             var (today, month) = FixStatsAndGetCurrent();
-            AppendChangingsToStats(changing, today, month,0);
+            ApplyWordStatsChangings(changing, today, month,0);
         }
 
-        /*public void OnGameScoreIncreased(int count)
-        {
-            _gamingScore += count;
-            if (_gamingScore <= 0) _gamingScore = 0;
-            var (today, month) = FixStatsAndGetCurrent();
-            today.OnGameScoreIncreased(count);
-            month.OnGameScoreIncreased(count);
-        }*/
+    
         
-        private void AppendChangingsToStats(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, int gamingScore)
+        private void ApplyWordStatsChangings(WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, int gamingScore)
         {
             dailyStats.AppendStats(statsChanging);
             monthsStats.AppendStats(statsChanging);
@@ -255,7 +249,7 @@ namespace SayWhat.MongoDAL.Users
             OnAnyActivity();
 
             var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore * Zen.LearnWordsBonusRate;
-            AppendChangingsToStats(statsChanging, today, month, gamingScore);
+            ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
             return gamingScore;
         }
         public int OnQuestionFailed(WordStatsChanging statsChanging)
@@ -268,7 +262,7 @@ namespace SayWhat.MongoDAL.Users
 
             OnAnyActivity();
 
-            AppendChangingsToStats(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
+            ApplyWordStatsChangings(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
             return WordLeaningGlobalSettings.QuestionFailedGamingScore;
         }
         public int OnLearningDone()
@@ -280,12 +274,11 @@ namespace SayWhat.MongoDAL.Users
             month.LearningDone++;
 
             var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore* Zen.LearnWordsBonusRate;
-            AppendChangingsToStats(WordStatsChanging.Zero, today, month, gamingScore);
+            ApplyWordStatsChangings(WordStatsChanging.Zero, today, month, gamingScore);
             OnAnyActivity();
 
             return gamingScore;
         }
-
         
         public IReadOnlyList<DailyStats> GetLastWeek()
         {
@@ -301,6 +294,76 @@ namespace SayWhat.MongoDAL.Users
             }
             return dailyStats;
         }
-        
+
+        public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords)
+        {
+            if(_wordsCount== _countByCategoryScores?.Sum())
+                return;
+            
+            var days = new Dictionary<DateTime, DailyStats>();
+            var months = new Dictionary<DateTime,MonthsStats>();
+            _countByCategoryScores = new int[8];
+            _outdatedWordsCount = 0;
+            this._gamingScore = 0;
+            foreach (var word in allUserWords)
+            {
+                var creationTime = word.Id.CreationTime;
+                var day = creationTime.Date;
+                if (!days.TryGetValue(day, out var dailyStats))
+                {
+                    dailyStats = new DailyStats()
+                    {
+                        Date = day
+                    };
+                    days.Add(day, dailyStats);
+                }
+
+                var month = new DateTime(creationTime.Year, creationTime.Month, 1);
+                if (!months.TryGetValue(month, out var monthsStats))
+                {
+                    monthsStats = new MonthsStats()
+                    {
+                        Date = month
+                    };
+                    months.Add(month, monthsStats);
+                }
+
+                var eCount = word.Translations.Select(t => t.Examples.Length).Sum();
+                monthsStats.ExamplesAdded += eCount;
+                dailyStats.ExamplesAdded += eCount;
+                monthsStats.PairsAdded += word.Translations.Length;
+                dailyStats.PairsAdded += word.Translations.Length;
+                monthsStats.WordsAdded++;
+                dailyStats.WordsAdded++;
+
+                dailyStats.QuestionsPassed += word.QuestionPassed;
+                monthsStats.QuestionsPassed += word.QuestionPassed;
+                dailyStats.QuestionsFailed += word.QuestionAsked - word.QuestionPassed;
+                monthsStats.QuestionsFailed += word.QuestionAsked - word.QuestionPassed;
+
+                var wc = WordStatsChanging.CreateForNewWord(word.AbsoluteScore);
+
+                var score = WordLeaningGlobalSettings.NewWordGamingScore +
+                            WordLeaningGlobalSettings.NewPairGamingScore * word.Translations.Length +
+                            WordLeaningGlobalSettings.ScoresForPassedQuestion * word.QuestionPassed +
+                            WordLeaningGlobalSettings.QuestionFailedGamingScore *
+                            (word.QuestionAsked - word.QuestionPassed);
+                ApplyWordStatsChangings(wc, dailyStats, monthsStats,(int)score);
+            }
+
+            LastDaysStats.Clear();
+            LastMonthStats.Clear();
+
+            foreach (var day in days) {
+                LastDaysStats.Add(day.Value);
+            }
+            LastDaysStats.Sort((d1,d2)=>d1.Day.CompareTo(d2.Day));
+            
+            foreach (var month in months) {
+                LastMonthStats.Add(month.Value);
+            }
+            LastMonthStats.Sort((d1,d2)=>d1.Months.CompareTo(d2.Months));
+            _wordsCount = allUserWords.Count();
+        }
     }
 }

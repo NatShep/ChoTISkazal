@@ -120,7 +120,11 @@ namespace SayWhat.MongoDAL.Words
                 .Limit(count)
                 .ToListAsync();
 
-        
+        public async Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user)
+        {
+            var c =await Collection.FindAsync( Builders<UserWordModel>.Filter.Eq(UserIdFieldName,user.Id));
+            return await c.ToListAsync();
+        }
         //DELETE This after
         public IReadOnlyCollection<UserWordModel> GetTestWords(UserModel user)
         {

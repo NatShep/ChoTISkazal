@@ -68,7 +68,7 @@ namespace SayWhat.MongoDAL.Words
         /// Absolute words score.
         /// </summary>
         [BsonElement(UserWordsRepo.AbsoluteScoreFieldName)]
-        private double _absoluteScore;
+        public double _absoluteScore;
 
         /// <summary>
         /// Number of correctly answered questions 

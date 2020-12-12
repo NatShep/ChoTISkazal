@@ -246,13 +246,7 @@ namespace SayWhat.Bll.Services
             return examsList;
         }
         
-        //DELETE THIS AFTER
-        public async Task<UserWordModel[]> GetTestingFords(UserModel user)
-        {
-            var words =  _userWordsRepository.GetTestWords(user);
-            await IncludeExamples(words);
-            return words.ToArray();
-            
-        }
+        public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
+            => _userWordsRepository.GetAllWords(user);
     }
 }
