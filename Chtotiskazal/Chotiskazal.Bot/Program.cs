@@ -40,7 +40,7 @@ namespace Chotiskazal.Bot
                 
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase("swdumbp"/*"SayWhatDb"*/);
-
+            StatsMigrator.Do(db).Wait();
             var userWordRepo   = new UserWordsRepo(db);
             var dictionaryRepo = new DictionaryRepo(db);
             var userRepo       = new UsersRepo(db);
@@ -165,7 +165,12 @@ namespace Chotiskazal.Bot
         private static void RunChatRoom(Chat chat, ChatRoomFlow newChatRoom)
         {
             var task = newChatRoom.Run();
-            task.ContinueWith((t) => Botlog.WriteError(chat.Id, $"Faulted {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(
+                (t) =>
+                {
+                    Botlog.WriteError(chat.Id, $"Faulted {t.Exception}");
+                    Chats.TryRemove(chat.Id, out _);
+                }, TaskContinuationOptions.OnlyOnFaulted);
         }
         private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {

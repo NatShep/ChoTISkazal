@@ -350,9 +350,15 @@ namespace SayWhat.MongoDAL.Users
                             (word.QuestionAsked - word.QuestionPassed);
                 ApplyWordStatsChangings(wc, dailyStats, monthsStats,(int)score);
             }
-
-            LastDaysStats.Clear();
-            LastMonthStats.Clear();
+            if(LastDaysStats==null)
+                LastDaysStats = new List<DailyStats>();
+            else
+                LastDaysStats.Clear();
+            
+            if(LastMonthStats==null)
+                LastMonthStats = new List<MonthsStats>();
+            else
+                LastMonthStats.Clear();
 
             foreach (var day in days) {
                 LastDaysStats.Add(day.Value);

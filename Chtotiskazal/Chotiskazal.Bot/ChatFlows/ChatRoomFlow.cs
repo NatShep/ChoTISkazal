@@ -49,29 +49,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     UserModel = await addUserTask;
                     Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString());
                 }
-                else
-                {
-                    
-                    if (UserModel.WordsCount != UserModel.CountOf(0, 100))
-                    {
-                        Stopwatch sw = Stopwatch.StartNew();
-                        var allWords =  await _usersWordsService.GetAllWords(UserModel);
-                        foreach (var word in allWords)
-                        {
-                            word._absoluteScore = word.AbsoluteScore / 3;
-                            word.UpdateCurrentScore();
-                        }
-                        UserModel.RecreateStatistic(allWords);
-                        foreach (var word in allWords)
-                        {
-                            await _usersWordsService.UpdateWordMetrics(word);
-                        }
-
-                        await _userService.Update(UserModel);
-                        sw.Stop();
-                        await ChatProcedures.ShowStats(ChatIo, UserModel);
-                    }
-                }
+                
                 while (true)
                 {
                     try
@@ -91,6 +69,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     {
                         Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
                         await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
+                        throw;
                     }
                 }
             }
@@ -179,7 +158,5 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
         }
-
-        
     }
 }
