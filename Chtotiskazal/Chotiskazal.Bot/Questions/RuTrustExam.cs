@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -14,14 +17,28 @@ namespace Chotiskazal.Bot.Questions
         {
             var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
                       $"Do you know the translation?";
+            var id = Rand.Next();
+            
             var _ = chatIo.SendMessageAsync(msg,
                 new InlineKeyboardButton()
                 {
-                    CallbackData = "1",
+                    CallbackData = id.ToString(),
                     Text = "See the translation"
                 });
-            await chatIo.WaitInlineIntKeyboardInput();
-            
+            while (true)
+            {
+                var update = await chatIo.WaitUserInputAsync();
+                if (update.CallbackQuery?.Data == id.ToString())
+                    break;
+                var input = update.Message?.Text;
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    if (word.Word.Equals(input, StringComparison.InvariantCultureIgnoreCase))
+                        return ExamResult.Passed;
+                    await chatIo.SendMessageAsync("No. It is not right. Try again");
+                }
+            }
+
             _= chatIo.SendMessageAsync($"Translation is \r\n" +
                                        $"{word.Word}\r\n" +
                                        $" Did you guess?",
