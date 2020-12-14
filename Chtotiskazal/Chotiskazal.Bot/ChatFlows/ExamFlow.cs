@@ -7,6 +7,7 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;

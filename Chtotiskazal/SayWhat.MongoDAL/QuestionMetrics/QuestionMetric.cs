@@ -5,7 +5,7 @@ using SayWhat.MongoDAL.Words;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace SayWhat.Bll
+namespace SayWhat.MongoDAL.QuestionMetrics
 {
     [BsonIgnoreExtraElements]
     public class QuestionMetric

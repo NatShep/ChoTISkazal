@@ -4,7 +4,7 @@ using MongoDB.Driver;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
 
-namespace SayWhat.Bll
+namespace SayWhat.MongoDAL.QuestionMetrics
 {
     public class QuestionMetricRepo: IMongoRepo
     {

@@ -11,6 +11,7 @@ using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot;
@@ -34,7 +35,7 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration(substitudeDebugConfig: true);
+            _settings = ReadConfiguration(substitudeDebugConfig: false);
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);
@@ -65,6 +66,7 @@ namespace Chotiskazal.Bot
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
+            
             var me = _botClient.GetMeAsync().Result;
             
             Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ");
