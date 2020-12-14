@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration(substitudeDebugConfig: false);
+            _settings = ReadConfiguration(substitudeDebugConfig: true);
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);
@@ -43,16 +43,19 @@ namespace Chotiskazal.Bot
             var dictionaryRepo = new DictionaryRepo(db);
             var userRepo       = new UsersRepo(db);
             var examplesRepo   = new ExamplesRepo(db);
-            
+            var questionMetricsRepo = new QuestionMetricRepo(db);
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
             examplesRepo.UpdateDb();
+            questionMetricsRepo.UpdateDb();
+
+            Botlog.QuestionMetricRepo = questionMetricsRepo;
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
             _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
             _userService          = new UserService(userRepo);
-
+            
             _addWordService = new AddWordService(
                 _userWordService,
                 yandexDictionaryClient,

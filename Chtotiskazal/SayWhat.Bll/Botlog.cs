@@ -8,6 +8,7 @@
 {
     public static class Botlog{
         
+        public static QuestionMetricRepo QuestionMetricRepo { get; set; }
         
         private static ILogger _log = Log.Logger = new LoggerConfiguration()
             .Enrich.WithProperty("Version", "6.0.0")
@@ -41,6 +42,7 @@
         public static void SaveQuestionMetricInfo(QuestionMetric questionMetric, string chatId)
         {
             _log.Information("Save question metric {@ChatInfo} {@questionMetric}", new {ChatInfo=chatId}, questionMetric);
+            QuestionMetricRepo?.Add(questionMetric);
         }
 
         public static void RegisterExamInfo(long? userTelegramId, DateTime started, int questionsCount, int questionsPassed)
