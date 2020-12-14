@@ -102,7 +102,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 do
                 {
                     retryFlag = false;
-                    var sw = Stopwatch.StartNew();
                     var questionMetric = new QuestionMetric(word, exam.Name);
 
                     var learnList = learningWords;
@@ -117,12 +116,10 @@ namespace Chotiskazal.Bot.ChatFlows
                             await WritePassed();
                     }
                     user.OnAnyActivity();
-                    var result = await exam.Pass(_chatIo, word, learnList);
-                    
-                    sw.Stop();
-                    questionMetric.ElaspedMs = (int) sw.ElapsedMilliseconds;
                     var originRate =word.Score;
-                    
+
+                    var result = await exam.Pass(_chatIo, word, learnList);
+
                     switch (result)
                     {
                         case ExamResult.Impossible:
@@ -134,17 +131,17 @@ namespace Chotiskazal.Bot.ChatFlows
                            var succTask = _usersWordsService.RegisterSuccess(word);
 
                             await WritePassed();
-                            Botlog.SaveQuestionMetricInfo(questionMetric,_chatIo.ChatId );
                             questionsCount++;
                             questionsPassed++;
-                           
+                            questionMetric.OnExamFinished(word.Score, true ); 
+                            Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             await succTask;
                             user.OnQuestionPassed(word.Score - originRate);
                            break;
                         case ExamResult.Failed:
                             var failureTask = _usersWordsService.RegisterFailure(word);
                             await WriteFailed();
-                            questionMetric.Result = 0;
+                            questionMetric.OnExamFinished(word.Score, false );
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
                             await failureTask;
