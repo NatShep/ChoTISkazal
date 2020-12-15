@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot
        
         internal void OnUpdate(Update args)
         {
-            Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}");
+            Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}",false);
             _senderChannel.Writer.TryWrite(args);
         }
 
@@ -51,14 +51,14 @@ namespace Chotiskazal.Bot
 
         public async Task<Update> WaitUserInputAsync()
         {
-            Botlog.WriteInfo($"Wait for update",ChatId);
+            Botlog.WriteInfo($"Wait for update",ChatId,false);
             var upd = await _senderChannel.Reader.ReadAsync();
             var txt = upd.Message?.Text ?? upd.CallbackQuery?.Data;
             
             if(_menuItems.Contains(txt))
                 throw new ProcessInterruptedWithMenuCommand(txt);
 
-            Botlog.WriteInfo($"Got update",ChatId);
+            Botlog.WriteInfo($"Got update",ChatId,false);
             return upd;
         }
         

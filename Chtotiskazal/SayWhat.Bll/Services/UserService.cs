@@ -29,12 +29,12 @@ namespace SayWhat.Bll.Services
                     telegramNick: info.UserNick, 
                     source:       UserSource.Telegram);
                 await _repository.Add(user);
-                Botlog.WriteInfo($"Register new user - {user.TelegramNick}",user.TelegramId.ToString());
+                Botlog.WriteInfo($"Register new user - {user.TelegramNick}",user.TelegramId.ToString(),true);
                 return user;
             }
             catch
             {
-                Botlog.WriteError(info.TelegramId,$"Can't add new user {info.TelegramId}");
+                Botlog.WriteError(info.TelegramId,$"Can't add new user {info.TelegramId}",true);
                 return null;
             }
         }

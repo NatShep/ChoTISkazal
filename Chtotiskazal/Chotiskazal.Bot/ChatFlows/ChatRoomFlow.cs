@@ -47,7 +47,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     var addUserTask = _userService.AddUserFromTelegram(_userInfo);
                     await SayHelloAsync();
                     UserModel = await addUserTask;
-                    Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString());
+                    Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString(),true);
                 }
                 
                 while (true)
@@ -67,7 +67,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     }
                     catch (Exception e)
                     {
-                        Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
+                        Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}",true);
                         await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
                         throw;
                     }
@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
             catch (Exception e)
             {
-                Botlog.WriteError(this.ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}");
+                Botlog.WriteError(this.ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}",true);
                 throw;
             }
         }
