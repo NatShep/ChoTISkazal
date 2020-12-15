@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration(substitudeDebugConfig: false);
+            _settings = ReadConfiguration(substitudeDebugConfig: true);
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);

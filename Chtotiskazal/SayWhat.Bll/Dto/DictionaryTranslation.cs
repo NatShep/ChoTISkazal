@@ -35,6 +35,11 @@ namespace SayWhat.Bll.Dto
         public List<Example> Examples { get; set; } = new List<Example>();
         public TranslationSource Source { get; }
 
+        public DictionaryTranslation GetEnRu() => 
+            TranlationDirection == TranslationDirection.RuEn 
+                ? GetReversed() 
+                : this;
+
         public DictionaryTranslation GetReversed()
         {
             return new DictionaryTranslation(TranslatedText, OriginText, "", 

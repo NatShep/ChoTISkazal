@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -14,14 +14,17 @@ namespace Chotiskazal.Bot.ChatFlows
     {
         private readonly ChatIO _chatIo;
         private readonly AddWordService _addWordService;
+        private readonly SelectWordTranslationCallbackQueryHandler _translationCallbackQueryHandler;
 
         public AddingWordsMode(
             ChatIO chatIo,
-            AddWordService addWordService
+            AddWordService addWordService,
+            SelectWordTranslationCallbackQueryHandler translationCallbackQueryHandler
             )
         {
             _chatIo = chatIo;
             _addWordService = addWordService;
+            _translationCallbackQueryHandler = translationCallbackQueryHandler;
         }
 
         public async Task Enter(UserModel user, string? word = null)
@@ -49,23 +52,47 @@ namespace Chotiskazal.Bot.ChatFlows
                 await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
                 return null;
             }
-
+            //getting first transcription
             var tr = translations.FirstOrDefault(t =>!string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
 
-
+            var handler = new ConcreteTranslationFastHandler(
+                translations:   translations,
+                user:           user,
+                chat:           _chatIo, 
+                addWordService: _addWordService);
+            
+            _translationCallbackQueryHandler.SetTranslationHandler(handler);
+            
             await _chatIo.SendMarkdownMessageAsync(
                 $"_Here are the translations\\._ \r\n" +
                 $"_Choose one of them to learn them in the future_\r\n\r\n" +
                 $"*{word.Capitalize()}*" +
                 $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr}]\r\n```")}",
-                    InlineButtons.CreateVariantsWithCancel(translations.Select(t => t.TranslatedText)));
+                translations.Select(v => AddWordHelper.CreateButtonFor(v, false))
+                    .Append(new InlineKeyboardButton
+                    {
+                        CallbackData = "/start",
+                        Text = "Cancel",
+                    }).ToArray());
             
             
             if(word.IsRussian())
                 user.OnRussianWordTranlationRequest();
             else
                 user.OnEnglishWordTranslationRequest();
-            
+
+            try
+            {
+                // user start to translate next word
+                return await _chatIo.WaitUserTextInputAsync();
+            }
+            finally
+            {
+                //notify handler, that we leave the flow
+                await handler.OnNextUserMessage();
+            }
+
+            /*
             while (true)
             {
                 var update = await _chatIo.WaitUserInputAsync();
@@ -83,15 +110,15 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (selectedIndex < 0 || selectedIndex >= translations.Count)
                     continue;
                     
-                var selected = GetSelectedTranslation(translations, selectedIndex);
-                await _addWordService.AddWordsToUser(user,  selected);
+                var selected = translations[selectedIndex].GetEnRu();
+                await _addWordService.AddTranslationToUser(user,  selected);
                     
                 if(selected.Examples.Count>0)
                     await _chatIo.SendMessageAsync($"Saved. Examples: {selected.Examples.Count}");
                 else
                     await _chatIo.SendMessageAsync($"Saved.");
-                return null;
-            }
+                return null;*/
+            //}
         }
 
         private async Task SaveFirstTranslationBecauseOfCancel(UserModel user, IReadOnlyList<DictionaryTranslation> translations)
@@ -101,16 +128,8 @@ namespace Chotiskazal.Bot.ChatFlows
             // but we can not be sure that it is new word for user
             // so we give score '8' to that pair, witch means 'familiar word'
             // and user needs at least one or two exams to pass the word
-            var selected = GetSelectedTranslation(translations, 0);
-            await _addWordService.AddWordsToUser(user, selected, 8);
-        }
-
-        private static DictionaryTranslation GetSelectedTranslation(IReadOnlyList<DictionaryTranslation> translations, int value)
-        {
-            var selected = translations[value];
-            if (selected.TranlationDirection == TranslationDirection.RuEn)
-                selected = selected.GetReversed(); //Reverse translate direction, to store all pairs in one dirrection
-            return selected;
+            var selected = translations[0].GetEnRu();
+            await _addWordService.AddTranslationToUser(user, selected, 8);
         }
     }
 }

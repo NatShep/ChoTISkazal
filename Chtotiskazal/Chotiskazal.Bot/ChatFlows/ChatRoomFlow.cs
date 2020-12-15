@@ -32,6 +32,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private readonly UsersWordsService _usersWordsService;
         private readonly UserService _userService;
         private readonly TelegramUserInfo _userInfo;
+        private SelectWordTranslationCallbackQueryHandler _translationCallbackQueryHandler;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
 
@@ -49,7 +50,14 @@ namespace Chotiskazal.Bot.ChatFlows
                     UserModel = await addUserTask;
                     Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString(),true);
                 }
+                _translationCallbackQueryHandler = new SelectWordTranslationCallbackQueryHandler(
+                    _addWordsService, 
+                    ChatIo, 
+                    UserModel, 
+                    _usersWordsService);
                 
+                
+                ChatIo.RegistrateCallbackQueryHandler(_translationCallbackQueryHandler);
                 while (true)
                 {
                     try
@@ -102,7 +110,7 @@ namespace Chotiskazal.Bot.ChatFlows
             .EnterAsync(UserModel);
 
         private Task StartToAddNewWords(string text = null) 
-            => new AddingWordsMode(ChatIo, _addWordsService).Enter(UserModel, text);
+            => new AddingWordsMode(ChatIo, _addWordsService, _translationCallbackQueryHandler).Enter(UserModel, text);
 
       
         private Task HandleMainMenu(string command){

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -26,11 +27,21 @@ namespace Chotiskazal.Bot
         }
 
         private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/learn"};
-       
+        private IChatCallbackQuery _callbackQuery;
+        public void RegistrateCallbackQueryHandler(IChatCallbackQuery callbackQuery)
+        {
+            _callbackQuery = callbackQuery;
+        }
         internal void OnUpdate(Update args)
         {
             Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}",false);
-            _senderChannel.Writer.TryWrite(args);
+            if (args.CallbackQuery != null && _callbackQuery?.CanBeHandled(args.CallbackQuery) == true)
+            {
+                var _ =_callbackQuery.Handle(args);
+            }
+            else
+                _senderChannel.Writer.TryWrite(args);
+
         }
 
         public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);
@@ -105,6 +116,14 @@ namespace Chotiskazal.Bot
             }
         }
 
-        public Task SendTyping() => _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
+        public Task SendTyping() 
+            => _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
+
+        public  Task EditMessageButtons(int messageId, InlineKeyboardButton[] buttons) 
+            => _client.EditMessageReplyMarkupAsync(ChatId, messageId, 
+                new InlineKeyboardMarkup(buttons.Select(b=>new[]{b})));
+
+        public  Task AnswerCallbackQueryWithTooltip(string callbackQueryId, string s) 
+            => _client.AnswerCallbackQueryAsync(callbackQueryId, s, true);
     }
 }
