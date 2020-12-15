@@ -14,8 +14,8 @@ public class Zen
         var notLearnedWords = 0;
         for (int i = 0; i < 4; i++)
         {
-            needToBeDone+= changings[i] * ( 4-i);
-            notLearnedWords += changings[i];
+            needToBeDone+= _changings[i] * ( 4-i);
+            notLearnedWords += _changings[i];
         }
         //we got 4 scores per learning (approx)
         // so we need at least {needToBeDone}/4 exams to be done

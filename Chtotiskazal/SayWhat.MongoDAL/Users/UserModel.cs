@@ -219,7 +219,7 @@ namespace SayWhat.MongoDAL.Users
             if (_gamingScore <= 0) _gamingScore = 0;
             
             if (_countByCategoryScores == null)
-                _countByCategoryScores = statsChanging.WordScoreChangings;
+                _countByCategoryScores = statsChanging.WordScoreChangings?? new int[8];
             else
                 _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
             _countByCategoryScores.SetLowLimitInplace(0);
