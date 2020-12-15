@@ -32,20 +32,20 @@
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();
 
-        public static void WriteError(long? chatId, string msg, bool writeToTelegram)
+        public static void WriteError(long? chatId, string msg, bool writeToTelegram=false)
         {
             _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
             if (writeToTelegram)
                 _alarmLog?.Error("❗ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
         }
-        public static void WriteInfo(string msg,bool writeToTelegram)
+        public static void WriteInfo(string msg,bool writeToTelegram=false)
         {
             _log.Information(msg);
             if (writeToTelegram)
                 _alarmLog?.Error("✅ " + msg);
         }
         
-        public static void WriteInfo(string msg, string chatId,bool writeToTelegram)
+        public static void WriteInfo(string msg, string chatId,bool writeToTelegram=false)
         {
             _log.Information(msg+" {@ChatInfo}", new {ChatInfo = chatId});
             if (writeToTelegram)

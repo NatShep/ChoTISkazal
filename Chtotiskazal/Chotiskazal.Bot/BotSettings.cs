@@ -45,8 +45,8 @@ namespace Chotiskazal.Bot
         public string YatransapiKey { get; }
         public TimeSpan YatransapiTimeout { get; }
         public string TelegramToken { get; set; }
-        public string BotHelperToken { get;  }
-        public string ControlPanelChatId { get;  }
+        public string BotHelperToken { get; set; }
+        public string ControlPanelChatId { get; set; }
         public string MongoConnectionString { get; set; }
         public string MongoDbName { get; set; }
 

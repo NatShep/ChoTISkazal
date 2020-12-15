@@ -79,14 +79,14 @@ namespace Chotiskazal.Bot
             Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",true);
 
             var allUpdates =_botClient.GetUpdatesAsync().Result;
-            Botlog.WriteInfo($"{allUpdates.Length} messages were missed",false);
+            Botlog.WriteInfo($"{allUpdates.Length} messages were missed");
 
             foreach (var update in allUpdates) 
                 OnBotWokeUp(update);
             if (allUpdates.Any())
             {
                 _botClient.MessageOffset = allUpdates.Last().Id + 1;
-                Botlog.WriteInfo($"{Chats.Count} users were waitig for us",false);
+                Botlog.WriteInfo($"{Chats.Count} users were waitig for us");
             }
             _botClient.OnUpdate+= BotClientOnOnUpdate;
             _botClient.OnMessage += Bot_OnMessage;
@@ -114,6 +114,8 @@ namespace Chotiskazal.Bot
                     set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
                     set.MongoConnectionString = "mongodb://localhost:27017/";
                     set.MongoDbName = "swdumbp";
+                    set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
+                    set.ControlPanelChatId = "326823645";
                 }
 
                 return set;
@@ -186,19 +188,19 @@ namespace Chotiskazal.Bot
             long? chatId = null;
             try
             {
-                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...",false);
+                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...");
 
                 if (e.Update.Message != null)
                 {
                     chatId = e.Update.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString(),false);
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
                     chatId = e.Update.CallbackQuery.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString(),false);
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
 
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
@@ -215,7 +217,7 @@ namespace Chotiskazal.Bot
         {
             if (e.Message.Text != null)
             {
-                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString(),false);
+                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
             }
         }
         
