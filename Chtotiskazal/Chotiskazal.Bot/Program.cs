@@ -23,6 +23,7 @@ namespace Chotiskazal.Bot
 {
     static class Program {
         private static TelegramBotClient _botClient;
+        private static TelegramBotClient _botHelper;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
@@ -66,32 +67,31 @@ namespace Chotiskazal.Bot
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
+            _botHelper = new TelegramBotClient(_settings.BotHelperToken);
             
             var me = _botClient.GetMeAsync().Result;
             
-            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ");
+            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",false);
 
             var allUpdates =_botClient.GetUpdatesAsync().Result;
-            Botlog.WriteInfo($"{allUpdates.Length} messages were missed");
+            Botlog.WriteInfo($"{allUpdates.Length} messages were missed",false);
 
             foreach (var update in allUpdates) 
                 OnBotWokeUp(update);
             if (allUpdates.Any())
             {
                 _botClient.MessageOffset = allUpdates.Last().Id + 1;
-                Botlog.WriteInfo($"{Chats.Count} users were waitig for us");
+                Botlog.WriteInfo($"{Chats.Count} users were waitig for us",false);
             }
             _botClient.OnUpdate+= BotClientOnOnUpdate;
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-            Botlog.WriteInfo($"... and here i go!");
+            Botlog.WriteInfo($"... and here i go!",false);
             // workaround for infinity awaiting
              new TaskCompletionSource<bool>().Task.Wait();
              // it will never happens
              _botClient.StopReceiving();
-             
-
         }
 
         private static BotSettings ReadConfiguration(bool substitudeDebugConfig)
@@ -172,7 +172,7 @@ namespace Chotiskazal.Bot
             task.ContinueWith(
                 (t) =>
                 {
-                    Botlog.WriteError(chat.Id, $"Faulted {t.Exception}");
+                    Botlog.WriteError(chat.Id, $"Faulted {t.Exception}",true);
                     Chats.TryRemove(chat.Id, out _);
                 }, TaskContinuationOptions.OnlyOnFaulted);
         }
@@ -181,19 +181,19 @@ namespace Chotiskazal.Bot
             long? chatId = null;
             try
             {
-                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...");
+                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...",false);
 
                 if (e.Update.Message != null)
                 {
                     chatId = e.Update.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString(),false);
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
                     chatId = e.Update.CallbackQuery.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
+                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString(),false);
 
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
@@ -202,7 +202,7 @@ namespace Chotiskazal.Bot
             }
             catch (Exception)
             {
-                Botlog.WriteError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}");
+                Botlog.WriteError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}",true);
             }
         }
 
@@ -210,7 +210,7 @@ namespace Chotiskazal.Bot
         {
             if (e.Message.Text != null)
             {
-                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
+                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString(),false);
             }
         }
         
