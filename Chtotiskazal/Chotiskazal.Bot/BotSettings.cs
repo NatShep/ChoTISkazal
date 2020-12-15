@@ -15,8 +15,8 @@ namespace Chotiskazal.Bot
             
             ExamSettings = ReadExamSettings(configuration.GetSection("examSettings")); 
             TelegramToken = configuration["telegramToken"];
-            BotHelperToken = configuration["botHelperToken"];
-            ControlPanelChatId = configuration["controlPanelChatId"];
+            BotHelperToken = configuration.GetSection("botHelper").GetSection("botHelperToken").Value;
+            ControlPanelChatId = configuration.GetSection("botHelper").GetSection("controlPanelChatId").Value;
             MongoConnectionString = configuration["dbString"];
             MongoDbName = configuration["dbName"];
             HelpMessage = configuration["help-msg"];
