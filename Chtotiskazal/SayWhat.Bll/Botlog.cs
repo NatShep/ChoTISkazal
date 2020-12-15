@@ -12,8 +12,17 @@
     public static class Botlog{
         
         public static QuestionMetricRepo QuestionMetricRepo { get; set; }
-        
-    
+
+        private static ILogger _alarmLog;
+        public static void CreateTelegramLogger(string apiKey, string chatId)
+        {
+             _alarmLog = Log.Logger = new LoggerConfiguration()
+            .WriteTo.TeleSink(
+                telegramApiKey: apiKey,
+                telegramChatId: chatId,
+                minimumLevel:LogEventLevel.Information)
+            .CreateLogger();
+        }
         
         private static ILogger _log = Log.Logger = new LoggerConfiguration()
             .WriteTo.Sink(new RollingFileSink(
@@ -22,33 +31,25 @@
             .WriteTo.File(@"log-ChoTiSkazal-.txt", rollingInterval:RollingInterval.Day)
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();
-        
-        
-        private static ILogger _alarmLog = Log.Logger = new LoggerConfiguration()
-            .WriteTo.TeleSink(
-                telegramApiKey:"1481805832:AAEHcFj3toa6D4_D0UQDX9FjHJ0P2QeGN80",
-                telegramChatId:"-331839279",
-                minimumLevel:LogEventLevel.Information)
-            .CreateLogger();
-        
+
         public static void WriteError(long? chatId, string msg, bool writeToTelegram)
         {
             _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
             if (writeToTelegram)
-                _alarmLog.Error("❗ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
+                _alarmLog?.Error("❗ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
         }
         public static void WriteInfo(string msg,bool writeToTelegram)
         {
             _log.Information(msg);
             if (writeToTelegram)
-                _alarmLog.Error("✅ " + msg);
+                _alarmLog?.Error("✅ " + msg);
         }
         
         public static void WriteInfo(string msg, string chatId,bool writeToTelegram)
         {
             _log.Information(msg+" {@ChatInfo}", new {ChatInfo = chatId});
             if (writeToTelegram)
-                _alarmLog.Error("✅ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
+                _alarmLog?.Error("✅ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
         }
 
         public static void UpdateMetricInfo(long? userTelegramId, string metricId, string param,
@@ -63,14 +64,11 @@
             QuestionMetricRepo?.Add(questionMetric);
         }
 
-        public static void RegisterExamInfo(long? userTelegramId, DateTime started, int questionsCount, int questionsPassed)
+        public static void RegisterExamInfo(long? userTelegramId, DateTime started, int questionsCount,
+            int questionsPassed)
         {
-            _log.Information("Register Exam {@ChatInfo} {@Exam}", new {ChatInfo=userTelegramId},
-                new {Started=started,QuestionsCount=questionsCount,QuestionPassed=questionsPassed});
+            _log.Information("Register Exam {@ChatInfo} {@Exam}", new {ChatInfo = userTelegramId},
+                new {Started = started, QuestionsCount = questionsCount, QuestionPassed = questionsPassed});
         }
-        
-    
-    
-        
     }
 }

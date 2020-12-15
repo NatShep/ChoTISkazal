@@ -14,9 +14,12 @@ using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
+using Serilog;
+using Serilog.Events;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
+using TelegramSink;
 
 
 namespace Chotiskazal.Bot
@@ -69,9 +72,11 @@ namespace Chotiskazal.Bot
             _botClient = new TelegramBotClient(_settings.TelegramToken);
             _botHelper = new TelegramBotClient(_settings.BotHelperToken);
             
+            Botlog.CreateTelegramLogger(_settings.BotHelperToken,_settings.ControlPanelChatId);
+
             var me = _botClient.GetMeAsync().Result;
             
-            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",false);
+            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",true);
 
             var allUpdates =_botClient.GetUpdatesAsync().Result;
             Botlog.WriteInfo($"{allUpdates.Length} messages were missed",false);
