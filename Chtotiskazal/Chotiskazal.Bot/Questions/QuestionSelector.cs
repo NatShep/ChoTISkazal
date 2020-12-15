@@ -13,146 +13,146 @@ namespace Chotiskazal.Bot.Questions
 
         private readonly ExamAndPreferredScore _engChoose = new ExamAndPreferredScore(
             exam: new EngChooseExam(),
-            expectedScore: 2,
+            expectedScore: 0.6,
             frequency: 7);
 
         private readonly ExamAndPreferredScore _ruChoose = new ExamAndPreferredScore(
             exam: new RuChooseExam(),
-            expectedScore: 2,
+            expectedScore: 0.6,
             frequency: 7);
 
         private readonly ExamAndPreferredScore _engTrust = new ExamAndPreferredScore(
             exam: new EnTrustExam(),
-            expectedScore: 6,
+            expectedScore: 2,
             frequency: 10);
 
         private readonly ExamAndPreferredScore _ruTrust = new ExamAndPreferredScore(
             exam: new RuTrustExam(),
-            expectedScore: 6,
+            expectedScore: 2,
             frequency: 10);
 
         private readonly ExamAndPreferredScore _engPhraseChoose = new ExamAndPreferredScore(
             exam: new EngChoosePhraseExam(),
-            expectedScore: 4,
+            expectedScore: 1.3,
             frequency: 4);
 
         private readonly ExamAndPreferredScore _ruPhraseChoose = new ExamAndPreferredScore(
             exam: new RuChoosePhraseExam(),
-            expectedScore: 4,
+            expectedScore: 1.3,
             frequency: 4);
 
         private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
-            new EngChooseWordInPhraseExam(), 6, 20);
+            new EngChooseWordInPhraseExam(), 2, 20);
 
         private readonly ExamAndPreferredScore _clearEngChooseWordInPhrase = new ExamAndPreferredScore(
-            new ClearScreenExamDecorator(new EngChooseWordInPhraseExam()), 7, 20);
+            new ClearScreenExamDecorator(new EngChooseWordInPhraseExam()), 2.3, 20);
 
         private readonly ExamAndPreferredScore _engPhraseSubstitute = new ExamAndPreferredScore(
             exam: new EngPhraseSubstituteExam(),
-            expectedScore: 6,
+            expectedScore: 2,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _ruPhraseSubstitute = new ExamAndPreferredScore(
             exam: new RuPhraseSubstituteExam(),
-            expectedScore: 6,
+            expectedScore: 2,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _assemblePhraseExam = new ExamAndPreferredScore(
-            new AssemblePhraseExam(), 7, 7);
+            new AssemblePhraseExam(), 2.3, 7);
 
         private readonly ExamAndPreferredScore _clearEngPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngPhraseSubstituteExam()),
-            expectedScore: 8,
+            expectedScore: 2.6,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _clearRuPhraseSubstitute = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuPhraseSubstituteExam()),
-            expectedScore: 8,
+            expectedScore: 2.6,
             frequency: 12);
 
         private ExamAndPreferredScore EngWrite(DictionaryService service) =>
             new ExamAndPreferredScore(
                 exam: new EngWriteExam(service),
-                expectedScore: 8,
+                expectedScore: 2.6,
                 frequency: 14);
 
         private ExamAndPreferredScore RuWrite(DictionaryService service) => new ExamAndPreferredScore(
             exam: new RuWriteExam(service),
-            expectedScore: 8,
+            expectedScore: 2.6,
             frequency: 14);
 
         private readonly ExamAndPreferredScore _hideousEngPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngChoosePhraseExam()),
-            expectedScore: 7,
+            expectedScore: 2.3,
             frequency: 10);
 
         private readonly ExamAndPreferredScore _hideousRuPhraseChoose = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuChoosePhraseExam()),
-            expectedScore: 7,
+            expectedScore: 2.3,
             frequency: 10);
 
         private readonly ExamAndPreferredScore _hideousEngTrust = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EnTrustExam()),
-            expectedScore: 10,
+            expectedScore: 3.3,
             frequency: 2);
 
         private readonly ExamAndPreferredScore _hideousRuTrust =
             new ExamAndPreferredScore(
                 exam: new ClearScreenExamDecorator(new RuTrustExam()),
-                expectedScore: 10,
+                expectedScore: 3.3,
                 frequency: 3);
 
         private ExamAndPreferredScore HideousEngWriteExam(DictionaryService service) =>
             new ExamAndPreferredScore(
                 exam: new ClearScreenExamDecorator(new EngWriteExam(service)),
-                expectedScore: 12,
+                expectedScore: 4,
                 frequency: 14);
 
         private ExamAndPreferredScore HideousRuWriteExam(DictionaryService service) =>
             new ExamAndPreferredScore(
                 exam: new ClearScreenExamDecorator(new RuWriteExam(service)),
-                expectedScore: 12,
+                expectedScore: 4,
                 frequency: 14);
 
         private readonly ExamAndPreferredScore _transcriptionExam = new ExamAndPreferredScore(
             exam: new TranscriptionChooseExam(),
-            expectedScore: 5,
+            expectedScore: 1.6,
             frequency:10);
         
         private readonly ExamAndPreferredScore _hideousTranscriptionExam = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new TranscriptionChooseExam()),
-            expectedScore: 8,
+            expectedScore: 2.6,
             frequency:10);
 
 
         private readonly ExamAndPreferredScore _ruChooseByTranscriptionExam = new ExamAndPreferredScore(
             exam: new RuChooseByTranscriptionExam(),
-            expectedScore: 10,
+            expectedScore: 3.3,
             frequency: 10);
         
         private readonly ExamAndPreferredScore _hideousRuChooseByTranscriptionExam = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new RuChooseByTranscriptionExam()),
-            expectedScore: 12,
+            expectedScore: 4,
             frequency: 10);
         
         private readonly ExamAndPreferredScore _isItRightTranslationExam = new ExamAndPreferredScore(
             exam:new IsItRightTranslationExam(), 
-            expectedScore:5,
+            expectedScore:1.6,
             frequency:10);
         
         private readonly ExamAndPreferredScore _hideousIsItRightTranslationExam = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new IsItRightTranslationExam()), 
-            expectedScore:7,
+            expectedScore:2.3,
             frequency:10);
         
         private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new ExamAndPreferredScore(
             exam:new EngChooseMultipleTranslationsExam(),  
-            expectedScore:5,
+            expectedScore:1.6,
             frequency:10);
 
         private readonly ExamAndPreferredScore _hideousEngChooseMultipleTranslationExam = new ExamAndPreferredScore(
             exam: new ClearScreenExamDecorator(new EngChooseMultipleTranslationsExam()),
-            expectedScore: 8,
+            expectedScore: 2.3,
             frequency: 10);
 
         public QuestionSelector(DictionaryService dictionaryService)
@@ -227,7 +227,7 @@ namespace Chotiskazal.Bot.Questions
             if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.IncompleteWordMinScore)
                 return _simpleExamsList.GetRandomItem().Exam;
 
-            var score = model.AbsoluteScore - (isFirstExam ? (WordLeaningGlobalSettings.LearnedWordMinScore/6) : 0);
+            var score = model.AbsoluteScore - (isFirstExam ? (WordLeaningGlobalSettings.LearnedWordMinScore/2) : 0);
 
             if (model.AbsoluteScore < WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return ChooseExam(score, _intermidiateExamsList);
@@ -237,12 +237,12 @@ namespace Chotiskazal.Bot.Questions
 
         private static IExam ChooseExam(double score, ExamAndPreferredScore[] exams)
         {
-            score = Math.Min(score, 14);
+            score = Math.Min(score, 4.5);
             var probability = new Dictionary<double, IExam>(exams.Length);
             double accumulator = 0;
             foreach (var e in exams)
             {
-                var delta = e.Frequency / (Math.Abs(e.ExpectedScore - score) + 1.0);
+                var delta = e.Frequency / (Math.Abs(e.ExpectedScore - score) + 0.3);
                 accumulator += delta;
                 probability.Add(accumulator, e.Exam);
             }
@@ -254,7 +254,7 @@ namespace Chotiskazal.Bot.Questions
 
         private class ExamAndPreferredScore
         {
-            public ExamAndPreferredScore(IExam exam, int expectedScore, int frequency)
+            public ExamAndPreferredScore(IExam exam, double expectedScore, int frequency)
             {
                 Exam = exam;
                 ExpectedScore = expectedScore;
@@ -262,7 +262,7 @@ namespace Chotiskazal.Bot.Questions
             }
 
             public IExam Exam { get; }
-            public int ExpectedScore { get; }
+            public double ExpectedScore { get; }
             public int Frequency { get; }
         }
     }
