@@ -41,11 +41,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
             }
             
-            //Randomization and jobs
-            //if (RandomTools.Rnd.Next() % 30 == 0)
-            //    await _usersWordsService.AddMutualPhrasesToVocabAsync(user, 10);
-            // else
-            
             var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(user, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  _chatIo.SendTyping();
 
@@ -93,15 +88,35 @@ namespace Chotiskazal.Bot.ChatFlows
             var questionsPassed = 0;
             var i = 0;
             ExamResult? lastExamResult = null;
-         
+
+            string lastQuestionName = null;
+            UserWordModel lastWord = null;
             foreach (var word in learningAndAdvancedWords)
             {
                 var allLearningWordsWereShowedAtLeastOneTime = i < learningWordsCount;
                 var exam = QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
                 i++;
                 var retryFlag = false;
+                int questionIterations = 0;
                 do
                 {
+                    // Protection from inifity cycle
+                    questionIterations++;
+                    if (questionIterations > 100)
+                    {
+                        Botlog.WriteError(this._chatIo.ChatId.Identifier,
+                            $"Infinite loop in question selection. " +
+                            $"Last Question:{lastQuestionName}," +
+                            $"Last word: {word?.Word}", true);
+                        break;
+                    }
+                    
+                    // cancel if question is absolutely the same with previous
+                    if (lastWord == word && lastQuestionName == exam.Name)
+                        continue;
+                    lastWord = word;
+                    lastQuestionName = exam.Name;
+                    
                     retryFlag = false;
                     var questionMetric = new QuestionMetric(word, exam.Name);
 
@@ -109,7 +124,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
                     if (!learningWords.Contains(word))
                         learnList = learningWords.Append(word).ToArray();
-
+                        
                     if (i>1 && exam.NeedClearScreen && lastExamResult != ExamResult.Impossible)
                     {
                         await WriteDontPeakMessage();
@@ -174,19 +189,8 @@ namespace Chotiskazal.Bot.ChatFlows
             
             await updateUserTask;
             await finializeScoreUpdateTask;
-            /*var scoresAfter = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
-            var changing = WordStatsChanging.Zero;
-            for (int j = 0; j < scoresBefore.Length; j++)
-            {
-                changing += scoresAfter[j] - scoresBefore[j];
-            }*/
-
-            //doneMessage.Append(
-            //    $"Changings. as:{(int) changing.AbsoluteScoreChanging} od:{changing.OutdatedChanging}\r\ncat: {string.Join(",", changing.WordScoreChangings)}\r\n"
-            //        .Replace("-", "\\-"));
             doneMessage.Append("```\r\n\r\nEnter new word to translate or /start to return to main menu");
             await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
-
         }
 
         private async Task WriteDontPeakMessage()
