@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration(substitudeDebugConfig: false);
+            _settings = ReadConfiguration(substitudeDebugConfig: true);
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);
@@ -86,7 +86,7 @@ namespace Chotiskazal.Bot
             if (allUpdates.Any())
             {
                 _botClient.MessageOffset = allUpdates.Last().Id + 1;
-                Botlog.WriteInfo($"{Chats.Count} users were waitig for us");
+                Botlog.WriteInfo($"{Chats.Count} users were waiting for us");
             }
             _botClient.OnUpdate+= BotClientOnOnUpdate;
             _botClient.OnMessage += Bot_OnMessage;
@@ -111,10 +111,14 @@ namespace Chotiskazal.Bot
                 if (substitudeDebugConfig)
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
-                    set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
-                    set.MongoConnectionString = "mongodb://localhost:27017/";
-                    set.MongoDbName = "swdumbp";
-                    set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
+                    //set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
+                    set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+                //    set.MongoConnectionString = "mongodb://localhost:27017/";
+                 //   set.MongoDbName = "swdumbp";
+                 set.MongoConnectionString =
+                     "mongodb+srv://4tsbot:hi-i-am-4ts-bot@cluster0.vam3q.mongodb.net/saywhatdb?retryWrites=true&w=majority";
+                 set.MongoDbName = "SayWhatDb"; 
+                 set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
                     set.ControlPanelChatId = "326823645";
                 }
 
