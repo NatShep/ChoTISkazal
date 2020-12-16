@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -48,7 +49,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
             
-            return string.Equals(variants[choice.Value],targetPhrase.OriginPhrase, StringComparison.InvariantCultureIgnoreCase) 
+            return variants[choice.Value].AreEqualIgnoreCase(targetPhrase.OriginPhrase) 
                 ? ExamResult.Passed 
                 : ExamResult.Failed;
         }

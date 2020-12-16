@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.Questions
             
             var allWordsWithPhraseOfSimilarTranslate = examList
                 .SelectMany(e => e.Examples)
-                .Where(p => string.Equals(p.TranslatedPhrase, phrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
+                .Where(p => p.TranslatedPhrase.AreEqualIgnoreCase(phrase.TranslatedPhrase))
                 .Select(e=>e.OriginWord)
                 .ToList();
             
@@ -40,12 +40,14 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (allWordsWithPhraseOfSimilarTranslate.Contains(enter.ToLower().Trim()))
-                {
+                var (_, comparation) = allWordsWithPhraseOfSimilarTranslate.GetClosestTo(enter.Trim());
+                if (comparation == StringsCompareResult.Equal)
                     return ExamResult.Passed;
+                if (comparation == StringsCompareResult.SmallMistakes) {
+                    await chatIo.SendMessageAsync("Almost right. But you have a typo. Let's try again");
+                    return ExamResult.Retry;
                 }
-
-                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.OriginPhrase}\"");
+                await chatIo.SendMessageAsync($"Wrong. Origin phrase was \"{phrase.OriginPhrase}\"");
                 return ExamResult.Failed;
             }
         }

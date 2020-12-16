@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -33,7 +34,7 @@ namespace Chotiskazal.Bot.Questions
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     if (word.AllTranslations.Any(a =>
-                        string.Equals(input, a, StringComparison.InvariantCultureIgnoreCase)))
+                        input.AreEqualIgnoreCase(a)))
                         return ExamResult.Passed;
 
                     await chatIo.SendMessageAsync("No. It is not right. Try again");

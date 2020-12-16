@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -29,7 +30,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
             
-            return string.Equals(variants[choice.Value],word.Word, StringComparison.InvariantCultureIgnoreCase) 
+            return variants[choice.Value].AreEqualIgnoreCase(word.Word) 
                 ? ExamResult.Passed 
                 : ExamResult.Failed;
         }

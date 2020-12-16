@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
@@ -37,12 +38,17 @@ namespace Chotiskazal.Bot.Questions
                 var enter = await chatIo.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                if (string.Compare(phrase.TranslatedWord, enter.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
-                {
+                var comparation = phrase.TranslatedWord.CheckForMistakes(enter.Trim());
+
+                if (comparation== StringsCompareResult.Equal)
                     return ExamResult.Passed;
+
+                if (comparation == StringsCompareResult.SmallMistakes) {
+                    await chatIo.SendMessageAsync("Almost right. But you have a typo. Let's try again");
+                    return ExamResult.Retry;
                 }
 
-                await chatIo.SendMessageAsync($"Origin phrase was \"{phrase.TranslatedPhrase}\"");
+                await chatIo.SendMessageAsync($"Origin phrase was '{phrase.TranslatedPhrase}'");
                 return ExamResult.Failed;
             }
         }

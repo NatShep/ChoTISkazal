@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -35,7 +36,7 @@ namespace Chotiskazal.Bot.Questions
                 return ExamResult.Retry;
 
             var selected = variants[choice.Value];
-            return word.AllTranslations.Any(t=>string.Equals(t,selected, StringComparison.InvariantCultureIgnoreCase)) 
+            return word.AllTranslations.Any(t=>t.AreEqualIgnoreCase(selected)) 
                 ? ExamResult.Passed 
                 : ExamResult.Failed;
         }

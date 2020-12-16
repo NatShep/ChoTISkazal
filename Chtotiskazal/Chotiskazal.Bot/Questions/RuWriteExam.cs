@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 
@@ -32,15 +33,28 @@ namespace Chotiskazal.Bot.Questions
             if (string.IsNullOrEmpty(userEntry))
                 return ExamResult.Retry;
 
-            if (words.Any(t => string.Compare(userEntry.Trim(), t, StringComparison.OrdinalIgnoreCase) == 0))
-            {
+            var (text, comparation) = words.GetClosestTo(userEntry.Trim());
+            
+            if (comparation == StringsCompareResult.Equal)
                 return ExamResult.Passed;
+
+            if (comparation == StringsCompareResult.SmallMistakes)
+            {
+                await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'. Let's try again.");
+                return ExamResult.Retry;
             }
+            
+            if (comparation == StringsCompareResult.BigMistakes)
+            {
+                await chatIo.SendMessageAsync($"Mistaken. Correct spelling is '{text}'");
+                return ExamResult.Failed;
+            }
+
             //search for other translation
             var translationCandidate = await _dictionaryService.GetAllTranslationWords(userEntry.ToLower());
             
             if (translationCandidate.Any(t1 =>
-                word.AllTranslations.Any(t2 => string.CompareOrdinal(t1.Trim(), t2.Trim()) == 0)))
+                word.AllTranslations.Any(t2 => t1.Trim().AreEqualIgnoreCase(t2.Trim()))))
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(

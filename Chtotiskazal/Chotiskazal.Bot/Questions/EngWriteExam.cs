@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 
@@ -34,18 +35,37 @@ namespace Chotiskazal.Bot.Questions
             if (string.IsNullOrEmpty(translation))
                 return ExamResult.Retry;
 
-            if (translations.Any(t => string.Compare(translation.Trim(), t, StringComparison.OrdinalIgnoreCase) == 0))
-            {
+            var (text,comparation) =  translations.GetClosestTo(translation.Trim());
+            
+            if (comparation== StringsCompareResult.Equal)
                 return ExamResult.Passed;
+            if (comparation == StringsCompareResult.SmallMistakes)
+            {
+                await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'.");
+                return ExamResult.Impossible;
+            }
+            if (comparation == StringsCompareResult.BigMistakes)
+            {
+                await chatIo.SendMessageAsync($"Mistaken. Correct spelling is '{text}'");
+                return ExamResult.Failed;
             }
 
+            
             var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
-          
-            if (allMeaningsOfWord
-                .Any(t => string.Compare(translation, t, StringComparison.OrdinalIgnoreCase) == 0))
+
+            var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
+            
+            if (otherComparation == StringsCompareResult.Equal)
             {
                 await chatIo.SendMessageAsync(
                     $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
+                    word.TranslationAsList);
+                return ExamResult.Impossible;
+            }
+            if (otherComparation == StringsCompareResult.SmallMistakes)
+            {
+                await chatIo.SendMessageAsync(
+                    $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are: " +
                     word.TranslationAsList);
                 return ExamResult.Impossible;
             }

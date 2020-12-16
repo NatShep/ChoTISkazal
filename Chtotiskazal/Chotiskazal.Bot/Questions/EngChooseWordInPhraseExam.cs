@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -37,7 +38,7 @@ namespace Chotiskazal.Bot.Questions
 
             var variants = examList
                 .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
-                    .Any(t=>string.Equals(t,phrase.TranslatedPhrase.ToLower(),StringComparison.OrdinalIgnoreCase)))
+                    .Any(t=>t.AreEqualIgnoreCase(phrase.TranslatedPhrase)))
                 .Select(e => e.Word)
                 .Randomize()
                 .Take(5)
@@ -51,11 +52,9 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
 
-            if (string.Equals(variants[choice.Value], word.Word, StringComparison.InvariantCultureIgnoreCase))
-            {
+            if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
                 return ExamResult.Passed;
-            }
-
+            
             await chatIo.SendMessageAsync($"Origin was: \"{phrase.OriginPhrase}\"");
             return ExamResult.Failed;
         }

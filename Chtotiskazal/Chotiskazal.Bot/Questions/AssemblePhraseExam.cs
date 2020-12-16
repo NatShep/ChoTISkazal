@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -35,10 +36,8 @@ namespace Chotiskazal.Bot.Questions
             var entry = await chatIo.WaitUserTextInputAsync();
             entry = entry.Trim();
 
-            if (string.Compare(targetPhrase.OriginPhrase, entry.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
-            {
+            if (targetPhrase.OriginPhrase.AreEqualIgnoreCase(entry.Trim()))
                 return ExamResult.Passed;
-            }
 
             await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.OriginPhrase}'");
             return ExamResult.Failed;

@@ -38,11 +38,9 @@ namespace Chotiskazal.Bot.Questions
             var answer = variants[choice.Value].Split(",")
                 .Select(e => e.Trim()).ToList();
             
-            if (!answer.Except(word.AllTranslations).Any())
-            {
-                return ExamResult.Passed;
-            }
-            return ExamResult.Failed;
+            return !answer.Except(word.AllTranslations).Any() 
+                ? ExamResult.Passed 
+                : ExamResult.Failed;
         }
     }
 }

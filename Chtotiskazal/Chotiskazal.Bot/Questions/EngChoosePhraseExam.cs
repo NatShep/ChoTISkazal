@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -24,7 +25,7 @@ namespace Chotiskazal.Bot.Questions
 
             var otherExamples = examList
                 .SelectMany(e => e.Examples)
-                .Where(p => !string.Equals(p.TranslatedPhrase, targetPhrase.TranslatedPhrase,StringComparison.InvariantCultureIgnoreCase))
+                .Where(p => !p.TranslatedPhrase.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase))
                 .Randomize()
                 .Take(5)
                 .ToArray();
@@ -46,10 +47,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return ExamResult.Retry;
             
-            return string.Equals(
-                    variants[choice.Value], 
-                    targetPhrase.TranslatedPhrase, 
-                    StringComparison.InvariantCultureIgnoreCase) 
+            return variants[choice.Value].AreEqualIgnoreCase(targetPhrase.TranslatedPhrase) 
                 ? ExamResult.Passed 
                 : ExamResult.Failed;
         }
