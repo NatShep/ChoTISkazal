@@ -183,7 +183,7 @@ namespace Chotiskazal.Bot
                     Chats.TryRemove(chat.Id, out _);
                 }, TaskContinuationOptions.OnlyOnFaulted);
         }
-        private static async void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
+        private static void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
             long? chatId = null;
             try
@@ -204,7 +204,6 @@ namespace Chotiskazal.Bot
 
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
-                    await _botClient.AnswerCallbackQueryAsync(e.Update.CallbackQuery.Id);
                 }
             }
             catch (Exception)

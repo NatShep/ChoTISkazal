@@ -1,22 +1,52 @@
 ﻿using System.Collections.Generic;
 using SayWhat.Bll.Dto;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
+    public class TranslationButtonData
+    {
+        public TranslationButtonData(string origin, string translation, bool isSelected)
+        {
+            Origin = origin;
+            Translation = translation;
+            IsSelected = isSelected;
+        }
+
+        public string Origin { get; }
+        public string Translation { get; }
+        public bool IsSelected { get; }
+    }
     public static class AddWordHelper
     {
         public const string Separator = "$:$";
         public const string TranslationDataPrefix = "/tr";
+        public const string SelectedPrefix = "☑️ ";
+        
+        static string CreateButtonDataFor(DictionaryTranslation translation, bool isSelected)
+            => TranslationDataPrefix 
+               + translation.OriginText 
+               + Separator 
+               + translation.TranslatedText+Separator
+               + (isSelected?"1":"0");
 
-        private static string CreateButtonDataFor(DictionaryTranslation translation)
-            => TranslationDataPrefix + translation.OriginText + Separator + translation.TranslatedText;
-
+        public static TranslationButtonData ParseQueryDataOrNull(string buttonQueryData)
+        {
+            if (string.IsNullOrWhiteSpace(buttonQueryData))
+                return null;
+            if (!buttonQueryData.StartsWith(TranslationDataPrefix))
+                return null;
+            var splitted = buttonQueryData.Substring(3).Split(Separator);
+            if (splitted.Length != 3)
+                return null;
+            return new TranslationButtonData(splitted[0],splitted[1], splitted[2]=="1");
+        }
         public static InlineKeyboardButton CreateButtonFor(DictionaryTranslation translation, bool selected)
             => new InlineKeyboardButton {
-                CallbackData = CreateButtonDataFor(translation), 
+                CallbackData = CreateButtonDataFor(translation,selected), 
                 Text = selected
-                    ? $"✅ {translation.TranslatedText}"
+                    ? $"{SelectedPrefix}{translation.TranslatedText}"
                     : translation.TranslatedText
             };
         public static  int  FindIndexOf(IReadOnlyList<DictionaryTranslation> translations, string translation)
@@ -30,5 +60,8 @@ namespace Chotiskazal.Bot.ChatFlows
             }
             return -1;
         }
+
+        public static string GetMessageAfterTranslationIsSelected(DictionaryTranslation translation) 
+            => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
     }
 }

@@ -140,7 +140,7 @@ namespace SayWhat.Bll.Services
         public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word) 
             => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task AddTranslationToUser(UserModel user, DictionaryTranslation translation, int? wordRating = null )
+        public async Task AddTranslationToUser(UserModel user, DictionaryTranslation translation, double? wordRating = null )
         {
             if (translation == null) return;
             if(translation.TranlationDirection!= TranslationDirection.EnRu)
