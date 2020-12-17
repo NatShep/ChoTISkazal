@@ -80,7 +80,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var started = DateTime.Now;
 
             var learningAndAdvancedWords
-                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings));
+                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings)).Take(4).ToArray();
             
             var distinctLearningWords = learningAndAdvancedWords.Distinct().ToArray();
             
@@ -208,12 +208,15 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            var doneMessage = new StringBuilder("*Learning done:* {questionsPassed}/{questionsCount}*\r\n" +
-                                                $"Words in test: {learningWords.Length}\r\n\r\n"); 
+            var doneMessage = new StringBuilder($"*Learning done:* {questionsPassed}/{questionsCount}\r\n" +
+                                                $"*Words in test:* {learningWords.Length}\r\n"); 
             
           if (newWellLearnedWords.Any())
             {
-                doneMessage.Append($"*You have learned {newWellLearnedWords.Count} words:*\r\n");
+                if (newWellLearnedWords.Count>1)
+                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} words:*\r\n");
+                else
+                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} word:*\r\n");
                 foreach (var word in newWellLearnedWords)
                 {
                     doneMessage.Append("✅ "+word.Word + "\r\n");
@@ -229,7 +232,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            doneMessage.Append("*All words in test:*\r\n");
+            doneMessage.Append("\r\n*All words in test:*\r\n");
             var emoji = "";
             foreach (var word in distinctLearningWords)
             {
