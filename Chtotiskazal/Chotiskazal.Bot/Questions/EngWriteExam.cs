@@ -19,35 +19,35 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.AllTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n" +
                                           $"Write the translation... ");
             var translation = await chatIo.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
 
             var (text,comparation) =  translations.GetClosestTo(translation.Trim());
             
             if (comparation== StringsCompareResult.Equal)
-                return ExamResult.Passed;
+                return QuestionResult.Passed;
             if (comparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'.");
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             }
             if (comparation == StringsCompareResult.BigMistakes)
             {
                 await chatIo.SendMessageAsync($"Mistaken. Correct spelling is '{text}'");
-                return ExamResult.Failed;
+                return QuestionResult.Failed;
             }
 
             
@@ -60,18 +60,17 @@ namespace Chotiskazal.Bot.Questions
                 await chatIo.SendMessageAsync(
                     $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
                     word.TranslationAsList);
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync(
                     $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are: " +
                     word.TranslationAsList);
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             }
 
-            await chatIo.SendMessageAsync("The translation was: " + word.TranslationAsList);
-            return ExamResult.Failed;
+            return QuestionResult.FailedText($"The translation was '{word.TranslationAsList}'");
         }
     }
 }

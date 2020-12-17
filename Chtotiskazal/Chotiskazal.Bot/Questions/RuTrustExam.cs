@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
                       $"Do you know the translation?";
@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.Questions
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     if (word.Word.AreEqualIgnoreCase(input))
-                        return ExamResult.Passed;
+                        return QuestionResult.Passed;
                     await chatIo.SendMessageAsync("No. It is not right. Try again");
                 }
             }
@@ -59,8 +59,8 @@ namespace Chotiskazal.Bot.Questions
 
             var choice = await chatIo.WaitInlineIntKeyboardInput();
             return choice == 1 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.PassedText("Good. I hope you were honest", QuestionResult.NoText) 
+                : QuestionResult.FailedText("But you were honest...", QuestionResult.NoText);
         }
     }
 }

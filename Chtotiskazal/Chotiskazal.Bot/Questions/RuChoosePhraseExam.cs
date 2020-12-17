@@ -14,10 +14,10 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Ru Choose Phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             
             var targetPhrase = word.GetRandomExample();
 
@@ -28,7 +28,7 @@ namespace Chotiskazal.Bot.Questions
                 .ToArray();
 
             if(!other.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var variants = other
                 .Append(targetPhrase)
@@ -47,11 +47,11 @@ namespace Chotiskazal.Bot.Questions
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
             
             return variants[choice.Value].AreEqualIgnoreCase(targetPhrase.OriginPhrase) 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.Passed 
+                : QuestionResult.Failed;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo,  UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.TranslationAsList;
@@ -33,14 +33,14 @@ namespace Chotiskazal.Bot.Questions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
 
             var answer = variants[choice.Value].Split(",")
                 .Select(e => e.Trim()).ToList();
             
             return !answer.Except(word.AllTranslations).Any() 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.Passed 
+                : QuestionResult.Failed;
         }
     }
 }

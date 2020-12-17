@@ -14,18 +14,18 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose word in phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var phrase = word.GetRandomExample();
 
             var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
 
             if (replaced == phrase.OriginPhrase)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
@@ -50,13 +50,12 @@ namespace Chotiskazal.Bot.Questions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return ExamResult.Passed;
+                return QuestionResult.PassedText("Ayeee!");
             
-            await chatIo.SendMessageAsync($"Origin was: \"{phrase.OriginPhrase}\"");
-            return ExamResult.Failed;
+            return QuestionResult.FailedText($"Origin was: \"{phrase.OriginPhrase}\"");
         }
     }
 }

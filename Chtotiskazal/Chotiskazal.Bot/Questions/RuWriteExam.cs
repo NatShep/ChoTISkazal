@@ -18,36 +18,35 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var words = word.Word.Split(',').Select(s => s.Trim()).ToArray();
             var minCount = words.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.TranslationAsList}    <=====\r\n" +
                                           $"Write the translation... ");
             var userEntry = await chatIo.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(userEntry))
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
 
             var (text, comparation) = words.GetClosestTo(userEntry.Trim());
             
             if (comparation == StringsCompareResult.Equal)
-                return ExamResult.Passed;
+                return QuestionResult.Passed;
 
             if (comparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'. Let's try again.");
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
             }
             
             if (comparation == StringsCompareResult.BigMistakes)
             {
-                await chatIo.SendMessageAsync($"Mistaken. Correct spelling is '{text}'");
-                return ExamResult.Failed;
+                return QuestionResult.FailedText($"Mistaken. Correct spelling is '{text}'", "Mistaken");
             }
 
             //search for other translation
@@ -59,14 +58,15 @@ namespace Chotiskazal.Bot.Questions
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(
                     $"the translation was correct, but the question was about the word '{word.Word} - {word.TranslationAsList}'\r\nlet's try again");
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
             }
             
             var translates = string.Join(",",translationCandidate);
+            string failedMessage = "";
             if(!string.IsNullOrWhiteSpace(translates))
-                await chatIo.SendMessageAsync($"'{userEntry}' translates as {translates}");
-            await chatIo.SendMessageAsync("The right translation was: " + word.Word);
-            return ExamResult.Failed;
+                failedMessage =$"'{userEntry}' translates as '{translates}'";
+            failedMessage += $"The right translation was: '{word.Word}'";
+            return QuestionResult.FailedText(failedMessage);
         }
     }
 }

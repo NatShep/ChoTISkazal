@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -13,13 +12,13 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose Phrase";
 
-        public async Task<ExamResult> Pass(
+        public async Task<QuestionResult> Pass(
             ChatIO chatIo, 
             UserWordModel word, 
             UserWordModel[] examList)
         {
             if (!word.HasAnyExamples)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             
             var targetPhrase = word.GetRandomExample();
 
@@ -31,7 +30,7 @@ namespace Chotiskazal.Bot.Questions
                 .ToArray();
 
             if(!otherExamples.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             
             var variants = otherExamples
                 .Append(targetPhrase)
@@ -41,15 +40,16 @@ namespace Chotiskazal.Bot.Questions
             
             var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\n" +
                       $"Choose the translation";
+            
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
             
             return variants[choice.Value].AreEqualIgnoreCase(targetPhrase.TranslatedPhrase) 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.Passed 
+                : QuestionResult.Failed;
         }
     }
 }

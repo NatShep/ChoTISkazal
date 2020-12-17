@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo,  UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word,
             UserWordModel[] examList)
         {
             var translation = examList.SelectMany(e => e.AllTranslations)
@@ -24,7 +24,7 @@ namespace Chotiskazal.Bot.Questions
                 .ToList()
                 .GetRandomItem();
             
-            var msg = $"{word.Word.ToUpper()} translates as {translation.ToUpper()}.\r\n"+
+            var msg = $"'{word.Word}' translates as '{translation}'.\r\n"+
                              $"Is it right translation?";
 
             _ = chatIo.SendMessageAsync(msg,
@@ -48,11 +48,11 @@ namespace Chotiskazal.Bot.Questions
                 choice == 0 && !word.AllTranslations.Contains(translation)
                 )
             {
-                return ExamResult.Passed;
+                return QuestionResult.Passed;
             }
             else
             {
-                return ExamResult.Failed;
+                return QuestionResult.FailedText($"Mistaken. '{word.Word}' translates as '{translation}' ");
             }
         }
 

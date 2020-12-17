@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "RuChoose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             var variants = examList.Where(e=>e.TranslationAsList!=word.TranslationAsList)
                 .Select(e => e.Word)
@@ -28,11 +28,11 @@ namespace Chotiskazal.Bot.Questions
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
             
             return variants[choice.Value].AreEqualIgnoreCase(word.Word) 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.Passed 
+                : QuestionResult.Failed;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var msg = $"=====>   {word.Word}    <=====\r\n" +
@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.Questions
                 {
                     if (word.AllTranslations.Any(a =>
                         input.AreEqualIgnoreCase(a)))
-                        return ExamResult.Passed;
+                        return QuestionResult.Passed;
 
                     await chatIo.SendMessageAsync("No. It is not right. Try again");
                 }
@@ -59,7 +59,9 @@ namespace Chotiskazal.Bot.Questions
 
             var choice = await chatIo.WaitInlineIntKeyboardInput();
 
-            return choice == 1 ? ExamResult.Passed : ExamResult.Failed;
+            return choice == 1 ? 
+                QuestionResult.PassedText("Good. I hope you were honest", QuestionResult.NoText) 
+                : QuestionResult.FailedText("But you were honest...", QuestionResult.NoText);
         }
     }
 }

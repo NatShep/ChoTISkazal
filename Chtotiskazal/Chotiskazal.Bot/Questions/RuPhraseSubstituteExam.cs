@@ -12,17 +12,17 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitute";
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var phrase = word.GetRandomExample();
 
             var replaced = phrase.TranslatedPhrase.Replace(phrase.TranslatedWord, "...");
             if (replaced == phrase.TranslatedPhrase)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var sb = new StringBuilder();
 
@@ -41,15 +41,13 @@ namespace Chotiskazal.Bot.Questions
                 var comparation = phrase.TranslatedWord.CheckForMistakes(enter.Trim());
 
                 if (comparation== StringsCompareResult.Equal)
-                    return ExamResult.Passed;
+                    return QuestionResult.Passed;
 
                 if (comparation == StringsCompareResult.SmallMistakes) {
                     await chatIo.SendMessageAsync("Almost right. But you have a typo. Let's try again");
-                    return ExamResult.Retry;
+                    return QuestionResult.Retry;
                 }
-
-                await chatIo.SendMessageAsync($"Origin phrase was '{phrase.TranslatedPhrase}'");
-                return ExamResult.Failed;
+                return QuestionResult.FailedText($"Origin phrase was '{phrase.TranslatedPhrase}'");
             }
         }
     }

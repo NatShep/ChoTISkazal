@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Eng Choose";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
             var originTranslation = word.Translations.ToList().GetRandomItem();
@@ -33,12 +33,12 @@ namespace Chotiskazal.Bot.Questions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return ExamResult.Retry;
+                return QuestionResult.Retry;
 
             var selected = variants[choice.Value];
             return word.AllTranslations.Any(t=>t.AreEqualIgnoreCase(selected)) 
-                ? ExamResult.Passed 
-                : ExamResult.Failed;
+                ? QuestionResult.Passed 
+                : QuestionResult.Failed;
         }
     }
 }

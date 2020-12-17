@@ -81,13 +81,10 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningAndAdvancedWords 
                 = await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords,_examSettings);
 
-            //var scoresBefore = learningAndAdvancedWords.Distinct().Select(l => l.Score).ToArray();
-            
-            
             var questionsCount = 0;
             var questionsPassed = 0;
             var i = 0;
-            ExamResult? lastExamResult = null;
+            QuestionResult? lastExamResult = null;
 
             string lastQuestionName = null;
             UserWordModel lastWord = null;
@@ -125,18 +122,16 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (!learningWords.Contains(word))
                         learnList = learningWords.Append(word).ToArray();
                         
-                    if (i>1 && exam.NeedClearScreen && lastExamResult != ExamResult.Impossible)
+                    if (i>1 && exam.NeedClearScreen && lastExamResult.Results != ExamResult.Impossible)
                     {
-                        await WriteDontPeakMessage();
-                        if (lastExamResult == ExamResult.Passed)
-                            await WritePassed();
+                        await WriteDontPeakMessage(lastExamResult.ResultsBeforeHideousText);
                     }
                     user.OnAnyActivity();
                     var originRate =word.Score;
 
                     var result = await exam.Pass(_chatIo, word, learnList);
 
-                    switch (result)
+                    switch (result.Results)
                     {
                         case ExamResult.Impossible:
                             exam = QuestionSelector.Singletone.GetNextQuestionFor(i == 0, word);
@@ -145,8 +140,6 @@ namespace Chotiskazal.Bot.ChatFlows
                         case ExamResult.Passed:
                                                         
                            var succTask = _usersWordsService.RegisterSuccess(word);
-
-                            await WritePassed();
                             questionsCount++;
                             questionsPassed++;
                             questionMetric.OnExamFinished(word.Score, true ); 
@@ -156,18 +149,21 @@ namespace Chotiskazal.Bot.ChatFlows
                            break;
                         case ExamResult.Failed:
                             var failureTask = _usersWordsService.RegisterFailure(word);
-                            await WriteFailed();
                             questionMetric.OnExamFinished(word.Score, false );
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
                             await failureTask;
                             user.OnQuestionFailed(word.Score - originRate);
                             break;
+                        case ExamResult.Ignored:
+                            break;
                         case ExamResult.Retry:
                             retryFlag = true;
                             break;
-                        case ExamResult.Exit: return;
                     }
+                    
+                    if(!string.IsNullOrWhiteSpace(result.OpenResultsText))
+                        await _chatIo.SendMessageAsync(result.OpenResultsText);
 
                     lastExamResult = result;
 
@@ -193,17 +189,15 @@ namespace Chotiskazal.Bot.ChatFlows
             await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
         }
 
-        private async Task WriteDontPeakMessage()
+        private async Task WriteDontPeakMessage(string resultsBeforeHideousText)
         {
+            //it is not an empty string;
+            // it contains invisible character, that allows to show blank message
+            string emptySymbol = "‎";
+            
             await _chatIo.SendMessageAsync(
-                "\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.\r\n.");
-            await _chatIo.SendMessageAsync(
-                "Don't peek");
+                $"\r\n\r\n{emptySymbol}‎\r\n{emptySymbol}‎\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n{resultsBeforeHideousText}\r\n\r\nDon't peek\r\n");
             await _chatIo.SendMessageAsync("\U0001F648");
         }
-
-        private Task WriteFailed() => _chatIo.SendMessageAsync("Noo... \U0001F61E");
-
-        private Task WritePassed() => _chatIo.SendMessageAsync($"It's right! \U0001F609");
     }
 }

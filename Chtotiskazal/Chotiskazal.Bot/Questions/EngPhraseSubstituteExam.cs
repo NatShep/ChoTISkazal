@@ -10,10 +10,10 @@ namespace Chotiskazal.Bot.Questions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var phrase   =  word.GetRandomExample();
             
@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.Questions
             
             var replaced =  phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
             if (replaced == phrase.OriginPhrase)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
             
             var sb = new StringBuilder();
             
@@ -42,13 +42,12 @@ namespace Chotiskazal.Bot.Questions
                     continue;
                 var (_, comparation) = allWordsWithPhraseOfSimilarTranslate.GetClosestTo(enter.Trim());
                 if (comparation == StringsCompareResult.Equal)
-                    return ExamResult.Passed;
+                    return QuestionResult.Passed;
                 if (comparation == StringsCompareResult.SmallMistakes) {
                     await chatIo.SendMessageAsync("Almost right. But you have a typo. Let's try again");
-                    return ExamResult.Retry;
+                    return QuestionResult.Retry;
                 }
-                await chatIo.SendMessageAsync($"Wrong. Origin phrase was \"{phrase.OriginPhrase}\"");
-                return ExamResult.Failed;
+                return QuestionResult.FailedText($"Wrong. Origin phrase was \"{phrase.OriginPhrase}\"");
             }
         }
     }

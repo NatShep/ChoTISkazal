@@ -12,10 +12,10 @@ namespace Chotiskazal.Bot.Questions
 
         public string Name => "Assemble phrase";
 
-        public async Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList) 
+        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList) 
         {
             if (!word.HasAnyExamples)
-                return ExamResult.Impossible;
+                return QuestionResult.Impossible;
 
             var targetPhrase = word.GetRandomExample();
 
@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.Questions
                 var wordsInExample = targetPhrase.SplitWordsOfPhrase;
                 
                 if (wordsInExample.Length < 2)
-                    return ExamResult.Impossible;
+                    return QuestionResult.Impossible;
 
                 shuffled = string.Join(" ", wordsInExample.Randomize());
                 if(shuffled!= targetPhrase.OriginPhrase)
@@ -37,10 +37,9 @@ namespace Chotiskazal.Bot.Questions
             entry = entry.Trim();
 
             if (targetPhrase.OriginPhrase.AreEqualIgnoreCase(entry.Trim()))
-                return ExamResult.Passed;
+                return QuestionResult.Passed;
 
-            await chatIo.SendMessageAsync($"Original phrase was: '{targetPhrase.OriginPhrase}'");
-            return ExamResult.Failed;
+            return QuestionResult.FailedText($"Original phrase was: '{targetPhrase.OriginPhrase}'");
         }
     }
 }

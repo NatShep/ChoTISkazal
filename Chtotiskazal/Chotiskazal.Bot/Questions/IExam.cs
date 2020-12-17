@@ -7,7 +7,7 @@ namespace Chotiskazal.Bot.Questions
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        Task<ExamResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList);
+        Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList);
     }
 
     public enum ExamResult
@@ -16,6 +16,6 @@ namespace Chotiskazal.Bot.Questions
         Failed,
         Retry,
         Impossible,
-        Exit
+        Ignored,
     }
 }
