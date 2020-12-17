@@ -171,7 +171,7 @@ namespace Chotiskazal.Bot.ChatFlows
             await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"),
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.MainMenu}, 
-                    new[]{ InlineButtons.EnterWords}});
+                    new[]{ InlineButtons.Translation}});
         }
     }
 }

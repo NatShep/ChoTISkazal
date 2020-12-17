@@ -104,8 +104,9 @@ namespace Chotiskazal.Bot.ChatFlows
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task StartLearning() => new ExamFlow(ChatIo, _userService,_usersWordsService, _settings.ExamSettings)
-            .EnterAsync(UserModel);
+        private Task StartLearning() => new ExamFlow(
+                ChatIo, UserModel, _userService, _usersWordsService, _settings.ExamSettings)
+            .EnterAsync();
 
         private Task StartToAddNewWords(string text = null) 
             => new AddingWordsMode(ChatIo, _addWordsService, _translationSelectedQueryHandler).Enter(UserModel, text);
@@ -127,7 +128,7 @@ namespace Chotiskazal.Bot.ChatFlows
             await ChatIo.SendMarkdownMessageAsync(_settings.HelpMessage,
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.Stats},
-                    new[]{ InlineButtons.EnterWords}});
+                    new[]{ InlineButtons.Translation}});
         }
 
         private async Task ShowMainMenu()
@@ -137,7 +138,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 var _  = ChatIo.SendMessageAsync("Write any word for translate or press button you need",
                     new[]{new[]{
                         InlineButtons.Exam, InlineButtons.Stats}, 
-                        new[]{ InlineButtons.EnterWords},
+                        new[]{ InlineButtons.Translation},
                         new[]{ InlineButtons.HowToUse}});
 
                 while (true)
@@ -153,7 +154,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (action.CallbackQuery!=null)
                     {
                         var btn = action.CallbackQuery.Data;
-                        if (btn == InlineButtons.EnterWords.CallbackData) {
+                        if (btn == InlineButtons.Translation.CallbackData) {
                             await StartToAddNewWords();
                             return;
                         }
