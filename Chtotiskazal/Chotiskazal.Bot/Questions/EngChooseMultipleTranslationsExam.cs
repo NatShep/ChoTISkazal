@@ -18,15 +18,14 @@ namespace Chotiskazal.Bot.Questions
         public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.Translations.Randomize().Take(3);
+            var translations = word.AllTranslations.Randomize().Take(3);
             
             var variants = examList
                 .Where(e => e.TranslationAsList != word.TranslationAsList)
-                .SelectMany(e => e.Translations.Randomize().Take(3))
-                .Select(e=>e.Word)
+                .SelectMany(e => e.AllTranslations.Randomize().Take(3))
                 .Randomize()
                 .Take(5)
-                .Union(translations.Select(e=>e.Word))
+                .Union(translations)
                 .ToList();
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
