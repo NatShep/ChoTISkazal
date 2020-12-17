@@ -64,8 +64,8 @@ namespace Chotiskazal.Bot.Questions
             var translates = string.Join(",",translationCandidate);
             string failedMessage = "";
             if(!string.IsNullOrWhiteSpace(translates))
-                failedMessage =$"'{userEntry}' translates as '{translates}'";
-            failedMessage += $"The right translation was: '{word.Word}'";
+                failedMessage =$"{userEntry} translates as {translates}\r\n";
+            failedMessage += $"The right translation was: {word.Word}";
             return QuestionResult.FailedText(failedMessage);
         }
     }
