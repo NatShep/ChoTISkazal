@@ -224,7 +224,7 @@ namespace Chotiskazal.Bot.ChatFlows
                                    $"*Forgotten words:*\r\n");
                 foreach (var word in forgottenWords)
                 {
-                    doneMessage.Append("❗ "+word.Word + "\r\n\r\n");
+                    doneMessage.Append("❗ "+word.Word + "\r\n");
                 }
             }
 

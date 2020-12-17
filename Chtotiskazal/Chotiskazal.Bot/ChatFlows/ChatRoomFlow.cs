@@ -134,11 +134,12 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync("Write any word for translate or press button you need",
-                    new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.Stats}, 
+                var _  = ChatIo.SendMessageAsync("Hi! Choose your action.",
+                    new[]{
                         new[]{ InlineButtons.EnterWords},
-                        new[]{ InlineButtons.HowToUse}});
+                        new[]{ InlineButtons.Exam},
+                        new[]{InlineButtons.Stats, InlineButtons.HowToUse}
+                    });
 
                 while (true)
                 {
