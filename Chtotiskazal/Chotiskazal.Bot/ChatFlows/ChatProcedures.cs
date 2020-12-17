@@ -143,7 +143,23 @@ namespace Chotiskazal.Bot.ChatFlows
             var lastDay = userModel.GetToday();
 
             var msg =
-                $"Your stats: \r\n```\r\n  Words added: {userModel.WordsCount}\r\n  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n  Score: {(int)userModel.GamingScore}\r\n```\r\nThis month:\r\n```  New words: {lastMonth.WordsAdded}\r\n  Learned well: {lastMonth.WordsLearnt}\r\n  Exams passed: {lastMonth.LearningDone}\r\n  Score: {lastMonth.GameScoreChanging}\r\n```\r\nThis day:\r\n```  New words: {lastDay.WordsAdded}\r\n  Learned well: {lastDay.WordsLearnt}\r\n  Exams passed: {lastDay.LearningDone}\r\n  Score: {lastDay.GameScoreChanging}\r\n```\r\n Activity during last 7 weeks:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\nRecomendation: \r\n*{recomendation}*";
+                $"Your stats: \r\n```\r\n" +
+                $"  Words added: {userModel.WordsCount}\r\n" +
+                $"  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                $"  Score: {(int)userModel.GamingScore}\r\n```\r\n" +
+                $"This month:\r\n```" +
+                $"  New words: {lastMonth.WordsAdded}\r\n" +
+                $"  Learned well: {lastMonth.WordsLearnt}\r\n" +
+                $"  Exams passed: {lastMonth.LearningDone}\r\n" +
+                $"  Score: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
+                $"This day:\r\n```" +
+                $"  New words: {lastDay.WordsAdded}\r\n" +
+                $"  Learned well: {lastDay.WordsLearnt}\r\n" +
+                $"  Exams passed: {lastDay.LearningDone}\r\n" +
+                $"  Score: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
+                $" Activity during last 7 weeks:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\n" +
+                $"Recomendation: \r\n" +
+                $"*{recomendation}*";
             await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"),
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.MainMenu}, 
