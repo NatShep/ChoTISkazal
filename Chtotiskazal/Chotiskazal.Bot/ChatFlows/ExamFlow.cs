@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -50,7 +51,7 @@ namespace Chotiskazal.Bot.ChatFlows
             await typing;
             var learningWords 
                 = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
-            
+      
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
@@ -77,9 +78,20 @@ namespace Chotiskazal.Bot.ChatFlows
                     return;
             }
             var started = DateTime.Now;
-         
-            var learningAndAdvancedWords 
-                = await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords,_examSettings);
+
+            var learningAndAdvancedWords
+                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings)).Take(4).ToArray();
+            
+            var distinctLearningWords = learningAndAdvancedWords.Distinct().ToArray();
+            
+            var wordAndScore = new Dictionary<string,double>();
+            foreach (var word in distinctLearningWords)
+            {
+                if (!wordAndScore.ContainsKey(word.Word))
+                    wordAndScore.Add(word.Word,word.AbsoluteScore);
+            }
+
+            var gamingScoreBefore = user.GamingScore;
 
             var questionsCount = 0;
             var questionsPassed = 0;
@@ -138,15 +150,14 @@ namespace Chotiskazal.Bot.ChatFlows
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:
-                                                        
-                           var succTask = _usersWordsService.RegisterSuccess(word);
+                            var succTask = _usersWordsService.RegisterSuccess(word);
                             questionsCount++;
                             questionsPassed++;
                             questionMetric.OnExamFinished(word.Score, true ); 
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             await succTask;
                             user.OnQuestionPassed(word.Score - originRate);
-                           break;
+                            break;
                         case ExamResult.Failed:
                             var failureTask = _usersWordsService.RegisterFailure(word);
                             questionMetric.OnExamFinished(word.Score, false );
@@ -175,18 +186,68 @@ namespace Chotiskazal.Bot.ChatFlows
             var updateUserTask = _userService.Update(user);
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(user,10);
 
-            var doneMessage = new StringBuilder($"*Learning done:  {questionsPassed}/{questionsCount}*\r\n\r\n```\r\n");
-            foreach (var pairModel in learningAndAdvancedWords.Distinct())
+            //info after examination
+            var newWellLearnedWords=new List<UserWordModel>();
+            var forgottenWords = new List<UserWordModel>();
+            
+            foreach (var word in distinctLearningWords)
             {
-                doneMessage.Append(pairModel.Word + "  -  " + pairModel.TranslationAsList + "  (" +
-                                   (int)pairModel.AbsoluteScore + ")\r\n");
+                if (word.AbsoluteScore > 4)
+                {
+                    if (wordAndScore[word.Word]<=4)
+                        newWellLearnedWords.Add(word);
+                }
+                else
+                {
+                    if (wordAndScore[word.Word]>4)
+                        forgottenWords.Add(word);
+                }
             }
 
+            var doneMessage = new StringBuilder($"*Learning done:* {questionsPassed}/{questionsCount}\r\n" +
+                                                $"*Words in test:* {learningWords.Length}\r\n"); 
+            
+          if (newWellLearnedWords.Any())
+            {
+                if (newWellLearnedWords.Count>1)
+                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} words:*\r\n");
+                else
+                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} word:*\r\n");
+                foreach (var word in newWellLearnedWords)
+                {
+                    doneMessage.Append("✅ "+word.Word + "\r\n");
+                }
+            }
+            if (forgottenWords.Any())
+            {
+                doneMessage.Append($"\r\n" +
+                                   $"*Forgotten words:*\r\n");
+                foreach (var word in forgottenWords)
+                {
+                    doneMessage.Append("❗ "+word.Word + "\r\n\r\n");
+                }
+            }
+
+            doneMessage.Append("\r\n*All words in test:*\r\n");
+            var emoji = "";
+            foreach (var word in distinctLearningWords)
+            {
+                if (word.AbsoluteScore > 4) emoji = "✅";
+                else if (word.AbsoluteScore <= 4 || word.AbsoluteScore > 1) emoji = "👌";
+                else emoji = "❌";
+                doneMessage.Append(emoji+" "+word.Word + "   " + word.TranslationAsList + "\r\n");
+            }
+
+            doneMessage.Append($"\r\n*Earned score:* "+$"{user.GamingScore-gamingScoreBefore}");
+            doneMessage.Append($"\r\n*Total score:* "+ user.GamingScore+"\r\n");
             
             await updateUserTask;
-            await finializeScoreUpdateTask;
-            doneMessage.Append("```\r\n\r\nEnter new word to translate or /start to return to main menu");
-            await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString());
+
+            await finializeScoreUpdateTask; 
+            await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString(),
+            new[]{new[]{
+                        InlineButtons.Exam, InlineButtons.Stats}, 
+                    new[]{ InlineButtons.EnterWords}});
         }
 
         private async Task WriteDontPeakMessage(string resultsBeforeHideousText)
