@@ -104,8 +104,9 @@ namespace Chotiskazal.Bot.ChatFlows
         }
 
         private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
-        private Task StartLearning() => new ExamFlow(ChatIo, _userService,_usersWordsService, _settings.ExamSettings)
-            .EnterAsync(UserModel);
+        private Task StartLearning() => new ExamFlow(
+                ChatIo, UserModel, _userService, _usersWordsService, _settings.ExamSettings)
+            .EnterAsync();
 
         private Task StartToAddNewWords(string text = null) 
             => new AddingWordsMode(ChatIo, _addWordsService, _translationSelectedQueryHandler).Enter(UserModel, text);
@@ -124,6 +125,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private async Task SendHelp()
         {
+
             await ChatIo.SendMarkdownMessageAsync("*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
                                                   "1⃣ You can use me as a regular translator\\. " +
                                                   "Just write the word for translation or use /add command to begin translate\\.\r\n\r\n" +
@@ -136,16 +138,19 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.Stats},
-                    new[]{ InlineButtons.EnterWords}});
+                    new[]{ InlineButtons.Translation}});
         }
 
         private async Task ShowMainMenu()
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync("Hi! Choose your action.",
+                var _  = ChatIo.SendMessageAsync("I am a translator and teacher. " +
+                                                 "First you use me as a regular translator. " +
+                                                 "Then, when you have time, " +
+                                                 "click on the 'Learn' button or /learn command to start training translated words.",
                     new[]{
-                        new[]{ InlineButtons.EnterWords},
+                        new[]{ InlineButtons.Translation},
                         new[]{ InlineButtons.Exam},
                         new[]{InlineButtons.Stats, InlineButtons.HowToUse}
                     });
@@ -163,7 +168,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (action.CallbackQuery!=null)
                     {
                         var btn = action.CallbackQuery.Data;
-                        if (btn == InlineButtons.EnterWords.CallbackData) {
+                        if (btn == InlineButtons.Translation.CallbackData) {
                             await StartToAddNewWords();
                             return;
                         }

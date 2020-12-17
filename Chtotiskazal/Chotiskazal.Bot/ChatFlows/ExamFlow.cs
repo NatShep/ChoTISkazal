@@ -19,30 +19,33 @@ namespace Chotiskazal.Bot.ChatFlows
     {
         private readonly ExamSettings _examSettings;
         private readonly ChatIO _chatIo;
+        private readonly UserModel _user;
         private readonly UserService _userService;
         private readonly UsersWordsService _usersWordsService;
 
         public ExamFlow(
             ChatIO chatIo, 
+            UserModel user,
             UserService userService,
             UsersWordsService usersWordsService, 
             ExamSettings examSettings)
         {
             _chatIo = chatIo;
+            _user = user;
             _userService = userService;
             _usersWordsService = usersWordsService;
             _examSettings = examSettings;
         }
 
-        public async Task EnterAsync(UserModel user)
+        public async Task EnterAsync()
         {
-            if (!await _usersWordsService.HasWords(user))
+            if (!await _usersWordsService.HasWords(_user))
             {
                 await _chatIo.SendMessageAsync("You need to add some more words before examination");
                 return;
             }
             
-            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(user, _examSettings.MaxLearningWordsCountInOneExam*2);
+            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(_user, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  _chatIo.SendTyping();
 
             var c = Rand.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
@@ -50,7 +53,7 @@ namespace Chotiskazal.Bot.ChatFlows
             await startupScoreUpdate;
             await typing;
             var learningWords 
-                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(user, c, 3);
+                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(_user, c, 3);
       
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
@@ -80,18 +83,18 @@ namespace Chotiskazal.Bot.ChatFlows
             var started = DateTime.Now;
 
             var learningAndAdvancedWords
-                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings));
+                = (await _usersWordsService.AppendAdvancedWordsToExamList(_user, learningWords, _examSettings));
             
             var distinctLearningWords = learningAndAdvancedWords.Distinct().ToArray();
             
-            var wordAndScore = new Dictionary<string,double>();
+            var originWordsScore = new Dictionary<string,double>();
             foreach (var word in distinctLearningWords)
             {
-                if (!wordAndScore.ContainsKey(word.Word))
-                    wordAndScore.Add(word.Word,word.AbsoluteScore);
+                if (!originWordsScore.ContainsKey(word.Word))
+                    originWordsScore.Add(word.Word,word.AbsoluteScore);
             }
 
-            var gamingScoreBefore = user.GamingScore;
+            var gamingScoreBefore = _user.GamingScore;
 
             var questionsCount = 0;
             var questionsPassed = 0;
@@ -140,7 +143,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     {
                         await WriteDontPeakMessage(lastExamResult.ResultsBeforeHideousText);
                     }
-                    user.OnAnyActivity();
+                    _user.OnAnyActivity();
                     var originRate =word.Score;
 
                     var result = await exam.Pass(_chatIo, word, learnList);
@@ -158,7 +161,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             questionMetric.OnExamFinished(word.Score, true ); 
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             await succTask;
-                            user.OnQuestionPassed(word.Score - originRate);
+                            _user.OnQuestionPassed(word.Score - originRate);
                             break;
                         case ExamResult.Failed:
                             var failureTask = _usersWordsService.RegisterFailure(word);
@@ -166,7 +169,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
                             questionsCount++;
                             await failureTask;
-                            user.OnQuestionFailed(word.Score - originRate);
+                            _user.OnQuestionFailed(word.Score - originRate);
                             break;
                         case ExamResult.Ignored:
                             break;
@@ -182,54 +185,81 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 } while (retryFlag);
                 
-                Botlog.RegisterExamInfo(user.TelegramId, started, questionsCount, questionsPassed);
+                Botlog.RegisterExamInfo(_user.TelegramId, started, questionsCount, questionsPassed);
             }              
-            user.OnLearningDone();
-            var updateUserTask = _userService.Update(user);
-            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(user,10);
+            _user.OnLearningDone();
+            var updateUserTask = _userService.Update(_user);
+            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(_user,10);
 
             //info after examination
-            var newWellLearnedWords=new List<UserWordModel>();
+            var doneMessage = CreateLearningResultsMessage(
+                distinctLearningWords, 
+                originWordsScore,
+                questionsPassed, 
+                questionsCount, 
+                learningWords, 
+                gamingScoreBefore);
+            await updateUserTask;
+            await finializeScoreUpdateTask;
+            await _chatIo.SendMarkdownMessageAsync(doneMessage,
+            new[]{new[] { InlineButtons.ExamText("🔁 One more learn")}, 
+                  new[] { InlineButtons.Stats,InlineButtons.Translation}});
+        }
+
+        private string CreateLearningResultsMessage(
+            UserWordModel[] wordsInExam,
+            Dictionary<string, double> originWordsScore, 
+            int questionsPassed, 
+            int questionsCount, 
+            UserWordModel[] learningWords,
+            int gamingScoreBefore
+        )
+        {
+            var newWellLearnedWords = new List<UserWordModel>();
             var forgottenWords = new List<UserWordModel>();
-            
-            foreach (var word in distinctLearningWords)
+
+            foreach (var word in wordsInExam)
             {
-                if (word.AbsoluteScore > 4)
+                if (word.AbsoluteScore >= 4)
                 {
-                    if (wordAndScore[word.Word]<=4)
+                    if (originWordsScore[word.Word] < 4)
                         newWellLearnedWords.Add(word);
                 }
                 else
                 {
-                    if (wordAndScore[word.Word]>4)
+                    if (originWordsScore[word.Word] > 4)
                         forgottenWords.Add(word);
                 }
             }
 
             var doneMessage = new StringBuilder($"*Learning done:* {questionsPassed}/{questionsCount}\r\n" +
-                                                $"*Words in test:* {learningWords.Length}\r\n"); 
-            
-          if (newWellLearnedWords.Any())
+                                                $"*Words in test:* {learningWords.Length}\r\n");
+
+            if (newWellLearnedWords.Any())
             {
-                if (newWellLearnedWords.Count>1)
+                if (newWellLearnedWords.Count > 1)
                     doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} words:*\r\n");
                 else
-                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} word:*\r\n");
+                    doneMessage.Append($"*\r\nYou have learned one word:*\r\n");
                 foreach (var word in newWellLearnedWords)
                 {
-                    doneMessage.Append("✅ "+word.Word + "\r\n");
-                }
-            }
-            if (forgottenWords.Any())
-            {
-                doneMessage.Append($"\r\n" +
-                                   $"*Forgotten words:*\r\n");
-                foreach (var word in forgottenWords)
-                {
-                    doneMessage.Append("❗ "+word.Word + "\r\n");
+                    doneMessage.Append("✅ " + word.Word + "\r\n");
                 }
             }
 
+            if (forgottenWords.Any())
+            {
+                if(forgottenWords.Count>1)
+                    doneMessage.Append($"\r\n*You forgot {forgottenWords} words:*\r\n");
+                else
+                    doneMessage.Append("\r\n*You forgot one word:*\r\n");
+                foreach (var word in forgottenWords)
+                {
+                    doneMessage.Append("❗ " + word.Word + "\r\n\r\n");
+                }
+            }
+            
+            /*
             doneMessage.Append("\r\n*All words in test:*\r\n");
             var emoji = "";
             foreach (var word in distinctLearningWords)
@@ -238,18 +268,12 @@ namespace Chotiskazal.Bot.ChatFlows
                 else if (word.AbsoluteScore <= 4 || word.AbsoluteScore > 1) emoji = "👌";
                 else emoji = "❌";
                 doneMessage.Append(emoji+" "+word.Word + "   " + word.TranslationAsList + "\r\n");
-            }
+            }*/
 
-            doneMessage.Append($"\r\n*Earned score:* "+$"{user.GamingScore-gamingScoreBefore}");
-            doneMessage.Append($"\r\n*Total score:* "+ user.GamingScore+"\r\n");
-            
-            await updateUserTask;
+            doneMessage.Append($"\r\n*Earned score:* " + $"{_user.GamingScore - gamingScoreBefore}");
+            doneMessage.Append($"\r\n*Total score:* " + _user.GamingScore + "\r\n");
 
-            await finializeScoreUpdateTask; 
-            await _chatIo.SendMarkdownMessageAsync(doneMessage.ToString(),
-            new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.Stats}, 
-                    new[]{ InlineButtons.EnterWords}});
+            return doneMessage.ToString();
         }
 
         private async Task WriteDontPeakMessage(string resultsBeforeHideousText)
@@ -259,7 +283,8 @@ namespace Chotiskazal.Bot.ChatFlows
             string emptySymbol = "‎";
             
             await _chatIo.SendMessageAsync(
-                $"\r\n\r\n{emptySymbol}‎\r\n{emptySymbol}‎\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n{resultsBeforeHideousText}\r\n\r\nDon't peek\r\n");
+                $"\r\n\r\n{emptySymbol}‎\r\n{emptySymbol}‎\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n{resultsBeforeHideousText}\r\n\r\n" +
+                $"Now try to answer without hints. Don't peek upward!\r\n");
             await _chatIo.SendMessageAsync("\U0001F648");
         }
     }
