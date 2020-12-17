@@ -269,8 +269,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 doneMessage.Append(emoji+" "+word.Word + "   " + word.TranslationAsList + "\r\n");
             }*/
 
-            doneMessage.Append(($"\r\n*Earned score:* " + $"{(int)(_user.GamingScore - gamingScoreBefore)}").Replace("-","\\-"));
-            doneMessage.Append(($"\r\n*Total score:* {(int) _user.GamingScore}\r\n").Replace("-","\\-"));
+            doneMessage.Append(($"\r\n*Earned score:* " + $"{(int)(_user.GamingScore - gamingScoreBefore)}"));
+            doneMessage.Append(($"\r\n*Total score:* {(int) _user.GamingScore}\r\n"));
 
             return doneMessage.ToString();
         }
