@@ -216,7 +216,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            doneMessage.Append("All words in test:\r\n");
+            doneMessage.Append("*All words in test:*\r\n");
             var emoji = "";
             foreach (var word in distinctLearningWords)
             {
