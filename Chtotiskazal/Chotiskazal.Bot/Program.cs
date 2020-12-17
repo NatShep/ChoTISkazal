@@ -26,7 +26,6 @@ namespace Chotiskazal.Bot
 {
     static class Program {
         private static TelegramBotClient _botClient;
-        private static TelegramBotClient _botHelper;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
@@ -70,7 +69,6 @@ namespace Chotiskazal.Bot
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
-            _botHelper = new TelegramBotClient(_settings.BotHelperToken);
             
             Botlog.CreateTelegramLogger(_settings.BotHelperToken,_settings.ControlPanelChatId);
 

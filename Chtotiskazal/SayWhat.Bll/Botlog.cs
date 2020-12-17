@@ -16,7 +16,10 @@
         private static ILogger _alarmLog;
         public static void CreateTelegramLogger(string apiKey, string chatId)
         {
-             _alarmLog = Log.Logger = new LoggerConfiguration()
+            if(string.IsNullOrWhiteSpace(apiKey))
+                return;
+            
+            _alarmLog = Log.Logger = new LoggerConfiguration()
             .WriteTo.TeleSink(
                 telegramApiKey: apiKey,
                 telegramChatId: chatId,
