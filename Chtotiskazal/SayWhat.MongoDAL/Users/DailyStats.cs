@@ -14,15 +14,15 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("oc")] 
         [BsonIgnoreIfDefault]
         private int _outdatedChanging;
-        [BsonElement("gc")]
+        [BsonElement("gs")]
         [BsonIgnoreIfDefault]
-        private int _gameScoreChanging;
+        private double _gameScoreChanging;
 
         public int CountOf(int minLearnCategory, int maxLearnCategory)
         =>
             CummulativeStatsChanging.CountOf(minLearnCategory, maxLearnCategory);
         
-        public void OnGameScoreIncreased(in int gameScoreChanging)
+        public void OnGameScoreIncreased(double gameScoreChanging)
         {
             _gameScoreChanging += gameScoreChanging;
         }
@@ -67,7 +67,7 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("ld")]
         [BsonIgnoreIfDefault]
         public int LearningDone { get; set; }
-        public int GameScoreChanging => _gameScoreChanging;
+        public double GameScoreChanging => _gameScoreChanging;
     }
     [BsonIgnoreExtraElements]
     public class TotalStats : StatsBase

@@ -24,12 +24,11 @@
         public const double IncompleteWordMinScore = 2.66;
         public const double FamiliarWordMinScore = 1.33;
 
-
-
-        public static int NewWordGamingScore { get; set; } = 20;
-        public static int NewPairGamingScore { get; set; } = 3;
-        public static int QuestionPassedGamingScore { get; set; } = 3;
-        public static int QuestionFailedGamingScore { get; set; } = -9;
-        public static int LearningDoneGamingScore { get; set; } = 15;
+        //scores:
+        public static double NewWordGamingScore { get; set; } = 4;
+        public static double NewPairGamingScore { get; set; } = 0.1;
+        public static double QuestionPassedGamingScore { get; set; } = 1;
+        public static double QuestionFailedGamingScore { get; set; } = -3;
+        public static double LearningDoneGamingScore { get; set; } = 0;
     }
 }

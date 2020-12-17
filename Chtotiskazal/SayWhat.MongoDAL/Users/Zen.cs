@@ -22,7 +22,7 @@ public class Zen
 
         var learningCount = needToBeDone / 4;
 
-        var outdateLearnCount = outdatedWordsCount / 2;
+        var outdateLearnCount = outdatedWordsCount / 3;
 
         if (learningCount > outdateLearnCount) {
             CountOfLearningNeedToBeDone = learningCount;
@@ -30,19 +30,19 @@ public class Zen
         else {
             CountOfLearningNeedToBeDone = learningCount + (outdateLearnCount - learningCount) / 4;
         }
-        //we have to have at leat 20 words for learning
-        CountOfWordsNeedToBeAdded += Math.Max(20 - notLearnedWords, 0);
+        //we have to have at leat 30 words for learning
+        CountOfWordsNeedToBeAdded += Math.Max(30 - notLearnedWords, 0);
         
         //Zen Equal 0 if CountOfLearningNeedToBeDone== CountOfWordsNeedToBeAdded = 0;
         //Zen is negative if CountOfWordsNeedToBeAdded = 20 && CountOfLearningNeedToBeDone = 0;
         //Zen is positive if CountOfLearningNeedToBeDone = 20 && CountOfWordsNeedToBeAdded = 0;
         Rate = CountOfLearningNeedToBeDone - CountOfWordsNeedToBeAdded;
         if (Rate >= 20) Rate = 20;
-        //if zen = 20  rate = 1
-        //if zen = 0   rate ~ 2
-        //if zen = -20 rate = 3
-        AddWordsBonusRate = (int)Math.Round(-0.05 * Rate + 2);
-        LearnWordsBonusRate = (3 - AddWordsBonusRate) + 1;
+        //if zen = 20  rate = 0.5
+        //if zen = 0   rate ~ 1
+        //if zen = -20 rate = 1.5
+        AddWordsBonusRate = -0.025 * Rate + 1;
+        LearnWordsBonusRate = 2 - AddWordsBonusRate;
     }
     /// <summary>
     /// if rate is negative - user should add words
@@ -51,7 +51,7 @@ public class Zen
     public double Rate { get; }
     public int CountOfLearningNeedToBeDone { get; }
     public int CountOfWordsNeedToBeAdded { get; }
-    public int AddWordsBonusRate { get; } = 1;
-    public int LearnWordsBonusRate { get; } = 1;
+    public double AddWordsBonusRate { get; } = 1;
+    public double LearnWordsBonusRate { get; } = 1;
     
 }

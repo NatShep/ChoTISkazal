@@ -212,7 +212,7 @@ namespace Chotiskazal.Bot.ChatFlows
             int questionsPassed, 
             int questionsCount, 
             UserWordModel[] learningWords,
-            int gamingScoreBefore
+            double gamingScoreBefore
         )
         {
             var newWellLearnedWords = new List<UserWordModel>();
@@ -270,8 +270,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 doneMessage.Append(emoji+" "+word.Word + "   " + word.TranslationAsList + "\r\n");
             }*/
 
-            doneMessage.Append($"\r\n*Earned score:* " + $"{_user.GamingScore - gamingScoreBefore}");
-            doneMessage.Append($"\r\n*Total score:* " + _user.GamingScore + "\r\n");
+            doneMessage.Append($"\r\n*Earned score:* " + $"{(int)(_user.GamingScore - gamingScoreBefore)}");
+            doneMessage.Append($"\r\n*Total score:* {(int) _user.GamingScore}\r\n");
 
             return doneMessage.ToString();
         }
