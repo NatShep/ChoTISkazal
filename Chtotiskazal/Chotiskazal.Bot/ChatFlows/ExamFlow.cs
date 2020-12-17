@@ -63,7 +63,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 foreach (var pairModel in learningWords.Randomize())
                 {
-                    sb.AppendLine($"{pairModel.Word}\t\t:{pairModel.TranslationAsList}");
+                    sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.TranslationAsList.EscapeForMarkdown()}");
                 }
                 sb.AppendLine("\r\n```\r\n\\.\\.\\. then click start");
                 await _chatIo.SendMarkdownMessageAsync(sb.ToString(),new[]{ new[]{ new InlineKeyboardButton
@@ -200,7 +200,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 gamingScoreBefore);
             await updateUserTask;
             await finializeScoreUpdateTask;
-            await _chatIo.SendMarkdownMessageAsync(doneMessage,
+            await _chatIo.SendMarkdownMessageAsync(doneMessage.EscapeForMarkdown(),
             new[]{new[] { InlineButtons.ExamText("🔁 One more learn")}, 
                   new[] { InlineButtons.Stats,InlineButtons.Translation}});
         }

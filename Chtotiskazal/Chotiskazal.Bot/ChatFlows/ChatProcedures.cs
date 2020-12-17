@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
@@ -160,7 +161,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 $" Activity during last 7 weeks:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\n" +
                 $"Recomendation: \r\n" +
                 $"*{recomendation}*";
-            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"),
+            await chatIo.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.MainMenu}, 
                     new[]{ InlineButtons.Translation}});
