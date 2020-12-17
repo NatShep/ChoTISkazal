@@ -16,6 +16,12 @@ namespace Chotiskazal.Bot
         public static readonly InlineKeyboardButton Stats = new InlineKeyboardButton
             {CallbackData = "/stats", Text = "Stats"};
 
+        public static InlineKeyboardButton HowToUse = new InlineKeyboardButton
+            {CallbackData = "/help", Text = "Help"};
+
+        public static InlineKeyboardButton MainMenu = new InlineKeyboardButton
+            {CallbackData = "/start", Text = "Main menu"};
+
         public static InlineKeyboardButton[] CreateVariants(IEnumerable<string> variants)
             => variants.Select((v, i) => new InlineKeyboardButton
             {

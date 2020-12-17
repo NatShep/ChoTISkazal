@@ -168,7 +168,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     .Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray()) +
                 "```\r\n" +
                 "Recomendation: \r\n"+recomendation;
-            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"));
+            await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"),
+                new[]{new[]{
+                        InlineButtons.Exam, InlineButtons.MainMenu}, 
+                    new[]{ InlineButtons.EnterWords}});
         }
     }
 }
