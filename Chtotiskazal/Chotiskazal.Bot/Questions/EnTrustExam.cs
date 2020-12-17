@@ -60,8 +60,8 @@ namespace Chotiskazal.Bot.Questions
             var choice = await chatIo.WaitInlineIntKeyboardInput();
 
             return choice == 1 ? 
-                QuestionResult.PassedText("Good. I hope you were honest", QuestionResult.NoText) 
-                : QuestionResult.FailedText("But you were honest...", QuestionResult.NoText);
+                QuestionResult.PassedText("Good. I hope you were honest", "Well") 
+                : QuestionResult.FailedText("But you were honest...", "Honesty is gold");
         }
     }
 }

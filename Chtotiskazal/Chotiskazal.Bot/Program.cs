@@ -26,7 +26,6 @@ namespace Chotiskazal.Bot
 {
     static class Program {
         private static TelegramBotClient _botClient;
-        private static TelegramBotClient _botHelper;
         private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
@@ -70,7 +69,6 @@ namespace Chotiskazal.Bot
             QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
-            _botHelper = new TelegramBotClient(_settings.BotHelperToken);
             
             Botlog.CreateTelegramLogger(_settings.BotHelperToken,_settings.ControlPanelChatId);
 
@@ -112,7 +110,7 @@ namespace Chotiskazal.Bot
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
               //      set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
-                    set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+                    set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
                     set.MongoConnectionString = "mongodb://localhost:27017/";
                     set.MongoDbName = "swdumbp";
                     //set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";

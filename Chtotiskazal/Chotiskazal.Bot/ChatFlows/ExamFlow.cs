@@ -121,7 +121,9 @@ namespace Chotiskazal.Bot.ChatFlows
                     }
                     
                     // cancel if question is absolutely the same with previous
-                    if (lastWord == word && lastQuestionName == exam.Name)
+                    if (lastExamResult?.Results!= ExamResult.Retry 
+                        && lastWord == word 
+                        && lastQuestionName == exam.Name)
                         continue;
                     lastWord = word;
                     lastQuestionName = exam.Name;
