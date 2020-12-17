@@ -80,7 +80,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var started = DateTime.Now;
 
             var learningAndAdvancedWords
-                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings)).Take(4).ToArray();
+                = (await _usersWordsService.AppendAdvancedWordsToExamList(user, learningWords, _examSettings));
             
             var distinctLearningWords = learningAndAdvancedWords.Distinct().ToArray();
             
