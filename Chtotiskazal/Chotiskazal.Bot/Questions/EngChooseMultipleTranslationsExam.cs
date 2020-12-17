@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
@@ -17,14 +18,14 @@ namespace Chotiskazal.Bot.Questions
         public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.TranslationAsList;
+            var translations = word.AllTranslations.Randomize().Take(3);
             
             var variants = examList
                 .Where(e => e.TranslationAsList != word.TranslationAsList)
-                .Select(e => e.TranslationAsList)
+                .SelectMany(e => e.AllTranslations.Randomize().Take(3))
                 .Randomize()
                 .Take(5)
-                .Append(translations)
+                .Union(translations)
                 .ToList();
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +

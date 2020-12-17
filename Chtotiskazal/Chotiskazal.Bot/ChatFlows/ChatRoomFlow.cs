@@ -126,20 +126,23 @@ namespace Chotiskazal.Bot.ChatFlows
         private async Task SendHelp()
         {
             await ChatIo.SendMarkdownMessageAsync(_settings.HelpMessage,
-                new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.Stats},
-                    new[]{ InlineButtons.Translation}});
+                new[]{new[]{InlineButtons.Exam, InlineButtons.Stats},
+                    new[]{  InlineButtons.Translation}});
         }
 
         private async Task ShowMainMenu()
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync("Write any word for translate or press button you need",
-                    new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.Stats}, 
+                var _  = ChatIo.SendMessageAsync("I am a translator and teacher. " +
+                                                 "First you use me as a regular translator. " +
+                                                 "Then, when you have time, " +
+                                                 "click on the 'Learn' button or /learn command to start training translated words.",
+                    new[]{
                         new[]{ InlineButtons.Translation},
-                        new[]{ InlineButtons.HowToUse}});
+                        new[]{ InlineButtons.Exam},
+                        new[]{InlineButtons.Stats, InlineButtons.HowToUse}
+                    });
 
                 while (true)
                 {

@@ -81,7 +81,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 "November",
                 "December"
             };
-            var sb = new StringBuilder( "-------------------------\r\n");
+            var sb = new StringBuilder( "----------------------\r\n");
 
             //how many weeks ago month starts
             var weeksLastMonthStarts =  today.Day / 7;
@@ -112,7 +112,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 sb.Append("\r\n");
             }
-            sb.Append("-------------------------\r\n ");
+            sb.Append("----------------------\r\n ");
             sb.Append("less " + r + o + y + g + best + " more\r\n");
             return sb.ToString();
         }
@@ -122,52 +122,28 @@ namespace Chotiskazal.Bot.ChatFlows
 
             string recomendation = "";
             if (userModel.Zen.Rate < -15)
-                recomendation += $"We need more words! You have to add at least {userModel.Zen.CountOfWordsNeedToBeAdded} more words.";
+                recomendation = $"We need much more new words!";
             else if (userModel.Zen.Rate < -10)
-                recomendation += $"Add {userModel.Zen.CountOfWordsNeedToBeAdded} words.";
+                recomendation = $"Translate new words";
             else if (userModel.Zen.Rate < -5)
-                recomendation += $"Add {userModel.Zen.CountOfWordsNeedToBeAdded} words and pass {userModel.Zen.CountOfLearningNeedToBeDone} exams.";
+                recomendation = $"Translate new words and pass exams.";
             else if (userModel.Zen.Rate < 5)
-                recomendation += $"Everything is perfect! " +
-                                 $"\r\nAdd {userModel.Zen.CountOfWordsNeedToBeAdded} words and pass {userModel.Zen.CountOfLearningNeedToBeDone} exams.";
+                recomendation = $"Everything is perfect! " +
+                                 $"\r\nTranslate new words and pass exams.";
             else if (userModel.Zen.Rate < 10)
-                recomendation += $"Pass {userModel.Zen.CountOfLearningNeedToBeDone} exams and add {userModel.Zen.CountOfWordsNeedToBeAdded} words.";
+                recomendation = $"Pass exams and translate new words.";
             else if (userModel.Zen.Rate < 15)
-                recomendation += $"Pass {userModel.Zen.CountOfLearningNeedToBeDone} exams";
+                recomendation = $"Pass exams";
             else 
-                recomendation += $"Learning learning learning! You have to pass at least {userModel.Zen.CountOfLearningNeedToBeDone} more exams";
+                recomendation = $"Learning learning learning!";
 
             var weekStart = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek);
             var lastWeek = userModel.LastDaysStats.Where(w => w.Date >= weekStart).ToArray();
             var lastMonth = userModel.GetLastMonth();
             var lastDay = userModel.GetToday();
 
-            var msg = "Your stats: \r\n```\r\n" +
-                $"  Words added: {userModel.WordsCount}\r\n" +
-                $"  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
-                $"  Score: {userModel.GamingScore}\r\n```\r\n" +
-                $"This month:\r\n```" +
-                $"  New words: {lastMonth.WordsAdded}\r\n" +
-                $"  Learned well: {lastMonth.WordsLearnt}\r\n" +
-                $"  Exams passed: {lastMonth.LearningDone}\r\n" +
-                $"  Score: {lastMonth.GameScoreChanging}\r\n```\r\n" +
-                $"This week:\r\n```" +
-                $"  New words: {lastWeek.Sum(l=>l.WordsAdded)}\r\n" +
-                $"  Learned well: {lastWeek.Sum(l=>l.WordsLearnt)}\r\n" +
-                $"  Exams passed: {lastWeek.Sum(l=>l.LearningDone)}\r\n" +
-                $"  Score: {lastWeek.Sum(l=>l.GameScoreChanging)}\r\n```\r\n" +
-                $"This day:\r\n```" +
-                $"  New words: {lastDay.WordsAdded}\r\n" +
-                $"  Learned well: {lastDay.WordsLearnt}\r\n" +
-                $"  Exams passed: {lastDay.LearningDone}\r\n" +
-                $"  Score: {lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" Activity during last 7 weeks:\r\n" +
-                $"```" +
-                $"-------------------------\r\n "+
-                Render7WeeksCalendar(userModel.LastDaysStats
-                    .Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray()) +
-                "```\r\n" +
-                "Recomendation: \r\n"+recomendation;
+            var msg =
+                $"Your stats: \r\n```\r\n  Words added: {userModel.WordsCount}\r\n  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n  Score: {userModel.GamingScore}\r\n```\r\nThis month:\r\n```  New words: {lastMonth.WordsAdded}\r\n  Learned well: {lastMonth.WordsLearnt}\r\n  Exams passed: {lastMonth.LearningDone}\r\n  Score: {lastMonth.GameScoreChanging}\r\n```\r\nThis day:\r\n```  New words: {lastDay.WordsAdded}\r\n  Learned well: {lastDay.WordsLearnt}\r\n  Exams passed: {lastDay.LearningDone}\r\n  Score: {lastDay.GameScoreChanging}\r\n```\r\n Activity during last 7 weeks:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\nRecomendation: \r\n*{recomendation}*";
             await chatIo.SendMarkdownMessageAsync(msg.Replace("-", "\\-").Replace(".","\\.").Replace("!","\\!"),
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.MainMenu}, 
