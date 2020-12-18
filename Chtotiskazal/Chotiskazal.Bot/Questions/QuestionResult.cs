@@ -1,4 +1,6 @@
-﻿namespace Chotiskazal.Bot.Questions
+﻿using Chotiskazal.Bot.InterfaceLang;
+
+namespace Chotiskazal.Bot.Questions
 {
     public class QuestionResult
     {
@@ -16,25 +18,18 @@
             Results = results;
         }
 
-        private const string defaultFailedString = "Noo...";
-        private const string defaultPassedString = "It's right!";
-        private const string defaultIgnoredString = "So so ...";
-
-        private const string defaultHideousFailedString = "Last answer was wrong";
-        private const string defaultHideousPassedString = "Last answer was right";
-        private const string defaultHideousIgnoredString = "Not really";
         
         public static QuestionResult PassedText(string text, string hideousText = null) 
-            => new QuestionResult(text, hideousText??defaultHideousPassedString, ExamResult.Passed);
+            => new QuestionResult(text, hideousText??Texts.Current.defaultHideousPassedString, ExamResult.Passed);
         public static QuestionResult FailedText(string text, string hideousText = null)
-            => new QuestionResult(text,hideousText??defaultHideousFailedString , ExamResult.Failed);
+            => new QuestionResult(text,hideousText??Texts.Current.defaultHideousFailedString , ExamResult.Failed);
       
         public static QuestionResult Passed=> new QuestionResult(
-            defaultPassedString,
-            defaultHideousPassedString, ExamResult.Passed);
+            Texts.Current.defaultPassedString,
+            Texts.Current.defaultHideousPassedString, ExamResult.Passed);
         public static QuestionResult Failed=> new QuestionResult(
-            defaultFailedString,
-            defaultHideousFailedString, ExamResult.Failed);
+            Texts.Current.defaultFailedString,
+            Texts.Current.defaultHideousFailedString, ExamResult.Failed);
         public static QuestionResult Retry=> new QuestionResult("","", ExamResult.Retry);
         public static QuestionResult Impossible => new QuestionResult("","", ExamResult.Impossible);
 

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -30,10 +30,10 @@ namespace Chotiskazal.Bot.Questions
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine();
-            sb.AppendLine($" translated as ");
+            sb.AppendLine($" {Texts.Current.translatesAs} ");
             sb.AppendLine();
             sb.AppendLine($"\"{replaced}\"");
-            sb.AppendLine($"Choose missing word...");
+            sb.AppendLine($"{Texts.Current.ChooseMissingWord}...");
 
 
             var variants = examList
@@ -53,9 +53,9 @@ namespace Chotiskazal.Bot.Questions
                 return QuestionResult.Retry;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResult.PassedText("Ayeee!");
+                return QuestionResult.PassedText(Texts.Current.Passed1);
             
-            return QuestionResult.FailedText($"Origin was: \"{phrase.OriginPhrase}\"");
+            return QuestionResult.FailedText($"{Texts.Current.OriginWas}: \"{phrase.OriginPhrase}\"");
         }
     }
 }

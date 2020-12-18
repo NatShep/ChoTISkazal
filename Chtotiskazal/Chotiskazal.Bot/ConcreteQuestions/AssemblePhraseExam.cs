@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -32,14 +33,15 @@ namespace Chotiskazal.Bot.Questions
                     break;
             }
 
-            await chatIo.SendMessageAsync("Words in phrase are shuffled. Write them in correct order:\r\n'" +  shuffled+ "'");
+            await chatIo.SendMessageAsync($"{Texts.Current.WordsInPhraseAreShufledWriteThemInOrder}:\r\n'" +  shuffled+ "'");
             var entry = await chatIo.WaitUserTextInputAsync();
             entry = entry.Trim();
 
             if (targetPhrase.OriginPhrase.AreEqualIgnoreCase(entry.Trim()))
                 return QuestionResult.Passed;
 
-            return QuestionResult.FailedText($"Original phrase was: '{targetPhrase.OriginPhrase}'");
+            
+            return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas2}: '{targetPhrase.OriginPhrase}'");
         }
     }
 }

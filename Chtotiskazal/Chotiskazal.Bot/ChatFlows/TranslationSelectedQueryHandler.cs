@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
@@ -92,7 +93,7 @@ namespace Chotiskazal.Bot.ChatFlows
             }
 
             await _chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
-                AddWordHelper.GetMessageAfterTranslationIsSelected(allTranslations[index]));
+                Texts.Current.MessageAfterTranslationIsSelected(allTranslations[index]));
         }
 
         private static bool[] GetSelectionMarks(IReadOnlyList<DictionaryTranslation> allTranslations, InlineKeyboardButton[] originMessageButtons)

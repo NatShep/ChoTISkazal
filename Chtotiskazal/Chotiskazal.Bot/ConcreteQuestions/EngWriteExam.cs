@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
@@ -58,19 +59,19 @@ namespace Chotiskazal.Bot.Questions
             if (otherComparation == StringsCompareResult.Equal)
             {
                 await chatIo.SendMessageAsync(
-                    $"Chosen translation is out of scope (but it is correct). Expected translations are: " +
+                    $"{Texts.Current.OutOfScopeTranslation}: " +
                     word.TranslationAsList);
                 return QuestionResult.Impossible;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync(
-                    $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are: " +
+                    Texts.Current.OutOfScopeWithCandidate(otherMeaning)+": "+
                     word.TranslationAsList);
                 return QuestionResult.Impossible;
             }
 
-            return QuestionResult.FailedText($"The translation was '{word.TranslationAsList}'");
+            return QuestionResult.FailedText(Texts.Current.FailedTranslationWas +$" '{word.TranslationAsList}'");
         }
     }
 }

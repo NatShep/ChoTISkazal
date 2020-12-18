@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -39,7 +40,7 @@ namespace Chotiskazal.Bot.Questions
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.OriginPhrase}    <=====\r\n" +
-                      $"Choose the translation";
+                      Texts.Current.ChooseTheTranslation;
             
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             

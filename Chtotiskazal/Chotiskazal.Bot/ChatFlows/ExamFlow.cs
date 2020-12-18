@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -40,7 +41,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (!await _usersWordsService.HasWords(_user))
             {
-                await _chatIo.SendMessageAsync("You need to add some more words before examination");
+                await _chatIo.SendMessageAsync(Texts.Current.NeedToAddMoreWordsBeforeLearning);
                 return;
             }
             
@@ -57,23 +58,21 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
-                var sb = new StringBuilder("*Learning*\r\n\r\n" +
-                                           "Carefully study the words in the list below:\r\n\r\n" +
-                                           "```\r\n");
+                var sb = new StringBuilder(Texts.Current.LearningCarefullyStudyTheListMarkdown +"\r\n\r\n```\r\n");
 
                 foreach (var pairModel in learningWords.Randomize())
                 {
                     sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.TranslationAsList.EscapeForMarkdown()}");
                 }
-                sb.AppendLine("\r\n```\r\n\\.\\.\\. then click start");
+                sb.AppendLine($"\r\n```\r\n\\.\\.\\. {Texts.Current.thenClickStartMarkdown}");
                 await _chatIo.SendMarkdownMessageAsync(sb.ToString(),new[]{ new[]{ new InlineKeyboardButton
                 {
                     CallbackData = "/startExamination",
-                    Text = "Start"
+                    Text = Texts.Current.StartButton
                 }, new InlineKeyboardButton
                 {
                     CallbackData = "/start",
-                    Text = "Cancel",
+                    Text = Texts.Current.CancelButton,
                 }}});
                 var userInput = await _chatIo.WaitInlineKeyboardInput();
                 if (userInput != "/startExamination")
@@ -201,7 +200,7 @@ namespace Chotiskazal.Bot.ChatFlows
             await updateUserTask;
             await finializeScoreUpdateTask;
             await _chatIo.SendMarkdownMessageAsync(doneMessage.EscapeForMarkdown(),
-            new[]{new[] { InlineButtons.ExamText("🔁 One more learn")}, 
+            new[]{new[] { InlineButtons.ExamText($"🔁 {Texts.Current.OneMoreLearnButton}")}, 
                   new[] { InlineButtons.Stats,InlineButtons.Translation}});
         }
 
@@ -231,15 +230,15 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            var doneMessage = new StringBuilder($"*Learning done:* {questionsPassed}/{questionsCount}\r\n" +
-                                                $"*Words in test:* {learningWords.Length}\r\n");
+            var doneMessage = new StringBuilder($"*{Texts.Current.LearningDone}:* {questionsPassed}/{questionsCount}\r\n" +
+                                                $"*{Texts.Current.WordsInTestCount}:* {learningWords.Length}\r\n");
 
             if (newWellLearnedWords.Any())
             {
                 if (newWellLearnedWords.Count > 1)
-                    doneMessage.Append($"*\r\nYou have learned {newWellLearnedWords.Count} words:*\r\n");
+                    doneMessage.Append($"*\r\n{Texts.Current.YouHaveLearnedWords(newWellLearnedWords.Count)}:*\r\n");
                 else
-                    doneMessage.Append($"*\r\nYou have learned one word:*\r\n");
+                    doneMessage.Append($"*\r\n{Texts.Current.YouHaveLearnedOneWord}:*\r\n");
                 foreach (var word in newWellLearnedWords)
                 {
                     doneMessage.Append("✅ " + word.Word + "\r\n");
@@ -249,28 +248,17 @@ namespace Chotiskazal.Bot.ChatFlows
             if (forgottenWords.Any())
             {
                 if(forgottenWords.Count>1)
-                    doneMessage.Append($"\r\n*You forgot {forgottenWords} words:*\r\n");
+                    doneMessage.Append($"\r\n*{Texts.Current.YouForgotCountWords(forgottenWords.Count)}:*\r\n");
                 else
-                    doneMessage.Append("\r\n*You forgot one word:*\r\n");
+                    doneMessage.Append($"\r\n*{Texts.Current.YouForgotOneWord}:*\r\n");
                 foreach (var word in forgottenWords)
                 {
                     doneMessage.Append("❗ " + word.Word + "\r\n\r\n");
                 }
             }
             
-            /*
-            doneMessage.Append("\r\n*All words in test:*\r\n");
-            var emoji = "";
-            foreach (var word in distinctLearningWords)
-            {
-                if (word.AbsoluteScore > 4) emoji = "✅";
-                else if (word.AbsoluteScore <= 4 || word.AbsoluteScore > 1) emoji = "👌";
-                else emoji = "❌";
-                doneMessage.Append(emoji+" "+word.Word + "   " + word.TranslationAsList + "\r\n");
-            }*/
-
-            doneMessage.Append(($"\r\n*Earned score:* " + $"{(int)(_user.GamingScore - gamingScoreBefore)}"));
-            doneMessage.Append(($"\r\n*Total score:* {(int) _user.GamingScore}\r\n"));
+            doneMessage.Append(($"\r\n*{Texts.Current.EarnedScore}:* " + $"{(int)(_user.GamingScore - gamingScoreBefore)}"));
+            doneMessage.Append(($"\r\n*{Texts.Current.TotalScore}:* {(int) _user.GamingScore}\r\n"));
 
             return doneMessage.ToString();
         }
@@ -283,7 +271,7 @@ namespace Chotiskazal.Bot.ChatFlows
             
             await _chatIo.SendMessageAsync(
                 $"\r\n\r\n{emptySymbol}‎\r\n{emptySymbol}‎\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n{resultsBeforeHideousText}\r\n\r\n" +
-                $"Now try to answer without hints. Don't peek upward!\r\n");
+                $"{Texts.Current.DontPeekUpward}\r\n");
             await _chatIo.SendMessageAsync("\U0001F648");
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
@@ -29,7 +30,7 @@ namespace Chotiskazal.Bot.Questions
                 .ToList();
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      $"Choose the translation";
+                      Texts.Current.ChooseTheTranslation;
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();

@@ -61,7 +61,6 @@ namespace Chotiskazal.Bot.ChatFlows
             return -1;
         }
 
-        public static string GetMessageAfterTranslationIsSelected(DictionaryTranslation translation) 
-            => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
+      
     }
 }

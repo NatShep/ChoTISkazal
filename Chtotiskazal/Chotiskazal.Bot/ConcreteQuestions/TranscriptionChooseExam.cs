@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
@@ -38,7 +39,7 @@ namespace Chotiskazal.Bot.Questions
                 return QuestionResult.Impossible;
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      $"Choose the transcription";
+                      Texts.Current.ChooseTheTranscription;
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();

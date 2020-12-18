@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -17,14 +18,14 @@ namespace Chotiskazal.Bot.Questions
         public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
-                      $"Do you know the translation?";
+                      Texts.Current.DoYouKnowTranslation;
             var id = Rand.Next();
             
             var _ = chatIo.SendMessageAsync(msg,
                 new InlineKeyboardButton()
                 {
                     CallbackData = id.ToString(),
-                    Text = "See the translation"
+                    Text = Texts.Current.ShowTheTranslationButton
                 });
             while (true)
             {
@@ -36,31 +37,35 @@ namespace Chotiskazal.Bot.Questions
                 {
                     if (word.Word.AreEqualIgnoreCase(input))
                         return QuestionResult.Passed;
-                    await chatIo.SendMessageAsync("No. It is not right. Try again");
+                    await chatIo.SendMessageAsync(Texts.Current.ItIsNotRightTryAgain);
                 }
             }
 
-            _= chatIo.SendMessageAsync($"Translation is \r\n" +
+            _= chatIo.SendMessageAsync($"{Texts.Current.TranslationIs} \r\n" +
                                        $"{word.Word}\r\n" +
-                                       $" Did you guess?",
+                                        Texts.Current.DidYouGuess,
                                 new[]{
                                     new[]{
                                         new InlineKeyboardButton {
                                             CallbackData = "1",
-                                            Text = "Yes"
+                                            Text = Texts.Current.YesButton
                                         },
                                         new InlineKeyboardButton {
                                             CallbackData = "0",
-                                            Text = "No"
+                                            Text = Texts.Current.NoButton
                                         }
                                     }
                                 }
                             );
 
             var choice = await chatIo.WaitInlineIntKeyboardInput();
-            return choice == 1 
-                ? QuestionResult.PassedText("Good. I hope you were honest", "Good") 
-                : QuestionResult.FailedText("But you were honest...", "Honesty is gold");
+            return choice == 1
+                ? QuestionResult.PassedText(
+                    Texts.Current.PassedOpenIHopeYouWereHonest,
+                    Texts.Current.PassedHideousWell2)
+                : QuestionResult.FailedText(
+                    Texts.Current.FailedOpenButYouWereHonest,
+                    Texts.Current.FailedHideousHonestyIsGold);
         }
     }
 }

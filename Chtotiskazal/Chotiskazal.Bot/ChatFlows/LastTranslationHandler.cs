@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
@@ -45,18 +46,18 @@ namespace Chotiskazal.Bot.ChatFlows
 
             await SelectIthTranslation(update.CallbackQuery.Message.MessageId, index, 0);
             await _chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
-                AddWordHelper.GetMessageAfterTranslationIsSelected(_translations[index]));
+                Texts.Current.MessageAfterTranslationIsSelected(_translations[index]));
             if (!_isLastMessageInTheChat)
                 return;
 
             if (_confirmationMessageId.HasValue) {
                 if (await _chat.EditMessageText(_confirmationMessageId.Value,
-                    AddWordHelper.GetMessageAfterTranslationIsSelected(_translations[index])))
+                    Texts.Current.MessageAfterTranslationIsSelected(_translations[index])))
                     return;
             }
 
             _confirmationMessageId = await _chat.SendMessageAsync(
-                AddWordHelper.GetMessageAfterTranslationIsSelected(_translations[index]));
+                Texts.Current.MessageAfterTranslationIsSelected(_translations[index]));
         }
 
         private int? _confirmationMessageId = null;

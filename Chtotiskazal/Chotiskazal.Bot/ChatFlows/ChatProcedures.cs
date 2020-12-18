@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    public class CalendarItem
-    {
-        public CalendarItem(DateTime date, double score)
-        {
-            Date = date;
-            Score = score;
-        }
-
-        public DateTime Date { get; }
-        public double Score { get; }
-    }
     public static class ChatProcedures
     {
         
@@ -58,41 +47,12 @@ namespace Chotiskazal.Bot.ChatFlows
             if (minDay.DayOfWeek != DayOfWeek.Sunday) 
                 undoneInLastWeek = (7 - (int) minDay.DayOfWeek);
            
-            string[] dayNames = {
-                "mon",
-                "tue",
-                "wed",
-                "thu",
-                "fri",
-                "sat",
-                "sun"
-            };
-            
-            string[] monthNames = {
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December"
-            };
+           
             var sb = new StringBuilder( "----------------------\r\n");
 
-            //how many weeks ago month starts
-            var weeksLastMonthStarts =  today.Day / 7;
-            // char position
-            var monthName = monthNames[today.Month-1];
-     //       var monthTitleOffset = 4 + (7 - weeksLastMonthStarts) * 2.5 - monthName.Length-2;
-    //        sb.Append(new string(' ', (int)monthTitleOffset) + monthName + "\r\n");
             for (int day = 0; day < 7; day++)
             {
-                sb.Append(dayNames[day] + " ");
+                sb.Append(Texts.Current.ShortDayNames[day] + " ");
                 for (int week = 7; week > 0; week--)
                 {
                     var offset = 7 * week - undoneInLastWeek - day - 1;
@@ -114,7 +74,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 sb.Append("\r\n");
             }
             sb.Append("----------------------\r\n ");
-            sb.Append("less " + r + o + y + g + best + " more\r\n");
+            sb.Append($"{Texts.Current.less} " + r + o + y + g + best + $" {Texts.Current.more}\r\n");
             return sb.ToString();
         }
 
@@ -123,20 +83,19 @@ namespace Chotiskazal.Bot.ChatFlows
 
             string recomendation = "";
             if (userModel.Zen.Rate < -15)
-                recomendation = $"We need much more new words!";
+                recomendation = Texts.Current.Zen1WeNeedMuchMoreNewWords;
             else if (userModel.Zen.Rate < -10)
-                recomendation = $"Translate new words";
+                recomendation = Texts.Current.Zen2TranslateNewWords;
             else if (userModel.Zen.Rate < -5)
-                recomendation = $"Translate new words and pass exams.";
+                recomendation = Texts.Current.Zen3TranslateNewWordsAndPassExams;
             else if (userModel.Zen.Rate < 5)
-                recomendation = $"Everything is perfect! " +
-                                 $"\r\nTranslate new words and pass exams.";
+                recomendation = Texts.Current.Zen3EverythingIsGood;
             else if (userModel.Zen.Rate < 10)
-                recomendation = $"Pass exams and translate new words.";
+                recomendation = Texts.Current.Zen4PassExamsAndTranslateNewWords;
             else if (userModel.Zen.Rate < 15)
-                recomendation = $"Pass exams";
+                recomendation = Texts.Current.Zen5PassExams;
             else 
-                recomendation = $"Learning learning learning!";
+                recomendation = Texts.Current.Zen6YouNeedToLearn;
 
             var weekStart = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek);
             var lastWeek = userModel.LastDaysStats.Where(w => w.Date >= weekStart).ToArray();
@@ -144,22 +103,22 @@ namespace Chotiskazal.Bot.ChatFlows
             var lastDay = userModel.GetToday();
 
             var msg =
-                $"Your stats: \r\n```\r\n" +
-                $"  Words added: {userModel.WordsCount}\r\n" +
-                $"  Learned well: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
-                $"  Score: {(int)userModel.GamingScore}\r\n```\r\n" +
-                $"This month:\r\n```" +
-                $"  New words: {lastMonth.WordsAdded}\r\n" +
-                $"  Learned well: {lastMonth.WordsLearnt}\r\n" +
-                $"  Exams passed: {lastMonth.LearningDone}\r\n" +
-                $"  Score: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
-                $"This day:\r\n```" +
-                $"  New words: {lastDay.WordsAdded}\r\n" +
-                $"  Learned well: {lastDay.WordsLearnt}\r\n" +
-                $"  Exams passed: {lastDay.LearningDone}\r\n" +
-                $"  Score: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" Activity during last 7 weeks:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\n" +
-                $"Recomendation: \r\n" +
+                $"{Texts.Current.StatsYourStats}: \r\n```\r\n" +
+                $"  {Texts.Current.StatsWordsAdded}: {userModel.WordsCount}\r\n" +
+                $"  {Texts.Current.StatsLearnedWell}: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                $"  {Texts.Current.StatsScore}: {(int)userModel.GamingScore}\r\n```\r\n" +
+                $"{Texts.Current.StatsThisMonth}:\r\n```" +
+                $"  {Texts.Current.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
+                $"  {Texts.Current.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
+                $"  {Texts.Current.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
+                $"  {Texts.Current.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
+                $"{Texts.Current.StatsThisDay}:\r\n```" +
+                $"  {Texts.Current.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
+                $"  {Texts.Current.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
+                $"  {Texts.Current.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
+                $"  {Texts.Current.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
+                $" {Texts.Current.StatsActivityForLast7Weeks}:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\n" +
+                $"\r\n" +
                 $"*{recomendation}*";
             await chatIo.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
                 new[]{new[]{

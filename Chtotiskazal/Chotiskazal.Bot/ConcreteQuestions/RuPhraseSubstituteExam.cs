@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 
@@ -27,10 +28,10 @@ namespace Chotiskazal.Bot.Questions
             var sb = new StringBuilder();
 
             sb.AppendLine($"\"{phrase.OriginPhrase}\"");
-            sb.AppendLine($" translated as ");
+            sb.AppendLine($" {Texts.Current.translatesAs} ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
-            sb.AppendLine($"Enter missing word: ");
+            sb.AppendLine($"{Texts.Current.EnterMissingWord}: ");
             await chatIo.SendMessageAsync(sb.ToString());
 
             while (true)
@@ -44,10 +45,10 @@ namespace Chotiskazal.Bot.Questions
                     return QuestionResult.Passed;
 
                 if (comparation == StringsCompareResult.SmallMistakes) {
-                    await chatIo.SendMessageAsync("Almost right. But you have a typo. Let's try again");
+                    await chatIo.SendMessageAsync(Texts.Current.RetryAlmostRightWithTypo);
                     return QuestionResult.Retry;
                 }
-                return QuestionResult.FailedText($"Origin phrase was '{phrase.TranslatedPhrase}'");
+                return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas2} '{phrase.TranslatedPhrase}'");
             }
         }
     }

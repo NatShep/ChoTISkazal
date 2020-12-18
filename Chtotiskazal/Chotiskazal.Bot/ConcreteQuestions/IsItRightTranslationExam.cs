@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
@@ -24,19 +25,19 @@ namespace Chotiskazal.Bot.Questions
                 .ToList()
                 .GetRandomItem();
             
-            var msg = $"'{word.Word}' translates as '{translation}'.\r\n"+
-                             $"Is it right translation?";
+            var msg = $"'{word.Word}' {Texts.Current.translatesAs} '{translation}'.\r\n"+
+                             $"{Texts.Current.IsItRightTranslation}";
 
             _ = chatIo.SendMessageAsync(msg,
                 new[] {
                     new[] {
                         new InlineKeyboardButton {
                             CallbackData = "1",
-                            Text = "Yes"
+                            Text = Texts.Current.YesButton
                         },
                         new InlineKeyboardButton {
                             CallbackData = "0",
-                            Text = "No"
+                            Text = Texts.Current.NoButton
                         }
                     }
                 });
@@ -52,7 +53,7 @@ namespace Chotiskazal.Bot.Questions
             }
             else
             {
-                return QuestionResult.FailedText($"Mistaken. '{word.Word}' translates as '{translation}' ");
+                return QuestionResult.FailedText($"{Texts.Current.Mistaken} '{word.Word}' {Texts.Current.translatesAs} '{translation}' ");
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
@@ -27,7 +28,7 @@ namespace Chotiskazal.Bot.Questions
                 return QuestionResult.Impossible;
 
             await chatIo.SendMessageAsync($"=====>   {word.TranslationAsList}    <=====\r\n" +
-                                          $"Write the translation... ");
+                                          Texts.Current.WriteTheTranslation);
             var userEntry = await chatIo.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(userEntry))
@@ -40,14 +41,12 @@ namespace Chotiskazal.Bot.Questions
 
             if (comparation == StringsCompareResult.SmallMistakes)
             {
-                await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'. Let's try again.");
+                await chatIo.SendMessageAsync(Texts.Current.YouHaveATypoLetsTryAgain(text));
                 return QuestionResult.Retry;
             }
             
             if (comparation == StringsCompareResult.BigMistakes)
-            {
-                return QuestionResult.FailedText($"Mistaken. Correct spelling is '{text}'", "Mistaken");
-            }
+                return QuestionResult.FailedText(Texts.Current.FailedMistaken(text), Texts.Current.Mistaken);
 
             //search for other translation
             var translationCandidate = await _dictionaryService.GetAllTranslationWords(userEntry.ToLower());
@@ -57,15 +56,17 @@ namespace Chotiskazal.Bot.Questions
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(
-                    $"the translation was correct, but the question was about the word '{word.Word} - {word.TranslationAsList}'\r\nlet's try again");
+                    
+                    $"{Texts.Current.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.TranslationAsList}'\r\n" +
+                       Texts.Current.LetsTryAgain);
                 return QuestionResult.Retry;
             }
             
             var translates = string.Join(",",translationCandidate);
             string failedMessage = "";
             if(!string.IsNullOrWhiteSpace(translates))
-                failedMessage =$"{userEntry} translates as {translates}\r\n";
-            failedMessage += $"The right translation was: {word.Word}";
+                failedMessage =$"{userEntry} {Texts.Current.translatesAs} {translates}\r\n";
+            failedMessage += $"{Texts.Current.RightTranslationWas}: {word.Word}";
             return QuestionResult.FailedText(failedMessage);
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
@@ -74,7 +74,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     catch (Exception e)
                     {
                         Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}",true);
-                        await ChatIo.SendMessageAsync("Oops. something goes wrong ;(");
+                        await ChatIo.SendMessageAsync(Texts.Current.OopsSomethingGoesWrong);
                         throw;
                     }
                 }
@@ -99,11 +99,11 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (message.Message?.Text != null)
                     await StartToAddNewWords(message.Message?.Text);
                 else
-                   await ChatIo.SendMessageAsync("Enter your word to translate or /start");
+                   await ChatIo.SendMessageAsync(Texts.Current.EnterWordOrStart);
             }
         }
 
-        private Task SendNotAllowedTooltip() => ChatIo.SendTooltip("action is not allowed");
+        private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Texts.Current.ActionIsNotAllowed);
         private Task StartLearning() => new ExamFlow(
                 ChatIo, UserModel, _userService, _usersWordsService, _settings.ExamSettings)
             .EnterAsync();
@@ -126,15 +126,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private async Task SendHelp()
         {
 
-            await ChatIo.SendMarkdownMessageAsync("*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
-                                                  "1⃣ You can use me as a regular translator\\. " +
-                                                  "Just write the word for translation or use /add command to begin translate\\.\r\n\r\n" +
-                                                  "2⃣ Then, when you have time and mood, click on the *\"Learn\"* button or " +
-                                                  "write /learn and start learning this words\\.\r\n\r\n" +
-                                                  "3⃣ Earn scores for your action and watch your progress using /stats command\\.\r\n\r\n" +
-                                                  "4⃣ Use /help command to see info how it works\\.\r\n\r\n" +
-                                                  "\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. " +
-                                                  "And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!",
+            await ChatIo.SendMarkdownMessageAsync(Texts.Current.HelpMarkdown,
 
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.Stats},
@@ -145,10 +137,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync("I am a translator and teacher. " +
-                                                 "First you use me as a regular translator. " +
-                                                 "Then, when you have time, " +
-                                                 "click on the 'Learn' button or /learn command to start training translated words.",
+                var _  = ChatIo.SendMessageAsync(Texts.Current.MainMenuText,
                     new[]{
                         new[]{ InlineButtons.Translation},
                         new[]{ InlineButtons.Exam},

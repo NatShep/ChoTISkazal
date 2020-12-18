@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
+using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -130,32 +131,42 @@ namespace Chotiskazal.Bot
         {
             Telegram.Bot.Types.Chat chat = null;
             Telegram.Bot.Types.User user = null;
-            if (update?.Message != null)
+            try
             {
-                chat = update.Message.Chat;
-                user = update.Message.From;
-            }
-            else if (update?.CallbackQuery != null)
-            {
-                chat = update.CallbackQuery.Message.Chat;
-                user = update.CallbackQuery.From;
-            }
-            else
-                return;
+               
+                if (update?.Message != null)
+                {
+                    chat = update.Message.Chat;
+                    user = update.Message.From;
+                }
+                else if (update?.CallbackQuery != null)
+                {
+                    chat = update.CallbackQuery.Message.Chat;
+                    user = update.CallbackQuery.From;
+                }
+                else
+                    return;
 
-            if (Chats.TryGetValue(chat.Id, out _))
-                return;
+                if (Chats.TryGetValue(chat.Id, out _))
+                    return;
             
-            var chatRoom = CreateChatRoom(chat);
-            if (chatRoom == null)
-            {
-                return;
-            }
-            chatRoom.ChatIo.SendMessageAsync("Did you write something? I was asleep the whole time...");
-            chatRoom.ChatIo.OnUpdate(
-                new Update {Message = new Message {Text = "/start", From = user}});
+                var chatRoom = CreateChatRoom(chat);
+                if (chatRoom == null)
+                {
+                    return;
+                }
+                chatRoom.ChatIo.SendMessageAsync(Texts.Current.DidYouWriteSomething).Wait();
+                chatRoom.ChatIo.OnUpdate(
+                    new Update {Message = new Message {Text = "/start", From = user}});
                 
-            RunChatRoom(chat, chatRoom);
+                RunChatRoom(chat, chatRoom);
+            }
+            catch (Exception e)
+            {
+                Botlog.WriteError(chat?.Id, "WokeUpfailed"+e, true);
+                throw;
+            }
+          
         }
         private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {

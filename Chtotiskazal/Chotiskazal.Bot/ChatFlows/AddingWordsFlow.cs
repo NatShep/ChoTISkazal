@@ -1,13 +1,11 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
-using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -39,8 +37,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await _chatIo.SendMessageAsync(
-                    "Enter english or russian word to translate or /start to open main menu ");
+                await _chatIo.SendMessageAsync(Texts.Current.EnterWordOrStart);
                 word = await _chatIo.WaitUserTextInputAsync();
             }
 
@@ -52,7 +49,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
             if (translations?.Any() != true)
             {
-                await _chatIo.SendMessageAsync("No translations found. Check the word and try again");
+                await _chatIo.SendMessageAsync(Texts.Current.NoTranslationsFound);
                 return null;
             }
 
@@ -68,10 +65,7 @@ namespace Chotiskazal.Bot.ChatFlows
             _translationSelectedQueryHandler.SetTranslationHandler(handler);
 
             var messageId = await _chatIo.SendMarkdownMessageAsync(
-                $"_Here are the translations\\._ \r\n" +
-                $"_Choose one of them to learn them in the future_\r\n\r\n" +
-                $"*{word.Capitalize()}*" +
-                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr}]\r\n```")}",
+                Texts.Current.HereAreTheTranslationMarkdown(word,tr),
                 translations.Select(v => AddWordHelper.CreateButtonFor(v, false)).ToArray());
 
             handler.SetMessageId(messageId);
