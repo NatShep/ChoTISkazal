@@ -104,7 +104,7 @@ namespace Chotiskazal.Bot.ChatFlows
             foreach (var word in learningAndAdvancedWords)
             {
                 var allLearningWordsWereShowedAtLeastOneTime = i < learningWordsCount;
-                var exam = QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
+                var question = QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
                 i++;
                 var retryFlag = false;
                 int questionIterations = 0;
@@ -124,32 +124,33 @@ namespace Chotiskazal.Bot.ChatFlows
                     // cancel if question is absolutely the same with previous
                     if (lastExamResult?.Results!= ExamResult.Retry 
                         && lastWord == word 
-                        && lastQuestionName == exam.Name)
+                        && lastQuestionName == question.Name)
                         continue;
+                    
                     lastWord = word;
-                    lastQuestionName = exam.Name;
+                    lastQuestionName = question.Name;
                     
                     retryFlag = false;
-                    var questionMetric = new QuestionMetric(word, exam.Name);
+                    var questionMetric = new QuestionMetric(word, question.Name);
 
                     var learnList = learningWords;
 
                     if (!learningWords.Contains(word))
                         learnList = learningWords.Append(word).ToArray();
                         
-                    if (i>1 && exam.NeedClearScreen && lastExamResult.Results != ExamResult.Impossible)
+                    if (i>1 && question.NeedClearScreen && lastExamResult.Results != ExamResult.Impossible)
                     {
                         await WriteDontPeakMessage(lastExamResult.ResultsBeforeHideousText);
                     }
                     _user.OnAnyActivity();
                     var originRate =word.Score;
 
-                    var result = await exam.Pass(_chatIo, word, learnList);
+                    var result = await question.Pass(_chatIo, word, learnList);
 
                     switch (result.Results)
                     {
                         case ExamResult.Impossible:
-                            exam = QuestionSelector.Singletone.GetNextQuestionFor(i == 0, word);
+                            question = QuestionSelector.Singletone.GetNextQuestionFor(i == 0, word);
                             retryFlag = true;
                             break;
                         case ExamResult.Passed:

@@ -47,6 +47,12 @@ namespace Chotiskazal.Bot.ChatFlows
             var translations = await _addWordService.FindInDictionaryWithExamples(word);
             if (!translations.Any()) // if not, find it in Ya dictionary
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
+            
+            // Inline keyboards has limitation for size of the message 
+            // Workaraound: exclude all translations that are more than 32 symbols
+            if(translations.Any(t=>t.OriginText.Length + t.TranslatedText.Length>32))
+                translations = translations.Where(t => t.OriginText.Length + t.TranslatedText.Length <= 32).ToArray();
+
             if (translations?.Any() != true)
             {
                 await _chatIo.SendMessageAsync(Texts.Current.NoTranslationsFound);

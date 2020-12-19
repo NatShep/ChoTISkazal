@@ -20,7 +20,7 @@ namespace Chotiskazal.Bot.ChatFlows
     }
     public static class AddWordHelper
     {
-        public const string Separator = "$:$";
+        public const string Separator = "@";
         public const string TranslationDataPrefix = "/tr";
         public const string SelectedPrefix = "☑️ ";
         
