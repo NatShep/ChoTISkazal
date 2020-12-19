@@ -20,16 +20,16 @@ namespace Chotiskazal.Bot.Questions
 
         
         public static QuestionResult PassedText(string text, string hideousText = null) 
-            => new QuestionResult(text, hideousText??Texts.Current.defaultHideousPassedString, ExamResult.Passed);
+            => new QuestionResult(text, hideousText??Texts.Current.PassedHideousDefault, ExamResult.Passed);
         public static QuestionResult FailedText(string text, string hideousText = null)
-            => new QuestionResult(text,hideousText??Texts.Current.defaultHideousFailedString , ExamResult.Failed);
+            => new QuestionResult(text,hideousText??Texts.Current.FailedHideousDefault , ExamResult.Failed);
       
         public static QuestionResult Passed=> new QuestionResult(
-            Texts.Current.defaultPassedString,
-            Texts.Current.defaultHideousPassedString, ExamResult.Passed);
+            Texts.Current.PassedDefault,
+            Texts.Current.PassedHideousDefault, ExamResult.Passed);
         public static QuestionResult Failed=> new QuestionResult(
-            Texts.Current.defaultFailedString,
-            Texts.Current.defaultHideousFailedString, ExamResult.Failed);
+            Texts.Current.FailedDefault,
+            Texts.Current.FailedHideousDefault, ExamResult.Failed);
         public static QuestionResult Retry=> new QuestionResult("","", ExamResult.Retry);
         public static QuestionResult Impossible => new QuestionResult("","", ExamResult.Impossible);
 

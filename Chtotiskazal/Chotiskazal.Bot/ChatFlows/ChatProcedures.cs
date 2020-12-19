@@ -11,21 +11,13 @@ namespace Chotiskazal.Bot.ChatFlows
 {
     public static class ChatProcedures
     {
-        
-        public const string b = "🟦";
-        public const string v = "🟪";
-        public const string w = "⬜";
-        public const string s = " ";
-        public const string td = "👉";
-
-        public const string r = "▫️";//"🟥";
-        public const string o = "◽️";//"🟧";
-        public const string y = "◻️";//"🟨";
-        public const string g = "⬜️";//"🟩";
-        public const string best = "🟩";//"🟩";
-        public const string d = "➖";//"▪️"; //"➖"//"✖";//"◾";//"✖";//"⬛";
-        public const string n = "✖";//"◾";
-
+        private const string Empty = "✖";
+        private const string S0 = "➖";
+        private const string S1 = "▫️";
+        private const string S2 = "◽️";
+        private const string S3 = "◻️";
+        private const string S4 = "⬜️";
+        private const string S5 = "🟩";
 
         private static string Render7WeeksCalendar(CalendarItem[] items)
         {
@@ -57,48 +49,29 @@ namespace Chotiskazal.Bot.ChatFlows
                 {
                     var offset = 7 * week - undoneInLastWeek - day - 1;
                     if (offset < 0)
-                        sb.Append(n);
+                        sb.Append(Empty);
                     else if (offsets.TryGetValue(offset, out var v))
                     {
-                        var symbol = v <= 0.1 ? r
-                            : v <= 0.2 ? o
-                            : v <= 0.5 ? y
-                            : v<= 0.9? g
-                            : best;
+                        var symbol = v <= 0.1 ? S1
+                            : v <= 0.2 ? S2
+                            : v <= 0.5 ? S3
+                            : v<= 0.9? S4
+                            : S5;
                         sb.Append(symbol);
                     }
                     else
-                        sb.Append(d);
+                        sb.Append(S0);
                 }
 
                 sb.Append("\r\n");
             }
             sb.Append("----------------------\r\n ");
-            sb.Append($"{Texts.Current.less} " + r + o + y + g + best + $" {Texts.Current.more}\r\n");
+            sb.Append($"{Texts.Current.less} " + S1 + S2 + S3 + S4 + S5 + $" {Texts.Current.more}\r\n");
             return sb.ToString();
         }
 
         public static async Task ShowStats(ChatIO chatIo, UserModel userModel)
         {
-
-            string recomendation = "";
-            if (userModel.Zen.Rate < -15)
-                recomendation = Texts.Current.Zen1WeNeedMuchMoreNewWords;
-            else if (userModel.Zen.Rate < -10)
-                recomendation = Texts.Current.Zen2TranslateNewWords;
-            else if (userModel.Zen.Rate < -5)
-                recomendation = Texts.Current.Zen3TranslateNewWordsAndPassExams;
-            else if (userModel.Zen.Rate < 5)
-                recomendation = Texts.Current.Zen3EverythingIsGood;
-            else if (userModel.Zen.Rate < 10)
-                recomendation = Texts.Current.Zen4PassExamsAndTranslateNewWords;
-            else if (userModel.Zen.Rate < 15)
-                recomendation = Texts.Current.Zen5PassExams;
-            else 
-                recomendation = Texts.Current.Zen6YouNeedToLearn;
-
-            var weekStart = DateTime.Today.AddDays(-(int) DateTime.Today.DayOfWeek);
-            var lastWeek = userModel.LastDaysStats.Where(w => w.Date >= weekStart).ToArray();
             var lastMonth = userModel.GetLastMonth();
             var lastDay = userModel.GetToday();
 
@@ -117,13 +90,34 @@ namespace Chotiskazal.Bot.ChatFlows
                 $"  {Texts.Current.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
                 $"  {Texts.Current.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
                 $"  {Texts.Current.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" {Texts.Current.StatsActivityForLast7Weeks}:\r\n```\r\n{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}```\r\n" +
+                $" {Texts.Current.StatsActivityForLast7Weeks}:\r\n" +
+                $"```\r\n" +
+                $"{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}" +
+                $"```\r\n" +
                 $"\r\n" +
-                $"*{recomendation}*";
+                $"*{GetRecomendationFor(userModel)}*";
             await chatIo.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
                 new[]{new[]{
                         InlineButtons.Exam, InlineButtons.MainMenu}, 
                     new[]{ InlineButtons.Translation}});
+        }
+
+        private static string GetRecomendationFor(UserModel userModel)
+        {
+            if (userModel.Zen.Rate < -15)
+                return Texts.Current.Zen1WeNeedMuchMoreNewWords;
+            else if (userModel.Zen.Rate < -10)
+                return Texts.Current.Zen2TranslateNewWords;
+            else if (userModel.Zen.Rate < -5)
+                return Texts.Current.Zen3TranslateNewWordsAndPassExams;
+            else if (userModel.Zen.Rate < 5)
+                return Texts.Current.Zen3EverythingIsGood;
+            else if (userModel.Zen.Rate < 10)
+                return Texts.Current.Zen4PassExamsAndTranslateNewWords;
+            else if (userModel.Zen.Rate < 15)
+                return Texts.Current.Zen5PassExams;
+            else
+                return Texts.Current.Zen6YouNeedToLearn;
         }
     }
 }

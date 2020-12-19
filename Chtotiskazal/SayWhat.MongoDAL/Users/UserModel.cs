@@ -19,13 +19,18 @@ namespace SayWhat.MongoDAL.Users
 
         public UserModel(long? telegramId,string firstName, string lastName, string telegramNick, UserSource source)
         {
+            Id = ObjectId.GenerateNewId();
+
             _source = source;
             _telegramId = telegramId;
             _telegramNick = telegramNick;
             _telegramFirstName = firstName;
             _telegramLastName = lastName;
+            _countByCategoryScores = new int[8];
+            
+            InitializeTodayStats(DateTime.Today);
+            InitializeLastMonthStats();
             OnAnyActivity();
-            Id = ObjectId.GenerateNewId();
         }
         #region mongo fields
         public ObjectId Id { get; set; }
@@ -132,26 +137,34 @@ namespace SayWhat.MongoDAL.Users
 
         public MonthsStats GetLastMonth()
         {
+            if (LastMonthStats == null || LastMonthStats.Count == 0)
+                return InitializeLastMonthStats();
+
             MonthsStats monthly;
             var today = DateTime.Today;
 
             var thisMonth = new DateTime(today.Year, today.Month, 1);
-            if (LastMonthStats == null || LastMonthStats.Count == 0)
+
+            monthly = LastMonthStats.Last();
+            if (monthly.Date != thisMonth)
             {
                 monthly = new MonthsStats {Date = thisMonth};
-                LastMonthStats = new List<MonthsStats>();
                 LastMonthStats.Add(monthly);
             }
-            else
-            {
-                monthly = LastMonthStats.Last();
-                if (monthly.Date != thisMonth)
-                {
-                    monthly = new MonthsStats {Date = thisMonth};
-                    LastMonthStats.Add(monthly);
-                }
-            }
 
+            return monthly;
+        }
+
+        private MonthsStats InitializeLastMonthStats()
+        {
+            var today = DateTime.Today;
+            var thisMonth = new DateTime(today.Year, today.Month, 1);
+
+            var monthly = new MonthsStats {Date = thisMonth};
+            if(LastMonthStats==null)
+                LastMonthStats = new List<MonthsStats>();
+            
+            LastMonthStats.Add(monthly);
             return monthly;
         }
 
@@ -167,7 +180,6 @@ namespace SayWhat.MongoDAL.Users
             }
             else
             {
-                var oldest = LastDaysStats[0];
                 while ((today - LastDaysStats[0].Date).TotalDays>49)
                 {
                     LastDaysStats.RemoveAt(0);
@@ -175,13 +187,21 @@ namespace SayWhat.MongoDAL.Users
                 var lastDay = LastDaysStats.Last();
                 if (lastDay.Date != today)
                 {
-                    daily = new DailyStats {Date = today};
-                    LastDaysStats.Add(daily);
+                    daily = InitializeTodayStats(today);
                 }
                 else
                     daily = lastDay;
             }
 
+            return daily;
+        }
+
+        private DailyStats InitializeTodayStats(DateTime today)
+        {
+            if(LastDaysStats==null)
+                LastDaysStats = new List<DailyStats>();
+            var daily = new DailyStats {Date = today};
+            LastDaysStats.Add(daily);
             return daily;
         }
 

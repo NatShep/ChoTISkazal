@@ -44,7 +44,6 @@ namespace Chotiskazal.Bot
             }
             else
                 _senderChannel.Writer.TryWrite(args);
-
         }
 
         public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);

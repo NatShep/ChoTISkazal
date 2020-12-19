@@ -1,7 +1,6 @@
 ﻿namespace Chotiskazal.Bot.InterfaceLang
 {
-    public static class Texts
-    {
-        public static EnglishTexts Current { get; } = new EnglishTexts();
+    public static class Texts {
+        public static IInterfaceTexts Current { get; } = new EnglishTexts();
     }
 }

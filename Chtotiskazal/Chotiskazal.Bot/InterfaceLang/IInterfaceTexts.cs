@@ -41,12 +41,12 @@ namespace Chotiskazal.Bot.InterfaceLang
         string LetsTryAgain { get; }
         string ChooseTheTranscription { get; }
         string WordsInPhraseAreShufledWriteThemInOrder { get; }
-        string defaultFailedString { get; }
-        string defaultPassedString { get; }
-        string defaultIgnoredString { get; }
-        string defaultHideousFailedString { get; }
-        string defaultHideousPassedString { get; }
-        string defaultHideousIgnoredString { get; }
+        string FailedDefault { get; }
+        string PassedDefault { get; }
+        string IgnoredDefault { get; }
+        string FailedHideousDefault { get; }
+        string PassedHideousDefault { get; }
+        string IgnoredHideousDefault { get; }
         string TranslateButton { get; }
         string LearnButton { get; }
         string StatsButton { get; }
