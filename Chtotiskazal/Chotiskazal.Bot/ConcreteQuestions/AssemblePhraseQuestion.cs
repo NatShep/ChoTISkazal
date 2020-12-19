@@ -1,13 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class AssemblePhraseExam :IExam
+    public class AssemblePhraseQuestion :IQuestion
     {
         public bool NeedClearScreen => false;
 

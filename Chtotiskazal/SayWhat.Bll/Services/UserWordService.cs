@@ -196,7 +196,7 @@ namespace SayWhat.Bll.Services
             foreach (var wordForLearning in wordsForLearning)
             {
                 
-                var translations = wordForLearning.AllTranslations.ToArray();
+                var translations = wordForLearning.TextTranslations.ToArray();
                 if (translations.Length <= maxTranslationSize)
                     continue;
 

@@ -3,7 +3,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public interface IExam
+    public interface IQuestion
     {
         bool NeedClearScreen { get; }
         string Name { get; }

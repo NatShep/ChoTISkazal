@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class EnTrustExam : IExam
+    public class EnTrustQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot.Questions
                 var input = update.Message?.Text;
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    if (word.AllTranslations.Any(a =>
+                    if (word.TextTranslations.Any(a =>
                         input.AreEqualIgnoreCase(a)))
                         return QuestionResult.Passed;
 
@@ -43,7 +43,7 @@ namespace Chotiskazal.Bot.Questions
             }
 
             _ = chatIo.SendMessageAsync($"{Texts.Current.TranslationIs} \r\n" +
-                                        $"{word.TranslationAsList}\r\n" +
+                                        $"{word.AllTranslationsAsSingleString}\r\n" +
                                         $" {Texts.Current.DidYouGuess}",
                                             new[] {
                                                 new[] {

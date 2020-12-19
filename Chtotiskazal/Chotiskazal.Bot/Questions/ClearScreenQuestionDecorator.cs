@@ -3,12 +3,12 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions
 {
-    public class ClearScreenExamDecorator:IExam {
+    public class ClearScreenQuestionDecorator:IQuestion {
         public bool NeedClearScreen => true;
 
-        private readonly IExam _origin;
+        private readonly IQuestion _origin;
 
-        public ClearScreenExamDecorator(IExam origin)=> _origin = origin;
+        public ClearScreenQuestionDecorator(IQuestion origin)=> _origin = origin;
 
         public string Name => "Clean "+ _origin.Name;
         public Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList) 

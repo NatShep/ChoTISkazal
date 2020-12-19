@@ -110,8 +110,8 @@ namespace SayWhat.MongoDAL.Words
         public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionAskedTimestamp??DateTime.Now);
         public bool HasAnyExamples => Translations.Any(t => t.Examples?.Any() == true);
         public DateTime? LastExam => LastQuestionAskedTimestamp;
-        public string TranslationAsList => string.Join(", ", Translations.Select(t => t.Word));
-        public IEnumerable<string> AllTranslations => Translations.Select(t => t.Word);
+        public string AllTranslationsAsSingleString => string.Join(", ", TextTranslations);
+        public IEnumerable<string> TextTranslations => Translations.Select(t => t.Word);
 
         public IEnumerable<Example> Examples =>
             Translations

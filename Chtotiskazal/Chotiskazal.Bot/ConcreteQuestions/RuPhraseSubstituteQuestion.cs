@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuPhraseSubstituteExam : IExam
+    public class RuPhraseSubstituteQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
 

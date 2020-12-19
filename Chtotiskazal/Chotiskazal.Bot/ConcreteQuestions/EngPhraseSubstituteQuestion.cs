@@ -2,12 +2,13 @@
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class EngPhraseSubstituteExam: IExam
+    public class EngPhraseSubstituteQuestion: IQuestion
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";

@@ -1,18 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuWriteExam : IExam
+    public class RuWriteQuestion : IQuestion
     {
         private readonly DictionaryService _dictionaryService;
 
-        public RuWriteExam(DictionaryService dictionaryService)
+        public RuWriteQuestion(DictionaryService dictionaryService)
         {
             _dictionaryService = dictionaryService;
         }
@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.Questions
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.TranslationAsList}    <=====\r\n" +
+            await chatIo.SendMessageAsync($"=====>   {word.AllTranslationsAsSingleString}    <=====\r\n" +
                                           Texts.Current.WriteTheTranslation);
             var userEntry = await chatIo.WaitUserTextInputAsync();
 
@@ -52,12 +52,12 @@ namespace Chotiskazal.Bot.Questions
             var translationCandidate = await _dictionaryService.GetAllTranslationWords(userEntry.ToLower());
             
             if (translationCandidate.Any(t1 =>
-                word.AllTranslations.Any(t2 => t1.Trim().AreEqualIgnoreCase(t2.Trim()))))
+                word.TextTranslations.Any(t2 => t1.Trim().AreEqualIgnoreCase(t2.Trim()))))
             {
                 //translation is correct, but for other word
                 await chatIo.SendMessageAsync(
                     
-                    $"{Texts.Current.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.TranslationAsList}'\r\n" +
+                    $"{Texts.Current.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.AllTranslationsAsSingleString}'\r\n" +
                        Texts.Current.LetsTryAgain);
                 return QuestionResult.Retry;
             }

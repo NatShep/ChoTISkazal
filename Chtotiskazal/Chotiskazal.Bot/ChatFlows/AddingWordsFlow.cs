@@ -50,7 +50,7 @@ namespace Chotiskazal.Bot.ChatFlows
             
             // Inline keyboards has limitation for size of the message 
             // Workaraound: exclude all translations that are more than 32 symbols
-            if(translations.Any(t=>t.OriginText.Length + t.TranslatedText.Length>32))
+            if(translations!=null && translations.Any(t=>t.OriginText.Length + t.TranslatedText.Length>32))
                 translations = translations.Where(t => t.OriginText.Length + t.TranslatedText.Length <= 32).ToArray();
 
             if (translations?.Any() != true)

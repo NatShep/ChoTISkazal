@@ -1,15 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuTrustExam : IExam
+    public class RuTrustQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
 
@@ -17,7 +16,7 @@ namespace Chotiskazal.Bot.Questions
 
         public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
-            var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
+            var msg = $"=====>   {word.AllTranslationsAsSingleString}    <=====\r\n" +
                       Texts.Current.DoYouKnowTranslation;
             var id = Rand.Next();
             

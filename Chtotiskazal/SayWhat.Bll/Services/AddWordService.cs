@@ -176,7 +176,7 @@ namespace SayWhat.Bll.Services
             {
                 // User already have the word.
                 var originRate = alreadyExistsWord.Score;
-                var translates = alreadyExistsWord.AllTranslations.ToList();
+                var translates = alreadyExistsWord.TextTranslations.ToList();
                 var newTranslations = new List<UserWordTranslation>();
                 var r = translation;
                 if (!translates.Contains(r.TranslatedText))

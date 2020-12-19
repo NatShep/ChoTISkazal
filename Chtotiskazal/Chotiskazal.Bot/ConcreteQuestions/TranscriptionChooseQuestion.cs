@@ -1,15 +1,13 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
-using SayWhat.Bll;
-using SayWhat.Bll.Services;
+using Chotiskazal.Bot.Questions;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class TranscriptionChooseExam : IExam
+    public class TranscriptionChooseQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
 

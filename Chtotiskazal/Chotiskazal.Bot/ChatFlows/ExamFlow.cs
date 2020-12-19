@@ -62,7 +62,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 foreach (var pairModel in learningWords.Randomize())
                 {
-                    sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.TranslationAsList.EscapeForMarkdown()}");
+                    sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.AllTranslationsAsSingleString.EscapeForMarkdown()}");
                 }
                 sb.AppendLine($"\r\n```\r\n\\.\\.\\. {Texts.Current.thenClickStartMarkdown}");
                 await _chatIo.SendMarkdownMessageAsync(sb.ToString(),new[]{ new[]{ new InlineKeyboardButton

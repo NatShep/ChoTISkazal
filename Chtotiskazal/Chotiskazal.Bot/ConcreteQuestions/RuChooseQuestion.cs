@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuChooseExam: IExam
+    public class RuChooseQuestion: IQuestion
     {
         public bool NeedClearScreen => false;
 
@@ -16,14 +16,14 @@ namespace Chotiskazal.Bot.Questions
 
         public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
         {
-            var variants = examList.Where(e=>e.TranslationAsList!=word.TranslationAsList)
+            var variants = examList.Where(e=>e.AllTranslationsAsSingleString!=word.AllTranslationsAsSingleString)
                 .Select(e => e.Word)
                 .Take(5)
                 .Append(word.Word)
                 .Randomize()
                 .ToArray();
 
-            var msg = $"=====>   {word.TranslationAsList}    <=====\r\n" +
+            var msg = $"=====>   {word.AllTranslationsAsSingleString}    <=====\r\n" +
                         Texts.Current.ChooseTheTranslation;
             await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
             

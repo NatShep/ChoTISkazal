@@ -1,18 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class EngWriteExam : IExam
+    public class EngWriteQuestion : IQuestion
     {
         private readonly DictionaryService _dictionaryService;
 
-        public EngWriteExam(DictionaryService dictionaryService)
+        public EngWriteQuestion(DictionaryService dictionaryService)
         {
             _dictionaryService = dictionaryService;
         }
@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.Questions
         public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = word.AllTranslations.ToArray();
+            var translations = word.TextTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
@@ -60,18 +60,18 @@ namespace Chotiskazal.Bot.Questions
             {
                 await chatIo.SendMessageAsync(
                     $"{Texts.Current.OutOfScopeTranslation}: " +
-                    word.TranslationAsList);
+                    word.AllTranslationsAsSingleString);
                 return QuestionResult.Impossible;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync(
                     Texts.Current.OutOfScopeWithCandidate(otherMeaning)+": "+
-                    word.TranslationAsList);
+                    word.AllTranslationsAsSingleString);
                 return QuestionResult.Impossible;
             }
 
-            return QuestionResult.FailedText(Texts.Current.FailedTranslationWas +$" '{word.TranslationAsList}'");
+            return QuestionResult.FailedText(Texts.Current.FailedTranslationWas +$" '{word.AllTranslationsAsSingleString}'");
         }
     }
 }

@@ -1,14 +1,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
-using SayWhat.Bll;
-using SayWhat.Bll.Services;
+using Chotiskazal.Bot.Questions;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.Questions
+namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuChooseByTranscriptionExam:IExam
+    public class RuChooseByTranscriptionQuestion:IQuestion
     {
         public bool NeedClearScreen => false;
 
@@ -22,7 +21,7 @@ namespace Chotiskazal.Bot.Questions
                 return QuestionResult.Impossible;
             
             var variants = examList.Where(e=> e.Translations.All(t => t.Transcription != originTranslation.Transcription))
-                .SelectMany(e => e.AllTranslations)
+                .SelectMany(e => e.TextTranslations)
                 .Take(5)
                 .Append(originTranslation.Word)
                 .Randomize()
@@ -37,7 +36,7 @@ namespace Chotiskazal.Bot.Questions
             if (choice == null)
                 return QuestionResult.Retry;
 
-            if (word.AllTranslations.Contains(variants[choice.Value]))
+            if (word.TextTranslations.Contains(variants[choice.Value]))
                 return QuestionResult.Passed;
             return QuestionResult.Failed;
 
