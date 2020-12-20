@@ -28,22 +28,22 @@ namespace Chotiskazal.Bot
         }
 
         private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/learn"};
-        private IChatQueryHandler _queryHandler;
+        private IChatUpdateHook[] _updateHooks = new IChatUpdateHook[0];
+        public void AddUpdateHooks(IChatUpdateHook hook) 
+            => _updateHooks = _updateHooks.Append(hook).ToArray();
 
-        public void RegistrateCallbackQueryHandler(IChatQueryHandler queryHandler)
-        {
-            _queryHandler = queryHandler;
-        }
-
-        internal void OnUpdate(Update args)
+        internal void OnUpdate(Update update)
         {
             Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}", false);
-            if (args.CallbackQuery != null && _queryHandler?.CanBeHandled(args.CallbackQuery) == true)
-            {
-                var _ = _queryHandler.Handle(args);
-            }
-            else
-                _senderChannel.Writer.TryWrite(args);
+                foreach (var hook in _updateHooks)
+                {
+                    if (hook.CanBeHandled(update))
+                    {
+                        var _ = hook.Handle(update);
+                        return;
+                    }
+                }
+            _senderChannel.Writer.TryWrite(update);
         }
 
         public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);

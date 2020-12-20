@@ -11,17 +11,17 @@ namespace Chotiskazal.Bot.ChatFlows
     {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private readonly TranslationSelectedQueryHandler _translationSelectedQueryHandler;
+        private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
         public AddingWordsMode(
             ChatRoom chat,
             AddWordService addWordService,
-            TranslationSelectedQueryHandler translationQueryHandlerHandler
+            TranslationSelectedUpdateHook translationUpdateHookHandler
             )
         {
             Chat = chat;
             _addWordService = addWordService;
-            _translationSelectedQueryHandler = translationQueryHandlerHandler;
+            _translationSelectedUpdateHook = translationUpdateHookHandler;
         }
 
         public async Task Enter(string? word = null)
@@ -66,7 +66,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 chat: Chat,
                 addWordService: _addWordService);
 
-            _translationSelectedQueryHandler.SetTranslationHandler(handler);
+            _translationSelectedUpdateHook.SetTranslationHandler(handler);
 
             var messageId = await Chat.SendMarkdownMessageAsync(
                 Chat.Texts.HereAreTheTranslationMarkdown(word,tr),

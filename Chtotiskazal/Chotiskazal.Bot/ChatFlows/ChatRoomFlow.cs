@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -30,7 +28,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private readonly UsersWordsService _usersWordsService;
         private readonly UserService _userService;
         private readonly TelegramUserInfo _userInfo;
-        private TranslationSelectedQueryHandler _translationSelectedQueryHandler;
+        private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
 
@@ -49,10 +47,11 @@ namespace Chotiskazal.Bot.ChatFlows
                     Botlog.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString(),true);
                 }
                 Chat = new ChatRoom(ChatIo, user);
-                _translationSelectedQueryHandler = new TranslationSelectedQueryHandler(
+                _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(
                     _addWordsService, 
                     Chat);
-                ChatIo.RegistrateCallbackQueryHandler(_translationSelectedQueryHandler);
+                
+                ChatIo.AddUpdateHooks(_translationSelectedUpdateHook);
 
                 while (true)
                 {
@@ -76,7 +75,7 @@ namespace Chotiskazal.Bot.ChatFlows
                         throw;
                     }
                 }
-            }
+            } 
             catch (Exception e)
             {
                 Botlog.WriteError(this.ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}",true);
@@ -109,7 +108,7 @@ namespace Chotiskazal.Bot.ChatFlows
             .EnterAsync();
 
         private Task StartToAddNewWords(string text = null) 
-            => new AddingWordsMode(Chat, _addWordsService, _translationSelectedQueryHandler).Enter(text);
+            => new AddingWordsMode(Chat, _addWordsService, _translationSelectedUpdateHook).Enter(text);
 
       
         private Task HandleMainMenu(string command){
@@ -125,9 +124,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
         private async Task SendHelp()
         {
-
             await ChatIo.SendMarkdownMessageAsync(Chat.Texts.HelpMarkdown,
-
                 new[]{new[]{
                         InlineButtons.Exam(Chat.Texts), InlineButtons.Stats(Chat.Texts)},
                     new[]{ InlineButtons.Translation(Chat.Texts)}});

@@ -16,6 +16,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string OriginWas { get; } = "Правильный ответ";
         public string EnterMissingWord { get; } = "Введите пропущенное слово";
         public string TypoAlmostRight { get; } = "Очепяточка. Попробуем еще разок";
+        public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
 
         public string OutOfScopeWithCandidate(string otherMeaning)
             => $"Перевод то правильный, но учим мы не его (имелось ввиду '{otherMeaning}'?). Ожидаемые переводы";
@@ -95,14 +96,14 @@ namespace Chotiskazal.Bot.InterfaceLang
 
    
         public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
-                                                   "1⃣ Можешь использовать меня как русско-английский переводчик\\. " +
+                                                   "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +
                                                    "Просто напиши мне слово на любом языке или нажми команду /add для перевода\\.\r\n\r\n" +
                                                    "2⃣ Затем, когда будет времечко нажми на кнопку *\"Тренировка\"* или " +
                                                    "набери команду /learn что бы начать учить переведенные ранее слова\\.\r\n\r\n" +
                                                    "3⃣ Зарабатывай очки и следи за своими успехами при помощи команды /stats\\.\r\n\r\n" +
                                                    "4⃣ Жмякай команду /help что бы увидеть это сообщение\\.\r\n\r\n" +
                                                    "\uD83D\uDE09Да, я бесплатен\\. Меня сделали для себя и для друзей\\. " +
-                                                   "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили - это работает!\\!";
+                                                   "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
 
         public string MainMenuText { get; } = "Я переводчик и учитель " +
                                               "Можешь использовать меня как русско-английский переводчик. " +
@@ -156,7 +157,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string Zen2TranslateNewWords { get; } = "Лучше б вам слова переводить";
         public string Zen3TranslateNewWordsAndPassExams { get; } = "Перводите и тренируйтесь.";
 
-        public string Zen3EverythingIsGood { get; } = $"Хорошо идете! " +
+        public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +
                                                       $"\r\nПереводите и тренируйтесь.";
 
         public string Zen4PassExamsAndTranslateNewWords { get; } = "Тренируйтесь и переводите.";

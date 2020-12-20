@@ -87,6 +87,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         string MainMenuText { get; }
         string ActionIsNotAllowed { get; }
         string OopsSomethingGoesWrong { get; }
+        string InterfaceLanguageSetupped { get; }
         string OutOfScopeWithCandidate(string otherMeaning);
         string YouHaveATypoLetsTryAgain(string text);
         string FailedMistaken(string text);

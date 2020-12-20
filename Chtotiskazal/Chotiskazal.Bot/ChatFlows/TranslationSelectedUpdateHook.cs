@@ -10,12 +10,12 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    public class TranslationSelectedQueryHandler : IChatQueryHandler
+    public class TranslationSelectedUpdateHook : IChatUpdateHook
     {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         
-        public TranslationSelectedQueryHandler(
+        public TranslationSelectedUpdateHook(
             AddWordService addWordService, 
             ChatRoom chat)
         {
@@ -27,7 +27,9 @@ namespace Chotiskazal.Bot.ChatFlows
         
         private LastTranslationHandler _cachedHandlerTranslationOrNull = null;
         
-        public bool CanBeHandled( CallbackQuery query) => query.Data.StartsWith(AddWordHelper.TranslationDataPrefix);
+        public bool CanBeHandled(Update update) => 
+            update.CallbackQuery?.Data!=null 
+            && update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefix);
 
         public async Task Handle(Update update)
         {

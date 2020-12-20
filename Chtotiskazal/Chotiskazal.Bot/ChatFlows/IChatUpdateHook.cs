@@ -6,12 +6,12 @@ namespace Chotiskazal.Bot.ChatFlows
     /// <summary>
     /// Hi priority inline query handler
     /// </summary>
-    public interface IChatQueryHandler
+    public interface IChatUpdateHook
     {
         /// <summary>
-        /// Check if the query can be handled by handler
+        /// Check if the update can be handled by hook
         /// </summary>
-        bool CanBeHandled( CallbackQuery query);
+        bool CanBeHandled(Update update);
         /// <summary>
         /// Handle update. the update is intercepted, so chat flow not handle it anymore
         /// </summary>

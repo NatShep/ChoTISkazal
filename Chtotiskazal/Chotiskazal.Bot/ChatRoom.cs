@@ -12,18 +12,19 @@ namespace Chotiskazal.Bot
     public class ChatRoom
     {
 
-        public IInterfaceTexts Texts { get; }
-        public UserModel User { get; }
+        public IInterfaceTexts Texts => _chlangHook.SelectedInterfaceLanguage;
+        public  UserModel User { get; }
         private ChatIO _origin;
-        public ChatId ChatId => _origin.ChatId;
-        public ChatIO ChatIo => _origin;
-
+        private ChangeInterfaceLanguageHook _chlangHook;
+        public  ChatId ChatId => _origin.ChatId;
+        public  ChatIO ChatIo => _origin;
 
         public ChatRoom(ChatIO origin, UserModel user)
         {
             _origin = origin;
             User = user;
-            Texts = new EnglishTexts();
+            _chlangHook = new ChangeInterfaceLanguageHook(origin);
+            origin.AddUpdateHooks(_chlangHook);
         }
 
         #region wrap chat io

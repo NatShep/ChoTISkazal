@@ -15,6 +15,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string EnterMissingWord { get; } = "Enter missing word";
         public string TypoAlmostRight { get; } = "Almost right. But you have a typo. Let's try again";
 
+        public string InterfaceLanguageSetupped { get; } = "Interface language: English";
+
         public string OutOfScopeWithCandidate(string otherMeaning)
             => $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are";
         public string OutOfScopeTranslation { get; } =
