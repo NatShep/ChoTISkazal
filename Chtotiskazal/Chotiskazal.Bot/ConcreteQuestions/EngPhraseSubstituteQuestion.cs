@@ -47,7 +47,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     return QuestionResult.Passed;
                 if (comparation == StringsCompareResult.SmallMistakes) {
                     await chatIo.SendMessageAsync(Texts.Current.TypoAlmostRight);
-                    return QuestionResult.Retry;
+                    return QuestionResult.RetryThisQuestion;
                 }
                 return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas} \"{phrase.OriginPhrase}\"");
             }

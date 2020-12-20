@@ -32,7 +32,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.Retry;
+                return QuestionResult.RetryThisQuestion;
 
             var answer = variants[choice.Value].Split(",")
                 .Select(e => e.Trim()).ToList();

@@ -29,46 +29,39 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n" +
-                                          $"Write the translation... ");
+            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n{Texts.Current.WriteTheTranslation}");
             var translation = await chatIo.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
-                return QuestionResult.Retry;
+                return QuestionResult.RetryThisQuestion;
 
             var (text,comparation) =  translations.GetClosestTo(translation.Trim());
             
-            if (comparation== StringsCompareResult.Equal)
-                return QuestionResult.Passed;
-            if (comparation == StringsCompareResult.SmallMistakes)
+            switch (comparation)
             {
-                await chatIo.SendMessageAsync($"You have a typo. Correct spelling is '{text}'.");
-                return QuestionResult.Impossible;
+                case StringsCompareResult.Equal:
+                    return QuestionResult.Passed;
+                case StringsCompareResult.SmallMistakes:
+                    await chatIo.SendMessageAsync(Texts.Current.YouHaveATypoLetsTryAgain(text));
+                    return QuestionResult.RetryThisQuestion;
+                case StringsCompareResult.BigMistakes:
+                    return QuestionResult.FailedText(Texts.Current.FailedMistaken(text));
             }
-            if (comparation == StringsCompareResult.BigMistakes)
-            {
-                await chatIo.SendMessageAsync($"Mistaken. Correct spelling is '{text}'");
-                return QuestionResult.Failed;
-            }
-
-            
             var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
-
             var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
-            
-            if (otherComparation == StringsCompareResult.Equal)
+            if (otherComparation == StringsCompareResult.Equal) 
             {
                 await chatIo.SendMessageAsync(
                     $"{Texts.Current.OutOfScopeTranslation}: " +
                     word.AllTranslationsAsSingleString);
-                return QuestionResult.Impossible;
+                return QuestionResult.RetryThisQuestion;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
                 await chatIo.SendMessageAsync(
                     Texts.Current.OutOfScopeWithCandidate(otherMeaning)+": "+
                     word.AllTranslationsAsSingleString);
-                return QuestionResult.Impossible;
+                return QuestionResult.RetryThisQuestion;
             }
 
             return QuestionResult.FailedText(Texts.Current.FailedTranslationWas +$" '{word.AllTranslationsAsSingleString}'");

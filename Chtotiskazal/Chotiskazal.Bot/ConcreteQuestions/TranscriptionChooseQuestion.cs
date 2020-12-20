@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Randomize()
                 .ToList();
             
-            if (variants.Count == 0)
+            if (variants.Count <= 1)
                 return QuestionResult.Impossible;
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.Retry;
+                return QuestionResult.RetryThisQuestion;
 
             return word.Translations.Any(t=>t.Transcription== variants[choice.Value]) 
                 ? QuestionResult.Passed 

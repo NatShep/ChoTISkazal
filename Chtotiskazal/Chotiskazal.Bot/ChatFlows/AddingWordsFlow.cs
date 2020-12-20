@@ -44,6 +44,7 @@ namespace Chotiskazal.Bot.ChatFlows
             user.OnAnyActivity();
 
             // Search translations in local dictionary
+            
             var translations = await _addWordService.FindInDictionaryWithExamples(word);
             if (!translations.Any()) // if not, find it in Ya dictionary
                 translations = await _addWordService.TranslateAndAddToDictionary(word);

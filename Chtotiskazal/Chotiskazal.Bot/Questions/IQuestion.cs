@@ -16,6 +16,5 @@ namespace Chotiskazal.Bot.Questions
         Failed,
         Retry,
         Impossible,
-        Ignored,
     }
 }

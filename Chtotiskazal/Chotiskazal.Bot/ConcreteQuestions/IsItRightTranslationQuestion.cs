@@ -51,7 +51,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
             else
             {
-                return QuestionResult.FailedText($"{Texts.Current.Mistaken} '{word.Word}' {Texts.Current.translatesAs} '{word.TextTranslations.FirstOrDefault()}' ");
+                return QuestionResult.FailedText($"{Texts.Current.Mistaken}. '{word.Word}' {Texts.Current.translatesAs} '{word.TextTranslations.FirstOrDefault()}' ");
             }
         }
     }

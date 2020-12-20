@@ -23,20 +23,18 @@ namespace Chotiskazal.Bot.Questions
             => new QuestionResult(text, hideousText??Texts.Current.PassedHideousDefault, ExamResult.Passed);
         public static QuestionResult FailedText(string text, string hideousText = null)
             => new QuestionResult(text,hideousText??Texts.Current.FailedHideousDefault , ExamResult.Failed);
-      
         public static QuestionResult Passed=> new QuestionResult(
             Texts.Current.PassedDefault,
             Texts.Current.PassedHideousDefault, ExamResult.Passed);
         public static QuestionResult Failed=> new QuestionResult(
             Texts.Current.FailedDefault,
             Texts.Current.FailedHideousDefault, ExamResult.Failed);
-        public static QuestionResult Retry=> new QuestionResult("","", ExamResult.Retry);
+        public static QuestionResult RetryThisQuestion=> new QuestionResult("","", ExamResult.Retry);
         public static QuestionResult Impossible => new QuestionResult("","", ExamResult.Impossible);
 
         private string Emoji => Results switch
         {
             ExamResult.Failed => FailedEmoji,
-            ExamResult.Ignored => SosoEmoji,
             ExamResult.Passed => PassedEmoji,
             _ => ""
         };

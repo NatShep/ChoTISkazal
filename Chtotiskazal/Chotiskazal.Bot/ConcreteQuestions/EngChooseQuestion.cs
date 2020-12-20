@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.Retry;
+                return QuestionResult.RetryThisQuestion;
 
             var selected = variants[choice.Value];
             return word.TextTranslations.Any(t=>t.AreEqualIgnoreCase(selected)) 

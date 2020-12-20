@@ -39,8 +39,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
         public async Task EnterAsync()
         {
-            if (!await _usersWordsService.HasWords(_user))
-            {
+            if (!await _usersWordsService.HasWords(_user)) {
                 await _chatIo.SendMessageAsync(Texts.Current.NeedToAddMoreWordsBeforeLearning);
                 return;
             }
@@ -96,96 +95,61 @@ namespace Chotiskazal.Bot.ChatFlows
 
             var questionsCount = 0;
             var questionsPassed = 0;
-            var i = 0;
+            var wordQuestionNumber = 0;
             QuestionResult? lastExamResult = null;
 
-            string lastQuestionName = null;
-            UserWordModel lastWord = null;
             foreach (var word in learningAndAdvancedWords)
             {
-                var allLearningWordsWereShowedAtLeastOneTime = i < learningWordsCount;
-                var question = QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
-                i++;
-                var retryFlag = false;
-                int questionIterations = 0;
-                do
+                var allLearningWordsWereShowedAtLeastOneTime = wordQuestionNumber < learningWordsCount;
+                var question =
+                    QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
+                wordQuestionNumber++;
+
+                var learnList = learningWords;
+
+                if (!learningWords.Contains(word))
+                    learnList = learningWords.Append(word).ToArray();
+
+                if (wordQuestionNumber > 1 && question.NeedClearScreen)
+                    await WriteDontPeakMessage(lastExamResult?.ResultsBeforeHideousText);
+
+                _user.OnAnyActivity();
+                var originRate = word.Score;
+
+                var questionMetric = new QuestionMetric(word, question.Name);
+                var result = await PassWithRetries(question, word, learnList, wordQuestionNumber);
+                switch (result.Results)
                 {
-                    // Protection from inifity cycle
-                    questionIterations++;
-                    if (questionIterations > 100)
-                    {
-                        Botlog.WriteError(this._chatIo.ChatId.Identifier,
-                            $"Infinite loop in question selection. " +
-                            $"Last Question:{lastQuestionName}," +
-                            $"Last word: {word?.Word}", true);
+                    case ExamResult.Passed:
+                        var succTask = _usersWordsService.RegisterSuccess(word);
+                        questionsCount++;
+                        questionsPassed++;
+                        questionMetric.OnExamFinished(word.Score, true);
+                        Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
+                        await succTask;
+                        _user.OnQuestionPassed(word.Score - originRate);
                         break;
-                    }
-                    
-                    // cancel if question is absolutely the same with previous
-                    if (lastExamResult?.Results!= ExamResult.Retry 
-                        && lastWord == word 
-                        && lastQuestionName == question.Name)
-                        continue;
-                    
-                    lastWord = word;
-                    lastQuestionName = question.Name;
-                    
-                    retryFlag = false;
-                    var questionMetric = new QuestionMetric(word, question.Name);
+                    case ExamResult.Failed:
+                        var failureTask = _usersWordsService.RegisterFailure(word);
+                        questionMetric.OnExamFinished(word.Score, false);
+                        Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
+                        questionsCount++;
+                        await failureTask;
+                        _user.OnQuestionFailed(word.Score - originRate);
+                        break;
+                    case ExamResult.Retry:
+                    case ExamResult.Impossible:
+                        throw new NotSupportedException(result.Results.ToString());
+                }
 
-                    var learnList = learningWords;
+                if (!string.IsNullOrWhiteSpace(result.OpenResultsText))
+                    await _chatIo.SendMessageAsync(result.OpenResultsText);
 
-                    if (!learningWords.Contains(word))
-                        learnList = learningWords.Append(word).ToArray();
-                        
-                    if (i>1 && question.NeedClearScreen && lastExamResult.Results != ExamResult.Impossible)
-                    {
-                        await WriteDontPeakMessage(lastExamResult.ResultsBeforeHideousText);
-                    }
-                    _user.OnAnyActivity();
-                    var originRate =word.Score;
+                lastExamResult = result;
 
-                    var result = await question.Pass(_chatIo, word, learnList);
-
-                    switch (result.Results)
-                    {
-                        case ExamResult.Impossible:
-                            question = QuestionSelector.Singletone.GetNextQuestionFor(i == 0, word);
-                            retryFlag = true;
-                            break;
-                        case ExamResult.Passed:
-                            var succTask = _usersWordsService.RegisterSuccess(word);
-                            questionsCount++;
-                            questionsPassed++;
-                            questionMetric.OnExamFinished(word.Score, true ); 
-                            Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
-                            await succTask;
-                            _user.OnQuestionPassed(word.Score - originRate);
-                            break;
-                        case ExamResult.Failed:
-                            var failureTask = _usersWordsService.RegisterFailure(word);
-                            questionMetric.OnExamFinished(word.Score, false );
-                            Botlog.SaveQuestionMetricInfo(questionMetric, _chatIo.ChatId);
-                            questionsCount++;
-                            await failureTask;
-                            _user.OnQuestionFailed(word.Score - originRate);
-                            break;
-                        case ExamResult.Ignored:
-                            break;
-                        case ExamResult.Retry:
-                            retryFlag = true;
-                            break;
-                    }
-                    
-                    if(!string.IsNullOrWhiteSpace(result.OpenResultsText))
-                        await _chatIo.SendMessageAsync(result.OpenResultsText);
-
-                    lastExamResult = result;
-
-                } while (retryFlag);
-                
                 Botlog.RegisterExamInfo(_user.TelegramId, started, questionsCount, questionsPassed);
-            }              
+            }
+
             _user.OnLearningDone();
             var updateUserTask = _userService.Update(_user);
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(_user,10);
@@ -198,11 +162,45 @@ namespace Chotiskazal.Bot.ChatFlows
                 questionsCount, 
                 learningWords, 
                 gamingScoreBefore);
-            await updateUserTask;
-            await finializeScoreUpdateTask;
+            
             await _chatIo.SendMarkdownMessageAsync(doneMessage.EscapeForMarkdown(),
             new[]{new[] { InlineButtons.ExamText($"🔁 {Texts.Current.OneMoreLearnButton}")}, 
                   new[] { InlineButtons.Stats,InlineButtons.Translation}});
+            
+            await updateUserTask;
+            await finializeScoreUpdateTask;
+        }
+
+        private async Task<QuestionResult> PassWithRetries(
+            IQuestion question, 
+            UserWordModel word, 
+            UserWordModel[] learnList, 
+            int wordQuestionNumber)
+        {
+            int retrieNumber = 0;
+            for(int i = 0; i<40; i++)
+            {
+                var result = await question.Pass(_chatIo, word, learnList);
+                if (result.Results == ExamResult.Impossible)
+                {
+                    var qName = question.Name;
+                    for (int iteration = 0;question.Name==qName; iteration++)
+                    {
+                        question = QuestionSelector.Singletone.GetNextQuestionFor(wordQuestionNumber == 0, word);
+                        if(iteration>100)
+                            return QuestionResult.FailedText("","");
+                    }
+                }
+                else if (result.Results == ExamResult.Retry)
+                {
+                    wordQuestionNumber++;
+                    retrieNumber++;
+                    if(retrieNumber>=4)
+                        return QuestionResult.FailedText("","");
+                }
+                else return result;
+            }
+            return QuestionResult.FailedText("","");
         }
 
         private string CreateLearningResultsMessage(

@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             var choice = await chatIo.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.Retry;
+                return QuestionResult.RetryThisQuestion;
             
             return variants[choice.Value].AreEqualIgnoreCase(word.Word) 
                 ? QuestionResult.Passed 
