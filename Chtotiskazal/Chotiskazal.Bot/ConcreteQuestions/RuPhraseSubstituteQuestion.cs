@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitute";
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
@@ -28,27 +28,29 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var sb = new StringBuilder();
 
             sb.AppendLine($"\"{phrase.OriginPhrase}\"");
-            sb.AppendLine($" {Texts.Current.translatesAs} ");
+            sb.AppendLine($" {chat.Texts.translatesAs} ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
-            sb.AppendLine($"{Texts.Current.EnterMissingWord}: ");
-            await chatIo.SendMessageAsync(sb.ToString());
+            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
+            await chat.SendMessageAsync(sb.ToString());
 
             while (true)
             {
-                var enter = await chatIo.WaitUserTextInputAsync();
+                var enter = await chat.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 var comparation = phrase.TranslatedWord.CheckForMistakes(enter.Trim());
 
                 if (comparation== StringsCompareResult.Equal)
-                    return QuestionResult.Passed;
+                    return QuestionResult.Passed(chat.Texts);
 
                 if (comparation == StringsCompareResult.SmallMistakes) {
-                    await chatIo.SendMessageAsync(Texts.Current.RetryAlmostRightWithTypo);
+                    await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
                     return QuestionResult.RetryThisQuestion;
                 }
-                return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas2} '{phrase.TranslatedPhrase}'");
+                return QuestionResult.Failed(
+                    $"{chat.Texts.FailedOriginExampleWas2} '{phrase.TranslatedPhrase}'", 
+                    chat.Texts);
             }
         }
     }

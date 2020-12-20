@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Trans Choose";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var originalTranslation = word.Translations.GetRandomItem();
@@ -37,16 +37,16 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      Texts.Current.ChooseTheTranscription;
-            await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
+                      chat.Texts.ChooseTheTranscription;
+            await chat.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
 
             return word.Translations.Any(t=>t.Transcription== variants[choice.Value]) 
-                ? QuestionResult.Passed 
-                : QuestionResult.Failed;
+                ? QuestionResult.Passed(chat.Texts) 
+                : QuestionResult.Failed(chat.Texts);
         }
     }
 }

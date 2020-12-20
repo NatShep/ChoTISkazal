@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private const string S4 = "⬜️";
         private const string S5 = "🟩";
 
-        private static string Render7WeeksCalendar(CalendarItem[] items)
+        private static string Render7WeeksCalendar(CalendarItem[] items, IInterfaceTexts texts)
         {
             var today = DateTime.Today;
             double minVal = double.MaxValue;
@@ -44,7 +44,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             for (int day = 0; day < 7; day++)
             {
-                sb.Append(Texts.Current.ShortDayNames[day] + " ");
+                sb.Append(texts.ShortDayNames[day] + " ");
                 for (int week = 7; week > 0; week--)
                 {
                     var offset = 7 * week - undoneInLastWeek - day - 1;
@@ -66,58 +66,57 @@ namespace Chotiskazal.Bot.ChatFlows
                 sb.Append("\r\n");
             }
             sb.Append("----------------------\r\n ");
-            sb.Append($"{Texts.Current.less} " + S1 + S2 + S3 + S4 + S5 + $" {Texts.Current.more}\r\n");
+            sb.Append($"{texts.less} " + S1 + S2 + S3 + S4 + S5 + $" {texts.more}\r\n");
             return sb.ToString();
         }
 
-        public static async Task ShowStats(ChatIO chatIo, UserModel userModel)
+        public static async Task ShowStats(ChatRoom chat)
         {
-            var lastMonth = userModel.GetLastMonth();
-            var lastDay = userModel.GetToday();
+            var lastMonth = chat.User.GetLastMonth();
+            var lastDay = chat.User.GetToday();
 
             var msg =
-                $"{Texts.Current.StatsYourStats}: \r\n```\r\n" +
-                $"  {Texts.Current.StatsWordsAdded}: {userModel.WordsCount}\r\n" +
-                $"  {Texts.Current.StatsLearnedWell}: {userModel.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
-                $"  {Texts.Current.StatsScore}: {(int)userModel.GamingScore}\r\n```\r\n" +
-                $"{Texts.Current.StatsThisMonth}:\r\n```" +
-                $"  {Texts.Current.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
-                $"  {Texts.Current.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
-                $"  {Texts.Current.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
-                $"  {Texts.Current.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
-                $"{Texts.Current.StatsThisDay}:\r\n```" +
-                $"  {Texts.Current.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
-                $"  {Texts.Current.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
-                $"  {Texts.Current.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
-                $"  {Texts.Current.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" {Texts.Current.StatsActivityForLast7Weeks}:\r\n" +
+                $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
+                $"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
+                $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                $"  {chat.Texts.StatsScore}: {(int)chat.User.GamingScore}\r\n```\r\n" +
+                $"{chat.Texts.StatsThisMonth}:\r\n```" +
+                $"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
+                $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
+                $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
+                $"  {chat.Texts.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
+                $"{chat.Texts.StatsThisDay}:\r\n```" +
+                $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
+                $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
+                $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
+                $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
+                $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n" +
                 $"```\r\n" +
-                $"{Render7WeeksCalendar(userModel.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray())}" +
+                $"{Render7WeeksCalendar(chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray(),chat.Texts)}" +
                 $"```\r\n" +
                 $"\r\n" +
-                $"*{GetRecomendationFor(userModel)}*";
-            await chatIo.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
+                $"*{GetRecomendationFor(chat.User, chat.Texts)}*";
+            await chat.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
                 new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.MainMenu}, 
-                    new[]{ InlineButtons.Translation}});
+                        InlineButtons.Exam(chat.Texts), InlineButtons.MainMenu(chat.Texts)}, 
+                    new[]{ InlineButtons.Translation(chat.Texts)}});
         }
 
-        private static string GetRecomendationFor(UserModel userModel)
+        private static string GetRecomendationFor(UserModel user, IInterfaceTexts texts)
         {
-            if (userModel.Zen.Rate < -15)
-                return Texts.Current.Zen1WeNeedMuchMoreNewWords;
-            else if (userModel.Zen.Rate < -10)
-                return Texts.Current.Zen2TranslateNewWords;
-            else if (userModel.Zen.Rate < -5)
-                return Texts.Current.Zen3TranslateNewWordsAndPassExams;
-            else if (userModel.Zen.Rate < 5)
-                return Texts.Current.Zen3EverythingIsGood;
-            else if (userModel.Zen.Rate < 10)
-                return Texts.Current.Zen4PassExamsAndTranslateNewWords;
-            else if (userModel.Zen.Rate < 15)
-                return Texts.Current.Zen5PassExams;
-            else
-                return Texts.Current.Zen6YouNeedToLearn;
+            if (user.Zen.Rate < -15)
+                return texts.Zen1WeNeedMuchMoreNewWords;
+            if (user.Zen.Rate < -10)
+                return texts.Zen2TranslateNewWords;
+            if (user.Zen.Rate < -5)
+                return texts.Zen3TranslateNewWordsAndPassExams;
+            if (user.Zen.Rate < 5)
+                return texts.Zen3EverythingIsGood;
+            if (user.Zen.Rate < 10)
+                return texts.Zen4PassExamsAndTranslateNewWords;
+            if (user.Zen.Rate < 15)
+                return texts.Zen5PassExams;
+            return texts.Zen6YouNeedToLearn;
         }
     }
 }

@@ -7,10 +7,9 @@ namespace Chotiskazal.Bot.Questions
         private readonly string _openResultsText;
         private readonly string _resultsBeforeHideousText;
         public const string NoText = "";
-        public const string PassedEmoji = "✅ ";
-        public const string FailedEmoji = "❌ ";
-        public const string SosoEmoji = "〰️";
-
+        private const string PassedEmoji = "✅ ";
+        private const string FailedEmoji = "❌ ";
+        
         public QuestionResult(string openResultsText, string resultsBeforeHideousText, ExamResult results)
         {
             _openResultsText = openResultsText;
@@ -18,17 +17,20 @@ namespace Chotiskazal.Bot.Questions
             Results = results;
         }
 
-        
-        public static QuestionResult PassedText(string text, string hideousText = null) 
-            => new QuestionResult(text, hideousText??Texts.Current.PassedHideousDefault, ExamResult.Passed);
-        public static QuestionResult FailedText(string text, string hideousText = null)
-            => new QuestionResult(text,hideousText??Texts.Current.FailedHideousDefault , ExamResult.Failed);
-        public static QuestionResult Passed=> new QuestionResult(
-            Texts.Current.PassedDefault,
-            Texts.Current.PassedHideousDefault, ExamResult.Passed);
-        public static QuestionResult Failed=> new QuestionResult(
-            Texts.Current.FailedDefault,
-            Texts.Current.FailedHideousDefault, ExamResult.Failed);
+        public static QuestionResult Passed(string text, IInterfaceTexts texts) 
+            => new QuestionResult(text, texts.PassedHideousDefault, ExamResult.Passed);
+        public static QuestionResult Failed(string text, IInterfaceTexts texts)
+            => new QuestionResult(text,texts.FailedHideousDefault , ExamResult.Failed);
+        public static QuestionResult Passed(string text, string hideousText) 
+            => new QuestionResult(text, hideousText, ExamResult.Passed);
+        public static QuestionResult Failed(string text, string hideousText)
+            => new QuestionResult(text,hideousText , ExamResult.Failed);
+        public static QuestionResult Passed(IInterfaceTexts texts)=> new QuestionResult(
+            texts.PassedDefault,
+            texts.PassedHideousDefault, ExamResult.Passed);
+        public static QuestionResult Failed(IInterfaceTexts texts)=> new QuestionResult(
+            texts.FailedDefault,
+            texts.FailedHideousDefault, ExamResult.Failed);
         public static QuestionResult RetryThisQuestion=> new QuestionResult("","", ExamResult.Retry);
         public static QuestionResult Impossible => new QuestionResult("","", ExamResult.Impossible);
 

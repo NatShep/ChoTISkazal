@@ -15,7 +15,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru Choose Phrase";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Examples.Any())
                 return QuestionResult.Impossible;
@@ -38,21 +38,21 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToArray();
             
             var msg = $"=====>   {targetPhrase.TranslatedPhrase}    <=====\r\n" +
-                      Texts.Current.ChooseTheTranslation;
-            await chatIo.SendMessageAsync(msg,
+                      chat.Texts.ChooseTheTranslation;
+            await chat.SendMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
                     CallbackData = i.ToString(),
                     Text = v
                 }).ToArray());
             
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
             
             return variants[choice.Value].AreEqualIgnoreCase(targetPhrase.OriginPhrase) 
-                ? QuestionResult.Passed 
-                : QuestionResult.Failed;
+                ? QuestionResult.Passed(chat.Texts) 
+                : QuestionResult.Failed(chat.Texts);
         }
     }
 }

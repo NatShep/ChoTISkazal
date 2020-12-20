@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng is it right transltion";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var translation = examList.SelectMany(e => e.TextTranslations)
@@ -24,34 +24,36 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList()
                 .GetRandomItem();
             
-            var msg = $"'{word.Word}' {Texts.Current.translatesAs} '{translation}'.\r\n"+
-                             $"{Texts.Current.IsItRightTranslation}";
+            var msg = $"'{word.Word}' {chat.Texts.translatesAs} '{translation}'.\r\n"+
+                             $"{chat.Texts.IsItRightTranslation}";
 
-            _ = chatIo.SendMessageAsync(msg,
+            _ = chat.SendMessageAsync(msg,
                 new[] {
                     new[] {
                         new InlineKeyboardButton {
                             CallbackData = "1",
-                            Text = Texts.Current.YesButton
+                            Text = chat.Texts.YesButton
                         },
                         new InlineKeyboardButton {
                             CallbackData = "0",
-                            Text = Texts.Current.NoButton
+                            Text = chat.Texts.NoButton
                         }
                     }
                 });
 
-            var choice = await chatIo.WaitInlineIntKeyboardInput();
+            var choice = await chat.WaitInlineIntKeyboardInput();
             if  (
                 choice == 1 &&  word.TextTranslations.Contains(translation) ||
                 choice == 0 && !word.TextTranslations.Contains(translation)
                 )
             {
-                return QuestionResult.Passed;
+                return QuestionResult.Passed(chat.Texts);
             }
             else
             {
-                return QuestionResult.FailedText($"{Texts.Current.Mistaken}. '{word.Word}' {Texts.Current.translatesAs} '{word.TextTranslations.FirstOrDefault()}' ");
+                return QuestionResult.Failed(
+                    $"{chat.Texts.Mistaken}. '{word.Word}' {chat.Texts.translatesAs} '{word.TextTranslations.FirstOrDefault()}' ", 
+                    chat.Texts);
             }
         }
     }

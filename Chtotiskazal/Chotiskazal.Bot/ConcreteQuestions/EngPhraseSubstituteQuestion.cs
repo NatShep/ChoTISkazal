@@ -12,7 +12,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             if (!word.Examples.Any())
                 return QuestionResult.Impossible;
@@ -32,24 +32,25 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var sb = new StringBuilder();
             
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
-            sb.AppendLine($" {Texts.Current.translatesAs} ");
+            sb.AppendLine($" {chat.Texts.translatesAs} ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
-            sb.AppendLine($"{Texts.Current.EnterMissingWord}: ");
-            await chatIo.SendMessageAsync(sb.ToString());
+            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
+            await chat.SendMessageAsync(sb.ToString());
             while (true)
             {
-                var enter = await chatIo.WaitUserTextInputAsync();
+                var enter = await chat.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
                 var (_, comparation) = allWordsWithPhraseOfSimilarTranslate.GetClosestTo(enter.Trim());
                 if (comparation == StringsCompareResult.Equal)
-                    return QuestionResult.Passed;
+                    return QuestionResult.Passed(chat.Texts);
                 if (comparation == StringsCompareResult.SmallMistakes) {
-                    await chatIo.SendMessageAsync(Texts.Current.TypoAlmostRight);
+                    await chat.SendMessageAsync(chat.Texts.TypoAlmostRight);
                     return QuestionResult.RetryThisQuestion;
                 }
-                return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas} \"{phrase.OriginPhrase}\"");
+                return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWas} \"{phrase.OriginPhrase}\"", 
+                    chat.Texts);
             }
         }
     }

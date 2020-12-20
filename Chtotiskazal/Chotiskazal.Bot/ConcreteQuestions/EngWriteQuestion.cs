@@ -20,7 +20,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Write";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.TextTranslations.ToArray();
@@ -29,8 +29,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.Word}    <=====\r\n{Texts.Current.WriteTheTranslation}");
-            var translation = await chatIo.WaitUserTextInputAsync();
+            await chat.SendMessageAsync($"=====>   {word.Word}    <=====\r\n{chat.Texts.WriteTheTranslation}");
+            var translation = await chat.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
                 return QuestionResult.RetryThisQuestion;
@@ -40,31 +40,34 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             switch (comparation)
             {
                 case StringsCompareResult.Equal:
-                    return QuestionResult.Passed;
+                    return QuestionResult.Passed(chat.Texts);
                 case StringsCompareResult.SmallMistakes:
-                    await chatIo.SendMessageAsync(Texts.Current.YouHaveATypoLetsTryAgain(text));
+                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(text));
                     return QuestionResult.RetryThisQuestion;
                 case StringsCompareResult.BigMistakes:
-                    return QuestionResult.FailedText(Texts.Current.FailedMistaken(text));
+                    return QuestionResult.Failed(chat.Texts.FailedMistaken(text), 
+                        chat.Texts);
             }
             var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
             var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
             if (otherComparation == StringsCompareResult.Equal) 
             {
-                await chatIo.SendMessageAsync(
-                    $"{Texts.Current.OutOfScopeTranslation}: " +
+                await chat.SendMessageAsync(
+                    $"{chat.Texts.OutOfScopeTranslation}: " +
                     word.AllTranslationsAsSingleString);
                 return QuestionResult.RetryThisQuestion;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
-                await chatIo.SendMessageAsync(
-                    Texts.Current.OutOfScopeWithCandidate(otherMeaning)+": "+
+                await chat.SendMessageAsync(
+                    chat.Texts.OutOfScopeWithCandidate(otherMeaning)+": "+
                     word.AllTranslationsAsSingleString);
                 return QuestionResult.RetryThisQuestion;
             }
 
-            return QuestionResult.FailedText(Texts.Current.FailedTranslationWas +$" '{word.AllTranslationsAsSingleString}'");
+            return QuestionResult.Failed(
+                chat.Texts.FailedTranslationWas +$" '{word.AllTranslationsAsSingleString}'", 
+                chat.Texts);
         }
     }
 }

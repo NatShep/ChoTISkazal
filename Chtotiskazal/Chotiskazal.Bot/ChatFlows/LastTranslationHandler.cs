@@ -4,16 +4,14 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
     public class LastTranslationHandler
     {
+        private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private readonly ChatIO _chat;
-        private readonly UserModel _user;
         private int _selectedTranslationsCount = 0;
         private readonly IReadOnlyList<DictionaryTranslation> _translations;
         private bool _isLastMessageInTheChat =true ;
@@ -24,15 +22,13 @@ namespace Chotiskazal.Bot.ChatFlows
         
         public LastTranslationHandler(
             IReadOnlyList<DictionaryTranslation> translations, 
-            UserModel user, 
-            ChatIO chat, 
+            ChatRoom chat,
             AddWordService addWordService)
         {
+            Chat = chat;
             OriginWordText = translations[0].OriginText;
             _translations = translations;
             _areSelected = new bool[_translations.Count];
-            _user = user;
-            _chat = chat;
             _addWordService = addWordService;
         }
 
@@ -45,19 +41,19 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
 
             await SelectIthTranslation(update.CallbackQuery.Message.MessageId, index, 0);
-            await _chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
-                Texts.Current.MessageAfterTranslationIsSelected(_translations[index]));
+            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
+                Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]));
             if (!_isLastMessageInTheChat)
                 return;
 
             if (_confirmationMessageId.HasValue) {
-                if (await _chat.EditMessageText(_confirmationMessageId.Value,
-                    Texts.Current.MessageAfterTranslationIsSelected(_translations[index])))
+                if (await Chat.EditMessageText(_confirmationMessageId.Value,
+                    Chat.Texts.MessageAfterTranslationIsSelected(_translations[index])))
                     return;
             }
 
-            _confirmationMessageId = await _chat.SendMessageAsync(
-                Texts.Current.MessageAfterTranslationIsSelected(_translations[index]));
+            _confirmationMessageId = await Chat.SendMessageAsync(
+                Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]));
         }
 
         private int? _confirmationMessageId = null;
@@ -65,8 +61,8 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             _areSelected[index] = true;
             _selectedTranslationsCount++;
-            await _addWordService.AddTranslationToUser(_user, _translations[index].GetEnRu(), score);
-            await _chat.EditMessageButtons(
+            await _addWordService.AddTranslationToUser(Chat.User, _translations[index].GetEnRu(), score);
+            await Chat.EditMessageButtons(
                 messageId,
                 _translations.Select((t, i) => AddWordHelper.CreateButtonFor(t, _areSelected[i])).ToArray()
             );

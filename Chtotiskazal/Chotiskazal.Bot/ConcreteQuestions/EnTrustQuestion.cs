@@ -14,21 +14,21 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      Texts.Current.DoYouKnowTranslation;
+                      chat.Texts.DoYouKnowTranslation;
             var id = Rand.Next();
-            var _ = chatIo.SendMessageAsync(msg,
+            var _ = chat.SendMessageAsync(msg,
                 new InlineKeyboardButton()
                 {
                     CallbackData = id.ToString(),
-                    Text =  Texts.Current.SeeTheTranslation 
+                    Text =  chat.Texts.SeeTheTranslation 
                 });
             while (true)
             {
-                var update = await chatIo.WaitUserInputAsync();
+                var update = await chat.WaitUserInputAsync();
                 if(update.CallbackQuery?.Data== id.ToString())
                     break;
                 var input = update.Message?.Text;
@@ -36,33 +36,33 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 {
                     if (word.TextTranslations.Any(a =>
                         input.AreEqualIgnoreCase(a)))
-                        return QuestionResult.Passed;
+                        return QuestionResult.Passed(chat.Texts);
 
-                    await chatIo.SendMessageAsync(Texts.Current.ItIsNotRightTryAgain);
+                    await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
                 }
             }
 
-            _ = chatIo.SendMessageAsync($"{Texts.Current.TranslationIs} \r\n" +
+            _ = chat.SendMessageAsync($"{chat.Texts.TranslationIs} \r\n" +
                                         $"{word.AllTranslationsAsSingleString}\r\n" +
-                                        $" {Texts.Current.DidYouGuess}",
+                                        $" {chat.Texts.DidYouGuess}",
                                             new[] {
                                                 new[] {
                                                     new InlineKeyboardButton {
                                                         CallbackData = "1",
-                                                        Text = Texts.Current.YesButton
+                                                        Text = chat.Texts.YesButton
                                                     },
                                                     new InlineKeyboardButton {
                                                         CallbackData = "0",
-                                                        Text = Texts.Current.NoButton
+                                                        Text = chat.Texts.NoButton
                                                     }
                                                 }
                                             });
 
-            var choice = await chatIo.WaitInlineIntKeyboardInput();
+            var choice = await chat.WaitInlineIntKeyboardInput();
 
             return choice == 1 ? 
-                QuestionResult.PassedText(Texts.Current.PassedOpenIHopeYouWereHonest, Texts.Current.PassedHideousWell ) 
-                : QuestionResult.FailedText(Texts.Current.FailedOpenButYouWereHonest, Texts.Current.FailedHideousHonestyIsGold);
+                QuestionResult.Passed(chat.Texts.PassedOpenIHopeYouWereHonest, chat.Texts.PassedHideousWell ) 
+                : QuestionResult.Failed(chat.Texts.FailedOpenButYouWereHonest, chat.Texts.FailedHideousHonestyIsGold);
         }
     }
 }

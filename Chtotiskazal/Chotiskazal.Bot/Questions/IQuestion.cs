@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using SayWhat.MongoDAL.Words;
+using Telegram.Bot.Types;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -7,7 +8,7 @@ namespace Chotiskazal.Bot.Questions
     {
         bool NeedClearScreen { get; }
         string Name { get; }
-        Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList);
+        Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList);
     }
 
     public enum ExamResult

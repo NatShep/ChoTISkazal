@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru Choose By Transcription";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo,  UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var originTranslation = word.Translations.GetRandomItem();
             
@@ -29,16 +29,16 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
 
             var msg = $"=====>   {originTranslation.Transcription}    <=====\r\n" +
-                      Texts.Current.ChooseWhichWordHasThisTranscription;
-            await chatIo.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
+                      chat.Texts.ChooseWhichWordHasThisTranscription;
+            await chat.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
 
             if (word.TextTranslations.Contains(variants[choice.Value]))
-                return QuestionResult.Passed;
-            return QuestionResult.Failed;
+                return QuestionResult.Passed(chat.Texts);
+            return QuestionResult.Failed(chat.Texts);
 
         }
         

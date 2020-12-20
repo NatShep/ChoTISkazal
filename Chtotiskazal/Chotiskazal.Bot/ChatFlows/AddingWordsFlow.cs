@@ -2,46 +2,44 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
     internal class AddingWordsMode
     {
-        private readonly ChatIO _chatIo;
+        private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         private readonly TranslationSelectedQueryHandler _translationSelectedQueryHandler;
 
         public AddingWordsMode(
-            ChatIO chatIo,
+            ChatRoom chat,
             AddWordService addWordService,
             TranslationSelectedQueryHandler translationQueryHandlerHandler
             )
         {
-            _chatIo = chatIo;
+            Chat = chat;
             _addWordService = addWordService;
             _translationSelectedQueryHandler = translationQueryHandlerHandler;
         }
 
-        public async Task Enter(UserModel user, string? word = null)
+        public async Task Enter(string? word = null)
         {
             do {
-                word = await EnterSingleWordAsync(user, word);
+                word = await EnterSingleWordAsync(word);
             } while (!string.IsNullOrWhiteSpace(word));
         }
 
-        private async Task<string?> EnterSingleWordAsync(UserModel user, string? word = null)
+        private async Task<string?> EnterSingleWordAsync(string? word = null)
         {
             if (word == null)
             {
-                await _chatIo.SendMessageAsync(Texts.Current.EnterWordOrStart);
-                word = await _chatIo.WaitUserTextInputAsync();
+                await Chat.SendMessageAsync(Chat.Texts.EnterWordOrStart);
+                word = await Chat.WaitUserTextInputAsync();
             }
 
-            user.OnAnyActivity();
+            Chat.User.OnAnyActivity();
 
             // Search translations in local dictionary
             
@@ -56,7 +54,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             if (translations?.Any() != true)
             {
-                await _chatIo.SendMessageAsync(Texts.Current.NoTranslationsFound);
+                await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
                 return null;
             }
 
@@ -65,25 +63,24 @@ namespace Chotiskazal.Bot.ChatFlows
                         
             var handler = new LastTranslationHandler(
                 translations: translations,
-                user: user,
-                chat: _chatIo,
+                chat: Chat,
                 addWordService: _addWordService);
 
             _translationSelectedQueryHandler.SetTranslationHandler(handler);
 
-            var messageId = await _chatIo.SendMarkdownMessageAsync(
-                Texts.Current.HereAreTheTranslationMarkdown(word,tr),
+            var messageId = await Chat.SendMarkdownMessageAsync(
+                Chat.Texts.HereAreTheTranslationMarkdown(word,tr),
                 translations.Select(v => AddWordHelper.CreateButtonFor(v, false)).ToArray());
 
             handler.SetMessageId(messageId);
 
-            if (word.IsRussian()) user.OnRussianWordTranlationRequest();
-            else user.OnEnglishWordTranslationRequest();
+            if (word.IsRussian()) Chat.User.OnRussianWordTranlationRequest();
+            else Chat.User.OnEnglishWordTranslationRequest();
 
             try
             {
                 // user request next word
-                var res = await _chatIo.WaitUserTextInputAsync();
+                var res = await Chat.WaitUserTextInputAsync();
                 // notify handler, that we leave the flow
                 // If user does not choose any translation for X seconds
                 // first option gonna be choosen automaticly

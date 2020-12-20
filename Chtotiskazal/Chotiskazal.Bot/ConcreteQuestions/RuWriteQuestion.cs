@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng Write";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var wordsInPhraseCount = word.Word.Count(c => c == ' ');
@@ -27,9 +27,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 && word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chatIo.SendMessageAsync($"=====>   {word.AllTranslationsAsSingleString}    <=====\r\n" +
-                                          Texts.Current.WriteTheTranslation);
-            var enUserEntry = await chatIo.WaitUserTextInputAsync();
+            await chat.SendMessageAsync($"=====>   {word.AllTranslationsAsSingleString}    <=====\r\n" +
+                                          chat.Texts.WriteTheTranslation);
+            var enUserEntry = await chat.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(enUserEntry))
                 return QuestionResult.RetryThisQuestion;
@@ -37,16 +37,16 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var comparation = word.Word.CheckForMistakes(enUserEntry);
             
             if (comparation == StringsCompareResult.Equal)
-                return QuestionResult.Passed;
+                return QuestionResult.Passed(chat.Texts);
 
             if (comparation == StringsCompareResult.SmallMistakes)
             {
-                await chatIo.SendMessageAsync(Texts.Current.YouHaveATypoLetsTryAgain(word.Word));
+                await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(word.Word));
                 return QuestionResult.RetryThisQuestion;
             }
             
             if (comparation == StringsCompareResult.BigMistakes)
-                return QuestionResult.FailedText(Texts.Current.FailedMistaken(word.Word), Texts.Current.Mistaken);
+                return QuestionResult.Failed(chat.Texts.FailedMistaken(word.Word), chat.Texts.Mistaken);
             
             
             // ## Other translation case ##
@@ -64,18 +64,19 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 otherRuTranslationsOfUserInput.Any(t1.AreEqualIgnoreSmallMistakes)))
             {
                 //translation is correct, but for other word
-                await chatIo.SendMessageAsync(
-                    $"{Texts.Current.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.AllTranslationsAsSingleString}'\r\n" +
-                       Texts.Current.LetsTryAgain);
+                await chat.SendMessageAsync(
+                    $"{chat.Texts.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.AllTranslationsAsSingleString}'\r\n" +
+                       chat.Texts.LetsTryAgain);
                 return QuestionResult.RetryThisQuestion;
             }
             
             var translates = string.Join(",",otherRuTranslationsOfUserInput);
             string failedMessage = "";
             if(!string.IsNullOrWhiteSpace(translates))
-                failedMessage =$"{enUserEntry} {Texts.Current.translatesAs} {translates}\r\n";
-            failedMessage += $"{Texts.Current.RightTranslationWas}: {word.Word}";
-            return QuestionResult.FailedText(failedMessage);
+                failedMessage =$"{enUserEntry} {chat.Texts.translatesAs} {translates}\r\n";
+            failedMessage += $"{chat.Texts.RightTranslationWas}: {word.Word}";
+            return QuestionResult.Failed(failedMessage, 
+                chat.Texts);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Assemble phrase";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word, UserWordModel[] examList) 
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
         {
             if (!word.HasAnyExamples)
                 return QuestionResult.Impossible;
@@ -33,15 +33,17 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     break;
             }
 
-            await chatIo.SendMessageAsync($"{Texts.Current.WordsInPhraseAreShufledWriteThemInOrder}:\r\n'" +  shuffled+ "'");
-            var entry = await chatIo.WaitUserTextInputAsync();
+            await chat.SendMessageAsync($"{chat.Texts.WordsInPhraseAreShufledWriteThemInOrder}:\r\n'" +  shuffled+ "'");
+            var entry = await chat.WaitUserTextInputAsync();
             entry = entry.Trim();
 
             if (targetPhrase.OriginPhrase.AreEqualIgnoreCase(entry.Trim()))
-                return QuestionResult.Passed;
+                return QuestionResult.Passed(chat.Texts);
 
             
-            return QuestionResult.FailedText($"{Texts.Current.FailedOriginExampleWas2}: '{targetPhrase.OriginPhrase}'");
+            return QuestionResult.Failed(
+                $"{chat.Texts.FailedOriginExampleWas2}: '{targetPhrase.OriginPhrase}'", 
+                chat.Texts);
         }
     }
 }

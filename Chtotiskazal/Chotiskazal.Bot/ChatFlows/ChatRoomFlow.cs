@@ -25,8 +25,6 @@ namespace Chotiskazal.Bot.ChatFlows
             _userService = userService;
         }
 
-        private UserModel UserModel { get; set; }
-
         private readonly BotSettings _settings;
         private readonly AddWordService _addWordsService;
         private readonly UsersWordsService _usersWordsService;
@@ -42,18 +40,18 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 string mainMenuCommandOrNull = null;
 
-                UserModel = await _userService.GetUserOrNull(_userInfo);
-                if (UserModel == null)
+                var user = await _userService.GetUserOrNull(_userInfo);
+                if (user == null)
                 {
                     var addUserTask = _userService.AddUserFromTelegram(_userInfo);
                     await SayHelloAsync();
-                    UserModel = await addUserTask;
-                    Botlog.WriteInfo($"New user {UserModel.TelegramNick}", UserModel.TelegramId.ToString(),true);
+                    user = await addUserTask;
+                    Botlog.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString(),true);
                 }
+                Chat = new ChatRoom(ChatIo, user);
                 _translationSelectedQueryHandler = new TranslationSelectedQueryHandler(
                     _addWordsService, 
-                    ChatIo, 
-                    UserModel);
+                    Chat);
                 ChatIo.RegistrateCallbackQueryHandler(_translationSelectedQueryHandler);
 
                 while (true)
@@ -74,7 +72,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     catch (Exception e)
                     {
                         Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}",true);
-                        await ChatIo.SendMessageAsync(Texts.Current.OopsSomethingGoesWrong);
+                        await ChatIo.SendMessageAsync(Chat.Texts.OopsSomethingGoesWrong);
                         throw;
                     }
                 }
@@ -86,9 +84,11 @@ namespace Chotiskazal.Bot.ChatFlows
             }
         }
 
+        private ChatRoom Chat { get; set; }
+
         private async Task HandleMainScenario(string mainMenuCommandOrNull)
         {
-            UserModel.OnAnyActivity();
+            Chat.User.OnAnyActivity();
             if (mainMenuCommandOrNull != null)
             {
                 await HandleMainMenu(mainMenuCommandOrNull);
@@ -99,17 +99,17 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (message.Message?.Text != null)
                     await StartToAddNewWords(message.Message?.Text);
                 else
-                   await ChatIo.SendMessageAsync(Texts.Current.EnterWordOrStart);
+                   await ChatIo.SendMessageAsync(Chat.Texts.EnterWordOrStart);
             }
         }
 
-        private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Texts.Current.ActionIsNotAllowed);
+        private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Chat.Texts.ActionIsNotAllowed);
         private Task StartLearning() => new ExamFlow(
-                ChatIo, UserModel, _userService, _usersWordsService, _settings.ExamSettings)
+                Chat, _userService, _usersWordsService, _settings.ExamSettings)
             .EnterAsync();
 
         private Task StartToAddNewWords(string text = null) 
-            => new AddingWordsMode(ChatIo, _addWordsService, _translationSelectedQueryHandler).Enter(UserModel, text);
+            => new AddingWordsMode(Chat, _addWordsService, _translationSelectedQueryHandler).Enter(text);
 
       
         private Task HandleMainMenu(string command){
@@ -117,7 +117,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 case "/help":   return SendHelp();
                 case "/add":    return StartToAddNewWords();
                 case "/learn":  return StartLearning();
-                case "/stats":  return ChatProcedures.ShowStats(ChatIo, UserModel);
+                case "/stats":  return ChatProcedures.ShowStats(Chat);
                 case "/start":  return ShowMainMenu();
             }
             return Task.CompletedTask;
@@ -126,22 +126,26 @@ namespace Chotiskazal.Bot.ChatFlows
         private async Task SendHelp()
         {
 
-            await ChatIo.SendMarkdownMessageAsync(Texts.Current.HelpMarkdown,
+            await ChatIo.SendMarkdownMessageAsync(Chat.Texts.HelpMarkdown,
 
                 new[]{new[]{
-                        InlineButtons.Exam, InlineButtons.Stats},
-                    new[]{ InlineButtons.Translation}});
+                        InlineButtons.Exam(Chat.Texts), InlineButtons.Stats(Chat.Texts)},
+                    new[]{ InlineButtons.Translation(Chat.Texts)}});
         }
 
         private async Task ShowMainMenu()
         {
             while (true)
             {
-                var _  = ChatIo.SendMessageAsync(Texts.Current.MainMenuText,
+                var translationBtn = InlineButtons.Translation(Chat.Texts);
+                var examBtn = InlineButtons.Exam(Chat.Texts);
+                var statsBtn = InlineButtons.Stats(Chat.Texts);
+                var helpBtn = InlineButtons.HowToUse(Chat.Texts);
+                var _  = ChatIo.SendMessageAsync(Chat.Texts.MainMenuText,
                     new[]{
-                        new[]{ InlineButtons.Translation},
-                        new[]{ InlineButtons.Exam},
-                        new[]{InlineButtons.Stats, InlineButtons.HowToUse}
+                        new[]{translationBtn },
+                        new[]{examBtn },
+                        new[]{statsBtn,helpBtn }
                     });
 
                 while (true)
@@ -157,16 +161,16 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (action.CallbackQuery!=null)
                     {
                         var btn = action.CallbackQuery.Data;
-                        if (btn == InlineButtons.Translation.CallbackData) {
+                        if (btn == translationBtn.CallbackData) {
                             await StartToAddNewWords();
                             return;
                         }
-                        if (btn == InlineButtons.Exam.CallbackData) {
+                        if (btn == examBtn.CallbackData) {
                             await StartLearning();
                             return;
                         }
-                        if (btn == InlineButtons.Stats.CallbackData) {
-                            await ChatProcedures.ShowStats(ChatIo, UserModel);;
+                        if (btn == statsBtn.CallbackData) {
+                            await ChatProcedures.ShowStats(Chat);;
                             return;
                         }
                     }

@@ -15,7 +15,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Choose word in phrase";
 
-        public async Task<QuestionResult> Pass(ChatIO chatIo, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
@@ -31,10 +31,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var sb = new StringBuilder();
             sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
             sb.AppendLine();
-            sb.AppendLine($" {Texts.Current.translatesAs} ");
+            sb.AppendLine($" {chat.Texts.translatesAs} ");
             sb.AppendLine();
             sb.AppendLine($"\"{replaced}\"");
-            sb.AppendLine($"{Texts.Current.ChooseMissingWord}...");
+            sb.AppendLine($"{chat.Texts.ChooseMissingWord}...");
 
 
             var variants = examList
@@ -47,16 +47,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Randomize()
                 .ToArray();
 
-            var _ = chatIo.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
+            var _ = chat.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
 
-            var choice = await chatIo.TryWaitInlineIntKeyboardInput();
+            var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResult.PassedText(Texts.Current.Passed1);
+                return QuestionResult.Passed(chat.Texts.Passed1, 
+                    chat.Texts);
             
-            return QuestionResult.FailedText($"{Texts.Current.OriginWas}: \"{phrase.OriginPhrase}\"");
+            return QuestionResult.Failed($"{chat.Texts.OriginWas}: \"{phrase.OriginPhrase}\"", 
+                chat.Texts);
         }
     }
 }

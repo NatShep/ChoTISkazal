@@ -154,7 +154,7 @@ namespace Chotiskazal.Bot
                 {
                     return;
                 }
-                chatRoom.ChatIo.SendMessageAsync(Texts.Current.DidYouWriteSomething).Wait();
+                chatRoom.ChatIo.SendMessageAsync( new EnglishTexts().DidYouWriteSomething).Wait();
                 chatRoom.ChatIo.OnUpdate(
                     new Update {Message = new Message {Text = "/start", From = user}});
                 

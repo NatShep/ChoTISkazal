@@ -96,7 +96,7 @@ namespace SayWhat.Bll.Services
             await _userWordsRepository.UpdateMetrics(model);
         }
 
-        public Task<bool> HasWords(UserModel user) => _userWordsRepository.HasAnyFor(user);
+        public Task<bool> HasWordsFor(UserModel user) => _userWordsRepository.HasAnyFor(user);
         public Task UpdateWord(UserWordModel model) =>
              _userWordsRepository.Update(model);
 
