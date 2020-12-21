@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             sb.AppendLine($"*\"{phrase.OriginPhrase}\"*");
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
-            sb.AppendLine($"\"{replaced}\"");
+            sb.AppendLine($"*\"{replaced}\"*");
             sb.AppendLine();
             sb.AppendLine($"`{chat.Texts.EnterMissingWord}: `");
             var msg = sb.ToString().Replace(".","\\.");

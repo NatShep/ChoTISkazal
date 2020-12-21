@@ -53,7 +53,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
-                var sb = new StringBuilder(Chat.Texts.LearningCarefullyStudyTheListMarkdown +"\r\n\r\n```\r\n");
+                var sb = new StringBuilder($"{Emojis.Learning} "+Chat.Texts.LearningCarefullyStudyTheListMarkdown +"\r\n\r\n```\r\n");
 
                 foreach (var pairModel in learningWords.Randomize())
                 {

@@ -102,7 +102,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
                                                    "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +
                                                    "Просто напиши мне слово на любом языке или нажми команду /add для перевода\\.\r\n\r\n" +
-                                                   "2⃣ Затем, когда будет времечко нажми на кнопку *\"Ботать\\!\"* или " +
+                                                   $"2⃣ Затем, когда будет времечко нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
                                                    "набери команду /learn что бы начать учить переведенные ранее слова\\.\r\n\r\n" +
                                                    "3⃣ Зарабатывай очки и следи за своими успехами при помощи команды /stats\\.\r\n\r\n" +
                                                    "4⃣ Жмякай команду /help что бы увидеть это сообщение\\.\r\n\r\n" +
@@ -110,8 +110,8 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
 
         public string MainMenuTextMarkdown { get; } = "Я переводчик и учитель " +
-                                              "Можешь использовать меня как русско-английский переводчик. " +
-                                              "Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать\\!\"* или " +
+                                              "Можешь использовать меня как русско\\-английский переводчик\\.\r\n\r\n" +
+                                              $"Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
                                               "набери команду /learn что бы начать учить переведенные ранее слова";
 
         public string ActionIsNotAllowed { get;  } = "Действие не разрешено";
@@ -146,7 +146,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string TranslateButton { get; } = "Перевод";
         public string ContinueTranslateButton { get; } = "Продолжить";
 
-        public string LearnButton { get; } = "Ботать!";
+        public string LearnButton { get; } = "Ботать";
         public string StatsButton { get; } = "Статы";
         public string HelpButton { get; } = "Помощь";
         public string MainMenuButton { get; } = "Глав меню";
