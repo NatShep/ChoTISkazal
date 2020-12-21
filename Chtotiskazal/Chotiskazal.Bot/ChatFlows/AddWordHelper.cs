@@ -21,7 +21,6 @@ namespace Chotiskazal.Bot.ChatFlows
     {
         public const string Separator = "@";
         public const string TranslationDataPrefix = "/tr";
-        public const string SelectedPrefix = "☑️ ";
         
         static string CreateButtonDataFor(DictionaryTranslation translation, bool isSelected)
             => TranslationDataPrefix 
@@ -45,7 +44,7 @@ namespace Chotiskazal.Bot.ChatFlows
             => new InlineKeyboardButton {
                 CallbackData = CreateButtonDataFor(translation,selected), 
                 Text = selected
-                    ? $"{SelectedPrefix}{translation.TranslatedText}"
+                    ? $"{Emojis.Selected} {translation.TranslatedText}"
                     : translation.TranslatedText
             };
         public static  int  FindIndexOf(IReadOnlyList<DictionaryTranslation> translations, string translation)

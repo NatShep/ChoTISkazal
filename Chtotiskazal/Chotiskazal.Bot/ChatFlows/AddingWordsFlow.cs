@@ -36,7 +36,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await Chat.SendMessageAsync(Chat.Texts.EnterWordOrStart);
+                await Chat.SendMessageAsync($"{Emojis.Translate} {Chat.Texts.EnterWordOrStart}");
                 word = await Chat.WaitUserTextInputAsync();
             }
 

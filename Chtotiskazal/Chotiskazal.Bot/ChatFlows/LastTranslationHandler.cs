@@ -72,8 +72,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 buttons = buttons
                     .Append(new[]
                     {
-                        InlineButtons.MainMenu("☰ "+Chat.Texts.MainMenuButton), 
-                        InlineButtons.Translation(Chat.Texts.TranslateButton+" ↻")
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"), 
+                        InlineButtons.Translation($"{Chat.Texts.ContinueTranslateButton} {Emojis.Translate}")
                     });
             return buttons;
         }

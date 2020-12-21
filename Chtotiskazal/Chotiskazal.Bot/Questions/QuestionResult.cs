@@ -7,8 +7,7 @@ namespace Chotiskazal.Bot.Questions
         private readonly string _openResultsText;
         private readonly string _resultsBeforeHideousText;
         public const string NoText = "";
-        private const string PassedEmoji = "✅ ";
-        private const string FailedEmoji = "❌ ";
+        
         
         public QuestionResult(string openResultsText, string resultsBeforeHideousText, ExamResult results)
         {
@@ -36,8 +35,8 @@ namespace Chotiskazal.Bot.Questions
 
         private string Emoji => Results switch
         {
-            ExamResult.Failed => FailedEmoji,
-            ExamResult.Passed => PassedEmoji,
+            ExamResult.Failed => Emojis.Failed,
+            ExamResult.Passed => Emojis.Passed,
             _ => ""
         };
         
@@ -46,14 +45,14 @@ namespace Chotiskazal.Bot.Questions
         /// </summary>
         public string OpenResultsText => string.IsNullOrWhiteSpace(_openResultsText)
             ?""
-            :(Emoji+_openResultsText);
+            :(Emoji+" "+_openResultsText);
 
         /// <summary>
         /// Text with results, showing after question before next hideous question
         /// </summary>
         public string ResultsBeforeHideousText => string.IsNullOrWhiteSpace(_resultsBeforeHideousText)
             ?""
-            :(Emoji+_resultsBeforeHideousText);
+            :(Emoji+" "+_resultsBeforeHideousText);
 
         public  ExamResult Results { get; }
 

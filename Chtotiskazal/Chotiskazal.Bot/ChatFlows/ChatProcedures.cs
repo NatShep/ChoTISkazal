@@ -98,8 +98,9 @@ namespace Chotiskazal.Bot.ChatFlows
                 $"*{GetRecomendationFor(chat.User, chat.Texts)}*";
             await chat.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
                 new[]{new[]{
-                         InlineButtons.MainMenu("☰ "+chat.Texts.MainMenuButton),InlineButtons.Exam(chat.Texts.LearnButton+" ☆"),}, 
-                    new[]{ InlineButtons.Translation(chat.Texts.TranslateButton+" ↻")}});
+                         InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),
+                         InlineButtons.Exam($"{chat.Texts.LearnButton} {Emojis.Learning}"),}, 
+                    new[]{ InlineButtons.Translation($"{chat.Texts.TranslateButton} {Emojis.Translate}")}});
         }
 
         private static string GetRecomendationFor(UserModel user, IInterfaceTexts texts)
