@@ -127,18 +127,18 @@ namespace Chotiskazal.Bot.ChatFlows
             await ChatIo.SendMarkdownMessageAsync(Chat.Texts.HelpMarkdown,
                 new[]{new[]{
                         InlineButtons.Exam(Chat.Texts), InlineButtons.Stats(Chat.Texts)},
-                    new[]{ InlineButtons.Translation(Chat.Texts)}});
+                    new[]{ InlineButtons.Translation(Chat.Texts.TranslateButton +" ↻")}});
         }
 
         private async Task ShowMainMenu()
         {
             while (true)
             {
-                var translationBtn = InlineButtons.Translation(Chat.Texts);
+                var translationBtn = InlineButtons.Translation(Chat.Texts.TranslateButton+" ↻");
                 var examBtn = InlineButtons.Exam(Chat.Texts);
                 var statsBtn = InlineButtons.Stats(Chat.Texts);
                 var helpBtn = InlineButtons.HowToUse(Chat.Texts);
-                await ChatIo.SendMarkdownMessageAsync(Chat.Texts.MainMenuTextMarkdown,
+                await ChatIo.SendMarkdownMessageAsync("☰ \r\n"+Chat.Texts.MainMenuTextMarkdown,
                     new[]{
                         new[]{translationBtn },
                         new[]{examBtn },
