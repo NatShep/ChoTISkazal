@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs} _\r\n" +
                                        $"*\"{word.Word}\"*\r\n\r\n" +
-                                       $"`{chat.Texts.DidYouGuess}`",
+                                       $"{chat.Texts.DidYouGuess}",
                                 new[]{
                                     new[]{
                                         new InlineKeyboardButton {
