@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
 
             var msg = $"\\=\\=\\=\\=\\=\\>   `{originTranslation.Transcription}`    \\<\\=\\=\\=\\=\\=\r\n" +
-                      "`"+chat.Texts.ChooseWhichWordHasThisTranscription+"`";
+                      ""+chat.Texts.ChooseWhichWordHasThisTranscription+"";
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();

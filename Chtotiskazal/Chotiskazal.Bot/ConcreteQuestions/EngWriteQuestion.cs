@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                                                $"`{chat.Texts.WriteTheTranslationMarkdown}`");
+                                                $"{chat.Texts.WriteTheTranslationMarkdown}");
             var translation = await chat.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))

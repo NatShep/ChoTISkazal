@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     break;
             }
 
-            await chat.SendMarkdownMessageAsync($"_{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:_\r\n\r\n*\"" +  shuffled+ "\"*");
+            await chat.SendMarkdownMessageAsync($"{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"" +  shuffled+ "\"*");
             var entry = await chat.WaitUserTextInputAsync();
             entry = entry.Trim();
 
