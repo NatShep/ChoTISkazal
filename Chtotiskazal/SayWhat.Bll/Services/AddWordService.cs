@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GoogleTranslateFreeApi;
 using MongoDB.Bson;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
@@ -140,7 +139,7 @@ namespace SayWhat.Bll.Services
         public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word) 
             => await _dictionaryService.GetTranslationsWithExamples(word.ToLower());
 
-        public async Task AddTranslationToUser(UserModel user, DictionaryTranslation translation, double? wordRating = null )
+        public async Task AddTranslationToUser(UserModel user, DictionaryTranslation translation)
         {
             if (translation == null) return;
             if(translation.TranlationDirection!= TranslationDirection.EnRu)
@@ -155,7 +154,7 @@ namespace SayWhat.Bll.Services
                     id:          user.Id, 
                     word:        translation.OriginText, 
                     direction:   TranslationDirection.EnRu,
-                    absScore:    wordRating ?? 0, 
+                    absScore:    0, 
                     translation: new UserWordTranslation
                     {
                         Transcription = translation.EnTranscription,
@@ -203,6 +202,30 @@ namespace SayWhat.Bll.Services
                     newTranslations.Sum(t => t.Examples?.Length ?? 0));
             }
             await _userService.Update(user);
+        }
+
+        public async Task RemoveTranslationFromUser(UserModel user, DictionaryTranslation translation)
+        {
+            if (translation == null) return;
+            if (translation.TranlationDirection != TranslationDirection.EnRu)
+                throw new InvalidOperationException("Only en-ru direction is supported");
+
+            var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
+            if (alreadyExistsWord == null)
+                return;
+            var scoreBefore = alreadyExistsWord.Score;
+            var tr = alreadyExistsWord.RemoveTranslation(translation.TranslatedText);
+            if (tr == null)
+                return;
+            
+            user.OnPairRemoved(tr, alreadyExistsWord.Score - scoreBefore);
+            if (alreadyExistsWord.Translations.Length == 0) {
+                await _usersWordsService.RemoveWord(alreadyExistsWord);
+                user.OnWordRemoved(alreadyExistsWord);
+            }
+            else
+                await _usersWordsService.UpdateWord(alreadyExistsWord);
+
         }
     }
 }

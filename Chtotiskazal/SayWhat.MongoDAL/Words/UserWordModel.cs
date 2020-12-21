@@ -170,5 +170,13 @@ namespace SayWhat.MongoDAL.Words
         }
 
         public override string ToString() => $"{Word} {CurrentOrderScore} updated {ScoreUpdatedTimestamp}";
+
+        public UserWordTranslation RemoveTranslation(string translationText)
+        {
+            var tr  = _translations.FirstOrDefault(i=>i.Word.Equals(translationText));
+            if (tr != null)
+                _translations =_translations.Where(t => t != tr).ToArray();
+            return tr;
+        }
     }
 }

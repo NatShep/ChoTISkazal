@@ -68,10 +68,10 @@ namespace Chotiskazal.Bot
             return answer.MessageId;
         }
 
-        public Task SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
-            => _client.SendTextMessageAsync(ChatId, message,
+        public async Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
+            => (await _client.SendTextMessageAsync(ChatId, message,
                 replyMarkup: new InlineKeyboardMarkup(buttons),
-                parseMode: ParseMode.MarkdownV2);
+                parseMode: ParseMode.MarkdownV2)).MessageId;
 
         public async Task<Update> WaitUserInputAsync()
         {
@@ -147,6 +147,19 @@ namespace Chotiskazal.Bot
             {
                 await _client.EditMessageReplyMarkupAsync(ChatId, messageId,
                     new InlineKeyboardMarkup(buttons.Select(b => new[] {b})));
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[][] buttons)
+        {
+            try
+            {
+                await _client.EditMessageReplyMarkupAsync(ChatId, messageId,
+                    new InlineKeyboardMarkup(buttons));
                 return true;
             }
             catch (Exception e)

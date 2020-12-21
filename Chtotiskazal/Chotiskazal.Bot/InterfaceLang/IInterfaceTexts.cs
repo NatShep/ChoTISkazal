@@ -95,5 +95,6 @@ namespace Chotiskazal.Bot.InterfaceLang
         string MessageAfterTranslationIsSelected(DictionaryTranslation translation);
         string YouHaveLearnedWords(in int count);
         string YouForgotCountWords(in int forgottenWordsCount);
+        string MessageAfterTranslationIsDeselected(DictionaryTranslation allTranslation);
     }
 }

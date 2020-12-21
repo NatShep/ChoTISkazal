@@ -117,8 +117,10 @@ namespace Chotiskazal.Bot.InterfaceLang
                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
         public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
-            => $"Translation  *'{translation.TranslatedText.ToUpper()} - {translation.OriginText}'* is saved\r\n\r\n" +
-               $"If you want to translate another word then write it.\r\nFor returning to main menu write /start.";
+
+            => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
+        public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
+            => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
         public string YouHaveLearnedWords(in int count)
         => $"You have learned {count} words";

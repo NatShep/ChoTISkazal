@@ -37,7 +37,7 @@ namespace Chotiskazal.Bot
             => _origin.SendMessageAsync(message, buttons);
         public Task<int> SendMarkdownMessageAsync(string message, params InlineKeyboardButton[] buttons)
             => _origin.SendMarkdownMessageAsync(message, buttons);
-        public Task SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
+        public Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
             => _origin.SendMarkdownMessageAsync(message, buttons);
         public  Task<Update> WaitUserInputAsync()
             => _origin.WaitUserInputAsync();
@@ -52,6 +52,8 @@ namespace Chotiskazal.Bot
         public Task SendTyping()
             => _origin.SendTyping();
         public Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[] buttons)
+            => _origin.EditMessageButtons(messageId, buttons);
+        public Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[][] buttons)
             => _origin.EditMessageButtons(messageId, buttons);
         public Task<bool> EditMessageText(int messageId, string newText)
             => _origin.EditMessageText(messageId, newText);

@@ -99,6 +99,8 @@ namespace SayWhat.Bll.Services
         public Task<bool> HasWordsFor(UserModel user) => _userWordsRepository.HasAnyFor(user);
         public Task UpdateWord(UserWordModel model) =>
              _userWordsRepository.Update(model);
+        public Task RemoveWord(UserWordModel model) =>
+            _userWordsRepository.Remove(model);
 
         public Task UpdateWordMetrics(UserWordModel model) =>
             _userWordsRepository.UpdateMetrics(model);

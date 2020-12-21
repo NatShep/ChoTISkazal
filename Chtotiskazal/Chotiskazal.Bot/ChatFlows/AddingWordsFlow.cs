@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -44,7 +45,7 @@ namespace Chotiskazal.Bot.ChatFlows
             // Search translations in local dictionary
             
             var translations = await _addWordService.FindInDictionaryWithExamples(word);
-            if (!translations.Any()) // if not, find it in Ya dictionary
+            if (!translations.Any()) // if not, search it in Ya dictionary
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
             
             // Inline keyboards has limitation for size of the message 
@@ -58,21 +59,20 @@ namespace Chotiskazal.Bot.ChatFlows
                 return null;
             }
 
+            // Automaticly select first translation
+            await _addWordService.AddTranslationToUser(Chat.User, translations[0]);
+            
             // getting first transcription
-            var tr = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
+            var transcription = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
                         
             var handler = new LastTranslationHandler(
                 translations: translations,
                 chat: Chat,
                 addWordService: _addWordService);
-
+            
             _translationSelectedUpdateHook.SetTranslationHandler(handler);
 
-            var messageId = await Chat.SendMarkdownMessageAsync(
-                Chat.Texts.HereAreTheTranslationMarkdown(word,tr),
-                translations.Select(v => AddWordHelper.CreateButtonFor(v, false)).ToArray());
-
-            handler.SetMessageId(messageId);
+            await handler.SendTranslationMessage(Chat.Texts.HereAreTheTranslationMarkdown(word, transcription));
 
             if (word.IsRussian()) Chat.User.OnRussianWordTranlationRequest();
             else Chat.User.OnEnglishWordTranslationRequest();
@@ -82,15 +82,11 @@ namespace Chotiskazal.Bot.ChatFlows
                 // user request next word
                 var res = await Chat.WaitUserTextInputAsync();
                 // notify handler, that we leave the flow
-                // If user does not choose any translation for X seconds
-                // first option gonna be choosen automaticly
-                handler.OnNextTranslationRequest();
                 return res;
             }
-            catch (Exception)
+            finally
             {
-                handler.OnFlowInterrupted();
-                throw;
+                handler.OnNextTranslationRequest();
             }
         }
     }
