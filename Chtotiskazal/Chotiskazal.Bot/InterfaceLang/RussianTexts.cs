@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string RetryAlmostRightWithTypo { get; } 
             = "Опечатка. Давайте заново.";
         public string ShowTheTranslationButton { get; } = "Показать перевод";
-        public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод... ";
+        public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод\\.\\.\\. ";
         public string RightTranslationWas { get; } = "А правильный перевод это";
 
         public string CorrectTranslationButQuestionWasAbout { get; } =
