@@ -38,9 +38,9 @@ namespace Chotiskazal.Bot.InterfaceLang
             "Your translation was correct, but the question was about the word";
         public string LetsTryAgain { get; } = "Let's try again";
         public string ChooseTheTranscription { get; } = "Choose the transcription";
-        public string WordsInPhraseAreShuffledWriteThemInOrder { get; } =
-            "Words in phrase are shuffled. Write them in correct order";
-        public string YouHaveATypoLetsTryAgainMarkdown(string text)
+        public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
+            "Words in phrase are shuffled\\. Write them in correct order";
+        public string YouHaveATypoLetsTryAgain(string text)
             => $"You have a typo. Correct spelling is '{text}'. Let's try again.";
        
         #region questionResult

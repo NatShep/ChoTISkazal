@@ -47,11 +47,11 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string LetsTryAgain { get; } = "Давайте еще разок";
         public string ChooseTheTranscription { get; } = "Выберите транскрипцию";
-        public string WordsInPhraseAreShuffledWriteThemInOrder { get; } =
+        public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
             "Слава во фразе перепутаны местами. Напишите эту фразу";
 
      
-        public string YouHaveATypoLetsTryAgainMarkdown(string text)
+        public string YouHaveATypoLetsTryAgain(string text)
             => $"Ошибочка. Правильно будет '{text}'. Давайте еще разок.";
     
         #region questionResult

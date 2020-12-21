@@ -41,7 +41,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         string CorrectTranslationButQuestionWasAbout { get; }
         string LetsTryAgain { get; }
         string ChooseTheTranscription { get; }
-        string WordsInPhraseAreShuffledWriteThemInOrder { get; }
+        string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; }
         string FailedDefaultMarkdown { get; }
         string PassedDefaultMarkdown { get; }
         string IgnoredDefaultMarkdown { get; }
@@ -90,7 +90,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         string OopsSomethingGoesWrong { get; }
         string InterfaceLanguageSetupped { get; }
         string OutOfScopeWithCandidate(string otherMeaning);
-        string YouHaveATypoLetsTryAgainMarkdown(string text);
+        string YouHaveATypoLetsTryAgain(string text);
         string FailedMistakenMarkdown(string text);
         string HereAreTheTranslationMarkdown(string word, string? tr);
         string MessageAfterTranslationIsSelected(DictionaryTranslation translation);
