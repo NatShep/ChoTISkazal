@@ -37,9 +37,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Select(e => e.OriginPhrase)
                 .ToArray();
             
-            var msg = $"=====>   {targetPhrase.TranslatedPhrase}    <=====\r\n" +
-                      chat.Texts.ChooseTheTranslation;
-            await chat.SendMessageAsync(msg,
+            var msg = $"\\=\\=\\=\\=\\=\\>  *{targetPhrase.TranslatedPhrase}*  \\<\\=\\=\\=\\=\\=\r\n" +
+                      "`"+chat.Texts.ChooseTheTranslation+"`";
+            await chat.SendMarkdownMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {
                     CallbackData = i.ToString(),

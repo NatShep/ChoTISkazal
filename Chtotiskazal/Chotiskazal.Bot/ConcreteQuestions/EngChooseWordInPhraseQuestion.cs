@@ -23,18 +23,17 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var phrase = word.GetRandomExample();
 
-            var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
+            var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "\\.\\.\\.");
 
             if (replaced == phrase.OriginPhrase)
                 return QuestionResult.Impossible;
             
             var sb = new StringBuilder();
-            sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
+            sb.AppendLine($"*\"{phrase.TranslatedPhrase}\"*");
+            sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
+            sb.AppendLine($"*\"{replaced}\"*");
             sb.AppendLine();
-            sb.AppendLine($" {chat.Texts.translatesAs} ");
-            sb.AppendLine();
-            sb.AppendLine($"\"{replaced}\"");
-            sb.AppendLine($"{chat.Texts.ChooseMissingWord}...");
+            sb.AppendLine($"`{chat.Texts.ChooseMissingWord}:`");
 
 
             var variants = examList
@@ -47,17 +46,17 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Randomize()
                 .ToArray();
 
-            var _ = chat.SendMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
+            var _ = await chat.SendMarkdownMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResult.Passed(chat.Texts.Passed1, 
+                return QuestionResult.Passed(chat.Texts.Passed1Markdown, 
                     chat.Texts);
             
-            return QuestionResult.Failed($"{chat.Texts.OriginWas}: \"{phrase.OriginPhrase}\"", 
+            return QuestionResult.Failed($"{chat.Texts.OriginWas}:\r\n*\"{phrase.OriginPhrase}\"*", 
                 chat.Texts);
         }
     }

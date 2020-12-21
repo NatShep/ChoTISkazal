@@ -32,6 +32,16 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2,
             frequency: 10);
 
+        private readonly ExamAndPreferredScore _ruTrustSingle = new ExamAndPreferredScore(
+            question: new RuTrustSingleTranslationQuestion(), 
+            expectedScore: 2,
+            frequency: 10);
+        
+        private readonly ExamAndPreferredScore _ruTrustSingleHideous = new ExamAndPreferredScore(
+            question: new ClearScreenQuestionDecorator(new RuTrustSingleTranslationQuestion()), 
+            expectedScore: 2,
+            frequency: 10);
+        
         private readonly ExamAndPreferredScore _engPhraseChoose = new ExamAndPreferredScore(
             question: new EngChoosePhraseQuestion(),
             expectedScore: 1.3,
@@ -156,6 +166,16 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2.3,
             frequency: 10);
 
+        private ExamAndPreferredScore RuWriteSingleTranslationExam(DictionaryService service) => new ExamAndPreferredScore(
+            question:new RuWriteSingleTarnslationQuestion(service),  
+            expectedScore:1.6,
+            frequency:10);
+       
+        private ExamAndPreferredScore HideousRuWriteSingleTranslationExam(DictionaryService service) => new ExamAndPreferredScore(
+            question:new RuWriteSingleTarnslationQuestion(service),  
+            expectedScore:1.6,
+            frequency:10);
+
         public QuestionSelector(DictionaryService dictionaryService)
         {
             _simpleExamsList = new[]
@@ -178,6 +198,8 @@ namespace Chotiskazal.Bot.Questions
                 _engTrust,
                 _ruTrust,
                 _hideousRuTrust,
+                _ruTrustSingle,
+                _ruTrustSingleHideous,
                 _hideousEngTrust,
                 _ruChooseByTranscriptionExam,
                 _transcriptionExam,
@@ -193,14 +215,18 @@ namespace Chotiskazal.Bot.Questions
                 _ruPhraseChoose,
                 _engTrust,
                 _ruTrust,
+                _ruTrustSingle,
                 EngWrite(dictionaryService),
                 RuWrite(dictionaryService),
+                RuWriteSingleTranslationExam(dictionaryService),
                 _hideousRuPhraseChoose,
                 _hideousEngPhraseChoose,
                 _hideousEngTrust,
                 _hideousRuTrust,
+                _ruTrustSingleHideous,
                 HideousEngWriteExam(dictionaryService),
                 HideousRuWriteExam(dictionaryService),
+                HideousRuWriteSingleTranslationExam(dictionaryService),
                 _clearEngPhraseSubstitute,
                 _clearRuPhraseSubstitute,
                 _engPhraseSubstitute,

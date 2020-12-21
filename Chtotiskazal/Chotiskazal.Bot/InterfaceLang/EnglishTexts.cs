@@ -21,7 +21,7 @@ namespace Chotiskazal.Bot.InterfaceLang
             => $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are";
         public string OutOfScopeTranslation { get; } =
             "Chosen translation is out of scope (but it is correct). Expected translations are";
-        public string FailedTranslationWas { get; } = "The translation was";
+        public string FailedTranslationWasMarkdown { get; } = "The translation was";
         public string ItIsNotRightTryAgain { get; } = "No. It is not right. Try again";
         public string SeeTheTranslation { get; } = "See the translation";
         public string DoYouKnowTranslation { get; } = $"Do you know the translation?";
@@ -34,36 +34,34 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ShowTheTranslationButton { get; } = "Show the translation";
         public string WriteTheTranslation { get; } = $"Write the translation... ";
         public string RightTranslationWas { get; } = "The right translation was";
-
         public string CorrectTranslationButQuestionWasAbout { get; } =
             "Your translation was correct, but the question was about the word";
-
         public string LetsTryAgain { get; } = "Let's try again";
         public string ChooseTheTranscription { get; } = "Choose the transcription";
-        public string WordsInPhraseAreShufledWriteThemInOrder { get; } =
-            "Words in phrase are shuffled. Write them in correct order";
-
-     
+        public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
+            "Words in phrase are shuffled\\. Write them in correct order";
         public string YouHaveATypoLetsTryAgain(string text)
             => $"You have a typo. Correct spelling is '{text}'. Let's try again.";
-    
+       
         #region questionResult
-        public string Passed1 { get; } = "Ayeee!";
-        public string PassedOpenIHopeYouWereHonest { get; } = "Good. I hope you were honest";
-        public string PassedHideousWell { get; } = "Well";
+        public string Passed1Markdown { get; } = "Ayeee\\!";
+        public string PassedOpenIHopeYouWereHonestMarkdown { get; } = "Good\\. I hope you were honest";
+        public string PassedHideousWellMarkdown { get; } = "Well";
         public string PassedHideousWell2 { get; } = "Good";
-        public string FailedOpenButYouWereHonest { get; } = "But you were honest...";
-        public string FailedHideousHonestyIsGold { get; } = "Honesty is gold";
-        public string FailedMistaken(string text)
-            => $"Mistaken. Correct spelling is '{text}'";
-        public object FailedOriginExampleWas { get; } = "Wrong. Origin phrase was";
-        public object FailedOriginExampleWas2 { get; } = "Origin phrase was";
-        public string FailedDefault { get; }= "Noo...";
-        public string PassedDefault { get; }= "It's right!";
-        public string IgnoredDefault { get; }= "So so ...";
+        public string FailedOpenButYouWereHonestMarkdown { get; } = "But you were honest\\.\\.\\.";
+        public string FailedHideousHonestyIsGoldMarkdown { get; } = "Honesty is gold";
+        public string FailedMistakenMarkdown(string text)
+            => $"Mistaken\\. Correct spelling is '{text}'";
+        public object FailedOriginExampleWasMarkdown { get; } = "Wrong\\. Origin phrase was";
 
-        public string FailedHideousDefault { get; }= "Last answer was wrong";
-        public string PassedHideousDefault { get; }= "Last answer was right";
+        public object FailedOriginExampleWas2 { get; } = "Origin phrase was";
+        public object FailedOriginExampleWas2Markdown { get; } = "Origin phrase was";
+
+        public string FailedDefaultMarkdown { get; }= "Noo\\.\\.\\.";
+        public string PassedDefaultMarkdown { get; }= "It's right\\!";
+        public string IgnoredDefaultMarkdown { get; }= "So so\\.\\.\\.";
+        public string FailedHideousDefaultMarkdown { get; }= "Last answer was wrong";
+        public string PassedHideousDefaultMarkdown { get; }= "Last answer was right";
         
         public string IgnoredHideousDefault { get; }= "Not really";
          #endregion
@@ -94,7 +92,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string HelpMarkdown { get; } = "*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
                                                    "1⃣ You can use me as a regular translator\\. " +
                                                    "Just write the word for translation or use /add command to begin translate\\.\r\n\r\n" +
-                                                   "2⃣ Then, when you have time and mood, click on the *\"Learn\"* button or " +
+                                                   "2⃣ Then, when you have time and mood, click on the _\"Learn\"_ button or " +
                                                    "write /learn and start learning this words\\.\r\n\r\n" +
                                                    "3⃣ Earn scores for your action and watch your progress using /stats command\\.\r\n\r\n" +
                                                    "4⃣ Use /help command to see info how it works\\.\r\n\r\n" +
@@ -108,7 +106,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "*Just try it and see for yourself\\!*";
 
         public string ActionIsNotAllowed { get;  } = "action is not allowed";
-        public string OopsSomethingGoesWrong { get;  } = "Oops. Something goes wrong ;( Write /start to go to main menu.";
+        public string OopsSomethingGoesWrong { get;  } = "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
 
         public string HereAreTheTranslationMarkdown(string word, string? tr)
             => $"_Here are the translations\\._ \r\n" +

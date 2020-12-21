@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     break;
             }
 
-            await chat.SendMessageAsync($"{chat.Texts.WordsInPhraseAreShufledWriteThemInOrder}:\r\n'" +  shuffled+ "'");
+            await chat.SendMarkdownMessageAsync($"_{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:_\r\n\r\n*\"" +  shuffled+ "\"*");
             var entry = await chat.WaitUserTextInputAsync();
             entry = entry.Trim();
 
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             
             return QuestionResult.Failed(
-                $"{chat.Texts.FailedOriginExampleWas2}: '{targetPhrase.OriginPhrase}'", 
+                $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
                 chat.Texts);
         }
     }

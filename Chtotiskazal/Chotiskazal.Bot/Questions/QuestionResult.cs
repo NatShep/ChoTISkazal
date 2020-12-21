@@ -18,19 +18,19 @@ namespace Chotiskazal.Bot.Questions
         }
 
         public static QuestionResult Passed(string text, IInterfaceTexts texts) 
-            => new QuestionResult(text, texts.PassedHideousDefault, ExamResult.Passed);
+            => new QuestionResult(text, texts.PassedHideousDefaultMarkdown, ExamResult.Passed);
         public static QuestionResult Failed(string text, IInterfaceTexts texts)
-            => new QuestionResult(text,texts.FailedHideousDefault , ExamResult.Failed);
+            => new QuestionResult(text,texts.FailedHideousDefaultMarkdown , ExamResult.Failed);
         public static QuestionResult Passed(string text, string hideousText) 
             => new QuestionResult(text, hideousText, ExamResult.Passed);
         public static QuestionResult Failed(string text, string hideousText)
             => new QuestionResult(text,hideousText , ExamResult.Failed);
         public static QuestionResult Passed(IInterfaceTexts texts)=> new QuestionResult(
-            texts.PassedDefault,
-            texts.PassedHideousDefault, ExamResult.Passed);
+            texts.PassedDefaultMarkdown,
+            texts.PassedHideousDefaultMarkdown, ExamResult.Passed);
         public static QuestionResult Failed(IInterfaceTexts texts)=> new QuestionResult(
-            texts.FailedDefault,
-            texts.FailedHideousDefault, ExamResult.Failed);
+            texts.FailedDefaultMarkdown,
+            texts.FailedHideousDefaultMarkdown, ExamResult.Failed);
         public static QuestionResult RetryThisQuestion=> new QuestionResult("","", ExamResult.Retry);
         public static QuestionResult Impossible => new QuestionResult("","", ExamResult.Impossible);
 

@@ -21,18 +21,19 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var phrase = word.GetRandomExample();
 
-            var replaced = phrase.TranslatedPhrase.Replace(phrase.TranslatedWord, "...");
+            var replaced = phrase.TranslatedPhrase.Replace(phrase.TranslatedWord, "\\.\\.\\.");
             if (replaced == phrase.TranslatedPhrase)
                 return QuestionResult.Impossible;
 
             var sb = new StringBuilder();
-
-            sb.AppendLine($"\"{phrase.OriginPhrase}\"");
-            sb.AppendLine($" {chat.Texts.translatesAs} ");
+            
+            sb.AppendLine($"*\"{phrase.OriginPhrase}\"*");
+            sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
             sb.AppendLine($"\"{replaced}\"");
             sb.AppendLine();
-            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
-            await chat.SendMessageAsync(sb.ToString());
+            sb.AppendLine($"`{chat.Texts.EnterMissingWord}: `");
+            var msg = sb.ToString().Replace(".","\\.");
+            await chat.SendMarkdownMessageAsync(sb.ToString());
 
             while (true)
             {
@@ -49,7 +50,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     return QuestionResult.RetryThisQuestion;
                 }
                 return QuestionResult.Failed(
-                    $"{chat.Texts.FailedOriginExampleWas2} '{phrase.TranslatedPhrase}'", 
+                    $"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*", 
                     chat.Texts);
             }
         }

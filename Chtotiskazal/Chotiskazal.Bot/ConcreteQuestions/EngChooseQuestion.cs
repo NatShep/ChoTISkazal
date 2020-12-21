@@ -28,10 +28,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Randomize()
                 .ToList();
 
-            var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      chat.Texts.ChooseTheTranslation;
+            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+                      "`"+chat.Texts.ChooseTheTranslation+"`";
             
-            await chat.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
+            await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
