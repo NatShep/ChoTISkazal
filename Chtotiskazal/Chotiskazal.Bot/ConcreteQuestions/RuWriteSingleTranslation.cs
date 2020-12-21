@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             if (comparation == StringsCompareResult.SmallMistakes)
             {
-                await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(word.Word));
+                await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(word.Word));
                 return QuestionResult.RetryThisQuestion;
             }
             

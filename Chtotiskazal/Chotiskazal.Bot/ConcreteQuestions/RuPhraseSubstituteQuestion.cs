@@ -50,7 +50,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     return QuestionResult.RetryThisQuestion;
                 }
                 return QuestionResult.Failed(
-                    $"{chat.Texts.FailedOriginExampleWas2} '{phrase.TranslatedPhrase}'", 
+                    $"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*", 
                     chat.Texts);
             }
         }

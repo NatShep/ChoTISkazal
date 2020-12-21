@@ -43,7 +43,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 case StringsCompareResult.Equal:
                     return QuestionResult.Passed(chat.Texts);
                 case StringsCompareResult.SmallMistakes:
-                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(text));
+                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(text));
                     return QuestionResult.RetryThisQuestion;
                 case StringsCompareResult.BigMistakes:
                     return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(text), 
@@ -67,7 +67,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
 
             return QuestionResult.Failed(
-                chat.Texts.FailedTranslationWasMarkdown +$" '{word.AllTranslationsAsSingleString}'", 
+                chat.Texts.FailedTranslationWasMarkdown +$"\r\n*\"{word.AllTranslationsAsSingleString}\"*", 
                 chat.Texts);
         }
     }
