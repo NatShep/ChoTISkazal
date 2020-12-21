@@ -93,6 +93,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
                 Chat.Texts.MessageAfterTranslationIsSelected(allTranslations[index]));
+   //   await Chat.SendMarkdownMessageAsync(Chat.Texts.MessageAfterTranslationIsSelected(allTranslations[index]));
         }
 
         private static bool[] GetSelectionMarks(IReadOnlyList<DictionaryTranslation> allTranslations, InlineKeyboardButton[] originMessageButtons)

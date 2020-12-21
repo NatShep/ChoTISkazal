@@ -138,7 +138,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 var examBtn = InlineButtons.Exam(Chat.Texts);
                 var statsBtn = InlineButtons.Stats(Chat.Texts);
                 var helpBtn = InlineButtons.HowToUse(Chat.Texts);
-                var _  = ChatIo.SendMessageAsync(Chat.Texts.MainMenuText,
+                await ChatIo.SendMarkdownMessageAsync(Chat.Texts.MainMenuTextMarkdown,
                     new[]{
                         new[]{translationBtn },
                         new[]{examBtn },

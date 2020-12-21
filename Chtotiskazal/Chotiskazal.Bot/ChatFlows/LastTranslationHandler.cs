@@ -41,8 +41,10 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
 
             await SelectIthTranslation(update.CallbackQuery.Message.MessageId, index, 0);
+            
             await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
                 Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]));
+            
             if (!_isLastMessageInTheChat)
                 return;
 
