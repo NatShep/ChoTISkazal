@@ -227,5 +227,8 @@ namespace SayWhat.Bll.Services
                 await _usersWordsService.UpdateWord(alreadyExistsWord);
 
         }
+
+        public Task<UserWordModel> GetWordNullByEngWord(UserModel chatUser, string word)
+            => _usersWordsService.GetWordNullByEngWord(chatUser, word);
     }
 }

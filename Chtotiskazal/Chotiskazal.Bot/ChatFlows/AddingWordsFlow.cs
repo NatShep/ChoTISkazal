@@ -1,10 +1,13 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -43,7 +46,12 @@ namespace Chotiskazal.Bot.ChatFlows
             Chat.User.OnAnyActivity();
 
             // Search translations in local dictionary
-            
+
+            Task<UserWordModel> getUserWordTask = null;
+
+            if (!word.IsRussian())
+                getUserWordTask = _addWordService.GetWordNullByEngWord(Chat.User, word);
+
             var translations = await _addWordService.FindInDictionaryWithExamples(word);
             if (!translations.Any()) // if not, search it in Ya dictionary
                 translations = await _addWordService.TranslateAndAddToDictionary(word);
@@ -52,15 +60,24 @@ namespace Chotiskazal.Bot.ChatFlows
             // Workaraound: exclude all translations that are more than 32 symbols
             if(translations!=null && translations.Any(t=>t.OriginText.Length + t.TranslatedText.Length>32))
                 translations = translations.Where(t => t.OriginText.Length + t.TranslatedText.Length <= 32).ToArray();
-
+                
             if (translations?.Any() != true)
             {
                 await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
                 return null;
             }
 
-            // Automaticly select first translation
-            await _addWordService.AddTranslationToUser(Chat.User, translations[0]);
+            UserWordModel alreadyExistUserWord = null;
+
+            if(getUserWordTask!=null)
+                alreadyExistUserWord = await getUserWordTask;
+        
+            // get button selection marks. It works only for english words!
+            bool[] selectionMarks = GetSelectionMarks(translations, alreadyExistUserWord);
+            
+            if(!selectionMarks[0])
+                // Automaticly select first translation if it was not selected before
+                await _addWordService.AddTranslationToUser(Chat.User, translations[0]);
             
             // getting first transcription
             var transcription = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
@@ -70,9 +87,9 @@ namespace Chotiskazal.Bot.ChatFlows
                 chat: Chat,
                 addWordService: _addWordService);
             
-            _translationSelectedUpdateHook.SetTranslationHandler(handler);
+            _translationSelectedUpdateHook.SetLastTranslationHandler(handler);
 
-            await handler.SendTranslationMessage(Chat.Texts.HereAreTheTranslationMarkdown(word, transcription));
+            await handler.SendTranslationMessage(word, transcription, selectionMarks);
 
             if (word.IsRussian()) Chat.User.OnRussianWordTranlationRequest();
             else Chat.User.OnEnglishWordTranslationRequest();
@@ -88,6 +105,17 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 handler.OnNextTranslationRequest();
             }
+        }
+
+        private bool[] GetSelectionMarks(
+            IReadOnlyList<DictionaryTranslation> translations, UserWordModel? alreadyExistUserWord)
+        {
+            bool[] ans = new bool[translations.Count];
+            if (alreadyExistUserWord == null)
+                return ans;
+            for (int i = 0; i < translations.Count; i++) 
+                ans[i] = alreadyExistUserWord.HasTranslation(translations[i].TranslatedText);
+            return ans;
         }
     }
 }
