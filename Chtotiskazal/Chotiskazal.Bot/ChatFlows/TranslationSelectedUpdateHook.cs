@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.ChatFlows
             _addWordService = addWordService;
         }
 
-        public void SetTranslationHandler(LastTranslationHandler handler) => _cachedHandlerTranslationOrNull = handler;
+        public void SetLastTranslationHandler(LastTranslationHandler handler) => _cachedHandlerTranslationOrNull = handler;
         
         private LastTranslationHandler _cachedHandlerTranslationOrNull = null;
         

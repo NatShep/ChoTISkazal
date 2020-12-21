@@ -16,7 +16,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
         public string OriginWordText { get;  }
         
-        private readonly bool[] _areSelected;
+        private bool[] _areSelected;
         
         public LastTranslationHandler(
             IReadOnlyList<DictionaryTranslation> translations, 
@@ -91,7 +91,12 @@ namespace Chotiskazal.Bot.ChatFlows
         /// Origin message of translation
         /// </summary>
         private int? _originMessageId;
-        public async Task SendTranslationMessage(string markdownMessage)
-            =>  _originMessageId = await Chat.SendMarkdownMessageAsync(markdownMessage, CreateButtons().ToArray());
+        public async Task SendTranslationMessage(string markdownMessage, string? transcription, bool[] selectionMarks)
+        {
+            _areSelected = selectionMarks;
+            _originMessageId = await Chat.SendMarkdownMessageAsync(
+                Chat.Texts.HereAreTheTranslationMarkdown(markdownMessage, transcription), 
+                CreateButtons().ToArray());
+        }
     }
 }

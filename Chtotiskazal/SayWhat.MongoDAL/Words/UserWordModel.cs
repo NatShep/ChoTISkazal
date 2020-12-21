@@ -178,5 +178,7 @@ namespace SayWhat.MongoDAL.Words
                 _translations =_translations.Where(t => t != tr).ToArray();
             return tr;
         }
+
+        public bool HasTranslation(string translatedText) => _translations.Any(t => t.Word.Equals(translatedText));
     }
 }
