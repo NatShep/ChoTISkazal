@@ -33,7 +33,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
             sb.AppendLine($"*\"{replaced}\"*");
             sb.AppendLine();
-            sb.AppendLine($"`{chat.Texts.ChooseMissingWord}:`");
+            sb.AppendLine($"{chat.Texts.ChooseMissingWord}:");
 
 
             var variants = examList

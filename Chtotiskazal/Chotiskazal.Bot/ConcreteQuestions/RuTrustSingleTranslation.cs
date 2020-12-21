@@ -17,7 +17,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItem().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      "`"+chat.Texts.DoYouKnowTranslation+"`".Replace(".","\\.");
+                      ""+chat.Texts.DoYouKnowTranslation+"".Replace(".","\\.");
             var id = Rand.Next();
             
             await chat.SendMarkdownMessageAsync(msg,

@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItem().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                                          "`"+chat.Texts.WriteTheTranslationMarkdown+"`");
+                                          ""+chat.Texts.WriteTheTranslationMarkdown+"");
             var enUserEntry = await chat.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(enUserEntry))

@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var msg = $"*\"{word.Word}\"*\r\n" +
                       $"    _{chat.Texts.translatesAs}_\r\n" +
                       $"*\"{translation}\"*\r\n\r\n"+
-                             $"`{chat.Texts.IsItRightTranslation}`";
+                             $"{chat.Texts.IsItRightTranslation}";
 
             await chat.SendMarkdownMessageAsync(msg,
                 new[] {
