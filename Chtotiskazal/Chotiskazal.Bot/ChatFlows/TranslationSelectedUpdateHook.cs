@@ -80,19 +80,25 @@ namespace Chotiskazal.Bot.ChatFlows
             }
                 
             var selectedBefore = selectionMarks[index];
-            selectionMarks[index] = true;
-            await _addWordService.AddTranslationToUser(Chat.User, allTranslations[index].GetEnRu(), 0);
             if (!selectedBefore)
             {
-                await Chat.EditMessageButtons(
-                    update.CallbackQuery.Message.MessageId,
-                    allTranslations
-                        .Select((t, i) => AddWordHelper.CreateButtonFor(t, selectionMarks[i]))
-                        .ToArray());
+                selectionMarks[index] = true;
+                await _addWordService.AddTranslationToUser(Chat.User, allTranslations[index].GetEnRu());
+                await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
+                    Chat.Texts.MessageAfterTranslationIsSelected(allTranslations[index]));
             }
-
-            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
-                Chat.Texts.MessageAfterTranslationIsSelected(allTranslations[index]));
+            else
+            {
+                selectionMarks[index] = false;
+                await _addWordService.RemoveTranslationFromUser(Chat.User, allTranslations[index].GetEnRu());
+                await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
+                    Chat.Texts.MessageAfterTranslationIsDeselected(allTranslations[index]));
+            }
+            await Chat.EditMessageButtons(
+                update.CallbackQuery.Message.MessageId,
+                allTranslations
+                    .Select((t, i) => AddWordHelper.CreateButtonFor(t, selectionMarks[i]))
+                    .ToArray());
         }
 
         private static bool[] GetSelectionMarks(IReadOnlyList<DictionaryTranslation> allTranslations, InlineKeyboardButton[] originMessageButtons)
@@ -107,10 +113,8 @@ namespace Chotiskazal.Bot.ChatFlows
                     if (allTranslations[i].TranslatedText.Equals(data.Translation) && data.IsSelected)
                         selectionMarks[i] = true;
                 }
-
                 i++;
             }
-
             return selectionMarks;
         }
     }

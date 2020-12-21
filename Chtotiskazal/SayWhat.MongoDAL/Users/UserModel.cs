@@ -220,7 +220,36 @@ namespace SayWhat.MongoDAL.Users
             OnAnyActivity();
             return gamingScore;
         }
+        public void OnPairRemoved(UserWordTranslation tr, WordStatsChanging wordScoreDelta)
+        {
+            var examplesCount = tr.Examples?.Length ?? 0;
+            _pairsCount--;
+            _examplesCount -= examplesCount;
+            var (today, month) = FixStatsAndGetCurrent();
+            today.PairsAdded--;
+            today.ExamplesAdded-= examplesCount;
+            month.PairsAdded--;
+            month.ExamplesAdded-= examplesCount;
+            
+            var gamingScore = - WordLeaningGlobalSettings.NewPairGamingScore* Zen.AddWordsBonusRate ;
+            ApplyWordStatsChangings(wordScoreDelta, today, month, gamingScore);
+            OnAnyActivity();
+        }
 
+        public void OnWordRemoved(UserWordModel alreadyExistsWord)
+        {
+            _wordsCount--;
+            if (_wordsCount < 0) _wordsCount = 0;
+           
+            var (today, month) = FixStatsAndGetCurrent();
+            today.WordsAdded--;
+            month.WordsAdded--;
+
+            var scoreDelta  =   UserWordScore.Zero - alreadyExistsWord.Score;
+            var gamingScore = - WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+
+            ApplyWordStatsChangings(scoreDelta,today, month, gamingScore);
+        }
         public void OnStatsChangings(WordStatsChanging changing)
         {
             var (today, month) = FixStatsAndGetCurrent();
@@ -315,7 +344,7 @@ namespace SayWhat.MongoDAL.Users
             }
             return dailyStats;
         }
-
+       
         public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords)
         {
             if(_wordsCount== _countByCategoryScores?.Sum())
@@ -392,5 +421,7 @@ namespace SayWhat.MongoDAL.Users
             LastMonthStats.Sort((d1,d2)=>d1.Months.CompareTo(d2.Months));
             _wordsCount = allUserWords.Count();
         }
+
+       
     }
 }

@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    public class LastTranslationHandler
-    {
+    public class LastTranslationHandler {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private int _selectedTranslationsCount = 0;
         private readonly IReadOnlyList<DictionaryTranslation> _translations;
         private bool _isLastMessageInTheChat =true ;
 
@@ -29,6 +27,8 @@ namespace Chotiskazal.Bot.ChatFlows
             OriginWordText = translations[0].OriginText;
             _translations = translations;
             _areSelected = new bool[_translations.Count];
+            if(translations.Count>0)
+                _areSelected[0] = true;
             _addWordService = addWordService;
         }
 
@@ -37,79 +37,60 @@ namespace Chotiskazal.Bot.ChatFlows
             var index = AddWordHelper.FindIndexOf(_translations, translation);
             if (index == -1)
                 return;
-            if (_areSelected[index])
-                return;
-
-            await SelectIthTranslation(update.CallbackQuery.Message.MessageId, index, 0);
-            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
-                Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]));
-            if (!_isLastMessageInTheChat)
-                return;
-
-            if (_confirmationMessageId.HasValue) {
-                if (await Chat.EditMessageText(_confirmationMessageId.Value,
-                    Chat.Texts.MessageAfterTranslationIsSelected(_translations[index])))
-                    return;
-            }
-
-            _confirmationMessageId = await Chat.SendMessageAsync(
-                Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]));
-        }
-
-        private int? _confirmationMessageId = null;
-        private async Task SelectIthTranslation(int messageId, int index, double score)
-        {
-            _areSelected[index] = true;
-            _selectedTranslationsCount++;
-            await _addWordService.AddTranslationToUser(Chat.User, _translations[index].GetEnRu(), score);
-            await Chat.EditMessageButtons(
-                messageId,
-                _translations.Select((t, i) => AddWordHelper.CreateButtonFor(t, _areSelected[i])).ToArray()
-            );
             
+            await SelectIthTranslation(update.CallbackQuery.Message.MessageId, index);
+            var message = "";
+            
+            if (_areSelected[index])
+                message = Chat.Texts.MessageAfterTranslationIsSelected(_translations[index]);
+            else
+                message = Chat.Texts.MessageAfterTranslationIsDeselected(_translations[index]);
+
+            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id, message);
         }
-        
+
+        private async Task SelectIthTranslation(int messageId, int index)
+        {
+            _areSelected[index] = !_areSelected[index];
+
+            if (_areSelected[index]) //if become selected
+                await _addWordService.AddTranslationToUser(Chat.User, _translations[index].GetEnRu());
+            else
+                await _addWordService.RemoveTranslationFromUser(Chat.User, _translations[index].GetEnRu());
+            
+            var buttons = CreateButtons();
+
+            await Chat.EditMessageButtons(messageId,buttons.ToArray());
+        }
+
+        private IEnumerable<InlineKeyboardButton[]> CreateButtons()
+        {
+            var buttons = _translations.Select((t, i) => new[] {AddWordHelper.CreateButtonFor(t, _areSelected[i])});
+
+            if (_isLastMessageInTheChat)
+                buttons = buttons
+                    .Append(new[] {InlineButtons.MainMenu(Chat.Texts), InlineButtons.Translation(Chat.Texts)});
+            return buttons;
+        }
+
         /// <summary>
-        /// User requests next translation.
+        /// User make next request
         /// </summary>
         public void OnNextTranslationRequest()
         {
             _isLastMessageInTheChat = false;
-            if (_selectedTranslationsCount == 0)
+            if (_originMessageId!=null)
             {
-                // run timer that automaticly selects first translation
-                // if it is not selected yet
-                var _ = RunAutoTranslateTimer();
-            }
-        }
-        private async Task RunAutoTranslateTimer()
-        {
-            int delay = 10000;
-            await Task.Delay(delay);
-            if ( _selectedTranslationsCount == 0 && _originMessageId.HasValue)
-            {
-                // if user did not select the word before for {delay} milliseconds 
-                // than we automaticly add first translation
-                // but we can not be sure that it is new word for user
-                // so we give score '3.7' to that pair, witch means 'familiar word'
-                // and user needs at least one or two question to pass the word
-                await SelectIthTranslation(
-                    messageId: _originMessageId.Value,
-                    index: 0,
-                    score: 3.7);
+                //hide "menu" and "translation" buttons
+                var buttons = CreateButtons();
+                var t = Chat.EditMessageButtons(_originMessageId.Value, buttons.ToArray());
             }
         }
         /// <summary>
         /// Origin message of translation
         /// </summary>
         private int? _originMessageId;
-        public void SetMessageId(int messageId) => _originMessageId = messageId;
-        /// <summary>
-        /// Flow was interrupted
-        /// </summary>
-        public void OnFlowInterrupted()
-        {
-            _isLastMessageInTheChat = false;
-        }
+        public async Task SendTranslationMessage(string markdownMessage)
+            =>  _originMessageId = await Chat.SendMarkdownMessageAsync(markdownMessage, CreateButtons().ToArray());
     }
 }

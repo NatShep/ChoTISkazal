@@ -117,7 +117,9 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
-
+        public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
+            => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
+        
         public string YouHaveLearnedWords(in int count)
         => $"You have learned {count} words";
 

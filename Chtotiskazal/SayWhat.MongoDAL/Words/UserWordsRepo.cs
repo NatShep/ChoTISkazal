@@ -143,5 +143,8 @@ namespace SayWhat.MongoDAL.Words
                 Builders<UserWordModel>.Filter.Eq(OriginWordFieldName,"statment"))).ToList());
             return learningWords;
         }
+
+        public Task Remove(UserWordModel model) 
+            => Collection.DeleteOneAsync(Builders<UserWordModel>.Filter.Eq("Id", model.Id));
     }
 }
