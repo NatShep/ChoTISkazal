@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             msg = ($"_{chat.Texts.TranslationIs} _\r\n" +
                    $"*\"{word.Word}\"*\r\n\r\n" +
-                   $"`{chat.Texts.DidYouGuess}`").Replace(".", "\\.");
+                   $"{chat.Texts.DidYouGuess}").Replace(".", "\\.");
             await chat.SendMarkdownMessageAsync(msg,
                                 new[]{
                                     new[]{
