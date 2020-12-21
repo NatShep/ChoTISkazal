@@ -105,7 +105,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "\uD83D\uDE09Да, я бесплатен\\. Меня сделали для себя и для друзей\\. " +
                                                    "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
 
-        public string MainMenuText { get; } = "Я переводчик и учитель " +
+        public string MainMenuTextMarkdown { get; } = "Я переводчик и учитель " +
                                               "Можешь использовать меня как русско-английский переводчик. " +
                                               "Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать\\!\"* или " +
                                               "набери команду /learn что бы начать учить переведенные ранее слова";
@@ -120,6 +120,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
         public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+
             => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
         
         public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)

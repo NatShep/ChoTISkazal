@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string NoTranslationsFound { get; } = "No translations found. Check the word and try again";
 
-        public string LearningCarefullyStudyTheListMarkdown { get; } = "*Learning*\r\n\r\n" +
+        public string LearningCarefullyStudyTheListMarkdown { get; } = "*Learning*\r\n"+
                                                                     "Carefully study the words in the list below:";
         
         public object LearningDone { get; } = "Learning done";
@@ -101,13 +101,14 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. " +
                                                    "And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!";
 
-        public string MainMenuText { get; } = "I am a translator and teacher. " +
-                                                   "First you use me as a regular translator. " +
-                                                   "Then, when you have time, " +
-                                                   "click on the 'Learn' button or /learn command to start training translated words.";
+        public string MainMenuTextMarkdown { get; } = "I am a translator and teacher\\.\r\n" +
+                                                   "First you can use me as a regular translator\\." +
+                                                   "After that " +
+                                                   "learn this words and it helps you to speak English easily\\.\r\n\r\n" +
+                                                   "*Just try it and see for yourself\\!*";
 
         public string ActionIsNotAllowed { get;  } = "action is not allowed";
-        public string OopsSomethingGoesWrong { get;  } = "Oops. something goes wrong ;(";
+        public string OopsSomethingGoesWrong { get;  } = "Oops. Something goes wrong ;( Write /start to go to main menu.";
 
         public string HereAreTheTranslationMarkdown(string word, string? tr)
             => $"_Here are the translations\\._ \r\n" +
@@ -116,10 +117,11 @@ namespace Chotiskazal.Bot.InterfaceLang
                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
         public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
         public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
-        
+
         public string YouHaveLearnedWords(in int count)
         => $"You have learned {count} words";
 

@@ -87,6 +87,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
                     Chat.Texts.MessageAfterTranslationIsSelected(allTranslations[index]));
             }
+
             else
             {
                 selectionMarks[index] = false;

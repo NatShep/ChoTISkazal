@@ -46,6 +46,7 @@ namespace Chotiskazal.Bot.ChatFlows
             else
                 message = Chat.Texts.MessageAfterTranslationIsDeselected(_translations[index]);
 
+
             await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id, message);
         }
 

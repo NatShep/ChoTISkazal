@@ -84,7 +84,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         object StatsThisDay { get; }
         object StatsActivityForLast7Weeks { get; }
         string HelpMarkdown { get; }
-        string MainMenuText { get; }
+        string MainMenuTextMarkdown { get; }
         string ActionIsNotAllowed { get; }
         string OopsSomethingGoesWrong { get; }
         string InterfaceLanguageSetupped { get; }
