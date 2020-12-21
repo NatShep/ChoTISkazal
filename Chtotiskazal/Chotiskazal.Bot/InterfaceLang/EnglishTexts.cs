@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string NoTranslationsFound { get; } = "No translations found. Check the word and try again";
 
-        public string LearningCarefullyStudyTheListMarkdown { get; } = "*Learning*\r\n\r\n" +
+        public string LearningCarefullyStudyTheListMarkdown { get; } = "*Learning*\r\n"+
                                                                     "Carefully study the words in the list below:";
         
         public object LearningDone { get; } = "Learning done";
@@ -101,10 +101,10 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. " +
                                                    "And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!";
 
-        public string MainMenuTextMarkdown { get; } = "_I am a translator and teacher\\.\r\n" +
+        public string MainMenuTextMarkdown { get; } = "I am a translator and teacher\\.\r\n" +
                                                    "First you can use me as a regular translator\\." +
                                                    "After that " +
-                                                   "you learn this words and it helps you to speak English very well\\._\r\n" +
+                                                   "you learn this words and it helps you to speak English easly\\.\r\n\r\n" +
                                                    "*Just try it and see for yourself\\!*";
 
         public string ActionIsNotAllowed { get;  } = "action is not allowed";
