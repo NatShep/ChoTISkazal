@@ -111,10 +111,10 @@ namespace Chotiskazal.Bot
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
                     set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
-                    set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+                 //   set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
                     set.MongoConnectionString = "mongodb://localhost:27017/";
                     set.MongoDbName = "swdumbp";
-              //      set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
+                    set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
                     set.ControlPanelChatId = "326823645";
                 }
 
