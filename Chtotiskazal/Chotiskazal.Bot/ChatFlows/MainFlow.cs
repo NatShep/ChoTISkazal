@@ -5,9 +5,9 @@ using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    public class ChatRoomFlow
+    public class MainFlow
     {
-        public ChatRoomFlow(ChatIO chatIo,
+        public MainFlow(ChatIO chatIo,
             TelegramUserInfo userInfo,
             BotSettings settings,
             AddWordService addWordsService,
@@ -127,18 +127,18 @@ namespace Chotiskazal.Bot.ChatFlows
             await ChatIo.SendMarkdownMessageAsync(Chat.Texts.HelpMarkdown,
                 new[]{new[]{
                         InlineButtons.Exam(Chat.Texts), InlineButtons.Stats(Chat.Texts)},
-                    new[]{ InlineButtons.Translation(Chat.Texts)}});
+                    new[]{ InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}});
         }
 
         private async Task ShowMainMenu()
         {
             while (true)
             {
-                var translationBtn = InlineButtons.Translation(Chat.Texts);
+                var translationBtn = InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}");
                 var examBtn = InlineButtons.Exam(Chat.Texts);
                 var statsBtn = InlineButtons.Stats(Chat.Texts);
                 var helpBtn = InlineButtons.HowToUse(Chat.Texts);
-                await ChatIo.SendMarkdownMessageAsync(Chat.Texts.MainMenuTextMarkdown,
+                await ChatIo.SendMarkdownMessageAsync($"{Emojis.MainMenu} {Chat.Texts.MainMenuTextMarkdown}",
                     new[]{
                         new[]{translationBtn },
                         new[]{examBtn },

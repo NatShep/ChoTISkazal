@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot
 {
     static class Program {
         private static TelegramBotClient _botClient;
-        private static readonly ConcurrentDictionary<long, ChatRoomFlow> Chats = new ConcurrentDictionary<long,ChatRoomFlow>();
+        private static readonly ConcurrentDictionary<long, MainFlow> Chats = new ConcurrentDictionary<long,MainFlow>();
         private static AddWordService _addWordService;
         private static DictionaryService _dictionaryService;
         private static UsersWordsService _userWordService;
@@ -110,8 +110,8 @@ namespace Chotiskazal.Bot
                 if (substitudeDebugConfig)
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
-                 //   set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
-                    set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+                    set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
+                        //   set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
                     set.MongoConnectionString = "mongodb://localhost:27017/";
                     set.MongoDbName = "swdumbp";
                     set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
@@ -168,7 +168,7 @@ namespace Chotiskazal.Bot
             }
           
         }
-        private static ChatRoomFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
+        private static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;
@@ -183,9 +183,9 @@ namespace Chotiskazal.Bot
             RunChatRoom(chat, newChatRoom);
             return newChatRoom;
         }
-        private static void RunChatRoom(Chat chat, ChatRoomFlow newChatRoom)
+        private static void RunChatRoom(Chat chat, MainFlow newMain)
         {
-            var task = newChatRoom.Run();
+            var task = newMain.Run();
             task.ContinueWith(
                 (t) =>
                 {
@@ -230,9 +230,9 @@ namespace Chotiskazal.Bot
             }
         }
         
-        private static ChatRoomFlow CreateChatRoom(Chat chat)
+        private static MainFlow CreateChatRoom(Chat chat)
         {
-            var newChatRoom = new ChatRoomFlow(
+            var newChatRoom = new MainFlow(
                 new ChatIO(_botClient, chat), 
                 new TelegramUserInfo(chat.Id, chat.FirstName, chat.LastName, chat.Username), 
                 _settings,

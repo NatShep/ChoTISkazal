@@ -161,8 +161,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 gamingScoreBefore);
             
             await Chat.SendMarkdownMessageAsync(doneMessage.EscapeForMarkdown(),
-            new[]{new[] { InlineButtons.ExamText($"🔁 {Chat.Texts.OneMoreLearnButton}")}, 
-                  new[] { InlineButtons.Stats(Chat.Texts),InlineButtons.Translation(Chat.Texts)}});
+            new[]{new[] { InlineButtons.Exam($"🔁 {Chat.Texts.OneMoreLearnButton}")}, 
+                  new[] { InlineButtons.Stats(Chat.Texts),InlineButtons.Translation(Chat.Texts.TranslateButton+" "+Emojis.Translate)}});
             
             await updateUserTask;
             await finializeScoreUpdateTask;

@@ -70,7 +70,11 @@ namespace Chotiskazal.Bot.ChatFlows
 
             if (_isLastMessageInTheChat)
                 buttons = buttons
-                    .Append(new[] {InlineButtons.MainMenu(Chat.Texts), InlineButtons.Translation(Chat.Texts)});
+                    .Append(new[]
+                    {
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"), 
+                        InlineButtons.Translation($"{Chat.Texts.ContinueTranslateButton} {Emojis.Translate}")
+                    });
             return buttons;
         }
 

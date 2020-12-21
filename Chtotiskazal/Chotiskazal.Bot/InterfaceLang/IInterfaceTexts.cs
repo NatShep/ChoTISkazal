@@ -49,6 +49,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         string PassedHideousDefaultMarkdown { get; }
         string IgnoredHideousDefault { get; }
         string TranslateButton { get; }
+        string ContinueTranslateButton { get; }
         string LearnButton { get; }
         string StatsButton { get; }
         string HelpButton { get; }

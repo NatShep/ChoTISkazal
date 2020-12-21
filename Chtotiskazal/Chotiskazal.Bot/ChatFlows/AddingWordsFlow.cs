@@ -1,18 +1,15 @@
 ﻿#nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    internal class AddingWordsMode
-    {
+    internal class AddingWordsMode {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
@@ -39,7 +36,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             if (word == null)
             {
-                await Chat.SendMessageAsync(Chat.Texts.EnterWordOrStart);
+                await Chat.SendMessageAsync($"{Emojis.Translate} {Chat.Texts.EnterWordOrStart}");
                 word = await Chat.WaitUserTextInputAsync();
             }
 
@@ -74,11 +71,14 @@ namespace Chotiskazal.Bot.ChatFlows
         
             // get button selection marks. It works only for english words!
             bool[] selectionMarks = GetSelectionMarks(translations, alreadyExistUserWord);
-            
-            if(!selectionMarks[0])
+
+            if (!selectionMarks[0])
+            {
                 // Automaticly select first translation if it was not selected before
                 await _addWordService.AddTranslationToUser(Chat.User, translations[0]);
-            
+                selectionMarks[0] = true;
+            }
+
             // getting first transcription
             var transcription = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
                         

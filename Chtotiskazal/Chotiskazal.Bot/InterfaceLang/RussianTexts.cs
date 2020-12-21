@@ -144,6 +144,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string CancelButton { get; } = "Отмена";
         public object OneMoreLearnButton { get; } = "Еще разок";
         public string TranslateButton { get; } = "Перевод";
+        public string ContinueTranslateButton { get; } = "Продолжить";
+
         public string LearnButton { get; } = "Ботать!";
         public string StatsButton { get; } = "Статы";
         public string HelpButton { get; } = "Помощь";
