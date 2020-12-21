@@ -24,7 +24,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToArray();
 
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                        "`"+chat.Texts.ChooseTheTranslation+"`";
+                        ""+chat.Texts.ChooseTheTranslation+"";
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
             
             var choice = await chat.TryWaitInlineIntKeyboardInput();

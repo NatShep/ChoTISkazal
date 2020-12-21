@@ -37,7 +37,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                     "`"+ chat.Texts.ChooseTheTranscription+"`";
+                     ""+ chat.Texts.ChooseTheTranscription+"";
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();

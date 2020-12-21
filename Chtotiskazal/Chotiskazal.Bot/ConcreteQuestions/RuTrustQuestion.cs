@@ -17,7 +17,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      "`"+chat.Texts.DoYouKnowTranslation+"`";
+                      ""+chat.Texts.DoYouKnowTranslation+"";
             var id = Rand.Next();
             
             await chat.SendMarkdownMessageAsync(msg,
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs} _\r\n" +
                                        $"*\"{word.Word}\"*\r\n\r\n" +
-                                       $"`{chat.Texts.DidYouGuess}`",
+                                       $"{chat.Texts.DidYouGuess}",
                                 new[]{
                                     new[]{
                                         new InlineKeyboardButton {

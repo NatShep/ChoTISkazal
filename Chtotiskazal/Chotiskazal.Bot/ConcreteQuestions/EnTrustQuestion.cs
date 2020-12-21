@@ -18,7 +18,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             UserWordModel[] examList)
         {
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      "`"+chat.Texts.DoYouKnowTranslation+"`";
+                      ""+chat.Texts.DoYouKnowTranslation+"";
             var id = Rand.Next();
             await chat.SendMarkdownMessageAsync(msg,
                 new InlineKeyboardButton()
@@ -44,7 +44,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs}_ \r\n" +
                                         $"*\"{word.AllTranslationsAsSingleString}\"*\r\n\r\n" +
-                                        $"`{chat.Texts.DidYouGuess}`",
+                                        $"{chat.Texts.DidYouGuess}",
                                             new[] {
                                                 new[] {
                                                     new InlineKeyboardButton {

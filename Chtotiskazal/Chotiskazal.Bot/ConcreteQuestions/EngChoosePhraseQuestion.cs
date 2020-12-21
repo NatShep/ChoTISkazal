@@ -40,7 +40,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToArray();
             
             var msg = $"\\=\\=\\=\\=\\=\\>  *{targetPhrase.OriginPhrase}*  \\<\\=\\=\\=\\=\\=\\=\r\n" +
-                      $"`{chat.Texts.ChooseTheTranslation}`";
+                      $"{chat.Texts.ChooseTheTranslation}";
             
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
             

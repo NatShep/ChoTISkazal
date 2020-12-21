@@ -31,7 +31,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
             sb.AppendLine($"*\"{replaced}\"*");
             sb.AppendLine();
-            sb.AppendLine($"`{chat.Texts.EnterMissingWord}: `");
+            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
             var msg = sb.ToString().Replace(".","\\.");
             await chat.SendMarkdownMessageAsync(sb.ToString());
 
