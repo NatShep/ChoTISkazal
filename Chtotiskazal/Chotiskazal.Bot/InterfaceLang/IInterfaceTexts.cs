@@ -10,14 +10,15 @@ namespace Chotiskazal.Bot.InterfaceLang
         string ChooseTheTranslation { get; }
         string translatesAs { get; }
         string ChooseMissingWord { get; }
-        string Passed1 { get; }
+        string Passed1Markdown { get; }
         string OriginWas { get; }
         string EnterMissingWord { get; }
         string TypoAlmostRight { get; }
-        object FailedOriginExampleWas { get; }
+        object FailedOriginExampleWasMarkdown { get; }
         object FailedOriginExampleWas2 { get; }
+        object FailedOriginExampleWas2Markdown { get; }
         string OutOfScopeTranslation { get; }
-        string FailedTranslationWas { get; }
+        string FailedTranslationWasMarkdown { get; }
         string ItIsNotRightTryAgain { get; }
         string SeeTheTranslation { get; }
         string DoYouKnowTranslation { get; }
@@ -25,11 +26,11 @@ namespace Chotiskazal.Bot.InterfaceLang
         string DidYouGuess { get; }
         string YesButton { get; }
         string NoButton { get; }
-        string PassedOpenIHopeYouWereHonest { get; }
-        string PassedHideousWell { get; }
+        string PassedOpenIHopeYouWereHonestMarkdown { get; }
+        string PassedHideousWellMarkdown { get; }
         string PassedHideousWell2 { get; }
-        string FailedOpenButYouWereHonest { get; }
-        string FailedHideousHonestyIsGold { get; }
+        string FailedOpenButYouWereHonestMarkdown { get; }
+        string FailedHideousHonestyIsGoldMarkdown { get; }
         string IsItRightTranslation { get; }
         string Mistaken { get; }
         string ChooseWhichWordHasThisTranscription { get; }
@@ -40,12 +41,12 @@ namespace Chotiskazal.Bot.InterfaceLang
         string CorrectTranslationButQuestionWasAbout { get; }
         string LetsTryAgain { get; }
         string ChooseTheTranscription { get; }
-        string WordsInPhraseAreShufledWriteThemInOrder { get; }
-        string FailedDefault { get; }
-        string PassedDefault { get; }
-        string IgnoredDefault { get; }
-        string FailedHideousDefault { get; }
-        string PassedHideousDefault { get; }
+        string WordsInPhraseAreShuffledWriteThemInOrder { get; }
+        string FailedDefaultMarkdown { get; }
+        string PassedDefaultMarkdown { get; }
+        string IgnoredDefaultMarkdown { get; }
+        string FailedHideousDefaultMarkdown { get; }
+        string PassedHideousDefaultMarkdown { get; }
         string IgnoredHideousDefault { get; }
         string TranslateButton { get; }
         string LearnButton { get; }
@@ -89,8 +90,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         string OopsSomethingGoesWrong { get; }
         string InterfaceLanguageSetupped { get; }
         string OutOfScopeWithCandidate(string otherMeaning);
-        string YouHaveATypoLetsTryAgain(string text);
-        string FailedMistaken(string text);
+        string YouHaveATypoLetsTryAgainMarkdown(string text);
+        string FailedMistakenMarkdown(string text);
         string HereAreTheTranslationMarkdown(string word, string? tr);
         string MessageAfterTranslationIsSelected(DictionaryTranslation translation);
         string YouHaveLearnedWords(in int count);

@@ -17,10 +17,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
-            var msg = $"=====>   {word.Word}    <=====\r\n" +
-                      chat.Texts.DoYouKnowTranslation;
+            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+                      "`"+chat.Texts.DoYouKnowTranslation+"`";
             var id = Rand.Next();
-            var _ = chat.SendMessageAsync(msg,
+            await chat.SendMarkdownMessageAsync(msg,
                 new InlineKeyboardButton()
                 {
                     CallbackData = id.ToString(),
@@ -42,9 +42,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 }
             }
 
-            _ = chat.SendMessageAsync($"{chat.Texts.TranslationIs} \r\n" +
-                                        $"{word.AllTranslationsAsSingleString}\r\n" +
-                                        $" {chat.Texts.DidYouGuess}",
+            await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs}_ \r\n" +
+                                        $"*\"{word.AllTranslationsAsSingleString}\"*\r\n\r\n" +
+                                        $"`{chat.Texts.DidYouGuess}`",
                                             new[] {
                                                 new[] {
                                                     new InlineKeyboardButton {
@@ -61,8 +61,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var choice = await chat.WaitInlineIntKeyboardInput();
 
             return choice == 1 ? 
-                QuestionResult.Passed(chat.Texts.PassedOpenIHopeYouWereHonest, chat.Texts.PassedHideousWell ) 
-                : QuestionResult.Failed(chat.Texts.FailedOpenButYouWereHonest, chat.Texts.FailedHideousHonestyIsGold);
+                QuestionResult.Passed(chat.Texts.PassedOpenIHopeYouWereHonestMarkdown, chat.Texts.PassedHideousWellMarkdown ) 
+                : QuestionResult.Failed(chat.Texts.FailedOpenButYouWereHonestMarkdown, chat.Texts.FailedHideousHonestyIsGoldMarkdown);
         }
     }
 }

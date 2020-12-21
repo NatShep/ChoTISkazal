@@ -1,23 +1,24 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuWriteQuestion : IQuestion
+    public class RuWriteSingleTarnslationQuestion : IQuestion
     {
         private readonly DictionaryService _dictionaryService;
 
-        public RuWriteQuestion(DictionaryService dictionaryService)
+        public RuWriteSingleTarnslationQuestion(DictionaryService dictionaryService)
         {
             _dictionaryService = dictionaryService;
         }
         public bool NeedClearScreen => false;
-        public string Name => "Ru Write";
+        public string Name => "Ru Write Single Translation";
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
@@ -27,7 +28,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 && word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +
+            await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItem().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
                                           "`"+chat.Texts.WriteTheTranslation+"`");
             var enUserEntry = await chat.WaitUserTextInputAsync();
 

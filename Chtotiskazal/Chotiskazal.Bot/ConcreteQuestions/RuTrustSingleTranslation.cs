@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
@@ -8,16 +8,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuTrustQuestion : IQuestion
+    public class RuTrustSingleTranslationQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
 
-        public string Name => "Ru trust";
+        public string Name => "Ru trust single translation";
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
-            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      "`"+chat.Texts.DoYouKnowTranslation+"`";
+            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItem().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+                      "`"+chat.Texts.DoYouKnowTranslation+"`".Replace(".","\\.");
             var id = Rand.Next();
             
             await chat.SendMarkdownMessageAsync(msg,
@@ -40,9 +40,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 }
             }
 
-            await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs} _\r\n" +
-                                       $"*\"{word.Word}\"*\r\n\r\n" +
-                                       $"`{chat.Texts.DidYouGuess}`",
+            msg = ($"_{chat.Texts.TranslationIs} _\r\n" +
+                   $"*\"{word.Word}\"*\r\n\r\n" +
+                   $"`{chat.Texts.DidYouGuess}`").Replace(".", "\\.");
+            await chat.SendMarkdownMessageAsync(msg,
                                 new[]{
                                     new[]{
                                         new InlineKeyboardButton {

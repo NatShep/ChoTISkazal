@@ -25,18 +25,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Select(e=>e.OriginWord)
                 .ToList();
             
-            var replaced =  phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
+            var replaced =  phrase.OriginPhrase.Replace(phrase.OriginWord, "\\.\\.\\.");
             if (replaced == phrase.OriginPhrase)
                 return QuestionResult.Impossible;
             
             var sb = new StringBuilder();
             
-            sb.AppendLine($"\"{phrase.TranslatedPhrase}\"");
-            sb.AppendLine($" {chat.Texts.translatesAs} ");
-            sb.AppendLine($"\"{replaced}\"");
+            sb.AppendLine($"*\"{phrase.TranslatedPhrase}\"*");
+            sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
+            sb.AppendLine($"*\"{replaced}\"*");
             sb.AppendLine();
-            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
-            await chat.SendMessageAsync(sb.ToString());
+            sb.AppendLine($"`{chat.Texts.EnterMissingWord}: `");
+            await chat.SendMarkdownMessageAsync(sb.ToString());
             while (true)
             {
                 var enter = await chat.WaitUserTextInputAsync();
@@ -49,7 +49,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     await chat.SendMessageAsync(chat.Texts.TypoAlmostRight);
                     return QuestionResult.RetryThisQuestion;
                 }
-                return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWas} \"{phrase.OriginPhrase}\"", 
+                return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWasMarkdown}\r\n*\"{phrase.OriginPhrase}\"*", 
                     chat.Texts);
             }
         }

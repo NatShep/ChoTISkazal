@@ -24,10 +24,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList()
                 .GetRandomItem();
             
-            var msg = $"'{word.Word}' {chat.Texts.translatesAs} '{translation}'.\r\n"+
-                             $"{chat.Texts.IsItRightTranslation}";
+            var msg = $"*\"{word.Word}\"*\r\n" +
+                      $"    _{chat.Texts.translatesAs}_\r\n" +
+                      $"*\"{translation}\"*\r\n\r\n"+
+                             $"`{chat.Texts.IsItRightTranslation}`";
 
-            _ = chat.SendMessageAsync(msg,
+            await chat.SendMarkdownMessageAsync(msg,
                 new[] {
                     new[] {
                         new InlineKeyboardButton {
@@ -52,7 +54,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             else
             {
                 return QuestionResult.Failed(
-                    $"{chat.Texts.Mistaken}. '{word.Word}' {chat.Texts.translatesAs} '{word.TextTranslations.FirstOrDefault()}' ", 
+                    $"{chat.Texts.Mistaken}\\.\r\n\"{word.Word}\" {chat.Texts.translatesAs} " +
+                    $"*\"{word.TextTranslations.FirstOrDefault()}\"* ", 
                     chat.Texts);
             }
         }

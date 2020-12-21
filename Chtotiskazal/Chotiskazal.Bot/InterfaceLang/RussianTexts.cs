@@ -16,14 +16,17 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string OriginWas { get; } = "Правильный ответ";
         public string EnterMissingWord { get; } = "Введите пропущенное слово";
         public string TypoAlmostRight { get; } = "Очепяточка. Попробуем еще разок";
+        
         public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
 
         public string OutOfScopeWithCandidate(string otherMeaning)
             => $"Перевод то правильный, но учим мы не его (имелось ввиду '{otherMeaning}'?). Ожидаемые переводы";
+
+
         public string OutOfScopeTranslation { get; } 
             = $"Перевод то правильный, но учим мы не его. Ожидаемые переводы";
 
-        public string FailedTranslationWas { get; } = "Правильный перевод";
+        public string FailedTranslationWasMarkdown { get; } = "Правильный перевод";
         public string ItIsNotRightTryAgain { get; } = "Неа. Давай попробуем еще раз";
         public string SeeTheTranslation { get; } = "Посмотреть перевод";
         public string DoYouKnowTranslation { get; } = $"Вы знаете перевод?";
@@ -44,30 +47,31 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string LetsTryAgain { get; } = "Давайте еще разок";
         public string ChooseTheTranscription { get; } = "Выберите транскрипцию";
-        public string WordsInPhraseAreShufledWriteThemInOrder { get; } =
+        public string WordsInPhraseAreShuffledWriteThemInOrder { get; } =
             "Слава во фразе перепутаны местами. Напишите эту фразу";
 
      
-        public string YouHaveATypoLetsTryAgain(string text)
+        public string YouHaveATypoLetsTryAgainMarkdown(string text)
             => $"Ошибочка. Правильно будет '{text}'. Давайте еще разок.";
     
         #region questionResult
-        public string Passed1 { get; } = "Дыа!";
-        public string PassedOpenIHopeYouWereHonest { get; } = "Надеюсь вы были честны с собой";
-        public string PassedHideousWell { get; } = "Неплохо";
+        public string Passed1Markdown { get; } = "Дыа!";
+        public string PassedOpenIHopeYouWereHonestMarkdown { get; } = "Надеюсь вы были честны с собой";
+        public string PassedHideousWellMarkdown { get; } = "Неплохо";
         public string PassedHideousWell2 { get; } = "Отлично";
-        public string FailedOpenButYouWereHonest { get; } = "Вы хотя бы были честны...";
-        public string FailedHideousHonestyIsGold { get; } = "Искренность - золото";
-        public string FailedMistaken(string text)
+        public string FailedOpenButYouWereHonestMarkdown { get; } = "Вы хотя бы были честны...";
+        public string FailedHideousHonestyIsGoldMarkdown { get; } = "Искренность - золото";
+        public string FailedMistakenMarkdown(string text)
             => $"Ой ой ой. Правильно будет - '{text}'";
-        public object FailedOriginExampleWas { get; } = "Неа. Фраза была";
+        public object FailedOriginExampleWas2Markdown { get; }= "Неа. Фраза была";
+        public object FailedOriginExampleWasMarkdown { get; } = "Фраза была";
         public object FailedOriginExampleWas2 { get; } = "Фраза была";
-        public string FailedDefault { get; }= "Ой не...";
-        public string PassedDefault { get; }= "И это правильный ответ";
-        public string IgnoredDefault { get; }= "Ну такое ...";
+        public string FailedDefaultMarkdown { get; }= "Ой не...";
+        public string PassedDefaultMarkdown { get; }= "И это правильный ответ";
+        public string IgnoredDefaultMarkdown { get; }= "Ну такое ...";
 
-        public string FailedHideousDefault { get; }= "Последний ответ был не верен";
-        public string PassedHideousDefault { get; }= "Последний ответ был верен";
+        public string FailedHideousDefaultMarkdown { get; }= "Последний ответ был не верен";
+        public string PassedHideousDefaultMarkdown { get; }= "Последний ответ был верен";
         
         public string IgnoredHideousDefault { get; }= "Ну не совсем";
          #endregion

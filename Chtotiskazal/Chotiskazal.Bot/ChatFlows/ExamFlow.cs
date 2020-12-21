@@ -140,7 +140,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
 
                 if (!string.IsNullOrWhiteSpace(result.OpenResultsText))
-                    await Chat.SendMessageAsync(result.OpenResultsText);
+                    await Chat.SendMarkdownMessageAsync(result.OpenResultsText);
 
                 lastExamResult = result;
 

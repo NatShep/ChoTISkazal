@@ -29,7 +29,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chat.SendMessageAsync($"=====>   {word.Word}    <=====\r\n{chat.Texts.WriteTheTranslation}");
+            await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+                                                $"`{chat.Texts.WriteTheTranslation}`");
             var translation = await chat.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
@@ -42,10 +43,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 case StringsCompareResult.Equal:
                     return QuestionResult.Passed(chat.Texts);
                 case StringsCompareResult.SmallMistakes:
-                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(text));
+                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(text));
                     return QuestionResult.RetryThisQuestion;
                 case StringsCompareResult.BigMistakes:
-                    return QuestionResult.Failed(chat.Texts.FailedMistaken(text), 
+                    return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(text), 
                         chat.Texts);
             }
             var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
@@ -66,7 +67,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
 
             return QuestionResult.Failed(
-                chat.Texts.FailedTranslationWas +$" '{word.AllTranslationsAsSingleString}'", 
+                chat.Texts.FailedTranslationWasMarkdown +$" '{word.AllTranslationsAsSingleString}'", 
                 chat.Texts);
         }
     }

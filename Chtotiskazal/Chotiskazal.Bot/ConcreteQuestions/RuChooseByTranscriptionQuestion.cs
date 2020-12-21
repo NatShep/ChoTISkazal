@@ -28,9 +28,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList();
 
 
-            var msg = $"=====>   {originTranslation.Transcription}    <=====\r\n" +
-                      chat.Texts.ChooseWhichWordHasThisTranscription;
-            await chat.SendMessageAsync(msg, InlineButtons.CreateVariants(variants));
+            var msg = $"\\=\\=\\=\\=\\=\\>   `{originTranslation.Transcription}`    \\<\\=\\=\\=\\=\\=\r\n" +
+                      "`"+chat.Texts.ChooseWhichWordHasThisTranscription+"`";
+            await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
