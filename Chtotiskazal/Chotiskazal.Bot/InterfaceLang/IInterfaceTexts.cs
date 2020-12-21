@@ -36,7 +36,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         string ChooseWhichWordHasThisTranscription { get; }
         string RetryAlmostRightWithTypo { get; }
         string ShowTheTranslationButton { get; }
-        string WriteTheTranslation { get; }
+        string WriteTheTranslationMarkdown { get; }
         string RightTranslationWas { get; }
         string CorrectTranslationButQuestionWasAbout { get; }
         string LetsTryAgain { get; }
@@ -89,8 +89,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         string ActionIsNotAllowed { get; }
         string OopsSomethingGoesWrong { get; }
         string InterfaceLanguageSetupped { get; }
-        string OutOfScopeWithCandidate(string otherMeaning);
-        string YouHaveATypoLetsTryAgain(string text);
+        string OutOfScopeWithCandidateMarkdown(string otherMeaning);
+        string YouHaveATypoLetsTryAgainMarkdown(string text);
         string FailedMistakenMarkdown(string text);
         string HereAreTheTranslationMarkdown(string word, string? tr);
         string MessageAfterTranslationIsSelected(DictionaryTranslation translation);

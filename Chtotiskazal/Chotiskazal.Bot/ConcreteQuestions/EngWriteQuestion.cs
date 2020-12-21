@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                                                $"`{chat.Texts.WriteTheTranslation}`");
+                                                $"`{chat.Texts.WriteTheTranslationMarkdown}`");
             var translation = await chat.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(translation))
@@ -43,7 +43,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 case StringsCompareResult.Equal:
                     return QuestionResult.Passed(chat.Texts);
                 case StringsCompareResult.SmallMistakes:
-                    await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(text));
+                    await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(text));
                     return QuestionResult.RetryThisQuestion;
                 case StringsCompareResult.BigMistakes:
                     return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(text), 
@@ -60,9 +60,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)
             {
-                await chat.SendMessageAsync(
-                    chat.Texts.OutOfScopeWithCandidate(otherMeaning)+": "+
-                    word.AllTranslationsAsSingleString);
+                await chat.SendMarkdownMessageAsync(
+                    chat.Texts.OutOfScopeWithCandidateMarkdown(otherMeaning)+": "+
+                    "*\""+word.AllTranslationsAsSingleString+"\"*");
                 return QuestionResult.RetryThisQuestion;
             }
 

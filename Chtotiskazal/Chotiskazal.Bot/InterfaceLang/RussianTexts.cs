@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         
         public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
 
-        public string OutOfScopeWithCandidate(string otherMeaning)
+        public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Перевод то правильный, но учим мы не его (имелось ввиду '{otherMeaning}'?). Ожидаемые переводы";
 
 
@@ -39,7 +39,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string RetryAlmostRightWithTypo { get; } 
             = "Опечатка. Давайте заново.";
         public string ShowTheTranslationButton { get; } = "Показать перевод";
-        public string WriteTheTranslation { get; } = $"Напишите перевод... ";
+        public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод... ";
         public string RightTranslationWas { get; } = "А правильный перевод это";
 
         public string CorrectTranslationButQuestionWasAbout { get; } =
@@ -51,7 +51,7 @@ namespace Chotiskazal.Bot.InterfaceLang
             "Слава во фразе перепутаны местами. Напишите эту фразу";
 
      
-        public string YouHaveATypoLetsTryAgain(string text)
+        public string YouHaveATypoLetsTryAgainMarkdown(string text)
             => $"Ошибочка. Правильно будет '{text}'. Давайте еще разок.";
     
         #region questionResult

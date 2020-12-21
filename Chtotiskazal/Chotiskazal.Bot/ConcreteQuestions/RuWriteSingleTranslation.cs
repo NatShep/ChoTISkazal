@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItem().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                                          "`"+chat.Texts.WriteTheTranslation+"`");
+                                          "`"+chat.Texts.WriteTheTranslationMarkdown+"`");
             var enUserEntry = await chat.WaitUserTextInputAsync();
 
             if (string.IsNullOrEmpty(enUserEntry))
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             if (comparation == StringsCompareResult.SmallMistakes)
             {
-                await chat.SendMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(word.Word));
+                await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(word.Word));
                 return QuestionResult.RetryThisQuestion;
             }
             

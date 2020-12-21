@@ -14,11 +14,9 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string OriginWas { get; } = "Origin was";
         public string EnterMissingWord { get; } = "Enter missing word";
         public string TypoAlmostRight { get; } = "Almost right. But you have a typo. Let's try again";
-
         public string InterfaceLanguageSetupped { get; } = "Interface language: English";
-
-        public string OutOfScopeWithCandidate(string otherMeaning)
-            => $"Chosen translation is out of scope (did you mean '{otherMeaning}'?). Expected translations are";
+        public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
+            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
         public string OutOfScopeTranslation { get; } =
             "Chosen translation is out of scope (but it is correct). Expected translations are";
         public string FailedTranslationWasMarkdown { get; } = "The translation was";
@@ -32,7 +30,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ChooseWhichWordHasThisTranscription { get; } = "Choose which word has this transcription";
         public string RetryAlmostRightWithTypo { get; } = "Almost right. But you have a typo. Let's try again";
         public string ShowTheTranslationButton { get; } = "Show the translation";
-        public string WriteTheTranslation { get; } = $"Write the translation... ";
+        public string WriteTheTranslationMarkdown { get; } = $"Write the translation\\.\\.\\. ";
         public string RightTranslationWas { get; } = "The right translation was";
         public string CorrectTranslationButQuestionWasAbout { get; } =
             "Your translation was correct, but the question was about the word";
@@ -40,8 +38,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ChooseTheTranscription { get; } = "Choose the transcription";
         public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
             "Words in phrase are shuffled\\. Write them in correct order";
-        public string YouHaveATypoLetsTryAgain(string text)
-            => $"You have a typo. Correct spelling is '{text}'. Let's try again.";
+        public string YouHaveATypoLetsTryAgainMarkdown(string text)
+            => $"You have a typo\\. Correct spelling is *\"{text}\"*\\. Let's try again\\.";
        
         #region questionResult
         public string Passed1Markdown { get; } = "Ayeee\\!";
