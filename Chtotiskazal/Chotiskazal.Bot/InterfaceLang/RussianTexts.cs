@@ -20,7 +20,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
 
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-            => $"Перевод то правильный, но учим мы не его (имелось ввиду '{otherMeaning}'?). Ожидаемые переводы";
+            => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 
 
         public string OutOfScopeTranslation { get; } 
@@ -48,27 +48,27 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string LetsTryAgain { get; } = "Давайте еще разок";
         public string ChooseTheTranscription { get; } = "Выберите транскрипцию";
         public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
-            "Слава во фразе перепутаны местами. Напишите эту фразу";
+            "Слава во фразе перепутаны местами\\. Напишите эту фразу";
 
      
         public string YouHaveATypoLetsTryAgainMarkdown(string text)
-            => $"Ошибочка. Правильно будет '{text}'. Давайте еще разок.";
+            => $"Ошибочка\\. Правильно будет *\"{text}\"*\\. Давайте еще разок\\.";
     
         #region questionResult
-        public string Passed1Markdown { get; } = "Дыа!";
+        public string Passed1Markdown { get; } = "Дыа\\!";
         public string PassedOpenIHopeYouWereHonestMarkdown { get; } = "Надеюсь вы были честны с собой";
         public string PassedHideousWellMarkdown { get; } = "Неплохо";
         public string PassedHideousWell2 { get; } = "Отлично";
-        public string FailedOpenButYouWereHonestMarkdown { get; } = "Вы хотя бы были честны...";
-        public string FailedHideousHonestyIsGoldMarkdown { get; } = "Искренность - золото";
+        public string FailedOpenButYouWereHonestMarkdown { get; } = "Вы хотя бы были честны\\.\\.\\.";
+        public string FailedHideousHonestyIsGoldMarkdown { get; } = "Искренность \\- золото";
         public string FailedMistakenMarkdown(string text)
-            => $"Ой ой ой. Правильно будет - '{text}'";
-        public object FailedOriginExampleWas2Markdown { get; }= "Неа. Фраза была";
+            => $"Ой ой ой\\. Правильно будет \\- *\"{text}\"*";
+        public object FailedOriginExampleWas2Markdown { get; }= "Неа\\. Фраза была";
         public object FailedOriginExampleWasMarkdown { get; } = "Фраза была";
         public object FailedOriginExampleWas2 { get; } = "Фраза была";
-        public string FailedDefaultMarkdown { get; }= "Ой не...";
+        public string FailedDefaultMarkdown { get; }= "Ой не\\.\\.\\.";
         public string PassedDefaultMarkdown { get; }= "И это правильный ответ";
-        public string IgnoredDefaultMarkdown { get; }= "Ну такое ...";
+        public string IgnoredDefaultMarkdown { get; }= "Ну такое \\.\\.\\.";
 
         public string FailedHideousDefaultMarkdown { get; }= "Последний ответ был не верен";
         public string PassedHideousDefaultMarkdown { get; }= "Последний ответ был верен";
@@ -85,7 +85,7 @@ namespace Chotiskazal.Bot.InterfaceLang
             = "Я не нашел переводов для этого слова. Оно точно существует?";
 
         public string LearningCarefullyStudyTheListMarkdown { get; } = "*Ботаем*\r\n\r\n" +
-                                                                    "Внимательно посмотрите слова из списка:";
+                                                                    "Внимательно посмотрите слова из списка\\:";
         
         public object LearningDone { get; } = "Ботанье завершено";
         public object WordsInTestCount { get; } = "Слов в тренировке";

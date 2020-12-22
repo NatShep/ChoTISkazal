@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             string failedMessage = "";
             if(!string.IsNullOrWhiteSpace(translates))
                 failedMessage =$"{enUserEntry} {chat.Texts.translatesAs} {translates}\r\n";
-            failedMessage += $"{chat.Texts.RightTranslationWas}: {word.Word}";
+            failedMessage += $"{chat.Texts.RightTranslationWas}: *\"{word.Word}\"*";
             return QuestionResult.Failed(failedMessage, 
                 chat.Texts);
         }

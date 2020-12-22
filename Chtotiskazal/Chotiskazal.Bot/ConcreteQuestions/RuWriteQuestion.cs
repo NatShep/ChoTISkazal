@@ -65,7 +65,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             {
                 //translation is correct, but for other word
                 await chat.SendMessageAsync(
-                    $"{chat.Texts.CorrectTranslationButQuestionWasAbout} '{word.Word} - {word.AllTranslationsAsSingleString}'\r\n" +
+                    $"{chat.Texts.CorrectTranslationButQuestionWasAbout} \"{word.Word}\" - *{word.AllTranslationsAsSingleString}*'\r\n" +
                        chat.Texts.LetsTryAgain);
                 return QuestionResult.RetryThisQuestion;
             }
