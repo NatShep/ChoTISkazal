@@ -17,7 +17,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         object FailedOriginExampleWasMarkdown { get; }
         object FailedOriginExampleWas2 { get; }
         object FailedOriginExampleWas2Markdown { get; }
-        string OutOfScopeTranslation { get; }
+        string OutOfScopeTranslationMarkdown { get; }
         string FailedTranslationWasMarkdown { get; }
         string ItIsNotRightTryAgain { get; }
         string SeeTheTranslation { get; }
@@ -90,6 +90,9 @@ namespace Chotiskazal.Bot.InterfaceLang
         string ActionIsNotAllowed { get; }
         string OopsSomethingGoesWrong { get; }
         string InterfaceLanguageSetupped { get; }
+        string ShowWellKnownWords { get; }
+        string NoWellKnownWords { get;}
+        string JustOneLearnedWord { get; }
         string OutOfScopeWithCandidateMarkdown(string otherMeaning);
         string YouHaveATypoLetsTryAgainMarkdown(string text);
         string FailedMistakenMarkdown(string text);
@@ -98,5 +101,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         string YouHaveLearnedWords(in int count);
         string YouForgotCountWords(in int forgottenWordsCount);
         string MessageAfterTranslationIsDeselected(DictionaryTranslation allTranslation);
+        string LearnMoreWordsMarkdown(in int length);
+        string LearnSomeWordsMarkdown(in int length);
+        string ShowNumberOfLists(in int number, in int count);
     }
 }

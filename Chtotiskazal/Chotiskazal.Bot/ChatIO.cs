@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot
                     {SingleReader = true, SingleWriter = true});
         }
 
-        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/learn"};
+        private readonly string[] _menuItems = {"/help", "/stats", "/start", "/add", "/learn", "/words"};
         private IChatUpdateHook[] _updateHooks = new IChatUpdateHook[0];
         public void AddUpdateHooks(IChatUpdateHook hook) 
             => _updateHooks = _updateHooks.Append(hook).ToArray();
@@ -172,6 +172,19 @@ namespace Chotiskazal.Bot
             try
             {
                 await _client.EditMessageTextAsync(ChatId, messageId, newText );
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        
+        public async Task<bool> EditMarkdownMessage(int messageId, string newText, InlineKeyboardMarkup inlineKeyboard=null)
+        {
+            try
+            {
+                await _client.EditMessageTextAsync(ChatId, messageId, newText,parseMode:ParseMode.MarkdownV2, replyMarkup:inlineKeyboard );
                 return true;
             }
             catch (Exception)

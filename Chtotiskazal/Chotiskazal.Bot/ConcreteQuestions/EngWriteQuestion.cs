@@ -53,9 +53,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
             if (otherComparation == StringsCompareResult.Equal) 
             {
-                await chat.SendMessageAsync(
-                    $"{chat.Texts.OutOfScopeTranslation}: " +
-                    word.AllTranslationsAsSingleString);
+                await chat.SendMarkdownMessageAsync(
+                    $"{chat.Texts.OutOfScopeTranslationMarkdown}: " +
+                    $"*{word.AllTranslationsAsSingleString}*");
                 return QuestionResult.RetryThisQuestion;
             }
             if (otherComparation == StringsCompareResult.SmallMistakes)

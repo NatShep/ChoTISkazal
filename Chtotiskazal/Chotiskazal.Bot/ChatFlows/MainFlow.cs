@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Words;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
@@ -29,6 +35,8 @@ namespace Chotiskazal.Bot.ChatFlows
         private readonly UserService _userService;
         private readonly TelegramUserInfo _userInfo;
         private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
+
+        private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
         public ChatIO ChatIo { get;}
         private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
 
@@ -51,7 +59,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     _addWordsService, 
                     Chat);
                 
+                _wellKnownWordsUpdateHook =new LeafWellKnownWordsUpdateHook(Chat);
+                
                 ChatIo.AddUpdateHooks(_translationSelectedUpdateHook);
+                ChatIo.AddUpdateHooks(_wellKnownWordsUpdateHook);
 
                 while (true)
                 {
@@ -118,8 +129,84 @@ namespace Chotiskazal.Bot.ChatFlows
                 case "/learn":  return StartLearning();
                 case "/stats":  return ChatProcedures.ShowStats(Chat);
                 case "/start":  return ShowMainMenu();
+                case "/words":  return ShowWellKnownWords();
             }
             return Task.CompletedTask;
+        }
+
+        private async Task ShowWellKnownWords()
+        {
+            var wellKnownWords = (await _usersWordsService.GetAllWords(Chat.User))
+                .Where(u => u._absoluteScore > 4).ToArray();
+            var paginationForWords = new List<List<UserWordModel>>();
+            var i = 0;
+            while (i < wellKnownWords.Length)
+            {
+                paginationForWords.Add(wellKnownWords.Skip(i).Take(10).ToList());
+                i += 10;
+            }
+
+            var msg = new StringBuilder();
+            msg.Append("*");
+
+            if (!wellKnownWords.Any())
+                msg.Append(Chat.Texts.NoWellKnownWords);
+            else if (wellKnownWords.Length == 1)
+                msg.Append(Chat.Texts.JustOneLearnedWord);
+            else if (wellKnownWords.Length <= 4)
+                msg.Append(Chat.Texts.LearnSomeWordsMarkdown(wellKnownWords.Length));
+            else
+                msg.Append(Chat.Texts.LearnMoreWordsMarkdown(wellKnownWords.Length));
+
+            msg.Append("*");
+
+            await Chat.SendMarkdownMessageAsync(msg.ToString());
+            if (wellKnownWords.Length == 0)
+                return;
+            msg = new StringBuilder();
+            foreach (var word in paginationForWords[0])
+            {
+                msg.Append(Emojis.ShowWellLearnedWords + " *" + word.Word + ":* " + word.AllTranslationsAsSingleString +
+                           "\r\n");
+            }
+
+            if (paginationForWords.Count > 1)
+                msg.Append(Chat.Texts.ShowNumberOfLists(1,paginationForWords.Count));
+
+
+            InlineKeyboardButton[][] buttons = null;
+            if (paginationForWords.Count > 1)
+            {
+                _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
+                _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
+
+                buttons = new[]
+                {
+                    new[]
+                    {
+                        new InlineKeyboardButton {CallbackData = "/<<", Text = "<<"},
+                        new InlineKeyboardButton {CallbackData = "/>>", Text = ">>"},
+                    },
+                    new[]
+                    {
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
+                        InlineButtons.Exam($"{Chat.Texts.LearnButton} {Emojis.Learning}"),
+                    },
+                    new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
+                };
+            }
+            else
+                buttons = new[]
+                {
+                    new[]
+                    {
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
+                        InlineButtons.Exam($"{Chat.Texts.LearnButton} {Emojis.Learning}"),
+                    },
+                    new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
+                };
+
+            await ChatIo.SendMarkdownMessageAsync(msg.ToString(), buttons);
         }
 
         private async Task SendHelp()

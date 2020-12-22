@@ -29,6 +29,9 @@ namespace Chotiskazal.Bot
             MainMenu(texts.MainMenuButton);
         public static InlineKeyboardButton MainMenu(string text) => new InlineKeyboardButton
             {CallbackData = "/start", Text = text};
+        
+        public static InlineKeyboardButton WellLearnedWords(string text) =>
+            new InlineKeyboardButton {CallbackData = "/words", Text = text};
 
         public static InlineKeyboardButton[] CreateVariants(IEnumerable<string> variants)
             => variants.Select((v, i) => new InlineKeyboardButton

@@ -15,10 +15,12 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string EnterMissingWord { get; } = "Enter missing word";
         public string TypoAlmostRight { get; } = "Almost right. But you have a typo. Let's try again";
         public string InterfaceLanguageSetupped { get; } = "Interface language: English";
+        public string JustOneLearnedWord { get; } = "You have learned just one word\\!";
+
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
-        public string OutOfScopeTranslation { get; } =
-            "Chosen translation is out of scope (but it is correct). Expected translations are";
+        public string OutOfScopeTranslationMarkdown { get; } =
+            "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";
         public string FailedTranslationWasMarkdown { get; } = "The translation was";
         public string ItIsNotRightTryAgain { get; } = "No. It is not right. Try again";
         public string SeeTheTranslation { get; } = "See the translation";
@@ -118,8 +120,17 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
+        public string LearnMoreWordsMarkdown(in int length)
+            => $"Good job\\! You have learned {length} words\\!";
+
+        public string LearnSomeWordsMarkdown(in int length)
+            =>$"You have learned {length} words\\. Let's do more\\!";
+
+        public string ShowNumberOfLists(in int number,in int count)
+            => $"\r\n`Show {number} list of {count}\\.\\.\\.`";
+
         public string YouHaveLearnedWords(in int count)
-        => $"You have learned {count} words";
+            => $"You have learned {count} words";
 
         public string YouForgotCountWords(in int forgottenWordsCount)
             =>$"You forgot {forgottenWordsCount} words";
@@ -137,6 +148,10 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string StatsButton { get; } = "Stats";
         public string HelpButton { get; } = "Help";
         public string MainMenuButton { get; } = "Main menu";
+
+        public string ShowWellKnownWords { get; } = "My learned words";
+        public string NoWellKnownWords { get; } = "You haven't learned words\\!";
+
         #endregion
         
         #region stats
@@ -158,7 +173,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                       $"\r\nTranslate new words and pass exams.";
 
         public string Zen4PassExamsAndTranslateNewWords { get; } = "Pass exams and translate new words.";
-        public string Zen5PassExams { get; } = "PassExams";
+        public string Zen5PassExams { get; } = "I recommend to pass exams";
         public string Zen6YouNeedToLearn { get; } = $"Learning learning learning!";
         public object StatsYourStats { get; } = "Your stats";
         public object StatsWordsAdded { get; } = "Words added";

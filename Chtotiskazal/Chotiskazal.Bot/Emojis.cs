@@ -8,6 +8,6 @@
         public const string Passed = "✅";
         public const string Failed = "❌";
         public const string Selected = "☑️";
-
+        public const string ShowWellLearnedWords = "✓";
     }
 }

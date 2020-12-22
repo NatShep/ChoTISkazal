@@ -19,12 +19,15 @@ namespace Chotiskazal.Bot.InterfaceLang
         
         public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
 
+        public string NoWellKnownWords { get; } = "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
+        public string JustOneLearnedWord { get; } = "Ты выучил только одно слово\\! Какая жалость\\.";
+
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 
 
-        public string OutOfScopeTranslation { get; } 
-            = $"Перевод то правильный, но учим мы не его. Ожидаемые переводы";
+        public string OutOfScopeTranslationMarkdown { get; } 
+            = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
 
         public string FailedTranslationWasMarkdown { get; } = "Правильный перевод";
         public string ItIsNotRightTryAgain { get; } = "Неа. Давай попробуем еще раз";
@@ -130,6 +133,14 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
             => $"Будто ничего и не было";
 
+        public string LearnMoreWordsMarkdown(in int length)
+            => $"Молодец\\! Ты выучил {length} слов\\! Давай еще\\!";
+
+        public string LearnSomeWordsMarkdown(in int length)
+            => $"Ты выучил всего {length} словa\\. Давай еще\\!";
+
+        public string ShowNumberOfLists(in int number, in int count)
+            => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
         public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";
 
@@ -149,7 +160,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string LearnButton { get; } = "Ботать";
         public string StatsButton { get; } = "Статы";
         public string HelpButton { get; } = "Помощь";
-        public string MainMenuButton { get; } = "Глав меню";
+        public string MainMenuButton { get; } = "Глав меню"; 
+        public string ShowWellKnownWords { get; } = "Посмотреть, что уже выучил";
         #endregion
         
         #region stats
