@@ -189,20 +189,13 @@ namespace Chotiskazal.Bot.ChatFlows
                     },
                     new[]
                     {
-                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
-                        InlineButtons.Exam($"{Chat.Texts.LearnButton} {Emojis.Learning}"),
-                    },
-                    new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
+                    }
                 };
             }
             else
                 buttons = new[]
                 {
-                    new[]
-                    {
-                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
-                        InlineButtons.Exam($"{Chat.Texts.LearnButton} {Emojis.Learning}"),
-                    },
                     new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
                 };
 
