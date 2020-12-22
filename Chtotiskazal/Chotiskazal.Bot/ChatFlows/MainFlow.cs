@@ -216,7 +216,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 {
                     new[]
                     {
-                        InlineButtons.Exam($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
+                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
                     }
                 });
         }
