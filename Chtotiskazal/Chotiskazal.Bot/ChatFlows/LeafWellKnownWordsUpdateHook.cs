@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
+using MongoDB.Bson;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
@@ -18,6 +19,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private ChatRoom Chat { get; }
         private List<List<UserWordModel>> _wellKnownWords = new List<List<UserWordModel>>(); 
         private int _numberOfPaginate;
+        private string _message;
 
         private int NumberOfPaginate
         {
@@ -33,14 +35,15 @@ namespace Chotiskazal.Bot.ChatFlows
             }
         }
 
-        public LeafWellKnownWordsUpdateHook(ChatRoom chat)
+        public LeafWellKnownWordsUpdateHook(ChatRoom chat )
         {
-            
             Chat = chat;
         }
 
         public void SetWellKnownWords(List<List<UserWordModel>> wellKnownWords) => _wellKnownWords = wellKnownWords;
         public void SetNumberOfPaginate(int i) => NumberOfPaginate = i;
+
+        public void SetBeginningMessage(string msg) => _message = msg;
 
         public bool CanBeHandled(Update update)
         {
@@ -62,6 +65,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 NumberOfPaginate++;
 
             var msg = new StringBuilder();
+            msg.Append(_message);
             foreach (var word in _wellKnownWords[NumberOfPaginate])
             {
                 msg.Append(Emojis.ShowWellLearnedWords + " *" + word.Word + ":* " + word.AllTranslationsAsSingleString + "\r\n");

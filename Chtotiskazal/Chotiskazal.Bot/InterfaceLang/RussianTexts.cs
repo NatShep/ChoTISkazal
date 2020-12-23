@@ -137,7 +137,7 @@ namespace Chotiskazal.Bot.InterfaceLang
             => $"Молодец\\! Ты выучил {length} слов\\! Давай еще\\!";
 
         public string LearnSomeWordsMarkdown(in int length)
-            => $"Ты выучил всего {length} словa\\. Давай еще\\!";
+            => $"Выучено слов: {length}\\. Давай еще\\!";
 
         public string ShowNumberOfLists(in int number, in int count)
             => $"\r\n`Страница {number} из {count}\\.\\.\\.`";

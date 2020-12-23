@@ -137,7 +137,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private async Task ShowWellKnownWords()
         {
             var wellKnownWords = (await _usersWordsService.GetAllWords(Chat.User))
-                .Where(u => u._absoluteScore > 4).ToArray();
+                .Where(u => u._absoluteScore >= 4).ToArray();
             var paginationForWords = new List<List<UserWordModel>>();
             var i = 0;
             while (i < wellKnownWords.Length)
@@ -158,20 +158,20 @@ namespace Chotiskazal.Bot.ChatFlows
             else
                 msg.Append(Chat.Texts.LearnMoreWordsMarkdown(wellKnownWords.Length));
 
-            msg.Append("*");
+            msg.Append("*\r\n\r\n");
 
-            await Chat.SendMarkdownMessageAsync(msg.ToString());
+        //    await Chat.SendMarkdownMessageAsync(msg.ToString());
             if (wellKnownWords.Length == 0)
                 return;
-            msg = new StringBuilder();
+            var msgWithWords = new StringBuilder();
             foreach (var word in paginationForWords[0])
             {
-                msg.Append(Emojis.ShowWellLearnedWords + " *" + word.Word + ":* " + word.AllTranslationsAsSingleString +
+                msgWithWords.Append(Emojis.ShowWellLearnedWords + " *" + word.Word + ":* " + word.AllTranslationsAsSingleString +
                            "\r\n");
             }
 
             if (paginationForWords.Count > 1)
-                msg.Append(Chat.Texts.ShowNumberOfLists(1,paginationForWords.Count));
+                msgWithWords.Append(Chat.Texts.ShowNumberOfLists(1,paginationForWords.Count));
 
 
             InlineKeyboardButton[][] buttons = null;
@@ -179,6 +179,7 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
                 _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
+                _wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
 
                 buttons = new[]
                 {
@@ -199,7 +200,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
                 };
 
-            await ChatIo.SendMarkdownMessageAsync(msg.ToString(), buttons);
+            await ChatIo.SendMarkdownMessageAsync(msg.ToString()+msgWithWords, buttons);
         }
 
         private async Task SendHelp()
