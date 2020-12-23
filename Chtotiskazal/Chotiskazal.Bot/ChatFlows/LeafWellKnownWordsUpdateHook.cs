@@ -65,7 +65,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 NumberOfPaginate++;
 
             var msg = new StringBuilder();
-            msg.Append(_message);
+            //Todo 
+            //  msg.Append(_message);
             foreach (var word in _wellKnownWords[NumberOfPaginate])
             {
                 msg.Append(Emojis.ShowWellLearnedWords + " *" + word.Word + ":* " + word.AllTranslationsAsSingleString + "\r\n");

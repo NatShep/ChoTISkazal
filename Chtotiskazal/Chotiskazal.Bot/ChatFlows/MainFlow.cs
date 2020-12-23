@@ -197,10 +197,11 @@ namespace Chotiskazal.Bot.ChatFlows
             else
                 buttons = new[]
                 {
-                    new[] {InlineButtons.Translation($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
+                    new[] {InlineButtons.MainMenu($"{Chat.Texts.TranslateButton} {Emojis.Translate}")}
                 };
 
-            await ChatIo.SendMarkdownMessageAsync(msg.ToString()+msgWithWords, buttons);
+            //TODO
+            await ChatIo.SendMarkdownMessageAsync(/*msg.ToString()+*/msgWithWords.ToString(), buttons);
         }
 
         private async Task SendHelp()
