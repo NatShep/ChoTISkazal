@@ -172,6 +172,7 @@ namespace SayWhat.MongoDAL.Users
         {
             var today = DateTime.Today;
             DailyStats daily;
+            
             if (LastDaysStats == null || LastDaysStats.Count == 0)
             {
                 daily = new DailyStats {Date = today};
@@ -180,10 +181,19 @@ namespace SayWhat.MongoDAL.Users
             }
             else
             {
-                while ((today - LastDaysStats[0].Date).TotalDays>49)
+                while ( LastDaysStats.Any() && (today - LastDaysStats[0].Date).TotalDays>49)
                 {
                     LastDaysStats.RemoveAt(0);
                 }
+
+                if (LastDaysStats.Count == 0)
+                {
+                    daily = new DailyStats {Date = today};
+                    LastDaysStats = new List<DailyStats>();
+                    LastDaysStats.Add(daily);
+                    return daily;
+                }
+                
                 var lastDay = LastDaysStats.Last();
                 if (lastDay.Date != today)
                 {
