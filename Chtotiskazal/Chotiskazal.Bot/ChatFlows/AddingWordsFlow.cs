@@ -75,7 +75,7 @@ namespace Chotiskazal.Bot.ChatFlows
             if (!selectionMarks[0])
             {
                 // Automaticly select first translation if it was not selected before
-                await _addWordService.AddTranslationToUser(Chat.User, translations[0]);
+                await _addWordService.AddTranslationToUser(Chat.User, translations[0].GetEnRu());
                 selectionMarks[0] = true;
             }
 
