@@ -164,9 +164,7 @@ namespace Chotiskazal.Bot
             catch (Exception e)
             {
                 Botlog.WriteError(chat?.Id, "WokeUpfailed"+e, true);
-                throw;
             }
-          
         }
         private static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
