@@ -14,15 +14,135 @@ namespace Chotiskazal.Investigation
     {
         static void Main()
         {
-            var client = new MongoClient("Place bot token here");
+            var client = new MongoClient("placeconnectionstringhere");
             var db = client.GetDatabase("SayWhatDb");
             var collection = db.GetCollection<Qmodel>("questionMetrics");
             var count = collection.CountDocuments(new BsonDocument());
-            Console.WriteLine("Count: "+ count);
+            Console.WriteLine("Count: " + count);
+            
+            Console.WriteLine(GetTimeMetricsReport(collection));
+
+            Console.WriteLine(GetScoreMetricsReport(collection));
+            
             Console.WriteLine(GetQuestionMetricsReport(collection));
 
             Console.WriteLine(GetCurrentQuestionParametersReport(db));
+        }
+
+        private static string GetScoreMetricsReport(IMongoCollection<Qmodel> collection)
+        {
+            var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+            var res = allMetrics.GroupBy(b => (int) b.ScoreBefore).Select(a => new
+            {
+                score = a.Key,
+                percent = a.Passed(),
+                count = a.Count(),
+            }).OrderBy(c => c.score).ToList();
             
+            var sb = new StringBuilder();
+            
+            for (int i = 0; i < 20; i++)
+            {
+                var a = res.FirstOrDefault(s => s.score == i);
+                if (a == null)
+                    sb.Append("| --- ");
+                else
+                    sb.Append("| " + a.percent.ToString().PadLeft(3) + " ");
+            }
+            
+            var s = sb.ToString();
+            return s;
+        }
+
+        class TimeBucket
+        {
+            public int SecLow;
+            public int SecHi;
+            
+            public int Count;
+            public int Passed;
+            public int[] CountByScore = new int[15];
+            public int[] PassedByScore = new int[15];
+
+            public void Put(double score, bool result)
+            {
+                Count++;
+                
+                var item = (int) score;
+                if (item >= CountByScore.Length)
+                    item = CountByScore.Length-1;
+
+                CountByScore[item]++;
+                if (result)
+                {
+                    Passed++;
+                    PassedByScore[item]++;
+                }
+            }
+            public TimeBucket(int secLow, int secHi)
+            {
+                SecLow = secLow;
+                SecHi = secHi;
+            }
+
+            public override string ToString()
+            {
+                if (Count == 0)
+                    return TimeSpan.FromSeconds(SecLow)
+                           + " - "
+                           + TimeSpan.FromSeconds(SecHi)
+                           + ":   NA";
+                
+                var sb = new StringBuilder(
+                    TimeSpan.FromSeconds(SecLow)
+                    + " - "
+                    + TimeSpan.FromSeconds(SecHi)
+                    + ":   "
+                    + Passed * 100 / Count + " ");
+
+                for (int i = 0; i < CountByScore.Length-1; i+=2)
+                {
+                    var count = CountByScore[i] + CountByScore[i + 1];
+                    var score = PassedByScore[i] + PassedByScore[i + 1];
+
+                    if (count < 3)
+                        sb.Append("| --- ");
+                    else
+                        sb.Append($"| {score * 100 / count:000} ");
+                }
+                return sb.ToString();
+            }
+        }
+
+        private static string GetTimeMetricsReport(IMongoCollection<Qmodel> collection)
+        {
+
+            var buckets = new[]
+            {
+                new TimeBucket(0, 10),
+                new TimeBucket(10, 60),
+                new TimeBucket(60, 6 * 60),
+                new TimeBucket(6 * 60, 36 * 60),
+                new TimeBucket(36 * 60, 6 * 36 * 60),
+
+                new TimeBucket(6 * 36 * 60, 36 * 36 * 60),
+                new TimeBucket(36 * 36 * 60, 6 * 36 * 36 * 60),
+                new TimeBucket(6 * 36 * 36 * 60, 36 * 36 * 36 * 60),
+                new TimeBucket(36 * 36 * 36 * 60, 6* 36 * 36 * 36 * 60),
+                new TimeBucket(6* 36 * 36 * 36 * 60, int.MaxValue),
+            };
+
+
+            var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+            foreach (var metric in allMetrics)
+            {
+                var buck = buckets.FirstOrDefault(b =>
+                    b.SecHi > metric.PreviousExamDeltaInSecs && b.SecLow <= metric.PreviousExamDeltaInSecs);
+                buck?.Put(metric.ScoreBefore,metric.Result);
+            }
+
+            var s = string.Join("\r\n", buckets.Select(s=>s.ToString()));
+            return s;
         }
 
         private static string GetQuestionMetricsReport(IMongoCollection<Qmodel> collection)
@@ -79,7 +199,7 @@ namespace Chotiskazal.Investigation
                     $"\r\n{q.Question.Name.PadRight(maxNameLen)}  {q.ExpectedScore}  {q.Question.GetType().Name}");
             }
 
-            var s= sb2.ToString();
+            var s = sb2.ToString();
             return s;
         }
     }
