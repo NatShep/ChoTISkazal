@@ -249,6 +249,8 @@ namespace Chotiskazal.Bot.Questions
         private readonly ExamAndPreferredScore[] _intermidiateExamsList;
         private readonly ExamAndPreferredScore[] _advancedExamsList;
 
+        public HashSet<ExamAndPreferredScore> AllQuestions =>
+            _simpleExamsList.Concat(_intermidiateExamsList).Concat(_advancedExamsList).ToHashSet();
         public IQuestion GetNextQuestionFor(bool isFirstExam, UserWordModel model)
         {
             if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.IncompleteWordMinScore)
@@ -279,7 +281,7 @@ namespace Chotiskazal.Bot.Questions
             return choice ?? probability.Last().Value;
         }
 
-        private class ExamAndPreferredScore
+        public class ExamAndPreferredScore
         {
             public ExamAndPreferredScore(IQuestion question, double expectedScore, int frequency)
             {

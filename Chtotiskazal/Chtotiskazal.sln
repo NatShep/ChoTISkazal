@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.Tests", "SayWhat.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.Bll", "SayWhat.Bll\SayWhat.Bll.csproj", "{D6FF280F-C200-483A-B619-4D5B6F0013F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chotiskazal.Investigation", "Chotiskazal.Investigation\Chotiskazal.Investigation.csproj", "{1984F152-FB6A-4EBE-A68A-B81F409881F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D6FF280F-C200-483A-B619-4D5B6F0013F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6FF280F-C200-483A-B619-4D5B6F0013F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6FF280F-C200-483A-B619-4D5B6F0013F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
