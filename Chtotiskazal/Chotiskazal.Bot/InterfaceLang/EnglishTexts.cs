@@ -18,7 +18,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string JustOneLearnedWord { get; } = "You have learned just one word\\!";
 
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
+            => $"Chosen translation is out of scope \\(did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
         public string OutOfScopeTranslationMarkdown { get; } =
             "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";
         public string FailedTranslationWasMarkdown { get; } = "The translation was";
@@ -106,7 +106,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                    "*Just try it and see for yourself\\!*";
 
         public string ActionIsNotAllowed { get;  } = "action is not allowed";
-        public string OopsSomethingGoesWrong { get;  } = "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
+        public string OopsSomethingGoesWrong { get;  } = "Oops. Something goes wrong ;\\( \r\nWrite /start to go to main menu.";
 
         public string HereAreTheTranslationMarkdown(string word, string? tr)
             => $"_Here are the translations\\._ \r\n" +
