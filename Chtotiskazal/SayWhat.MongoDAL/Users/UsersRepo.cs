@@ -11,6 +11,9 @@ namespace SayWhat.MongoDAL.Users
     {
         public const string UserCollectionName = "users";
         public const string UserTelegramIdFieldName = "TelegramId";
+        private IMongoCollection<UserModel> Collection 
+            => _db.GetCollection<UserModel>(UserCollectionName);
+
         private readonly IMongoDatabase _db;
 
         public UsersRepo(IMongoDatabase db) => _db = db;
@@ -36,8 +39,6 @@ namespace SayWhat.MongoDAL.Users
              return  user??throw new InvalidOperationException("Add user was failed.");
         }
 
-        private IMongoCollection<UserModel> Collection 
-            => _db.GetCollection<UserModel>(UserCollectionName);
         
         public async Task UpdateDb()
         {
@@ -67,9 +68,6 @@ namespace SayWhat.MongoDAL.Users
             return Collection.UpdateOneAsync(o => o.Id == user.Id, updateDef);
         }
 
-        public List<UserModel> GetAll()
-        {
-            return Collection.AsQueryable().ToList();
-        }
+        public List<UserModel> GetAll() => Collection.AsQueryable().ToList();
     }
 }

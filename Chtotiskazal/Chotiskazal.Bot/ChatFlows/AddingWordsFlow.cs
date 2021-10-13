@@ -92,7 +92,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             await handler.SendTranslationMessage(word, transcription, selectionMarks);
 
-            if (word.IsRussian()) Chat.User.OnRussianWordTranlationRequest();
+            if (word.IsRussian()) Chat.User.OnRussianWordTranslationRequest();
             else Chat.User.OnEnglishWordTranslationRequest();
 
             try

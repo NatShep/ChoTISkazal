@@ -34,13 +34,6 @@ namespace SayWhat.MongoDAL.Dictionary
             };
             var model = new CreateIndexModel<DictionaryWord>(keys, indexOptions);
             await Collection.Indexes.CreateOneAsync(model);
-            
-            /*var options = new CreateIndexOptions { Unique = true };
-            var field = new StringFieldDefinition<DictionaryWord>(WordFieldBsonName);
-            var indexDefinition = new IndexKeysDefinitionBuilder<DictionaryWord>().Ascending(field);
-            var indexModel = new CreateIndexModel<DictionaryWord>(indexDefinition,options);
-
-            return Collection.Indexes.CreateOneAsync(indexModel);*/
         }
     }
 }

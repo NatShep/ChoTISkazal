@@ -33,6 +33,7 @@ namespace SayWhat.MongoDAL.Tests
         [TestCase("безболезненный","безбоелзнненый")]
         public void CheckMistakes_returnsBigMistakes(string wordA, string wordB) 
             => Assert.AreEqual(StringsCompareResult.BigMistakes,wordA.CheckForMistakes(wordB));
+       
         [TestCase("Chekc","che")]
         [TestCase("a","b")]
         [TestCase("вася","петя")]
