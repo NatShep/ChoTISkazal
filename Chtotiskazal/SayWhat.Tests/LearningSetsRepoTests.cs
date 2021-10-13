@@ -80,8 +80,8 @@ public class LearningSetsRepoTests {
     }
 
 
-    private static LearningSetModel CreateLearningSetModel() {
-        var model = new LearningSetModel {
+    private static LearningSet CreateLearningSetModel() {
+        var model = new LearningSet {
             Enabled = true,
             Name = "qwe",
             Used = 12,
@@ -97,7 +97,7 @@ public class LearningSetsRepoTests {
         return model;
     }
 
-    private static void AssertModelsAreEqual(LearningSetModel expected, LearningSetModel actual) {
+    private static void AssertModelsAreEqual(LearningSet expected, LearningSet actual) {
         Assert.AreEqual(expected.Enabled, actual.Enabled);
         Assert.AreEqual(expected.Name, actual.Name);
         Assert.AreEqual(expected.Id, actual.Id);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using SayWhat.MongoDAL.WordKits;
 using SayWhat.MongoDAL.Words;
 
 #pragma warning disable 169
@@ -65,14 +66,6 @@ public class UserModel {
     [BsonIgnoreIfDefault]
     [BsonElement("kts")]
     public List<UserTrainSet> TrainingSets { get; set; }
-
-    /// <summary>
-    /// Training set, that was choosen last in "choose set to add words"
-    /// </summary>
-    [BsonElement("lkt")]
-    [BsonDefaultValue(null)]
-    [BsonIgnoreIfDefault]
-    public ObjectId LastTrainingSet { get; set; }
     
     [BsonElement("scr")] private int _totalScore;
     [BsonElement("ldc")] private int _learningDone;
