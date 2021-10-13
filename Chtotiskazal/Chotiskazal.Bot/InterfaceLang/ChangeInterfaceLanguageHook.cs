@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
+using Chotiskazal.Bot.Hooks;
 using Chotiskazal.Bot.InterfaceLang;
 using Telegram.Bot.Types;
 

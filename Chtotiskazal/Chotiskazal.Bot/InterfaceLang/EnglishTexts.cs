@@ -91,11 +91,11 @@ namespace Chotiskazal.Bot.InterfaceLang
    
         public string HelpMarkdown { get; } = "*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
                                                    "1⃣ You can use me as a regular translator\\. " +
-                                                   "Just write the word for translation or use /add command to begin translate\\.\r\n\r\n" +
+                                                   $"Just write the word for translation or use {BotCommands.Add} command to begin translate\\.\r\n\r\n" +
                                                    "2⃣ Then, when you have time and mood, click on the _\"Learn\"_ button or " +
-                                                   "write /learn and start learning this words\\.\r\n\r\n" +
-                                                   "3⃣ Earn scores for your action and watch your progress using /stats command\\.\r\n\r\n" +
-                                                   "4⃣ Use /help command to see info how it works\\.\r\n\r\n" +
+                                                   $"write {BotCommands.Learn} and start learning this words\\.\r\n\r\n" +
+                                                   $"3⃣ Earn scores for your action and watch your progress using {BotCommands.Stats} command\\.\r\n\r\n" +
+                                                   $"4⃣ Use {BotCommands.Help} command to see info how it works\\.\r\n\r\n" +
                                                    "\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. " +
                                                    "And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!";
 
