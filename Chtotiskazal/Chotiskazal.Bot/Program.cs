@@ -49,12 +49,14 @@ namespace Chotiskazal.Bot
             var userRepo       = new UsersRepo(db);
             var examplesRepo   = new ExamplesRepo(db);
             var questionMetricsRepo = new QuestionMetricRepo(db);
+            var learningSetsRepo = new LearningSetsRepo(db);
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
             examplesRepo.UpdateDb();
             questionMetricsRepo.UpdateDb();
-
+            learningSetsRepo.UpdateDb();
+            
             Botlog.QuestionMetricRepo = questionMetricsRepo;
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);

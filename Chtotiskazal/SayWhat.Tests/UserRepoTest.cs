@@ -179,7 +179,7 @@ namespace SayWhat.MongoDAL.Tests
             model.OnEnglishWordTranslationRequest();
             model.OnEnglishWordTranslationRequest();
             model.OnEnglishWordTranslationRequest();
-            model.OnRussianWordTranlationRequest();
+            model.OnRussianWordTranslationRequest();
 
             await _repo.Update(model);
             var user = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
