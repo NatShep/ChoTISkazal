@@ -43,7 +43,7 @@ namespace SayWhat.Bll.Services
                 if (originWord.IsRussian())
                     res = await TranslateRuEnWordAndAddItToDictionary(originWord);
                 else
-                    res =  await TranlateEnRuWordAndAddItToDictionary(originWord);
+                    res =  await TranslateEnRuWordAndAddItToDictionary(originWord);
 
                 if (res != null)
                     return res;
@@ -54,7 +54,7 @@ namespace SayWhat.Bll.Services
         }
 
 
-        private async Task<IReadOnlyList<DictionaryTranslation>> TranlateEnRuWordAndAddItToDictionary(string englishWord)
+        private async Task<IReadOnlyList<DictionaryTranslation>> TranslateEnRuWordAndAddItToDictionary(string englishWord)
         {
             // Go to yandex api
             var yaResponse = await _yaDicClient.EnRuTranslateAsync(englishWord);

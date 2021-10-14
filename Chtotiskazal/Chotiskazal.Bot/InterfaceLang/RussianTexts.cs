@@ -1,198 +1,204 @@
 ﻿using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceLang
-{
-    public class RussianTexts : IInterfaceTexts
-    {
-        public string more { get; } = "больше";
-        public object less { get; } = "меньше";
+namespace Chotiskazal.Bot.InterfaceLang {
 
-        public string thenClickStartMarkdown { get; }="затем нажмите 'старт'";
-        public string ChooseTheTranslation { get; } = "Выберите перевод";
-        public string translatesAs { get; } = "переводится как";
-        public string ChooseMissingWord { get; } = "Выберите пропущенное слово";
-        public string OriginWas { get; } = "Правильный ответ";
-        public string EnterMissingWord { get; } = "Введите пропущенное слово";
-        public string TypoAlmostRight { get; } = "Очепяточка. Попробуем еще разок";
-        
-        public string InterfaceLanguageSetupped { get; } = "Язык интрфейса - русский.";
+public class RussianTexts : IInterfaceTexts {
+    public string more => "больше";
+    public object less => "меньше";
 
-        public string NoWellKnownWords { get; } = "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
-        public string JustOneLearnedWord { get; } = "Ты выучил только одно слово\\! Какая жалость\\.";
+    public string thenClickStartMarkdown => "затем нажмите 'старт'";
+    public string ChooseTheTranslation => "Выберите перевод";
+    public string translatesAs => "переводится как";
+    public string ChooseMissingWord => "Выберите пропущенное слово";
+    public string OriginWas => "Правильный ответ";
+    public string EnterMissingWord => "Введите пропущенное слово";
+    public string TypoAlmostRight => "Очепяточка. Попробуем еще разок";
 
-        public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-            => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
+    public string InterfaceLanguageSetupped => "Язык интрфейса - русский.";
+
+    public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
+    public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
+
+    public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
+        => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 
 
-        public string OutOfScopeTranslationMarkdown { get; } 
-            = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
+    public string OutOfScopeTranslationMarkdown { get; }
+        = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
 
-        public string FailedTranslationWasMarkdown { get; } = "Правильный перевод";
-        public string ItIsNotRightTryAgain { get; } = "Неа. Давай попробуем еще раз";
-        public string SeeTheTranslation { get; } = "Посмотреть перевод";
-        public string DoYouKnowTranslation { get; } = $"Вы знаете перевод?";
-        public string TranslationIs { get; } = "Правильный перевод";
-        public string DidYouGuess { get; } = "Вы угадали?";
-        public string IsItRightTranslation { get; } = "Это правильный перевод?";
-        public string Mistaken { get; } = "Ошибочка";
-        public string ChooseWhichWordHasThisTranscription { get; } 
-            = "Выберите слово к которому подходит эта транскрипция";
-        public string RetryAlmostRightWithTypo { get; } 
-            = "Опечатка. Давайте заново.";
-        public string ShowTheTranslationButton { get; } = "Показать перевод";
-        public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод\\.\\.\\. ";
-        public string RightTranslationWas { get; } = "А правильный перевод это";
+    public string FailedTranslationWasMarkdown => "Правильный перевод";
+    public string ItIsNotRightTryAgain => "Неа. Давай попробуем еще раз";
+    public string SeeTheTranslation => "Посмотреть перевод";
+    public string DoYouKnowTranslation { get; } = $"Вы знаете перевод?";
+    public string TranslationIs => "Правильный перевод";
+    public string DidYouGuess => "Вы угадали?";
+    public string IsItRightTranslation => "Это правильный перевод?";
+    public string Mistaken => "Ошибочка";
+    public string ChooseWhichWordHasThisTranscription => "Выберите слово к которому подходит эта транскрипция";
+    public string RetryAlmostRightWithTypo => "Опечатка. Давайте заново.";
+    public string ShowTheTranslationButton => "Показать перевод";
+    public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод\\.\\.\\. ";
+    public string RightTranslationWas => "А правильный перевод это";
 
-        public string CorrectTranslationButQuestionWasAbout { get; } =
-            "Перевод то верный, но вопрос был о слове";
+    public string CorrectTranslationButQuestionWasAbout => "Перевод то верный, но вопрос был о слове";
 
-        public string LetsTryAgain { get; } = "Давайте еще разок";
-        public string ChooseTheTranscription { get; } = "Выберите транскрипцию";
-        public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; } =
-            "Слава во фразе перепутаны местами\\. Напишите эту фразу";
+    public string LetsTryAgain => "Давайте еще разок";
+    public string ChooseTheTranscription => "Выберите транскрипцию";
+    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown => "Слава во фразе перепутаны местами\\. Напишите эту фразу";
 
-     
-        public string YouHaveATypoLetsTryAgainMarkdown(string text)
-            => $"Ошибочка\\. Правильно будет *\"{text}\"*\\. Давайте еще разок\\.";
-    
-        #region questionResult
-        public string Passed1Markdown { get; } = "Дыа\\!";
-        public string PassedOpenIHopeYouWereHonestMarkdown { get; } = "Надеюсь вы были честны с собой";
-        public string PassedHideousWellMarkdown { get; } = "Неплохо";
-        public string PassedHideousWell2 { get; } = "Отлично";
-        public string FailedOpenButYouWereHonestMarkdown { get; } = "Вы хотя бы были честны\\.\\.\\.";
-        public string FailedHideousHonestyIsGoldMarkdown { get; } = "Искренность \\- золото";
-        public string FailedMistakenMarkdown(string text)
-            => $"Ой ой ой\\. Правильно будет \\- *\"{text}\"*";
-        public object FailedOriginExampleWas2Markdown { get; }= "Неа\\. Фраза была";
-        public object FailedOriginExampleWasMarkdown { get; } = "Фраза была";
-        public object FailedOriginExampleWas2 { get; } = "Фраза была";
-        public string FailedDefaultMarkdown { get; }= "Ой не\\.\\.\\.";
-        public string PassedDefaultMarkdown { get; }= "И это правильный ответ";
-        public string IgnoredDefaultMarkdown { get; }= "Ну такое \\.\\.\\.";
 
-        public string FailedHideousDefaultMarkdown { get; }= "Последний ответ был не верен";
-        public string PassedHideousDefaultMarkdown { get; }= "Последний ответ был верен";
-        
-        public string IgnoredHideousDefault { get; }= "Ну не совсем";
-         #endregion
+    public string YouHaveATypoLetsTryAgainMarkdown(string text)
+        => $"Ошибочка\\. Правильно будет *\"{text}\"*\\. Давайте еще разок\\.";
 
-        public string DidYouWriteSomething { get; } = "Вы что то писали? Всё это время я спал...";
 
-        public string EnterWordOrStart { get; } =
-            "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
+    #region questionResult
 
-        public string NoTranslationsFound { get; } 
-            = "Я не нашел переводов для этого слова. Оно точно существует?";
+    public string Passed1Markdown => "Дыа\\!";
+    public string PassedOpenIHopeYouWereHonestMarkdown => "Надеюсь вы были честны с собой";
+    public string PassedHideousWellMarkdown => "Неплохо";
+    public string PassedHideousWell2 => "Отлично";
+    public string FailedOpenButYouWereHonestMarkdown => "Вы хотя бы были честны\\.\\.\\.";
+    public string FailedHideousHonestyIsGoldMarkdown => "Искренность \\- золото";
 
-        public string LearningCarefullyStudyTheListMarkdown { get; } = "*Ботаем*\r\n\r\n" +
-                                                                    "Внимательно посмотрите слова из списка\\:";
-        
-        public object LearningDone { get; } = "Ботанье завершено";
-        public object WordsInTestCount { get; } = "Слов в тренировке";
-        public object YouHaveLearnedOneWord { get; } = "Вы выботали одно слово";
-        public object YouForgotOneWord { get; } ="Одно слово у вас позабылось";
-        public object EarnedScore { get; } = "Заработано очков";
-        public object TotalScore { get; } = "Всего очков";
-        public object DontPeekUpward { get; } = "Попробуйте ответить не подглядывая на верх!";
+    public string FailedMistakenMarkdown(string text)
+        => $"Ой ой ой\\. Правильно будет \\- *\"{text}\"*";
 
-        public string NeedToAddMoreWordsBeforeLearning { get; } =
-            "Нужно перевести больше слов дабы начать ботать";
+    public object FailedOriginExampleWas2Markdown => "Неа\\. Фраза была";
+    public object FailedOriginExampleWasMarkdown => "Фраза была";
+    public object FailedOriginExampleWas2 => "Фраза была";
+    public string FailedDefaultMarkdown => "Ой не\\.\\.\\.";
+    public string PassedDefaultMarkdown => "И это правильный ответ";
+    public string IgnoredDefaultMarkdown => "Ну такое \\.\\.\\.";
 
-   
-        public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
-                                                   "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +
-                                                   "Просто напиши мне слово на любом языке или нажми команду /add для перевода\\.\r\n\r\n" +
-                                                   $"2⃣ Затем, когда будет времечко нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
-                                                   "набери команду /learn что бы начать учить переведенные ранее слова\\.\r\n\r\n" +
-                                                   "3⃣ Зарабатывай очки и следи за своими успехами при помощи команды /stats\\.\r\n\r\n" +
-                                                   "4⃣ Жмякай команду /help что бы увидеть это сообщение\\.\r\n\r\n" +
-                                                   "\uD83D\uDE09Да, я бесплатен\\. Меня сделали для себя и для друзей\\. " +
-                                                   "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
+    public string FailedHideousDefaultMarkdown => "Последний ответ был не верен";
+    public string PassedHideousDefaultMarkdown => "Последний ответ был верен";
 
-        public string MainMenuTextMarkdown { get; } = "Я переводчик и учитель " +
-                                              "Можешь использовать меня как русско\\-английский переводчик\\.\r\n\r\n" +
-                                              $"Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
-                                              "набери команду /learn что бы начать учить переведенные ранее слова";
+    public string IgnoredHideousDefault => "Ну не совсем";
 
-        public string ActionIsNotAllowed { get;  } = "Действие не разрешено";
-        public string OopsSomethingGoesWrong { get;  } = "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
+    #endregion
 
-        public string HereAreTheTranslationMarkdown(string word, string? tr)
-            => $"_Вот что я перевел\\._ \r\n" +
-               $"_Выберите один или несколько переводов, дабы заботать их в будущем_\r\n\r\n" +
-               $"*{word.EscapeForMarkdown().Capitalize()}*" +
-               $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
-        public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+    public string DidYouWriteSomething => "Вы что то писали? Всё это время я спал...";
 
-            => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
-        
-        public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
-            => $"Будто ничего и не было";
+    public string EnterWordOrStart => "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
 
-        public string LearnMoreWordsMarkdown(in int length)
-            => $"Молодец\\! Ты выучил {length} слов\\! Давай еще\\!";
+    public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
 
-        public string LearnSomeWordsMarkdown(in int length)
-            => $"Выучено слов: {length}\\. Давай еще\\!";
+    public string LearningCarefullyStudyTheListMarkdown =>
+        "*Ботаем*\r\n\r\n" +
+        "Внимательно посмотрите слова из списка\\:";
 
-        public string ShowNumberOfLists(in int number, in int count)
-            => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
-        public string YouHaveLearnedWords(in int count)
+    public object LearningDone => "Ботанье завершено";
+    public object WordsInTestCount => "Слов в тренировке";
+    public object YouHaveLearnedOneWord => "Вы выботали одно слово";
+    public object YouForgotOneWord => "Одно слово у вас позабылось";
+    public object EarnedScore => "Заработано очков";
+    public object TotalScore => "Всего очков";
+    public object DontPeekUpward => "Попробуйте ответить не подглядывая на верх!";
+
+    public string NeedToAddMoreWordsBeforeLearning => "Нужно перевести больше слов дабы начать ботать";
+
+
+    public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
+                                          "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +
+                                          $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Add} для перевода\\.\r\n\r\n" +
+                                          $"2⃣ Затем, когда будет времечко нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
+                                          $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова\\.\r\n\r\n" +
+                                          $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}\\.\r\n\r\n" +
+                                          $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение\\.\r\n\r\n" +
+                                          "\uD83D\uDE09Да, я бесплатен\\. Меня сделали для себя и для друзей\\. " +
+                                          "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
+
+    public string MainMenuTextMarkdown { get; } = "Я переводчик и учитель " +
+                                                  "Можешь использовать меня как русско\\-английский переводчик\\.\r\n\r\n" +
+                                                  $"Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
+                                                  $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова";
+
+    public string ActionIsNotAllowed => "Действие не разрешено";
+    public string OopsSomethingGoesWrong => "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
+
+    public string HereAreTheTranslationMarkdown(string word, string? tr)
+        => $"_Вот что я перевел\\._ \r\n" +
+           $"_Выберите один или несколько переводов, дабы заботать их в будущем_\r\n\r\n" +
+           $"*{word.EscapeForMarkdown().Capitalize()}*" +
+           $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
+
+    public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+        => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
+
+    public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
+        => $"Будто ничего и не было";
+
+    public string LearnMoreWordsMarkdown(in int length)
+        => $"Молодец\\! Ты выучил {length} слов\\! Давай еще\\!";
+
+    public string LearnSomeWordsMarkdown(in int length)
+        => $"Выучено слов: {length}\\. Давай еще\\!";
+
+    public string ShowNumberOfLists(in int number, in int count)
+        => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
+
+    public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";
 
-        public string YouForgotCountWords(in int forgottenWordsCount)
-            =>$"Позабыто слов: {forgottenWordsCount}";
-        
-        
-        #region buttons
-        public string YesButton { get; } = "Да";
-        public string NoButton { get; } = "Нет";
-        public string StartButton { get; } = "Start";
-        public string CancelButton { get; } = "Отмена";
-        public object OneMoreLearnButton { get; } = "Еще разок";
-        public string TranslateButton { get; } = "Перевод";
-        public string ContinueTranslateButton { get; } = "Продолжить";
+    public string YouForgotCountWords(in int forgottenWordsCount)
+        => $"Позабыто слов: {forgottenWordsCount}";
 
-        public string LearnButton { get; } = "Ботать";
-        public string StatsButton { get; } = "Статы";
-        public string HelpButton { get; } = "Помощь";
-        public string MainMenuButton { get; } = "Глав меню"; 
-        public string ShowWellKnownWords { get; } = "Посмотреть, что уже выучил";
-        #endregion
-        
-        #region stats
-        public string[] ShortDayNames { get; } = {
-            "пон",
-            "вт ",
-            "срд",
-            "чт ",
-            "птн",
-            "суб",
-            "вск"
-        };
 
-        public string Zen1WeNeedMuchMoreNewWords { get; } = "Нам нужно больше переводов!";
-        public string Zen2TranslateNewWords { get; } = "Лучше б вам слова переводить";
-        public string Zen3TranslateNewWordsAndPassExams { get; } = "Перводите и ботайте.";
+    #region buttons
 
-        public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +
-                                                      $"\r\nПереводите и ботайте.";
+    public string YesButton => "Да";
+    public string NoButton => "Нет";
+    public string StartButton => "Start";
+    public string CancelButton => "Отмена";
+    public object OneMoreLearnButton => "Еще разок";
+    public string TranslateButton => "Перевод";
+    public string ContinueTranslateButton => "Продолжить";
 
-        public string Zen4PassExamsAndTranslateNewWords { get; } = "Тренируйтесь и переводите.";
-        public string Zen5PassExams { get; } = "Вам бы поботать";
-        public string Zen6YouNeedToLearn { get; } = $"Только ботать! Только хардкор";
-        public object StatsYourStats { get; } = "Ваши статы";
-        public object StatsWordsAdded { get; } = "Добавлено слов";
-        public object StatsLearnedWell { get; } = "Выучено";
-        public object StatsScore { get; } = "Очки";
-        public object StatsExamsPassed { get; } = "Проведено тернировок";
-        public object StatsThisMonth { get; } = "В это месяце";
-        public object StatsThisDay { get; } = "Сегодня";
-        public object StatsActivityForLast7Weeks { get; } = "Активность за последние 7 недель";
-        #endregion
-    }
+    public string LearnButton => "Ботать";
+    public string StatsButton => "Статы";
+    public string HelpButton => "Помощь";
+    public string MainMenuButton => "Глав меню";
+    public string ShowWellKnownWords => "Посмотреть, что уже выучил";
+
+    #endregion
+
+
+    #region stats
+
+    public string[] ShortDayNames { get; } = {
+        "пон",
+        "вт ",
+        "срд",
+        "чт ",
+        "птн",
+        "суб",
+        "вск"
+    };
+
+    public string Zen1WeNeedMuchMoreNewWords => "Нам нужно больше переводов!";
+    public string Zen2TranslateNewWords => "Лучше б вам слова переводить";
+    public string Zen3TranslateNewWordsAndPassExams => "Перводите и ботайте.";
+
+    public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +
+                                                  $"\r\nПереводите и ботайте.";
+
+    public string Zen4PassExamsAndTranslateNewWords => "Тренируйтесь и переводите.";
+    public string Zen5PassExams => "Вам бы поботать";
+    public string Zen6YouNeedToLearn { get; } = $"Только ботать! Только хардкор";
+    public object StatsYourStats => "Ваши статы";
+    public object StatsWordsAdded => "Добавлено слов";
+    public object StatsLearnedWell => "Выучено";
+    public object StatsScore => "Очки";
+    public object StatsExamsPassed => "Проведено тернировок";
+    public object StatsThisMonth => "В это месяце";
+    public object StatsThisDay => "Сегодня";
+    public object StatsActivityForLast7Weeks => "Активность за последние 7 недель";
+
+    #endregion
+}
+
 }

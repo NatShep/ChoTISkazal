@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace Chotiskazal.Bot.ChatFlows
+namespace Chotiskazal.Bot.Hooks
 {
     /// <summary>
     /// Hi priority inline query handler

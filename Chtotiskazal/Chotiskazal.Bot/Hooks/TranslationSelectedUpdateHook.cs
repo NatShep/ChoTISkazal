@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows
+namespace Chotiskazal.Bot.Hooks
 {
     public class TranslationSelectedUpdateHook : IChatUpdateHook
     {

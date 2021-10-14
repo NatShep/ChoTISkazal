@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
@@ -9,12 +10,12 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    internal class AddingWordsMode {
+    internal class AddingWordsFlow {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
-        public AddingWordsMode(
+        public AddingWordsFlow(
             ChatRoom chat,
             AddWordService addWordService,
             TranslationSelectedUpdateHook translationUpdateHookHandler
