@@ -11,7 +11,12 @@ namespace SayWhat.MongoDAL.WordKits {
 public class LearningSet {
     public ObjectId Id { get; set; } = new ObjectId();
     [BsonElement("words")] public List<WordInLearningSet> Words { get; set; }
-    [BsonElement("name")] public string Name { get; set; }
+    
+    [BsonElement("enname")] public string EnName { get; set; }
+    [BsonElement("runame")] public string RuName { get; set; }
+    [BsonElement("enDesc")] public string EnDescription { get; set; }
+    [BsonElement("ruDesc")] public string RuDescription { get; set; }
+
     [BsonElement("enabled")] public bool Enabled { get; set; }
     [BsonElement("used")] public int Used { get; set; }
     [BsonElement("passed")] public int Passed { get; set; }
@@ -31,9 +36,8 @@ public class LearningSet {
 
 [BsonIgnoreExtraElements]
 public class WordInLearningSet {
-    public WordInLearningSet() { Id = ObjectId.GenerateNewId(); }
-    public ObjectId Id { get; set; }
-    [BsonElement("wid")] public ObjectId WordId { get; set; }
+    [BsonElement("w")] public string Word { get; set; }
+
     [BsonElement("trs")] public string[] AllowedTranslations { get; set; }
     [BsonElement("es")] public ObjectId[] AllowedExamples { get; set; }
 }

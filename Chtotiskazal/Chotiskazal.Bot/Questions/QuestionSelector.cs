@@ -81,13 +81,13 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2.6,
             frequency: 12);
 
-        private ExamAndPreferredScore EngWrite(DictionaryService service) =>
+        private ExamAndPreferredScore EngWrite(LocalDictionaryService service) =>
             new ExamAndPreferredScore(
                 question: new EngWriteQuestion(service),
                 expectedScore: 2.6,
                 frequency: 14);
 
-        private ExamAndPreferredScore RuWrite(DictionaryService service) => new ExamAndPreferredScore(
+        private ExamAndPreferredScore RuWrite(LocalDictionaryService service) => new ExamAndPreferredScore(
             question: new RuWriteQuestion(service),
             expectedScore: 2.6,
             frequency: 14);
@@ -113,13 +113,13 @@ namespace Chotiskazal.Bot.Questions
                 expectedScore: 3.3,
                 frequency: 3);
 
-        private ExamAndPreferredScore HideousEngWriteExam(DictionaryService service) =>
+        private ExamAndPreferredScore HideousEngWriteExam(LocalDictionaryService service) =>
             new ExamAndPreferredScore(
                 question: new ClearScreenQuestionDecorator(new EngWriteQuestion(service)),
                 expectedScore: 4,
                 frequency: 14);
 
-        private ExamAndPreferredScore HideousRuWriteExam(DictionaryService service) =>
+        private ExamAndPreferredScore HideousRuWriteExam(LocalDictionaryService service) =>
             new ExamAndPreferredScore(
                 question: new ClearScreenQuestionDecorator(new RuWriteQuestion(service)),
                 expectedScore: 4,
@@ -166,17 +166,17 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2.3,
             frequency: 10);
 
-        private ExamAndPreferredScore RuWriteSingleTranslationExam(DictionaryService service) => new ExamAndPreferredScore(
+        private ExamAndPreferredScore RuWriteSingleTranslationExam(LocalDictionaryService service) => new ExamAndPreferredScore(
             question:new RuWriteSingleTarnslationQuestion(service),  
             expectedScore:1.6,
             frequency:10);
        
-        private ExamAndPreferredScore HideousRuWriteSingleTranslationExam(DictionaryService service) => new ExamAndPreferredScore(
+        private ExamAndPreferredScore HideousRuWriteSingleTranslationExam(LocalDictionaryService service) => new ExamAndPreferredScore(
             question:new RuWriteSingleTarnslationQuestion(service),  
             expectedScore:1.6,
             frequency:10);
 
-        public QuestionSelector(DictionaryService dictionaryService)
+        public QuestionSelector(LocalDictionaryService localDictionaryService)
         {
             _simpleExamsList = new[]
             {
@@ -216,17 +216,17 @@ namespace Chotiskazal.Bot.Questions
                 _engTrust,
                 _ruTrust,
                 _ruTrustSingle,
-                EngWrite(dictionaryService),
-                RuWrite(dictionaryService),
-                RuWriteSingleTranslationExam(dictionaryService),
+                EngWrite(localDictionaryService),
+                RuWrite(localDictionaryService),
+                RuWriteSingleTranslationExam(localDictionaryService),
                 _hideousRuPhraseChoose,
                 _hideousEngPhraseChoose,
                 _hideousEngTrust,
                 _hideousRuTrust,
                 _ruTrustSingleHideous,
-                HideousEngWriteExam(dictionaryService),
-                HideousRuWriteExam(dictionaryService),
-                HideousRuWriteSingleTranslationExam(dictionaryService),
+                HideousEngWriteExam(localDictionaryService),
+                HideousRuWriteExam(localDictionaryService),
+                HideousRuWriteSingleTranslationExam(localDictionaryService),
                 _clearEngPhraseSubstitute,
                 _clearRuPhraseSubstitute,
                 _engPhraseSubstitute,

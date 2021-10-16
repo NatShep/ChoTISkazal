@@ -9,5 +9,8 @@
         public const string Failed = "❌";
         public const string Selected = "☑️";
         public const string ShowWellLearnedWords = "✓";
+        public const string Next = ">>";
+        public const string Prev = "<<";
+
     }
 }

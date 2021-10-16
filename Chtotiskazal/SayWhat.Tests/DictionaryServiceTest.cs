@@ -15,7 +15,7 @@ namespace SayWhat.MongoDAL.Tests
             MongoTestHelper.DropAllCollections();
             var dictionaryRepo = new DictionaryRepo(MongoTestHelper.Database);
             var examplesRepo = new ExamplesRepo(MongoTestHelper.Database);
-            var service = new DictionaryService(dictionaryRepo, examplesRepo);
+            var service = new LocalDictionaryService(dictionaryRepo, examplesRepo);
             var example = new Example
             {
                 Direction = TranslationDirection.EnRu,

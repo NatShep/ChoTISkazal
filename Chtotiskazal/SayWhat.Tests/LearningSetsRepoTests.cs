@@ -70,10 +70,10 @@ public class LearningSetsRepoTests {
         await _repo.Add(origin);
         var updated = CreateLearningSetModel();
         updated.Id = origin.Id;
-        updated.Name = "newOne";
+        updated.EnName = "newOne";
         updated.Passed = 2;
         updated.Used = 3;
-        updated.Words[0].WordId = ObjectId.GenerateNewId();
+        updated.Words[0].Word = "test";
         await _repo.Update(updated);
         var recreated = await _repo.GetOrDefault(updated.Id);
         AssertModelsAreEqual(updated, recreated);
@@ -83,14 +83,14 @@ public class LearningSetsRepoTests {
     private static LearningSet CreateLearningSetModel() {
         var model = new LearningSet {
             Enabled = true,
-            Name = "qwe",
+            EnName = "qwe",
             Used = 12,
             Passed = 3,
             Words = new List<WordInLearningSet> {
                 new WordInLearningSet {
                     AllowedExamples = Array.Empty<ObjectId>(),
-                    AllowedTranslations = new[] { "test", "vest" },
-                    WordId = new ObjectId(),
+                    AllowedTranslations = new[] { "коу", "муу" },
+                    Word = "korova",
                 }
             }
         };
@@ -99,17 +99,16 @@ public class LearningSetsRepoTests {
 
     private static void AssertModelsAreEqual(LearningSet expected, LearningSet actual) {
         Assert.AreEqual(expected.Enabled, actual.Enabled);
-        Assert.AreEqual(expected.Name, actual.Name);
+        Assert.AreEqual(expected.EnName, actual.EnName);
         Assert.AreEqual(expected.Id, actual.Id);
         Assert.AreEqual(expected.Passed, actual.Passed);
         Assert.AreEqual(expected.Used, actual.Used);
 
         Assert.AreEqual(expected.Words.Count, actual.Words.Count);
-        Assert.AreEqual(expected.Words[0].Id, actual.Words[0].Id);
         Assert.AreEqual(expected.Words[0].AllowedExamples.Length, actual.Words[0].AllowedExamples.Length);
         Assert.AreEqual(expected.Words[0].AllowedTranslations.Length, actual.Words[0].AllowedTranslations.Length);
         Assert.AreEqual(expected.Words[0].AllowedTranslations[1], actual.Words[0].AllowedTranslations[1]);
-        Assert.AreEqual(expected.Words[0].WordId, actual.Words[0].WordId);
+        Assert.AreEqual(expected.Words[0].Word, actual.Words[0].Word);
     }
 }
 

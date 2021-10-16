@@ -11,11 +11,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 {
     public class RuWriteSingleTarnslationQuestion : IQuestion
     {
-        private readonly DictionaryService _dictionaryService;
+        private readonly LocalDictionaryService _localDictionaryService;
 
-        public RuWriteSingleTarnslationQuestion(DictionaryService dictionaryService)
+        public RuWriteSingleTarnslationQuestion(LocalDictionaryService localDictionaryService)
         {
-            _dictionaryService = dictionaryService;
+            _localDictionaryService = localDictionaryService;
         }
         public bool NeedClearScreen => false;
         public string Name => "Ru Write Single Translation";
@@ -58,7 +58,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             // Question is about 'коэффициент' (Coefficient)
             // User answers 'Rate'
             // Search for 'Rate' translations
-            var otherRuTranslationsOfUserInput = await _dictionaryService.GetAllTranslationWords(enUserEntry.ToLower());
+            var otherRuTranslationsOfUserInput = await _localDictionaryService.GetAllTranslationWords(enUserEntry.ToLower());
             // if otherRuTranslationsOfUserInput contains 'коэффициент' or something like it
             // then retry question
             if (word.TextTranslations.Any(t1 =>

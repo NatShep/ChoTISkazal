@@ -29,6 +29,11 @@ namespace SayWhat.MongoDAL.Examples
             Collection
                 .Find(Builders<Example>.Filter.In("Id", ids))
                 .ToListAsync();
+        
+        public Task<List<Example>> GetAll() =>
+            Collection
+                .Find(Builders<Example>.Filter.Empty)
+                .ToListAsync();
 
         private IMongoCollection<Example>Collection 
             => _db.GetCollection<Example>(ExampleCollectionName);

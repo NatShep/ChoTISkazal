@@ -9,6 +9,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows {
 
+public class WellKnownWordsHelper {
+    public const string PrevData = "/wk<<";
+    public const string NextData = "/wk>>";
+
+    public static InlineKeyboardButton[] GetPagingKeys() => new[] {
+        new InlineKeyboardButton { CallbackData = PrevData, Text = "<<" },
+        new InlineKeyboardButton { CallbackData = NextData, Text = ">>" },
+    };
+}
+
 public class ShowWellKnownWordsFlow {
     private readonly UsersWordsService _usersWordsService;
     private readonly LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
@@ -71,10 +81,7 @@ public class ShowWellKnownWordsFlow {
             _wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
 
             buttons = new[] {
-                new[] {
-                    new InlineKeyboardButton { CallbackData = "/<<", Text = "<<" },
-                    new InlineKeyboardButton { CallbackData = "/>>", Text = ">>" },
-                },
+                WellKnownWordsHelper.GetPagingKeys(),
                 new[] {
                     InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
                 }

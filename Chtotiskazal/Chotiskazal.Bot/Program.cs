@@ -29,10 +29,11 @@ namespace Chotiskazal.Bot
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, MainFlow> Chats = new ConcurrentDictionary<long,MainFlow>();
         private static AddWordService _addWordService;
-        private static DictionaryService _dictionaryService;
+        private static LocalDictionaryService _localDictionaryService;
         private static UsersWordsService _userWordService;
         private static BotSettings _settings;
         private static UserService _userService;
+        private static LearningSetService _learningSetService;
 
         private static void Main()
         {
@@ -60,16 +61,16 @@ namespace Chotiskazal.Bot
             Botlog.QuestionMetricRepo = questionMetricsRepo;
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
-            _dictionaryService    = new DictionaryService(dictionaryRepo,examplesRepo);
+            _localDictionaryService    = new LocalDictionaryService(dictionaryRepo,examplesRepo);
             _userService          = new UserService(userRepo);
-            
+            _learningSetService = new LearningSetService(learningSetsRepo);
             _addWordService = new AddWordService(
                 _userWordService,
                 yandexDictionaryClient,
-                _dictionaryService, 
+                _localDictionaryService, 
                 _userService);
             
-            QuestionSelector.Singletone = new QuestionSelector(_dictionaryService);
+            QuestionSelector.Singletone = new QuestionSelector(_localDictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
             
@@ -109,8 +110,7 @@ namespace Chotiskazal.Bot
                 var configuration = builder.Build();
                 
                 var set = new BotSettings(configuration);
-                if (substitudeDebugConfig)
-                {
+                
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
                     set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
                         //   set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
@@ -118,7 +118,7 @@ namespace Chotiskazal.Bot
                     set.MongoDbName = "swdumbp";
                     set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
                     set.ControlPanelChatId = "326823645";
-                }
+                
 
                 return set;
             }
@@ -238,7 +238,9 @@ namespace Chotiskazal.Bot
                 _settings,
                 _addWordService,
                 _userWordService, 
-                _userService);
+                _userService,
+                _localDictionaryService,
+                _learningSetService);
             Chats.TryAdd(chat.Id, newChatRoom);
             return newChatRoom;
         }

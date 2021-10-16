@@ -13,23 +13,29 @@ public class MainFlow {
         BotSettings settings,
         AddWordService addWordsService,
         UsersWordsService usersWordsService,
-        UserService userService
-    ) {
+        UserService userService, 
+        LocalDictionaryService localDictionaryService, 
+        LearningSetService learningSetService) {
         ChatIo = chatIo;
         _userInfo = userInfo;
         _settings = settings;
         _addWordsService = addWordsService;
         _usersWordsService = usersWordsService;
         _userService = userService;
+        _localDictionaryService = localDictionaryService;
+        _learningSetService = learningSetService;
     }
 
-    private readonly BotSettings _settings;
     private readonly AddWordService _addWordsService;
     private readonly UsersWordsService _usersWordsService;
     private readonly UserService _userService;
+    private readonly LocalDictionaryService _localDictionaryService;
+    private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
-    private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
+    private readonly BotSettings _settings;
+
+    private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
     public ChatIO ChatIo { get; }
     private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
@@ -49,7 +55,7 @@ public class MainFlow {
             }
 
             Chat = new ChatRoom(ChatIo, user);
-            
+
             _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(_addWordsService, Chat);
             _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
             ChatIo.AddUpdateHooks(_translationSelectedUpdateHook);
@@ -105,14 +111,19 @@ public class MainFlow {
 
     private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Chat.Texts.ActionIsNotAllowed);
 
-    private Task StartSelectLearningSets() => new SelectLearningSetsFlow(Chat)
+    private Task StartSelectLearningSets() => new SelectLearningSetsFlow(
+            Chat,
+            _localDictionaryService,
+            _learningSetService,
+            _usersWordsService,
+            _addWordsService)
         .EnterAsync();
 
     private Task StartLearning() => new ExamFlow(Chat, _userService, _usersWordsService, _settings.ExamSettings)
         .EnterAsync();
 
     private Task StartToAddNewWords(string text = null)
-        => new AddingWordsFlow(Chat, _addWordsService, _translationSelectedUpdateHook).Enter(text);
+        => new TranslateWordsFlow(Chat, _addWordsService, _translationSelectedUpdateHook).Enter(text);
 
     private Task ShowWellKnownWords() =>
         new ShowWellKnownWordsFlow(Chat, _usersWordsService, _wellKnownWordsUpdateHook).EnterAsync();

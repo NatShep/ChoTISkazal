@@ -21,6 +21,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
     public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
+    public string SelectLearningSet => "Выбрать";
+    public string SelectWordInLearningSet => "Хочу учить";
 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
@@ -47,7 +49,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string LetsTryAgain => "Давайте еще разок";
     public string ChooseTheTranscription => "Выберите транскрипцию";
-    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown => "Слава во фразе перепутаны местами\\. Напишите эту фразу";
+    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown =>
+        "Слава во фразе перепутаны местами\\. Напишите эту фразу";
 
 
     public string YouHaveATypoLetsTryAgainMarkdown(string text)
@@ -83,7 +86,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string DidYouWriteSomething => "Вы что то писали? Всё это время я спал...";
 
-    public string EnterWordOrStart => "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
+    public string EnterWordOrStart =>
+        "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
 
@@ -118,7 +122,8 @@ public class RussianTexts : IInterfaceTexts {
                                                   $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова";
 
     public string ActionIsNotAllowed => "Действие не разрешено";
-    public string OopsSomethingGoesWrong => "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
+    public string OopsSomethingGoesWrong =>
+        "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
 
     public string HereAreTheTranslationMarkdown(string word, string? tr)
         => $"_Вот что я перевел\\._ \r\n" +

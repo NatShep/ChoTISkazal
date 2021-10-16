@@ -250,5 +250,7 @@ namespace SayWhat.Bll.Services
         
         public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
             => _userWordsRepository.GetAllWords(user);
+
+        public Task<bool> Contains(UserModel user, string word) =>  _userWordsRepository.Contains(user, word);
     }
 }
