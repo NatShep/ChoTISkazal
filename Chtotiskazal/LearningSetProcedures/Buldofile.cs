@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using SayWhat.Bll.Services;
@@ -16,6 +17,7 @@ namespace LearningSetProcedures {
 public static class VocabFileTools {
     public static void Save(VocabularyEntry vocab, string path) {
         var options = new JsonSerializerOptions {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             WriteIndented = true,
         };
@@ -43,9 +45,7 @@ public static class VocabFileTools {
                             Examples = t.Examples.Select(
                                             e => new ExampleEntry {
                                                 OriginPhrase = e.ExampleOrNull.OriginPhrase,
-                                                OriginWord = e.ExampleOrNull.OriginWord,
                                                 TranslatedPhrase = e.ExampleOrNull.TranslatedPhrase,
-                                                TranslatedWord = e.ExampleOrNull.TranslatedWord
                                             })
                                         .ToList()
                         })
@@ -58,10 +58,10 @@ public static class VocabFileTools {
     public static async Task SaveToMongo(LocalDictionaryService localDictionaryService, VocabularyEntry vocabulary) {
         foreach (var vocWord in vocabulary.Words)
         {
-            var (w, ts) = await localDictionaryService.GetWordInfo(vocWord.Word);
-            if (w != null)
+            var ws = await localDictionaryService.GetAllTranslationWords(vocWord.Word);
+            if (ws != null && ws.Length>0)
             {
-                Console.WriteLine($"Skip {w.Word}");
+                Console.WriteLine($"Skip {vocWord.Word}");
             }
             else
             {
@@ -77,15 +77,19 @@ public static class VocabFileTools {
                                 Language = Language.En,
                                 Word = f.TranslatedText,
                                 Examples = f.Examples.SelectToArray(
-                                    e => new DictionaryReferenceToExample {
-                                        ExampleOrNull = new Example {
-                                            Id = ObjectId.Empty,
-                                            Direction = TranslationDirection.EnRu,
-                                            OriginPhrase = e.OriginPhrase,
-                                            OriginWord = e.OriginWord,
-                                            TranslatedPhrase = e.TranslatedPhrase,
-                                            TranslatedWord = e.TranslatedWord,
-                                        }
+                                    e => {
+                                        var eid = ObjectId.GenerateNewId();
+                                        return new DictionaryReferenceToExample {
+                                            ExampleId = eid,
+                                            ExampleOrNull = new Example {
+                                                Id = eid,
+                                                Direction = TranslationDirection.EnRu,
+                                                OriginPhrase = e.OriginPhrase,
+                                                OriginWord = vocWord.Word,
+                                                TranslatedPhrase = e.TranslatedPhrase,
+                                                TranslatedWord = f.TranslatedText,
+                                            }
+                                        };
                                     })
                             })
                     });

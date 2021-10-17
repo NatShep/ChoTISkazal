@@ -19,6 +19,7 @@ using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.WordKits;
 using SayWhat.MongoDAL.Words;
+using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
 namespace LearningSetProcedures {
 
@@ -30,20 +31,89 @@ class Program {
     private static AddWordService _addWordService;
 
     static async Task Main(string[] args) {
-        
         Initialize();
-        var vocaPath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/vocab.buldo";
+        var vocaPath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/all.vocab";
         //var vocab = VocabFileTools.Load(vocaPath);
-        //await VocabFileTools.SaveToMongo(_localDictionaryService,vocab);
         
+        //VocabFileTools.Save(vocab,vocaPath);
+        //await VocabFileTools.SaveToMongo(_localDictionaryService,vocab);
+
         var all = await VocabFileTools.GetFromMongo(_localDictionaryService);
         VocabFileTools.Save(all, vocaPath);
 
-        var path = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/prepared_words";
-        var pairs = ReadPairs(path, 0, 5000);//.Randomize().ToList();
+        var path = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sortedWithTranslation5000";
+        var pairs = ReadPairs(path, 0, 6000); //.Randomize().ToList();
+        int missed = 0;
+        int total = 0;
+        int restored = 0;
+        var restoredPairs = new StringBuilder(); 
+        foreach (var (en, ru) in pairs)
+        {
+            total++;
+            var  translations = await _addWordService.GetOrDownloadTranslation(en.ToLower());
+            if (translations == null || !translations.Any())
+            {
+                Console.WriteLine($"[{total}] Word {en}\t{ru} - not found");
+                restoredPairs.AppendLine($"{en}\t---");
+                continue;
+            }
+            var ruwords = ru.Split(",")
+                            .SelectToArray(t => t.Trim().ToLower());
+            var resultTrans = translations.FirstOrDefault(
+                t => ruwords.Any(a => a.Equals(t.TranslatedText, StringComparison.InvariantCultureIgnoreCase)));
+            if (resultTrans != null)
+            {
+                restoredPairs.AppendLine($"{en}\t{ru}");
+            }
+            else
+            {
+                var trans = translations.FirstOrDefault(t => t.Examples.Any()) ?? translations.FirstOrDefault();
+                restoredPairs.AppendLine($"{en}\t{trans.TranslatedText}");
+                Console.WriteLine($"[{total}] Trans: {en}\t{trans.TranslatedText}");
+            }
+            // if (word == null)
+            // {
+            //     missed++;
+            //     Console.WriteLine(en);
+            //     restoredPairs.AppendLine($"{en}\t{ru}");
+            //     continue;
+            // }
+            //
+            //
+            // var sb = new StringBuilder();
+            // if (resultTrans == null)
+            // {
+            //     var tr = FirstThatContainsRuWordInExamples(translations, ruwords);
+            //     if (tr != null)
+            //     {
+            //         restored++;
+            //         Console.WriteLine($"Restore: [{restored}/{total}] {en}\t{tr.TranslatedText}");
+            //         restoredPairs.AppendLine($"{en}\t{tr.TranslatedText}");                    
+            //         continue;    
+            //     }
+            //     var allTranslations = translations.Select(t => t.TranslatedText);
+            //     missed++;
+            //     var line = $"{en}\t{ru}\t:\t{string.Join("\t", allTranslations)}";
+            //     sb.AppendLine(line);
+            //     Console.WriteLine($"[{missed}/{total}] {line}");
+            // }
+            // restoredPairs.AppendLine($"{en}\t{ru}");
+        }
+        File.WriteAllText("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sortedAndTranslated", restoredPairs.ToString());
         int delay = 1000;
-        await EnsureDownloaded(pairs, 500);
-        await CreateLearningSet(pairs);
+        //await EnsureDownloaded(pairs, 500);
+        //await CreateLearningSet(pairs);
+    }
+
+    private static DictionaryTranslation FirstThatContainsRuWordInExamples(IReadOnlyList<DictionaryTranslation> translations, string[] ruwords) {
+        var tr = translations
+            .FirstOrDefault(
+                t =>
+                    t.Examples.Any(
+                        e =>
+                            e.TranslatedPhrase.Split(" ")
+                             .Any(w => ruwords.Contains(w.ToLower()))));
+        return tr;
     }
 
     private static BotSettings ReadConfiguration() {
@@ -115,8 +185,8 @@ class Program {
 
     private static void Initialize() {
         var settings = ReadConfiguration();
-        
-        
+
+
         var yandexDictionaryClient = new YandexDictionaryApiClient(settings.YadicapiKey, settings.YadicapiTimeout);
         var client = new MongoClient(settings.MongoConnectionString);
         var db = client.GetDatabase(settings.MongoDbName);
@@ -131,6 +201,7 @@ class Program {
         {
             throw new TimeoutException($"Could not connect to mongo db at {settings.MongoConnectionString}}}");
         }
+
         userWordRepo.UpdateDb();
         dictionaryRepo.UpdateDb();
         userRepo.UpdateDb();
@@ -160,7 +231,7 @@ class Program {
                 break;
             var splitted = line.Split("\t");
             if (splitted.Length == 2)
-                ans.Add((splitted[0], splitted[1]));
+                ans.Add((splitted[0].Trim(), splitted[1].Trim()));
         }
 
         return ans;

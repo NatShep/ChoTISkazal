@@ -16,13 +16,10 @@ public class DictionaryEntry {
 
 public class TranslationEntry {
     public string TranslatedText { get; set; }
-    public string EnTranscription { get; set; }
-    public List<ExampleEntry> Examples { get; set; } = new List<ExampleEntry>();
+    public List<ExampleEntry> Examples { get; set; } = new();
 }
 
 public class ExampleEntry {
-    public string OriginWord { get; set; }
-    public string TranslatedWord { get; set; }
     public string OriginPhrase { get; set; }
     public string TranslatedPhrase { get; set; }
 }
