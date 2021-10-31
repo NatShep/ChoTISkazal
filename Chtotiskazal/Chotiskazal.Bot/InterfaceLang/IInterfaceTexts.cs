@@ -94,6 +94,7 @@ public interface IInterfaceTexts {
     string JustOneLearnedWord { get; }
     string SelectLearningSet { get; }
     string SelectWordInLearningSet { get; }
+    string Skip { get;  }
     string OutOfScopeWithCandidateMarkdown(string otherMeaning);
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);
@@ -104,7 +105,10 @@ public interface IInterfaceTexts {
     string MessageAfterTranslationIsDeselected(DictionaryTranslation allTranslation);
     string LearnMoreWordsMarkdown(in int length);
     string LearnSomeWordsMarkdown(in int length);
-    string ShowNumberOfLists(in int number, in int count);
+    string PageXofYMarkdown(in int number, in int count);
+    string XofYMarkdown(in int x, in int y);
+    string WordIsAddedForLearning(string word);
+    string WordIsSkippedForLearning(string word);
 }
 
 }

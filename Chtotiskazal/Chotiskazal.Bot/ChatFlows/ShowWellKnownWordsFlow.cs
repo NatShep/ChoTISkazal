@@ -66,11 +66,11 @@ public class ShowWellKnownWordsFlow {
         foreach (var word in paginationForWords[0])
         {
             msgWithWords.Append(
-                $"{Emojis.ShowWellLearnedWords} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+                $"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
         }
 
         if (paginationForWords.Count > 1)
-            msgWithWords.Append(Chat.Texts.ShowNumberOfLists(1, paginationForWords.Count));
+            msgWithWords.Append(Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count));
 
 
         InlineKeyboardButton[][] buttons = null;

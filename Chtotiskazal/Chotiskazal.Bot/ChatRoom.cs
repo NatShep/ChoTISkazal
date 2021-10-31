@@ -19,8 +19,8 @@ namespace Chotiskazal.Bot
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;
 
-        public ChatRoom(ChatIO origin, UserModel user)
-        {
+        public ChatRoom(ChatIO origin, UserModel user) {
+            
             _origin = origin;
             User = user;
             _chlangHook = new ChangeInterfaceLanguageHook(origin);

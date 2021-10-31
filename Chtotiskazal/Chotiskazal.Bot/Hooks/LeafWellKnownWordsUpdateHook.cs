@@ -9,6 +9,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.Hooks {
 
+
 public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
     private PaginationCollection<List<UserWordModel>> _pages = new PaginationCollection<List<UserWordModel>>();
     private ChatRoom Chat { get; }
@@ -40,10 +41,10 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
         foreach (var word in _pages.Current)
         {
-            msg.Append($"{Emojis.ShowWellLearnedWords} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+            msg.Append($"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
         }
 
-        msg.Append(Chat.Texts.ShowNumberOfLists(_pages.Page + 1, _pages.Count));
+        msg.Append(Chat.Texts.PageXofYMarkdown(_pages.Page + 1, _pages.Count));
 
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,

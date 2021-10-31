@@ -115,6 +115,7 @@ public class MainFlow {
             Chat,
             _localDictionaryService,
             _learningSetService,
+            _userService,
             _usersWordsService,
             _addWordsService)
         .EnterAsync();

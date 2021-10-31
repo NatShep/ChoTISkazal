@@ -102,7 +102,7 @@ namespace Chotiskazal.Bot.ChatFlows
                          InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),
                          InlineButtons.Exam($"{chat.Texts.LearnButton} {Emojis.Learning}"),}, 
                     new[]{ InlineButtons.Translation($"{chat.Texts.TranslateButton} {Emojis.Translate}")},
-                    new[]{ InlineButtons.WellLearnedWords($"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}) {Emojis.ShowWellLearnedWords}")}
+                    new[]{ InlineButtons.WellLearnedWords($"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}) {Emojis.SoftMark}")}
                 });
         }
 

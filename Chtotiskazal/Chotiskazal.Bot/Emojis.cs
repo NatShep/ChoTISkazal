@@ -8,9 +8,13 @@
         public const string Passed = "✅";
         public const string Failed = "❌";
         public const string Selected = "☑️";
-        public const string ShowWellLearnedWords = "✓";
-        public const string Next = ">>";
-        public const string Prev = "<<";
-
+        public const string SoftMark = "✓";
+        public const string HeavyMinus = "➖";
+        public const string HeavyPlus = "➕";
+        public const string SoftNext = ">>";
+        public const string SoftPrev = "<<";
+        public const string OpenQuote = "«";
+        public const string CloseQuote = "»";
+        public static string NextButton = "⏭️";
     }
 }

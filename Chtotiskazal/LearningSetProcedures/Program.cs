@@ -32,31 +32,45 @@ class Program {
 
     static async Task Main(string[] args) {
         Initialize();
-        var vocaPath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/all.vocab";
-        //var vocab = VocabFileTools.Load(vocaPath);
         
-        //VocabFileTools.Save(vocab,vocaPath);
-        //await VocabFileTools.SaveToMongo(_localDictionaryService,vocab);
+        var vocaPath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/all.vocab";
+        var top5kpath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/final5000";
+        var setdirpath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/";
+        Split5000ToSets(top5kpath, setdirpath);
 
-        var all = await VocabFileTools.GetFromMongo(_localDictionaryService);
-        VocabFileTools.Save(all, vocaPath);
-
-        var path = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sortedWithTranslation5000";
-        var pairs = ReadPairs(path, 0, 6000); //.Randomize().ToList();
+        var sets = new[] {
+            await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/100.learningset"),
+            await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/300.learningset"),
+            await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/600.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/1000.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/1500.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/2000.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/3000.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/4000.learningset"),
+            // await ReadLearningSetModel("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sets/5000.learningset"),
+        };
+        foreach (var learningSet in sets)
+        {
+            Console.WriteLine($"Saving set {learningSet.ShortName}...");
+            await _learningSetService.Add(learningSet);
+        }
+        return;
+        var pairs = ReadPairs(top5kpath, 0, 6000); //.Randomize().ToList();
         int missed = 0;
         int total = 0;
         int restored = 0;
-        var restoredPairs = new StringBuilder(); 
+        var restoredPairs = new StringBuilder();
         foreach (var (en, ru) in pairs)
         {
             total++;
-            var  translations = await _addWordService.GetOrDownloadTranslation(en.ToLower());
+            var translations = await _addWordService.GetOrDownloadTranslation(en.ToLower());
             if (translations == null || !translations.Any())
             {
                 Console.WriteLine($"[{total}] Word {en}\t{ru} - not found");
                 restoredPairs.AppendLine($"{en}\t---");
                 continue;
             }
+
             var ruwords = ru.Split(",")
                             .SelectToArray(t => t.Trim().ToLower());
             var resultTrans = translations.FirstOrDefault(
@@ -99,22 +113,103 @@ class Program {
             // }
             // restoredPairs.AppendLine($"{en}\t{ru}");
         }
-        File.WriteAllText("/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sortedAndTranslated", restoredPairs.ToString());
+
+        File.WriteAllText(
+            "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/sortedAndTranslated", restoredPairs.ToString());
         int delay = 1000;
         //await EnsureDownloaded(pairs, 500);
         //await CreateLearningSet(pairs);
     }
 
-    private static DictionaryTranslation FirstThatContainsRuWordInExamples(IReadOnlyList<DictionaryTranslation> translations, string[] ruwords) {
-        var tr = translations
+    private static async Task LoadVocabToMongo(string path) {
+        var vocab = VocabFileTools.Load(path);
+        await VocabFileTools.SaveToMongo(_localDictionaryService, vocab);
+    }
+
+    private static async Task SaveVocabFromMongo(string path) {
+        var all = await VocabFileTools.GetFromMongo(_localDictionaryService);
+        VocabFileTools.Save(all, path);
+    }
+
+    private static async Task LoadLearningSetModel(string learnsetFile) {
+        var learningSet = await ReadLearningSetModel(learnsetFile);
+        await _learningSetService.Add(learningSet);
+        
+    }
+    private static async Task<LearningSet> ReadLearningSetModel(string learnsetFile) {
+        var learningSetDescription = LearningSetDescription.ReadFromFile(learnsetFile);
+        var words = new List<WordInLearningSet>();
+        Console.WriteLine($"Reading set {learningSetDescription.Id}...");
+        foreach (var wordDescription in learningSetDescription.Words)
+        {
+            var translations = await _addWordService.GetOrDownloadTranslation(wordDescription.En);
+            if (!translations.Any())
+                throw new InvalidOperationException();
+            
+            var allowedTranslations = translations.Where(
+                                          t => wordDescription.Ru
+                                                              .Any(
+                                                                  r => r.Equals(
+                                                                      t.TranslatedText,
+                                                                      StringComparison.InvariantCultureIgnoreCase))
+                                                              )
+                                      .ToArray();
+            if (!allowedTranslations.Any())
+                allowedTranslations = translations.Take(2).ToArray();
+
+            var examples = allowedTranslations.SelectMany(t => t.Examples).Select(e => e.Id).Randomize().Take(2).ToArray();
+            var wordModel = new WordInLearningSet() {
+                Word = wordDescription.En,
+                AllowedTranslations = allowedTranslations.SelectToArray(t => t.TranslatedText),
+                AllowedExamples = examples
+            };
+            words.Add(wordModel);
+        }
+
+        return new LearningSet {
+            Enabled = true,
+            ShortName = learningSetDescription.Id,
+            EnName = learningSetDescription.EnName,
+            EnDescription = learningSetDescription.EnDescription,
+            RuName = learningSetDescription.RuName,
+            RuDescription = learningSetDescription.RuDescription,
+            Words = words
+        };
+    }
+    
+    private static void Split5000ToSets(string topFile, string targetDir) {
+        var lines = File.ReadAllLines(topFile);
+        var count = new[] { 100, 200, 300, 400, 500, 500, 1000, 1000, 1000 };
+        var totalSize = 0;
+        foreach (int i in count)
+        {
+            var name = (totalSize + i).ToString();
+            var description = $"words [{totalSize} {totalSize + i}]";
+
+            var split = new[] {
+                    "id: " + "top"+name,
+                    "en: " + $"Top [{totalSize} {totalSize + i}] frequent words",
+                    "ru: " + $"Частотные слова [{totalSize} {totalSize + i}]",
+                    "end: " + $"",
+                    "rud: " + $"",
+                    "",
+                }.Concat(
+                     lines.Skip(totalSize).Take(i))
+                 .ToArray();
+            File.WriteAllLines($"{targetDir}{name}.learningset", split);
+            totalSize += i;
+        }
+    }
+
+    private static DictionaryTranslation GetFirstThatContainsRuWordInExamples(
+        IReadOnlyList<DictionaryTranslation> translations, string[] ruwords) =>
+        translations
             .FirstOrDefault(
                 t =>
                     t.Examples.Any(
                         e =>
                             e.TranslatedPhrase.Split(" ")
                              .Any(w => ruwords.Contains(w.ToLower()))));
-        return tr;
-    }
 
     private static BotSettings ReadConfiguration() {
         try

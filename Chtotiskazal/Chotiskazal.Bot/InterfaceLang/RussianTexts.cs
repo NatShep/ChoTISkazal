@@ -23,10 +23,10 @@ public class RussianTexts : IInterfaceTexts {
     public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
     public string SelectLearningSet => "Выбрать";
     public string SelectWordInLearningSet => "Хочу учить";
+    public string Skip => "Пропустить";
 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
-
 
     public string OutOfScopeTranslationMarkdown { get; }
         = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
@@ -143,8 +143,17 @@ public class RussianTexts : IInterfaceTexts {
     public string LearnSomeWordsMarkdown(in int length)
         => $"Выучено слов: {length}\\. Давай еще\\!";
 
-    public string ShowNumberOfLists(in int number, in int count)
+    public string PageXofYMarkdown(in int number, in int count)
         => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
+
+    public string XofYMarkdown(in int number, in int y) 
+        => $"\r\n`Слово {number} из {y}\\.\\.\\.`";
+
+    public string WordIsAddedForLearning(string word) =>
+        $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
+
+    public string WordIsSkippedForLearning(string word) =>
+        $"{Emojis.Failed} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} не будет изучено";
 
     public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";

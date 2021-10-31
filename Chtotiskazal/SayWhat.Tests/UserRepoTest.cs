@@ -144,11 +144,11 @@ public class UserRepoTests {
         model.OnRussianWordTranslationRequest();
         model.TrainingSets = new List<UserTrainSet> {
             new UserTrainSet {
-                KitId = ObjectId.GenerateNewId(),
+                SetId = ObjectId.GenerateNewId(),
                 LastSeenWordOffset = 1,
             },
             new UserTrainSet {
-                KitId = ObjectId.GenerateNewId(),
+                SetId = ObjectId.GenerateNewId(),
                 LastSeenWordOffset = 2,
             }
         };
@@ -166,9 +166,9 @@ public class UserRepoTests {
         Assert.AreEqual(124, user.ExamplesCount);
         Assert.AreEqual(2, user.TrainingSets?.Count);
         Assert.AreEqual(1, user.TrainingSets[0].LastSeenWordOffset);
-        Assert.AreEqual(model.TrainingSets[0].KitId, user.TrainingSets[0].KitId);
+        Assert.AreEqual(model.TrainingSets[0].SetId, user.TrainingSets[0].SetId);
         Assert.AreEqual(2, user.TrainingSets[1].LastSeenWordOffset);
-        Assert.AreEqual(model.TrainingSets[1].KitId, user.TrainingSets[1].KitId);
+        Assert.AreEqual(model.TrainingSets[1].SetId, user.TrainingSets[1].SetId);
     }
 }
 

@@ -11,7 +11,7 @@ namespace SayWhat.MongoDAL.WordKits {
 public class LearningSet {
     public ObjectId Id { get; set; } = new ObjectId();
     [BsonElement("words")] public List<WordInLearningSet> Words { get; set; }
-    
+    [BsonElement("shortName")] public string ShortName { get; set; }
     [BsonElement("enname")] public string EnName { get; set; }
     [BsonElement("runame")] public string RuName { get; set; }
     [BsonElement("enDesc")] public string EnDescription { get; set; }
@@ -23,10 +23,10 @@ public class LearningSet {
 
     public void RegisterUsage(UserModel user, int offset) {
         user.TrainingSets ??= new List<UserTrainSet>();
-        var alreadyContains = user.TrainingSets.FirstOrDefault(t => t.KitId == Id);
+        var alreadyContains = user.TrainingSets.FirstOrDefault(t => t.SetId == Id);
         if (alreadyContains == null)
         {
-            alreadyContains = new UserTrainSet { KitId = Id };
+            alreadyContains = new UserTrainSet { SetId = Id };
             user.TrainingSets.Add(alreadyContains);
         }
 

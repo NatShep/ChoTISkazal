@@ -41,7 +41,7 @@ public class ChatIO {
         => _updateHooks = _updateHooks.Append(hook).ToArray();
 
     internal void OnUpdate(Update update) {
-        Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}", false);
+        Botlog.WriteInfo($"Received msg from chat {ChatId.Identifier} {ChatId.Username}", false);
         foreach (var hook in _updateHooks)
         {
             if (hook.CanBeHandled(update))

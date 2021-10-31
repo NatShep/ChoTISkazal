@@ -17,7 +17,8 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string InterfaceLanguageSetupped => "Interface language: English";
         public string JustOneLearnedWord => "You have learned just one word\\!";
         public string SelectLearningSet => "Select set";
-        public string SelectWordInLearningSet => "Add word";
+        public string SelectWordInLearningSet => "Learn it";
+        public string Skip => "Skip it";
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
         public string OutOfScopeTranslationMarkdown => "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";
@@ -127,8 +128,17 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string LearnSomeWordsMarkdown(in int length)
             =>$"You have learned {length} words\\. Let's do more\\!";
 
-        public string ShowNumberOfLists(in int number,in int count)
-            => $"\r\n`Show {number} list of {count}\\.\\.\\.`";
+        public string PageXofYMarkdown(in int number,in int count)
+            => $"\r\n`Page {number} of {count}\\.\\.\\.`";
+        
+        public string XofYMarkdown(in int x,in int y)
+            => $"`{x} of {y}`";
+
+        public string WordIsAddedForLearning(string word) =>
+            $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
+
+        public string WordIsSkippedForLearning(string word) =>
+            $"{Emojis.Failed} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} will not be studied";
 
         public string YouHaveLearnedWords(in int count)
             => $"You have learned {count} words";

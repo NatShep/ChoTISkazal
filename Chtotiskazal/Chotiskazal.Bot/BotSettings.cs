@@ -26,20 +26,32 @@ namespace Chotiskazal.Bot
             WelcomeMessage = configuration["welcome-msg"];
         }
 
-        private ExamSettings ReadExamSettings(IConfigurationSection configuration) =>
+        private ExamSettings ReadExamSettings(IConfigurationSection secton) =>
             new ExamSettings
             {
-                MinAdvancedExamMinQuestionAskedCount = int.Parse(configuration["MinAdvancedExamMinQuestionAskedCount"]),
-                MaxAdvancedExamMinQuestionAskedCount = int.Parse(configuration["MaxAdvancedExamMinQuestionAskedCount"]),
-                MaxAdvancedQuestionsCount = int.Parse(configuration["MaxAdvancedQuestionsCount"]),
-                MinLearningWordsCountInOneExam = int.Parse(configuration["MinLearningWordsCountInOneExam"]),
-                MaxLearningWordsCountInOneExam = int.Parse(configuration["MaxLearningWordsCountInOneExam"]),
-                MinTimesThatLearningWordAppearsInExam = int.Parse(configuration["MinTimesThatLearningWordAppearsInExam"]),
-                MaxTimesThatLearningWordAppearsInExam = int.Parse(configuration["MaxTimesThatLearningWordAppearsInExam"]),
-                MaxExamSize = int.Parse(configuration["MaxExamSize"]),
+                MinAdvancedExamMinQuestionAskedCount = ReadInt(secton, "MinAdvancedExamMinQuestionAskedCount"),
+                MaxAdvancedExamMinQuestionAskedCount = ReadInt(secton,"MaxAdvancedExamMinQuestionAskedCount"),
+                MaxAdvancedQuestionsCount = ReadInt(secton,"MaxAdvancedQuestionsCount"),
+                MinLearningWordsCountInOneExam = ReadInt(secton,"MinLearningWordsCountInOneExam"),
+                MaxLearningWordsCountInOneExam = ReadInt(secton,"MaxLearningWordsCountInOneExam"),
+                MinTimesThatLearningWordAppearsInExam = ReadInt(secton,"MinTimesThatLearningWordAppearsInExam"),
+                MaxTimesThatLearningWordAppearsInExam = ReadInt(secton,"MaxTimesThatLearningWordAppearsInExam"),
+                MaxExamSize = ReadInt(secton,"MaxExamSize"),
             };
 
+        private int ReadInt(IConfigurationSection section, string key) {
 
+            try
+            {
+                var value = section[key];
+                return int.Parse(value);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException($"Cannot parse or found {key}");
+            }
+            
+        }
         public ExamSettings ExamSettings { get; }
         public string HelpMessage { get; }
         public string WelcomeMessage { get; }
