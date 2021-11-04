@@ -20,10 +20,10 @@ public class RussianTexts : IInterfaceTexts {
     public string InterfaceLanguageSetupped => "Язык интрфейса - русский.";
 
     public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
-    public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
-    public string SelectLearningSet => "Выбрать";
+    public string JustOneLearnedWord => "Выучено только одно слово\\! Какая жалость\\.";
     public string SelectWordInLearningSet => "Хочу учить";
     public string Skip => "Пропустить";
+    public string ChooseLearningSet => "Выберите набор слов для изучения";
 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
@@ -155,6 +155,8 @@ public class RussianTexts : IInterfaceTexts {
     public string WordIsSkippedForLearning(string word) =>
         $"{Emojis.Failed} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} не будет изучено";
 
+    public string LearningSetNotFound(string argument) => $"Набор слов '{argument}' не найден";
+
     public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";
 
@@ -176,6 +178,7 @@ public class RussianTexts : IInterfaceTexts {
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
     public string MainMenuButton => "Глав меню";
+    public string LearningSetsButton => "Наборы слов";
     public string ShowWellKnownWords => "Посмотреть, что уже выучил";
 
     #endregion

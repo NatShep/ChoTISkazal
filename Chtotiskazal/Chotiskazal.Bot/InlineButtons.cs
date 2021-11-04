@@ -12,6 +12,8 @@ public static class InlineButtons {
 
     public static InlineKeyboardButton Translation(string text) => new InlineKeyboardButton
         { CallbackData = BotCommands.Add, Text = text };
+    public static InlineKeyboardButton LearningSets(string text)=> new InlineKeyboardButton
+        { CallbackData = BotCommands.New, Text = text };
 
     public static InlineKeyboardButton Exam(IInterfaceTexts texts) =>
         Exam(texts.LearnButton);
@@ -41,6 +43,7 @@ public static class InlineButtons {
                            Text = v ?? throw new InvalidDataException("Keyboard text cannot be null")
                        })
                    .ToArray();
+
 }
 
 }

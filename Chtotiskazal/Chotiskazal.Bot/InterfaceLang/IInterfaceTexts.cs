@@ -92,9 +92,10 @@ public interface IInterfaceTexts {
     string ShowWellKnownWords { get; }
     string NoWellKnownWords { get; }
     string JustOneLearnedWord { get; }
-    string SelectLearningSet { get; }
     string SelectWordInLearningSet { get; }
     string Skip { get;  }
+    string ChooseLearningSet { get;  }
+    string LearningSetsButton { get; }
     string OutOfScopeWithCandidateMarkdown(string otherMeaning);
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);
@@ -109,6 +110,7 @@ public interface IInterfaceTexts {
     string XofYMarkdown(in int x, in int y);
     string WordIsAddedForLearning(string word);
     string WordIsSkippedForLearning(string word);
+    string LearningSetNotFound(string argument);
 }
 
 }

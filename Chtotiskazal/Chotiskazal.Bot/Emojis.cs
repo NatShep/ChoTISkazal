@@ -16,5 +16,6 @@
         public const string OpenQuote = "«";
         public const string CloseQuote = "»";
         public static string NextButton = "⏭️";
+        public static string LearningSets = "§";
     }
 }

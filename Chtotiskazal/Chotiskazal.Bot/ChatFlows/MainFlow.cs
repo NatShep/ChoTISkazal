@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
@@ -36,7 +37,6 @@ public class MainFlow {
 
     private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
-    private LearnBotCommandHandler _learnCommandHandler;
     private AddBotCommandHandler _addWordCommandHandler;
     public ChatIO ChatIo { get; }
 
@@ -99,16 +99,16 @@ public class MainFlow {
         ChatIo.AddUpdateHook(_wellKnownWordsUpdateHook);
 
         // Initialize  command handlers
-        _learnCommandHandler = new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings);
         _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _translationSelectedUpdateHook);
 
         ChatIo.CommandHandlers = new[] {
             HelpBotCommandHandler.Instance,
             StatsBotCommandHandler.Instance,
-            _learnCommandHandler,
+            new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings),
             _addWordCommandHandler,
-            new NewBotCommandHandler(
-                _localDictionaryService, _learningSetService, _userService, _usersWordsService, _addWordsService),
+            new ShowLearningSetsBotCommandHandler(_learningSetService),
+            new SelectLearningSet(
+                _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
             new StartBotCommandHandler(ShowMainMenu),
         };
     }
@@ -142,11 +142,14 @@ public class MainFlow {
             var examBtn = InlineButtons.Exam($"{Chat.Texts.LearnButton} {Emojis.Learning}");
             var statsBtn = InlineButtons.Stats(Chat.Texts);
             var helpBtn = InlineButtons.HowToUse(Chat.Texts);
+            var learningSetsBtn = InlineButtons.LearningSets($"{Chat.Texts.LearningSetsButton} {Emojis.LearningSets}");
+
             await ChatIo.SendMarkdownMessageAsync(
                 $"{Emojis.MainMenu} {Chat.Texts.MainMenuTextMarkdown}",
                 new[] {
                     new[] { translationBtn },
                     new[] { examBtn },
+                    new[] { learningSetsBtn },
                     new[] { statsBtn, helpBtn }
                 });
 
@@ -163,19 +166,11 @@ public class MainFlow {
                 if (action.CallbackQuery != null)
                 {
                     var btn = action.CallbackQuery.Data;
-                    if (btn == translationBtn.CallbackData)
+                    // button data contains same commands as in menu items 
+                    var commandHandler = ChatIo.CommandHandlers.FirstOrDefault(c => c.Acceptable(btn));
+                    if (commandHandler != null)
                     {
-                        await _addWordCommandHandler.Execute(String.Empty, Chat);
-                        return;
-                    }
-                    else if (btn == examBtn.CallbackData)
-                    {
-                        await _learnCommandHandler.Execute(string.Empty, Chat);
-                        return;
-                    }
-                    else if (btn == statsBtn.CallbackData)
-                    {
-                        await StatsBotCommandHandler.Instance.Execute(string.Empty, Chat);
+                        await commandHandler.Execute(null, Chat);
                         return;
                     }
                 }

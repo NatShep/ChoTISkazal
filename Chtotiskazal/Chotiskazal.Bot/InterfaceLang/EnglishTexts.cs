@@ -16,9 +16,10 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string TypoAlmostRight => "Almost right. But you have a typo. Let's try again";
         public string InterfaceLanguageSetupped => "Interface language: English";
         public string JustOneLearnedWord => "You have learned just one word\\!";
-        public string SelectLearningSet => "Select set";
         public string SelectWordInLearningSet => "Learn it";
         public string Skip => "Skip it";
+        public string ChooseLearningSet => "Choose learning set";
+
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
         public string OutOfScopeTranslationMarkdown => "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";
@@ -104,8 +105,7 @@ namespace Chotiskazal.Bot.InterfaceLang
             "I am a translator and teacher\\.\r\n" +
             "First you can use me as a regular translator\\." +
             "After that " +
-            "learn this words and it helps you to speak English easily\\.\r\n\r\n" +
-            "*Just try it and see for yourself\\!*";
+            "learn this words and it helps you to speak English easily\\.";
 
         public string ActionIsNotAllowed => "action is not allowed";
         public string OopsSomethingGoesWrong => "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
@@ -140,6 +140,9 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string WordIsSkippedForLearning(string word) =>
             $"{Emojis.Failed} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} will not be studied";
 
+        public string LearningSetNotFound(string argument) =>
+            $"Learning set {argument} was not found";
+
         public string YouHaveLearnedWords(in int count)
             => $"You have learned {count} words";
 
@@ -157,6 +160,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ContinueTranslateButton => "Continue";
         public string LearnButton => "Learn";
         public string StatsButton => "Stats";
+        public string LearningSetsButton => "Sets of words";
         public string HelpButton => "Help";
         public string MainMenuButton => "Main menu";
 

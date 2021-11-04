@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Hooks;
@@ -47,34 +49,29 @@ public class AddBotCommandHandler : IBotCommandHandler {
 }
 
 
-public class NewBotCommandHandler : IBotCommandHandler {
-    private readonly LocalDictionaryService _localDictionaryService;
+public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
     private readonly LearningSetService _learningSetService;
-    private readonly UserService _userService;
-    private readonly UsersWordsService _usersWordsService;
-    private readonly AddWordService _addWordsService;
 
-    public NewBotCommandHandler(
-        LocalDictionaryService localDictionaryService, LearningSetService learningSetService, UserService userService,
-        UsersWordsService usersWordsService, AddWordService addWordsService) {
-        _localDictionaryService = localDictionaryService;
+    public ShowLearningSetsBotCommandHandler(LearningSetService learningSetService) {
         _learningSetService = learningSetService;
-        _userService = userService;
-        _usersWordsService = usersWordsService;
-        _addWordsService = addWordsService;
     }
 
     public bool Acceptable(string text) => text == BotCommands.New;
     public string ParseArgument(string text) => null;
 
-    public Task Execute(string argument, ChatRoom chat) => new SelectLearningSetsFlow(
-            chat,
-            _localDictionaryService,
-            _learningSetService,
-            _userService,
-            _usersWordsService,
-            _addWordsService)
-        .EnterAsync();
+    public async Task Execute(string argument, ChatRoom chat) {
+        var allSets = await _learningSetService.GetAllSets();
+        var msg = new StringBuilder($"{chat.Texts.ChooseLearningSet}:\r\n");
+        foreach (var learningSet in allSets)
+        {
+            msg.AppendLine(
+                $"{BotCommands.LearningSetPrefix}_" 
+                + learningSet.ShortName + "   " 
+                + learningSet.EnName + "\r\n" 
+                + learningSet.EnDescription+"\r\n");
+        }
+        await chat.SendMessageAsync(msg.ToString());
+    }
 }
 
 public class LearnBotCommandHandler : IBotCommandHandler {
@@ -129,6 +126,43 @@ public class StartBotCommandHandler : IBotCommandHandler {
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) => _showMainMenu();
+}
+
+public class SelectLearningSet : IBotCommandHandler {
+    private const string Prefix = BotCommands.LearningSetPrefix + "_";
+    private readonly LearningSetService _learningSetService;
+    private readonly LocalDictionaryService _localDictionaryService;
+    private readonly UserService _userService;
+    private readonly UsersWordsService _usersWordsService;
+    private readonly AddWordService _addWordService;
+    public SelectLearningSet(LearningSetService learningSetService, LocalDictionaryService localDictionaryService, UserService userService, UsersWordsService usersWordsService, AddWordService addWordService) {
+        _learningSetService = learningSetService;
+        _localDictionaryService = localDictionaryService;
+        _userService = userService;
+        _usersWordsService = usersWordsService;
+        _addWordService = addWordService;
+    }
+
+    public bool Acceptable(string text) => text.StartsWith(Prefix);
+    public string ParseArgument(string text) => text[Prefix.Length..].Trim();
+
+    public async Task Execute(string argument, ChatRoom chat) {
+        var allSets = await _learningSetService.GetAllSets();
+        var set = allSets.FirstOrDefault(s => s.ShortName.Equals(argument, StringComparison.InvariantCultureIgnoreCase));
+        if (set == null)
+        {
+            await chat.SendMessageAsync(chat.Texts.LearningSetNotFound(argument));
+            return;
+        }
+        
+        await new AddFromLearningSetFlow(
+            chat: chat, 
+            localDictionaryService: _localDictionaryService, 
+            set: set, 
+            userService: _userService,
+            usersWordsService: _usersWordsService, 
+            addWordService: _addWordService).EnterAsync();
+    }
 }
 
 }
