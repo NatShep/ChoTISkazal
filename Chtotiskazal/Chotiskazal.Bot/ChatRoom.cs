@@ -24,7 +24,7 @@ namespace Chotiskazal.Bot
             _origin = origin;
             User = user;
             _chlangHook = new ChangeInterfaceLanguageHook(origin);
-            origin.AddUpdateHooks(_chlangHook);
+            origin.AddUpdateHook(_chlangHook);
         }
 
         #region wrap chat io

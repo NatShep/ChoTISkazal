@@ -34,7 +34,7 @@ internal class TranslateWordsFlow {
     }
 
     private async Task<string?> EnterSingleWordAsync(string? word = null) {
-        if (word == null)
+        if (string.IsNullOrWhiteSpace(word))
         {
             await Chat.SendMessageAsync($"{Emojis.Translate} {Chat.Texts.EnterWordOrStart}");
             word = await Chat.WaitUserTextInputAsync();
@@ -49,7 +49,9 @@ internal class TranslateWordsFlow {
         if (!word.IsRussian())
             getUserWordTask = _addWordService.GetWordNullByEngWord(Chat.User, word);
 
-        var translations = await _addWordService.GetOrDownloadTranslation(word);
+        var translations = await _addWordService.FindInDictionaryWithExamples(word);
+        if (!translations.Any()) // if not, search it in Ya dictionary
+            translations = await _addWordService.TranslateAndAddToDictionary(word);
 
         if (translations?.Any() != true)
         {

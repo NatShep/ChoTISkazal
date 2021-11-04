@@ -9,7 +9,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows
 {
-    public static class ChatProcedures
+    public static class StatsRenderer
     {
         private const string Empty = "✖";
         private const string S0 = "➖";
@@ -18,7 +18,14 @@ namespace Chotiskazal.Bot.ChatFlows
         private const string S3 = "◻️";
         private const string S4 = "⬜️";
         private const string S5 = "🟩";
-
+        
+        public static string GetStatsText(ChatRoom chat) =>
+            RenderStats(chat) +
+            $"```\r\n" +
+            Render7WeeksCalendar(chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray(), chat.Texts) +
+            $"```\r\n" +
+            $"\r\n" +
+            $"*{RenderRecomendations(chat.User, chat.Texts)}*";
         private static string Render7WeeksCalendar(CalendarItem[] items, IInterfaceTexts texts)
         {
             var today = DateTime.Today;
@@ -70,43 +77,28 @@ namespace Chotiskazal.Bot.ChatFlows
             return sb.ToString();
         }
 
-        public static async Task ShowStats(ChatRoom chat)
-        {
+        private static string RenderStats(ChatRoom chat) {
             var lastMonth = chat.User.GetLastMonth();
             var lastDay = chat.User.GetToday();
-
-            var msg =
-                $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
-                $"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
-                $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
-                $"  {chat.Texts.StatsScore}: {(int)chat.User.GamingScore}\r\n```\r\n" +
-                $"{chat.Texts.StatsThisMonth}:\r\n```" +
-                $"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
-                $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
-                $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
-                $"  {chat.Texts.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
-                $"{chat.Texts.StatsThisDay}:\r\n```" +
-                $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
-                $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
-                $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
-                $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
-                $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n" +
-                $"```\r\n" +
-                $"{Render7WeeksCalendar(chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray(),chat.Texts)}" +
-                $"```\r\n" +
-                $"\r\n" +
-                $"*{GetRecomendationFor(chat.User, chat.Texts)}*";
-            await chat.SendMarkdownMessageAsync(msg.EscapeForMarkdown(),
-                new[]{
-                    new[]{
-                         InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),
-                         InlineButtons.Exam($"{chat.Texts.LearnButton} {Emojis.Learning}"),}, 
-                    new[]{ InlineButtons.Translation($"{chat.Texts.TranslateButton} {Emojis.Translate}")},
-                    new[]{ InlineButtons.WellLearnedWords($"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}) {Emojis.SoftMark}")}
-                });
+            var statsText = $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
+                            $"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
+                            $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                            $"  {chat.Texts.StatsScore}: {(int)chat.User.GamingScore}\r\n```\r\n" +
+                            $"{chat.Texts.StatsThisMonth}:\r\n```" +
+                            $"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
+                            $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
+                            $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
+                            $"  {chat.Texts.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
+                            $"{chat.Texts.StatsThisDay}:\r\n```" +
+                            $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
+                            $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
+                            $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
+                            $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
+                            $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
+            return statsText;
         }
 
-        private static string GetRecomendationFor(UserModel user, IInterfaceTexts texts)
+        private static string RenderRecomendations(UserModel user, IInterfaceTexts texts)
         {
             if (user.Zen.Rate < -15)
                 return texts.Zen1WeNeedMuchMoreNewWords;

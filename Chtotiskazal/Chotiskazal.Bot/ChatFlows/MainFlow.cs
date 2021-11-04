@@ -13,8 +13,8 @@ public class MainFlow {
         BotSettings settings,
         AddWordService addWordsService,
         UsersWordsService usersWordsService,
-        UserService userService, 
-        LocalDictionaryService localDictionaryService, 
+        UserService userService,
+        LocalDictionaryService localDictionaryService,
         LearningSetService learningSetService) {
         ChatIo = chatIo;
         _userInfo = userInfo;
@@ -32,39 +32,26 @@ public class MainFlow {
     private readonly LocalDictionaryService _localDictionaryService;
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
-
     private readonly BotSettings _settings;
 
     private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
+    private LearnBotCommandHandler _learnCommandHandler;
+    private AddBotCommandHandler _addWordCommandHandler;
     public ChatIO ChatIo { get; }
-    private async Task SayHelloAsync() => await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
 
     public async Task Run() {
         try
         {
-            string mainMenuCommandOrNull = null;
+            await Initialize();
 
-            var user = await _userService.GetUserOrNull(_userInfo);
-            if (user == null)
-            {
-                var addUserTask = _userService.AddUserFromTelegram(_userInfo);
-                await SayHelloAsync();
-                user = await addUserTask;
-                Botlog.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString(), true);
-            }
-
-            Chat = new ChatRoom(ChatIo, user);
-
-            _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(_addWordsService, Chat);
-            _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
-            ChatIo.AddUpdateHooks(_translationSelectedUpdateHook);
-            ChatIo.AddUpdateHooks(_wellKnownWordsUpdateHook);
+            (string Command, IBotCommandHandler CommandHandler)? mainMenuCommandOrNull = null;
 
             while (true)
             {
                 try
                 {
+                    //run main scenario or mainMenuCommand
                     await HandleMainScenario(mainMenuCommandOrNull);
                     mainMenuCommandOrNull = null;
                 }
@@ -74,7 +61,8 @@ public class MainFlow {
                 }
                 catch (ProcessInterruptedWithMenuCommand e)
                 {
-                    mainMenuCommandOrNull = e.Command;
+                    //main scenario may be interrupted with main menu command
+                    mainMenuCommandOrNull = (e.Command, e.CommandHandler);
                 }
                 catch (Exception e)
                 {
@@ -91,66 +79,61 @@ public class MainFlow {
         }
     }
 
+    private async Task Initialize() {
+        //Initialize user
+        var user = await _userService.GetUserOrNull(_userInfo);
+        if (user == null)
+        {
+            var addUserTask = _userService.AddUserFromTelegram(_userInfo);
+            await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
+            user = await addUserTask;
+            Botlog.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString(), true);
+        }
+
+        Chat = new ChatRoom(ChatIo, user);
+        // Initialize update hooks
+        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(_addWordsService, Chat);
+        _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
+
+        ChatIo.AddUpdateHook(_translationSelectedUpdateHook);
+        ChatIo.AddUpdateHook(_wellKnownWordsUpdateHook);
+
+        // Initialize  command handlers
+        _learnCommandHandler = new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings);
+        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _translationSelectedUpdateHook);
+
+        ChatIo.CommandHandlers = new[] {
+            HelpBotCommandHandler.Instance,
+            StatsBotCommandHandler.Instance,
+            _learnCommandHandler,
+            _addWordCommandHandler,
+            new NewBotCommandHandler(
+                _localDictionaryService, _learningSetService, _userService, _usersWordsService, _addWordsService),
+            new StartBotCommandHandler(ShowMainMenu),
+        };
+    }
+
     private ChatRoom Chat { get; set; }
 
-    private async Task HandleMainScenario(string mainMenuCommandOrNull) {
+    private async Task HandleMainScenario((string Command, IBotCommandHandler CommandHandler)? command) {
         Chat.User.OnAnyActivity();
-        if (mainMenuCommandOrNull != null)
+        if (command.HasValue)
         {
-            await HandleMainMenu(mainMenuCommandOrNull);
+            // if main scenario was interrupted by command - then handle the command
+            await command.Value.CommandHandler.Execute(command.Value.Command, Chat);
         }
         else
         {
+            // handle user input as "translate" handler
             var message = await ChatIo.WaitUserInputAsync();
             if (message.Message?.Text != null)
-                await StartToAddNewWords(message.Message?.Text);
+                await _addWordCommandHandler.Execute(message.Message?.Text, Chat);
             else
                 await ChatIo.SendMessageAsync(Chat.Texts.EnterWordOrStart);
         }
     }
 
     private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Chat.Texts.ActionIsNotAllowed);
-
-    private Task StartSelectLearningSets() => new SelectLearningSetsFlow(
-            Chat,
-            _localDictionaryService,
-            _learningSetService,
-            _userService,
-            _usersWordsService,
-            _addWordsService)
-        .EnterAsync();
-
-    private Task StartLearning() => new ExamFlow(Chat, _userService, _usersWordsService, _settings.ExamSettings)
-        .EnterAsync();
-
-    private Task StartToAddNewWords(string text = null)
-        => new TranslateWordsFlow(Chat, _addWordsService, _translationSelectedUpdateHook).Enter(text);
-
-    private Task ShowWellKnownWords() =>
-        new ShowWellKnownWordsFlow(Chat, _usersWordsService, _wellKnownWordsUpdateHook).EnterAsync();
-
-    private Task HandleMainMenu(string command) =>
-        command switch {
-            BotCommands.Help  => SendHelp(),
-            BotCommands.Add   => StartToAddNewWords(),
-            BotCommands.New   => StartSelectLearningSets(),
-            BotCommands.Learn => StartLearning(),
-            BotCommands.Stats => ChatProcedures.ShowStats(Chat),
-            BotCommands.Start => ShowMainMenu(),
-            BotCommands.Words => ShowWellKnownWords(),
-            _                 => Task.CompletedTask
-        };
-
-
-    private async Task SendHelp() {
-        await ChatIo.SendMarkdownMessageAsync(
-            Chat.Texts.HelpMarkdown,
-            new[] {
-                new[] {
-                    InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
-                }
-            });
-    }
 
     private async Task ShowMainMenu() {
         while (true)
@@ -173,27 +156,26 @@ public class MainFlow {
 
                 if (action.Message != null)
                 {
-                    await StartToAddNewWords(action.Message.Text);
+                    await _addWordCommandHandler.Execute(action.Message.Text, Chat);
                     return;
                 }
 
                 if (action.CallbackQuery != null)
                 {
                     var btn = action.CallbackQuery.Data;
-
                     if (btn == translationBtn.CallbackData)
                     {
-                        await StartToAddNewWords();
+                        await _addWordCommandHandler.Execute(String.Empty, Chat);
                         return;
                     }
                     else if (btn == examBtn.CallbackData)
                     {
-                        await StartLearning();
+                        await _learnCommandHandler.Execute(string.Empty, Chat);
                         return;
                     }
                     else if (btn == statsBtn.CallbackData)
                     {
-                        await ChatProcedures.ShowStats(Chat);
+                        await StatsBotCommandHandler.Instance.Execute(string.Empty, Chat);
                         return;
                     }
                 }

@@ -216,7 +216,7 @@ class Program {
         {
             var set = new BotSettings();
             Console.WriteLine("DEBUG SETTINGS APPLIED");
-            set.TelegramToken = "1410506895:AAH2Qy4yRBJ8b_9zkqD0z3B-_BUoezBdbXU";
+            set.TelegramToken = "1426375583:AAFRepTstawnI9o6kDFIRQviWqTzgae_O0M";
             //   set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
             set.MongoConnectionString = "mongodb://localhost:27017/";
             set.MongoDbName = "swdumbp";
