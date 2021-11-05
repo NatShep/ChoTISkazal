@@ -23,7 +23,7 @@ public class RussianTexts : IInterfaceTexts {
     public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-        => $"Перевод-то правильный, но учим мы не его (имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
+        => $"Перевод-то правильный, но учим мы не его \\(имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 
 
     public string OutOfScopeTranslationMarkdown { get; }
