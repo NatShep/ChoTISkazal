@@ -17,7 +17,7 @@ public class RussianTexts : IInterfaceTexts {
     public string EnterMissingWord => "Введите пропущенное слово";
     public string TypoAlmostRight => "Очепяточка. Попробуем еще разок";
 
-    public string InterfaceLanguageSetupped => "Язык интрфейса - русский.";
+    public string InterfaceLanguageSetuped => "Язык интрфейса - русский.";
 
     public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
     public string JustOneLearnedWord => "Выучено только одно слово\\! Какая жалость\\.";

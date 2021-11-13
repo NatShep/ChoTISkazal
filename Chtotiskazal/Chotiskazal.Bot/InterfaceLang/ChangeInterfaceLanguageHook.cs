@@ -32,7 +32,7 @@ namespace Chotiskazal.Bot
                 SelectedInterfaceLanguage = new RussianTexts();
             }
 
-            return _chatIo.SendMessageAsync(SelectedInterfaceLanguage.InterfaceLanguageSetupped);
+            return _chatIo.SendMessageAsync(SelectedInterfaceLanguage.InterfaceLanguageSetuped);
         }
     }
 }

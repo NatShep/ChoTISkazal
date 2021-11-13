@@ -88,7 +88,7 @@ public interface IInterfaceTexts {
     string MainMenuTextMarkdown { get; }
     string ActionIsNotAllowed { get; }
     string OopsSomethingGoesWrong { get; }
-    string InterfaceLanguageSetupped { get; }
+    string InterfaceLanguageSetuped { get; }
     string ShowWellKnownWords { get; }
     string NoWellKnownWords { get; }
     string JustOneLearnedWord { get; }

@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string OriginWas => "Origin was";
         public string EnterMissingWord => "Enter missing word";
         public string TypoAlmostRight => "Almost right. But you have a typo. Let's try again";
-        public string InterfaceLanguageSetupped => "Interface language: English";
+        public string InterfaceLanguageSetuped => "Interface language: English";
         public string JustOneLearnedWord => "You have learned just one word\\!";
         public string SelectWordInLearningSet => "Learn it";
         public string Skip => "Skip it";
