@@ -1,7 +1,6 @@
 ﻿﻿using System;
  using SayWhat.MongoDAL.QuestionMetrics;
  using Serilog;
- using Serilog.Core;
  using Serilog.Events;
  using Serilog.Formatting.Json;
  using Serilog.Sinks.RollingFile;

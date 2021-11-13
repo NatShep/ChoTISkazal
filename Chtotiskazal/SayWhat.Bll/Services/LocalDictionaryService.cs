@@ -11,10 +11,10 @@ using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 namespace SayWhat.Bll.Services {
 
 public class LocalDictionaryService {
-    private readonly DictionaryRepo _dicRepository;
+    private readonly LocalDictionaryRepo _dicRepository;
     private readonly ExamplesRepo _exampleRepository;
 
-    public LocalDictionaryService(DictionaryRepo repository, ExamplesRepo exampleRepository) {
+    public LocalDictionaryService(LocalDictionaryRepo repository, ExamplesRepo exampleRepository) {
         _dicRepository = repository;
         _exampleRepository = exampleRepository;
     }
@@ -84,7 +84,7 @@ public class LocalDictionaryService {
             {
                 foreach (var example in trans.Examples)
                 {
-                    example.ExampleOrNull = examples.GetValueOrDefault(example.ExampleId);
+                    example.TryLoadExample(examples);
                 }
             }
         }
@@ -158,7 +158,10 @@ public class LocalDictionaryService {
                                       .ToList()))
                    .ToList();
     }
-
+    /// <summary>
+    /// Adds word, its translation and examples to database
+    /// </summary>
+    /// <param name="word"></param>
     public async Task AddNewWord(DictionaryWord word) {
         var allExamples = word.Translations
                               .SelectMany(t => t.Examples)

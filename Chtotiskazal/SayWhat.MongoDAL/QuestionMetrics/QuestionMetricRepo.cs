@@ -1,8 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MongoDB.Driver;
-using SayWhat.MongoDAL;
-using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.MongoDAL.QuestionMetrics {
 

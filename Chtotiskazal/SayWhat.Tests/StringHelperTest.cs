@@ -16,7 +16,7 @@ namespace SayWhat.MongoDAL.Tests
         [TestCase(" abc"," aBc")]
         [TestCase("Иди ты в пень","Иди ты в пень")]
         public void CheckMistakes_returnsEqual(string wordA, string wordB) 
-            => Assert.AreEqual(StringsCompareResult.Equal,wordA.CheckForMistakes(wordB));
+            => Assert.AreEqual(StringsCompareResult.Equal,wordA.CheckCloseness(wordB));
         
         
         [TestCase("meaningfull","meaningful")]
@@ -25,20 +25,20 @@ namespace SayWhat.MongoDAL.Tests
         [TestCase("meaningfull","meaningful")]
         [TestCase("безболезненный","безболезненый")]
         public void CheckMistakes_returnsSmallMistakes(string wordA, string wordB) 
-            => Assert.AreEqual(StringsCompareResult.SmallMistakes,wordA.CheckForMistakes(wordB));
+            => Assert.AreEqual(StringsCompareResult.SmallMistakes,wordA.CheckCloseness(wordB));
         
         
         //[TestCase("meaningfull","meninful")]
         [TestCase("meaningfull","meaninful")]
         [TestCase("безболезненный","безбоелзнненый")]
         public void CheckMistakes_returnsBigMistakes(string wordA, string wordB) 
-            => Assert.AreEqual(StringsCompareResult.BigMistakes,wordA.CheckForMistakes(wordB));
+            => Assert.AreEqual(StringsCompareResult.BigMistakes,wordA.CheckCloseness(wordB));
        
         [TestCase("Chekc","che")]
         [TestCase("a","b")]
         [TestCase("вася","петя")]
         public void CheckMistakes_returnsNotEqual(string wordA, string wordB) 
-            => Assert.AreEqual(StringsCompareResult.NotEqual,wordA.CheckForMistakes(wordB));
+            => Assert.AreEqual(StringsCompareResult.NotEqual,wordA.CheckCloseness(wordB));
         
     }
 }

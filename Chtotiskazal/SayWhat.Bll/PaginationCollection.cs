@@ -31,7 +31,7 @@ public class PaginationCollection<T> {
         set
         {
             if (value >= _items.Count)
-                _numberOfPaginate = _items.Count - 1;
+                _numberOfPaginate = 0;
             else if (value < 0)
                 _numberOfPaginate = 0;
             else

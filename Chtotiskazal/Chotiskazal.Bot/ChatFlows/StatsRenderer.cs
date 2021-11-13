@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
-using SayWhat.Bll;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 

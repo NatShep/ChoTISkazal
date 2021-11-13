@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;

@@ -59,7 +59,7 @@ public static class VocabFileTools {
         foreach (var vocWord in vocabulary.Words)
         {
             var ws = await localDictionaryService.GetAllTranslationWords(vocWord.Word);
-            if (ws != null && ws.Length>0)
+            if (ws != null && ws.Length > 0)
             {
                 Console.WriteLine($"Skip {vocWord.Word}");
             }
@@ -77,20 +77,17 @@ public static class VocabFileTools {
                                 Language = Language.En,
                                 Word = f.TranslatedText,
                                 Examples = f.Examples.SelectToArray(
-                                    e => {
-                                        var eid = ObjectId.GenerateNewId();
-                                        return new DictionaryReferenceToExample {
-                                            ExampleId = eid,
-                                            ExampleOrNull = new Example {
-                                                Id = eid,
+                                    e =>
+                                        new DictionaryReferenceToExample(
+                                            new Example {
+                                                Id = ObjectId.GenerateNewId(),
                                                 Direction = TranslationDirection.EnRu,
                                                 OriginPhrase = e.OriginPhrase,
                                                 OriginWord = vocWord.Word,
                                                 TranslatedPhrase = e.TranslatedPhrase,
                                                 TranslatedWord = f.TranslatedText,
-                                            }
-                                        };
-                                    })
+                                            })
+                                )
                             })
                     });
             }

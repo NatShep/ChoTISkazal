@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -35,7 +34,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (string.IsNullOrEmpty(enUserEntry))
                 return QuestionResult.RetryThisQuestion;
 
-            var comparation = word.Word.CheckForMistakes(enUserEntry);
+            var comparation = word.Word.CheckCloseness(enUserEntry);
             
             if (comparation == StringsCompareResult.Equal)
                 return QuestionResult.Passed(chat.Texts);

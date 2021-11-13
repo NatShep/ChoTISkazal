@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.MongoDAL.WordKits {

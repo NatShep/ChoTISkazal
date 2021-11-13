@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Examples;
 

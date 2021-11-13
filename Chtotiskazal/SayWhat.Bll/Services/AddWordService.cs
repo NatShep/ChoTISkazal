@@ -68,9 +68,17 @@ public class AddWordService {
         // Go to yandex api
         var yaResponse = await _yaDicClient.EnRuTranslateAsync(englishWord);
         if (yaResponse?.Any() != true)
-            return new DictionaryTranslation[0];
+            return Array.Empty<DictionaryTranslation>();
         var word = ConvertToDictionaryWord(englishWord, yaResponse, Language.En, Language.Ru);
-        await _localDictionaryService.AddNewWord(word);
+        try
+        {
+            await _localDictionaryService.AddNewWord(word);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
         return ToDictionaryTranslations(word);
     }
 
@@ -125,12 +133,10 @@ public class AddWordService {
                                            Word = v.translation.Text,
                                            Language = langTo,
                                            Examples = v.translation.Ex?.Select(
-                                                           e => {
-                                                               var id = ObjectId.GenerateNewId();
-                                                               return new DictionaryReferenceToExample {
-                                                                   ExampleId = id,
-                                                                   ExampleOrNull = new Example {
-                                                                       Id = id,
+                                                           e =>
+                                                               new DictionaryReferenceToExample(
+                                                                   new Example {
+                                                                       Id = ObjectId.GenerateNewId(),
                                                                        OriginWord = originText,
                                                                        TranslatedWord = v.translation.Text,
                                                                        Direction = langFrom == Language.En
@@ -138,11 +144,9 @@ public class AddWordService {
                                                                            : TranslationDirection.RuEn,
                                                                        OriginPhrase = e.Text,
                                                                        TranslatedPhrase = e.Tr.First().Text,
-                                                                   }
-                                                               };
-                                                           })
+                                                                   }))
                                                        .ToArray() ??
-                                                      new DictionaryReferenceToExample[0]
+                                                      Array.Empty<DictionaryReferenceToExample>()
                                        })
                                    .ToArray()
         };

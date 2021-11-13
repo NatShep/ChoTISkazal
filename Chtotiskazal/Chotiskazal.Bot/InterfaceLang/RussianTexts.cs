@@ -162,7 +162,9 @@ public class RussianTexts : IInterfaceTexts {
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";
-
+    
+    public string AllWordsAreLearnedMessage(string setShortName) =>
+        $"Все слова из набора '{setShortName}' были добавлены";
 
     #region buttons
 

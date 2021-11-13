@@ -216,14 +216,13 @@ class Program {
         {
             var set = new BotSettings();
             Console.WriteLine("DEBUG SETTINGS APPLIED");
-            set.TelegramToken = "1426375583:AAFRepTstawnI9o6kDFIRQviWqTzgae_O0M";
-            //   set.TelegramToken = "1432654477:AAE3j13y69yhLxNIS6JYGbZDfhIDrcfgzCs";
+            set.TelegramToken = "<key>";
             set.MongoConnectionString = "mongodb://localhost:27017/";
             set.MongoDbName = "swdumbp";
-            set.YadicapiKey = "dict.1.1.20200117T131333Z.11b4410034057f30.cd96b9ccbc87c4d9036dae64ba539fc4644ab33d";
+            set.YadicapiKey = "<key>";
             set.YadicapiTimeout = TimeSpan.FromSeconds(5);
-            set.BotHelperToken = "1480472120:AAEXpltL9rrcgb3LE9sLWDeQrrXL4jVz1t8";
-            set.ControlPanelChatId = "326823645";
+            set.BotHelperToken = "<key>";
+            set.ControlPanelChatId = "<key>";
 
             return set;
         }
@@ -287,7 +286,7 @@ class Program {
         var db = client.GetDatabase(settings.MongoDbName);
 
         var userWordRepo = new UserWordsRepo(db);
-        var dictionaryRepo = new DictionaryRepo(db);
+        var dictionaryRepo = new LocalDictionaryRepo(db);
         var userRepo = new UsersRepo(db);
         var examplesRepo = new ExamplesRepo(db);
         var questionMetricsRepo = new QuestionMetricRepo(db);

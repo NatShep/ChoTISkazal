@@ -2,12 +2,6 @@
 {
     public class ExamSettings
     {
-        public ExamSettings()
-        {
-            
-        }
-
-
         public int MinAdvancedExamMinQuestionAskedCount { get; set; } = 5;
         public int MaxAdvancedExamMinQuestionAskedCount { get; set; } = 13;
         public int MaxAdvancedQuestionsCount     { get; set; } = 7;

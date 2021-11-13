@@ -143,6 +143,9 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string LearningSetNotFound(string argument) =>
             $"Learning set {argument} was not found";
 
+        public string AllWordsAreLearnedMessage(string setShortName) =>
+            $"All words from learning set '{setShortName}' were added";
+
         public string YouHaveLearnedWords(in int count)
             => $"You have learned {count} words";
 

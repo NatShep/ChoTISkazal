@@ -23,10 +23,10 @@ namespace SayWhat.Bll
                 return (null, StringsCompareResult.NotEqual);
             
             var bestOne  = translations[0];
-            var bestOneResult =  bestOne.CheckForMistakes(translation);
+            var bestOneResult =  bestOne.CheckCloseness(translation);
             for (int i = 1; i < translations.Count; i++)
             {
-                var res = translations[i].CheckForMistakes(translation);
+                var res = translations[i].CheckCloseness(translation);
                 if (res > bestOneResult)
                 {
                     bestOne = translations[i];
@@ -41,10 +41,10 @@ namespace SayWhat.Bll
                 return (null, StringsCompareResult.NotEqual);
             
             var bestOne  = translations[0];
-            var bestOneResult =  bestOne.TranslatedText.CheckForMistakes(translation);
+            var bestOneResult =  bestOne.TranslatedText.CheckCloseness(translation);
             for (int i = 1; i < translations.Length; i++)
             {
-                var res = translations[i].TranslatedText.CheckForMistakes(translation);
+                var res = translations[i].TranslatedText.CheckCloseness(translation);
                 if (res > bestOneResult)
                 {
                     bestOne = translations[i];
@@ -56,10 +56,10 @@ namespace SayWhat.Bll
         public static bool AreEqualIgnoreCase(this string wordA, string wordB) => wordA.Equals(wordB, StringComparison.OrdinalIgnoreCase);
         public static bool AreEqualIgnoreSmallMistakes(this string wordA, string wordB)
         {
-            var m =CheckForMistakes(wordA, wordB);
+            var m =CheckCloseness(wordA, wordB);
             return m == StringsCompareResult.Equal || m == StringsCompareResult.SmallMistakes;
         }
-        public static StringsCompareResult CheckForMistakes(this string wordA, string wordB)
+        public static StringsCompareResult CheckCloseness(this string wordA, string wordB)
         {
             if(wordA==null || wordB==null)
                 return wordA==wordB? StringsCompareResult.Equal: StringsCompareResult.NotEqual;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using SayWhat.MongoDAL.WordKits;
 using SayWhat.MongoDAL.Words;
 
 #pragma warning disable 169

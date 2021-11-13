@@ -112,7 +112,7 @@ public class AddFromLearningSetFlow {
         {
             if (!moveResult)
             {
-                await SendAllWordsAreLearnedMessage();
+                await SendAllWordsAreLearnedMessage(update.CallbackQuery.Message.MessageId);
                 return false;
             }
 
@@ -128,7 +128,8 @@ public class AddFromLearningSetFlow {
         return true;
     }
 
-    private async Task SendAllWordsAreLearnedMessage() { throw new NotImplementedException(); }
+    private async Task SendAllWordsAreLearnedMessage(int messageId) => 
+        await Chat.EditMessageTextMarkdown(messageId, Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName));
 
     private async Task<bool> MoveOnNextWord(PaginationCollection<WordInLearningSet> selector, bool moveNext) {
         for (int i = 0; i < selector.Count; i++)
@@ -145,7 +146,7 @@ public class AddFromLearningSetFlow {
         return false;
     }
 
-    private Task<bool> HasUserWord(WordInLearningSet current) => _usersWordsService.Contains(Chat.User, current.Word);
+    private Task<bool> HasUserWord(WordInLearningSet current) => _usersWordsService.Contains(Chat.User, current.Word.ToLower());
 
 
     private async Task AddWordToUser(WordInLearningSet word) {

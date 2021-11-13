@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types;
 
 namespace Chotiskazal.Bot.Questions
 {

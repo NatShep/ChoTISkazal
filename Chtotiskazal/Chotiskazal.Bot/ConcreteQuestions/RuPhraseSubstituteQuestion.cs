@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
@@ -40,7 +39,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 var enter = await chat.WaitUserTextInputAsync();
                 if (string.IsNullOrWhiteSpace(enter))
                     continue;
-                var comparation = phrase.TranslatedWord.CheckForMistakes(enter.Trim());
+                var comparation = phrase.TranslatedWord.CheckCloseness(enter.Trim());
 
                 if (comparation== StringsCompareResult.Equal)
                     return QuestionResult.Passed(chat.Texts);

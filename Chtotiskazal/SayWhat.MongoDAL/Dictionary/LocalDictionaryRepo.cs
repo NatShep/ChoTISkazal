@@ -5,20 +5,20 @@ using MongoDB.Driver;
 
 namespace SayWhat.MongoDAL.Dictionary {
 
-public class DictionaryRepo : IMongoRepo {
+public class LocalDictionaryRepo : IMongoRepo {
     public const string DictionaryCollectionName = "dictionary";
     public const string WordFieldBsonName = "w";
 
     private readonly IMongoDatabase _db;
 
-    public DictionaryRepo(IMongoDatabase db) => _db = db;
+    public LocalDictionaryRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(DictionaryWord word) => Collection.InsertOneAsync(word);
     public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
 
     public Task<DictionaryWord> GetOrDefault(string origin) =>
         Collection
-            .Find(Builders<DictionaryWord>.Filter.Eq(WordFieldBsonName, origin))
+            .Find(Builders<DictionaryWord>.Filter.Eq(WordFieldBsonName, origin.ToLower()))
             .FirstOrDefaultAsync();
 
     public Task<DictionaryWord> GetOrDefault(ObjectId id) =>
@@ -42,6 +42,9 @@ public class DictionaryRepo : IMongoRepo {
     public Task<List<DictionaryWord>> GetAll() => Collection
                                                   .Find(Builders<DictionaryWord>.Filter.Empty)
                                                   .ToListAsync();
+
+    public Task Update(DictionaryWord dicword) => Collection
+        .FindOneAndReplaceAsync(f => f.Id == dicword.Id, dicword);
 }
 
 }

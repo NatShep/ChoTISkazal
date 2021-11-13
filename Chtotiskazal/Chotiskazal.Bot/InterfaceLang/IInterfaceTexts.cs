@@ -111,6 +111,7 @@ public interface IInterfaceTexts {
     string WordIsAddedForLearning(string word);
     string WordIsSkippedForLearning(string word);
     string LearningSetNotFound(string argument);
+    string AllWordsAreLearnedMessage(string setShortName);
 }
 
 }
