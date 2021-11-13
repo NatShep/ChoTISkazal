@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
@@ -19,12 +16,12 @@ namespace Chotiskazal.Bot
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;
 
-        public ChatRoom(ChatIO origin, UserModel user)
-        {
+        public ChatRoom(ChatIO origin, UserModel user) {
+            
             _origin = origin;
             User = user;
             _chlangHook = new ChangeInterfaceLanguageHook(origin);
-            origin.AddUpdateHooks(_chlangHook);
+            origin.AddUpdateHook(_chlangHook);
         }
 
         #region wrap chat io

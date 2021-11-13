@@ -9,6 +9,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows {
 
+public class WellKnownWordsHelper {
+    public const string PrevData = "/wk<<";
+    public const string NextData = "/wk>>";
+
+    public static InlineKeyboardButton[] GetPagingKeys() => new[] {
+        new InlineKeyboardButton { CallbackData = PrevData, Text = "<<" },
+        new InlineKeyboardButton { CallbackData = NextData, Text = ">>" },
+    };
+}
+
 public class ShowWellKnownWordsFlow {
     private readonly UsersWordsService _usersWordsService;
     private readonly LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
@@ -56,11 +66,11 @@ public class ShowWellKnownWordsFlow {
         foreach (var word in paginationForWords[0])
         {
             msgWithWords.Append(
-                $"{Emojis.ShowWellLearnedWords} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+                $"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
         }
 
         if (paginationForWords.Count > 1)
-            msgWithWords.Append(Chat.Texts.ShowNumberOfLists(1, paginationForWords.Count));
+            msgWithWords.Append(Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count));
 
 
         InlineKeyboardButton[][] buttons = null;
@@ -71,10 +81,7 @@ public class ShowWellKnownWordsFlow {
             _wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
 
             buttons = new[] {
-                new[] {
-                    new InlineKeyboardButton { CallbackData = "/<<", Text = "<<" },
-                    new InlineKeyboardButton { CallbackData = "/>>", Text = ">>" },
-                },
+                WellKnownWordsHelper.GetPagingKeys(),
                 new[] {
                     InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
                 }

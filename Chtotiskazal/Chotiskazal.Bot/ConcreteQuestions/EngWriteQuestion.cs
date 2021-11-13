@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -10,11 +9,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 {
     public class EngWriteQuestion : IQuestion
     {
-        private readonly DictionaryService _dictionaryService;
+        private readonly LocalDictionaryService _localDictionaryService;
 
-        public EngWriteQuestion(DictionaryService dictionaryService)
+        public EngWriteQuestion(LocalDictionaryService localDictionaryService)
         {
-            _dictionaryService = dictionaryService;
+            _localDictionaryService = localDictionaryService;
         }
         public bool NeedClearScreen => false;
 
@@ -49,7 +48,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(text), 
                         chat.Texts);
             }
-            var allMeaningsOfWord = await _dictionaryService.GetAllTranslationWords(word.Word);
+            var allMeaningsOfWord = await _localDictionaryService.GetAllTranslationWords(word.Word);
             var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
             if (otherComparation == StringsCompareResult.Equal) 
             {

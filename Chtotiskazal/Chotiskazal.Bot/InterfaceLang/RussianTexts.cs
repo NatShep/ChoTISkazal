@@ -20,11 +20,13 @@ public class RussianTexts : IInterfaceTexts {
     public string InterfaceLanguageSetupped => "Язык интрфейса - русский.";
 
     public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
-    public string JustOneLearnedWord => "Ты выучил только одно слово\\! Какая жалость\\.";
+    public string JustOneLearnedWord => "Выучено только одно слово\\! Какая жалость\\.";
+    public string SelectWordInLearningSet => "Хочу учить";
+    public string Skip => "Пропустить";
+    public string ChooseLearningSet => "Выберите набор слов для изучения";
 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его \\(имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
-
 
     public string OutOfScopeTranslationMarkdown { get; }
         = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
@@ -47,7 +49,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string LetsTryAgain => "Давайте еще разок";
     public string ChooseTheTranscription => "Выберите транскрипцию";
-    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown => "Слава во фразе перепутаны местами\\. Напишите эту фразу";
+    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown =>
+        "Слава во фразе перепутаны местами\\. Напишите эту фразу";
 
 
     public string YouHaveATypoLetsTryAgainMarkdown(string text)
@@ -83,7 +86,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string DidYouWriteSomething => "Вы что то писали? Всё это время я спал...";
 
-    public string EnterWordOrStart => "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
+    public string EnterWordOrStart =>
+        "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
 
@@ -118,7 +122,8 @@ public class RussianTexts : IInterfaceTexts {
                                                   $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова";
 
     public string ActionIsNotAllowed => "Действие не разрешено";
-    public string OopsSomethingGoesWrong => "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
+    public string OopsSomethingGoesWrong =>
+        "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
 
     public string HereAreTheTranslationMarkdown(string word, string? tr)
         => $"_Вот что я перевел\\._ \r\n" +
@@ -138,15 +143,28 @@ public class RussianTexts : IInterfaceTexts {
     public string LearnSomeWordsMarkdown(in int length)
         => $"Выучено слов: {length}\\. Давай еще\\!";
 
-    public string ShowNumberOfLists(in int number, in int count)
+    public string PageXofYMarkdown(in int number, in int count)
         => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
+
+    public string XofYMarkdown(in int number, in int y) 
+        => $"\r\n`Слово {number} из {y}\\.\\.\\.`";
+
+    public string WordIsAddedForLearning(string word) =>
+        $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
+
+    public string WordIsSkippedForLearning(string word) =>
+        $"{Emojis.Failed} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} не будет изучено";
+
+    public string LearningSetNotFound(string argument) => $"Набор слов '{argument}' не найден";
 
     public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";
-
+    
+    public string AllWordsAreLearnedMessage(string setShortName) =>
+        $"Все слова из набора '{setShortName}' были добавлены";
 
     #region buttons
 
@@ -162,6 +180,7 @@ public class RussianTexts : IInterfaceTexts {
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
     public string MainMenuButton => "Глав меню";
+    public string LearningSetsButton => "Наборы слов";
     public string ShowWellKnownWords => "Посмотреть, что уже выучил";
 
     #endregion

@@ -8,6 +8,7 @@ public class BotCommands {
     public const string Stats = "/stats";
     public const string Start = "/start";
     public const string Words = "/words";
+    public const string LearningSetPrefix = "/set";
 }
 
 }

@@ -1,20 +1,19 @@
 ﻿using MongoDB.Bson;
 using NUnit.Framework;
 using SayWhat.MongoDAL.Dictionary;
-using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.MongoDAL.Tests
 {
     [TestFixture]
     public class DictionaryRepoTests
     {
-        private DictionaryRepo _repo;
+        private LocalDictionaryRepo _repo;
         
         [SetUp]
         public void Intitalize()
         {
             MongoTestHelper.DropAllCollections();
-            _repo =new DictionaryRepo(MongoTestHelper.Database);
+            _repo =new LocalDictionaryRepo(MongoTestHelper.Database);
             _repo.UpdateDb().Wait();
         }
         [Test]

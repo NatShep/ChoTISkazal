@@ -18,15 +18,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="appsettings.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+      <ProjectReference Include="..\SayWhat.Bll\SayWhat.Bll.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SayWhat.Bll\SayWhat.Bll.csproj" />
+      <None Remove="appsettings.json" />
+      <EmbeddedResource Include="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

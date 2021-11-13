@@ -8,6 +8,7 @@ namespace SayWhat.MongoDAL.Tests
 {
     public class ExampleRepoTests
     {
+        
         private ExamplesRepo _repo;
         
         [SetUp]

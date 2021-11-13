@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
 using Telegram.Bot;
@@ -13,10 +12,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot {
 
+// ReSharper disable once InconsistentNaming
 public class ChatIO {
     private readonly TelegramBotClient _client;
+    public IBotCommandHandler[] CommandHandlers { get; set; }
     public readonly ChatId ChatId;
     private readonly Channel<Update> _senderChannel;
+    private IChatUpdateHook[] _updateHooks = Array.Empty<IChatUpdateHook>();
 
     public ChatIO(TelegramBotClient client, Chat chat) {
         _client = client;
@@ -25,23 +27,12 @@ public class ChatIO {
             new BoundedChannelOptions(3)
                 { SingleReader = true, SingleWriter = true });
     }
-
-    private readonly string[] _menuItems = {
-        BotCommands.Help, 
-        BotCommands.Stats, 
-        BotCommands.Start, 
-        BotCommands.Add, 
-        BotCommands.Learn, 
-        BotCommands.Words,
-        BotCommands.New
-    };
-    private IChatUpdateHook[] _updateHooks = new IChatUpdateHook[0];
-
-    public void AddUpdateHooks(IChatUpdateHook hook)
+    
+    public void AddUpdateHook(IChatUpdateHook hook)
         => _updateHooks = _updateHooks.Append(hook).ToArray();
 
     internal void OnUpdate(Update update) {
-        Botlog.WriteInfo($"Received msg from chat {this.ChatId.Identifier} {this.ChatId.Username}", false);
+        Botlog.WriteInfo($"Received msg from chat {ChatId.Identifier} {ChatId.Username}", false);
         foreach (var hook in _updateHooks)
         {
             if (hook.CanBeHandled(update))
@@ -97,8 +88,15 @@ public class ChatIO {
             text = upd.Message?.Text;
         }
 
-        if (_menuItems.Contains(text))
-            throw new ProcessInterruptedWithMenuCommand(text);
+        foreach (var botCommandHandler in CommandHandlers)
+        {
+            if (botCommandHandler.Acceptable(text))
+            {
+                var argument = botCommandHandler.ParseArgument(text);
+                Botlog.WriteInfo($"Interrupt flow with command {text}", ChatId, false);
+                throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
+            }
+        }
 
         Botlog.WriteInfo($"Got update", ChatId, false);
         return upd;
@@ -136,9 +134,7 @@ public class ChatIO {
             var res = await WaitUserInputAsync();
             var txt = res.Message?.Text;
             if (!string.IsNullOrWhiteSpace(txt))
-            {
                 return txt;
-            }
         }
     }
 
@@ -153,7 +149,7 @@ public class ChatIO {
                 new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -167,7 +163,7 @@ public class ChatIO {
                 new InlineKeyboardMarkup(buttons));
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -205,7 +201,7 @@ public class ChatIO {
             await _client.AnswerCallbackQueryAsync(callbackQueryId, s, false);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
@@ -217,7 +213,9 @@ public class ChatIO {
             await _client.AnswerCallbackQueryAsync(callbackQueryId);
         }
         catch (Exception)
-        { }
+        {
+            // ignored
+        }
     }
 }
 

@@ -6,5 +6,6 @@
         Yatrans = 2,
         Manual   = 3,
         AutoPhrase = 4,
+        Restored = 5,
     }
 }

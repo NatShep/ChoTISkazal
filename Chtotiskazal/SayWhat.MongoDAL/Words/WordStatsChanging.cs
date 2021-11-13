@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SayWhat.MongoDAL.Words
+﻿namespace SayWhat.MongoDAL.Words
 {
     public class WordStatsChanging
     {

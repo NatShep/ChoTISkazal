@@ -186,10 +186,10 @@ namespace Chotiskazal.Investigation
 
         private static string GetCurrentQuestionParametersReport(IMongoDatabase db)
         {
-            var dictionaryRepo = new DictionaryRepo(db);
+            var dictionaryRepo = new LocalDictionaryRepo(db);
 
             var sb2 = new StringBuilder();
-            var allQuestions = new QuestionSelector(new DictionaryService(dictionaryRepo, new ExamplesRepo(db)))
+            var allQuestions = new QuestionSelector(new LocalDictionaryService(dictionaryRepo, new ExamplesRepo(db)))
                 .AllQuestions;
             var maxNameLen = allQuestions.Max(a => a.Question.Name.Length) + 2;
 
