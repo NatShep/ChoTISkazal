@@ -110,7 +110,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ActionIsNotAllowed => "action is not allowed";
         public string OopsSomethingGoesWrong => "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
 
-        public string HereAreTheTranslationMarkdown(string word, string? tr)
+        public string HereAreTheTranslationMarkdown(string word, string tr)
             => $"_Here are the translations\\._ \r\n" +
                $"_Choose one of them to learn them in the future_\r\n\r\n" +
                $"*{word.EscapeForMarkdown().Capitalize()}*" +

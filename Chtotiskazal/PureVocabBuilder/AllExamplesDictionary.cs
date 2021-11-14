@@ -49,7 +49,7 @@ class AllExamplesDictionary {
     }
 
     public void AddExample(Example example) {
-        var (en, ru) = OpTools.Deconstruct(example);
+        var (en, ru) = example.Deconstruct();
         AddExample(en, ru);
     }
 

@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.Bll", "SayWhat.Bll\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chotiskazal.Investigation", "Chotiskazal.Investigation\Chotiskazal.Investigation.csproj", "{1984F152-FB6A-4EBE-A68A-B81F409881F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningSetProcedures", "LearningSetProcedures\LearningSetProcedures.csproj", "{455318BF-06D9-4CE7-9A93-83904DED554B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NonBotTools", "NonBotTools", "{BBF5CFF3-AB81-4711-B8BF-DA3D79086675}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureVocabBuilder", "PureVocabBuilder\PureVocabBuilder.csproj", "{A7C55158-CD2B-4303-A82F-A60CEFA6F57E}"
@@ -45,10 +43,6 @@ Global
 		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1984F152-FB6A-4EBE-A68A-B81F409881F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{455318BF-06D9-4CE7-9A93-83904DED554B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{455318BF-06D9-4CE7-9A93-83904DED554B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{455318BF-06D9-4CE7-9A93-83904DED554B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{455318BF-06D9-4CE7-9A93-83904DED554B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A7C55158-CD2B-4303-A82F-A60CEFA6F57E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7C55158-CD2B-4303-A82F-A60CEFA6F57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7C55158-CD2B-4303-A82F-A60CEFA6F57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,7 +56,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1984F152-FB6A-4EBE-A68A-B81F409881F7} = {BBF5CFF3-AB81-4711-B8BF-DA3D79086675}
-		{455318BF-06D9-4CE7-9A93-83904DED554B} = {BBF5CFF3-AB81-4711-B8BF-DA3D79086675}
 		{A7C55158-CD2B-4303-A82F-A60CEFA6F57E} = {BBF5CFF3-AB81-4711-B8BF-DA3D79086675}
 	EndGlobalSection
 EndGlobal

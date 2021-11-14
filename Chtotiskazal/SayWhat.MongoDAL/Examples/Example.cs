@@ -23,5 +23,11 @@ namespace SayWhat.MongoDAL.Examples
         public string TranslatedPhrase { get; set; }
         [BsonElement("lng")]
         public TranslationDirection Direction { get; set; }
+        
+        public (string en, string ru) Deconstruct() {
+            var en = Direction == TranslationDirection.EnRu ? OriginPhrase : TranslatedPhrase;
+            var ru = Direction == TranslationDirection.EnRu ? TranslatedPhrase : OriginPhrase;
+            return (en, ru);
+        }
     }
 }

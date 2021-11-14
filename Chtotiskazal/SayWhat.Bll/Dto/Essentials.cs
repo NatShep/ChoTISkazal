@@ -1,27 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
-using SayWhat.MongoDAL;
-using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.Bll.Dto {
 
-public static class EssentialHelper{
-    public static EssentialPhrase ToEssentialPhrase(this Example example) 
-        => new(example.OriginPhrase, example.TranslatedPhrase);
-
-    public static Example ToExample(this EssentialPhrase phrase, EssentialWord word, EssentialTranslation translation) =>
-        new() {
-            Direction = TranslationDirection.EnRu,
-            Id = ObjectId.GenerateNewId(),
-            OriginPhrase = phrase.En,
-            OriginWord = word.En,
-            TranslatedWord = translation.Ru,
-            TranslatedPhrase = phrase.Ru
-        };
-
-}
 public class EssentialWord {
     public EssentialWord() {
         
@@ -59,7 +41,7 @@ public class EssentialPhrase {
     public string Ru { get; }
     public override string ToString() => $"{En} - {Ru}";
     public override int GetHashCode() => En.ToLower().Trim().GetHashCode() ^ Ru.ToLower().Trim().GetHashCode();
-    public override bool Equals(object? obj) {
+    public override bool Equals(object obj) {
         if (obj is EssentialPhrase p)
             return AreInvariantEquals(p);
         return false;

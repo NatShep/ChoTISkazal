@@ -92,7 +92,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var questionsCount = 0;
             var questionsPassed = 0;
             var wordQuestionNumber = 0;
-            QuestionResult? lastExamResult = null;
+            QuestionResult lastExamResult = null;
 
             foreach (var word in learningAndAdvancedWords)
             {

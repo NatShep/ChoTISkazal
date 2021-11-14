@@ -99,7 +99,7 @@ public interface IInterfaceTexts {
     string OutOfScopeWithCandidateMarkdown(string otherMeaning);
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);
-    string HereAreTheTranslationMarkdown(string word, string? tr);
+    string HereAreTheTranslationMarkdown(string word, string tr);
     string MessageAfterTranslationIsSelected(DictionaryTranslation translation);
     string YouHaveLearnedWords(in int count);
     string YouForgotCountWords(in int forgottenWordsCount);

@@ -40,23 +40,23 @@ class Program {
         await esService.CreateLearningSet(
             new LearningSetDescription(
                 "top100", "The 100 most frequent words", "100 самых частых слов", "", "",
-                OpTools.Load<List<EssentialWord>>(essentialPath).Skip(0).Take(100).ToList()));
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(0).Take(100).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
                 "top300", "The 300 most frequent words", "300 самых частых слов", "", "",
-                OpTools.Load<List<EssentialWord>>(essentialPath).Skip(100).Take(200).ToList()));
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(100).Take(200).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
                 "top600", "The 600 most frequent words", "600 самых частых слов", "", "",
-                OpTools.Load<List<EssentialWord>>(essentialPath).Skip(300).Take(300).ToList()));
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(300).Take(300).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
                 "top1000", "The 1000 most frequent words", "600 самых частых слов", "", "",
-                OpTools.Load<List<EssentialWord>>(essentialPath).Skip(600).Take(400).ToList()));
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(600).Take(400).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
                 "top1500", "The 1500 most frequent words", "1500 самых частых слов", "", "",
-                OpTools.Load<List<EssentialWord>>(essentialPath).Skip(1000).Take(500).ToList()));
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(1000).Take(500).ToList()));
     }
 
     private static BotSettings ReadConfiguration() {

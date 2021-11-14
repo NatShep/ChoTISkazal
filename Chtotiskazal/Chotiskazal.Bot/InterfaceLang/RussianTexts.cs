@@ -125,7 +125,7 @@ public class RussianTexts : IInterfaceTexts {
     public string OopsSomethingGoesWrong =>
         "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
 
-    public string HereAreTheTranslationMarkdown(string word, string? tr)
+    public string HereAreTheTranslationMarkdown(string word, string tr)
         => $"_Вот что я перевел\\._ \r\n" +
            $"_Выберите один или несколько переводов, дабы заботать их в будущем_\r\n\r\n" +
            $"*{word.EscapeForMarkdown().Capitalize()}*" +

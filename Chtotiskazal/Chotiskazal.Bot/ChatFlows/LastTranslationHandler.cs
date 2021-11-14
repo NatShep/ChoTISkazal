@@ -95,7 +95,7 @@ namespace Chotiskazal.Bot.ChatFlows
         /// Origin message of translation
         /// </summary>
         private int? _originMessageId;
-        public async Task SendTranslationMessage(string markdownMessage, string? transcription, bool[] selectionMarks)
+        public async Task SendTranslationMessage(string markdownMessage, string transcription, bool[] selectionMarks)
         {
             _areSelected = selectionMarks;
             _originMessageId = await Chat.SendMarkdownMessageAsync(

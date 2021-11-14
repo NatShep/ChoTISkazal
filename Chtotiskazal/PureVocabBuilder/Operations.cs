@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
@@ -36,7 +37,7 @@ public  class Operations {
         var essentialPathWithExamplesResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/CheckPhrasePlease.essential";
 
-        var loaded = OpTools.Load<List<EssentialWord>>(essentialPathResult);
+        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
         int good = 0;
         int optimized = 0;
         int saved = 0;
@@ -53,7 +54,7 @@ public  class Operations {
                 
                 if (yaTrans?.Examples.Any()==true)
                 {
-                    translation.Phrases.AddRange(yaTrans.Examples.Select(OpTools.DeconstructToPhrase));
+                    translation.Phrases.AddRange(yaTrans.Examples.Select(EssentialHelper.ToEssentialPhrase));
                     if (translation.Phrases.All(p => !p.Fits(word.En, translation.Ru)))
                     {
                         //if all origins does not fit - add single clean example
@@ -85,14 +86,14 @@ public  class Operations {
             word.Index = number;
             number++;
         }
-        OpTools.Save(loaded, essentialPathWithExamplesResult);
+        ChaosHelper.SaveJson(loaded, essentialPathWithExamplesResult);
     }
 
     private async Task CheckCophrasing(AllExamplesDictionary examplesDictionary) {
         var essentialPathResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/FilteredOnlyTranslations.essential";
 
-        var loaded = OpTools.Load<List<EssentialWord>>(essentialPathResult);
+        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
         int succ = 0;
         int fail = 0;
         int noCandidates = 0;
@@ -156,7 +157,7 @@ public  class Operations {
         var essentialPathResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/FilteredOnlyTranslations.essential";
 
-        var loaded = OpTools.Load<List<EssentialWord>>(essentialPath);
+        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath);
         foreach (string item in blackList)
         {
             var toRemove = loaded.FirstOrDefault(l => l.En == item);
@@ -215,10 +216,10 @@ public  class Operations {
         }
 
         Console.WriteLine("its done!");
-        OpTools.Save(loaded, essentialPathResult);
+        ChaosHelper.SaveJson(loaded, essentialPathResult);
     }
 
-    private async Task MergeUi() {
+    private Task MergeUi() {
         var engrupath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/5000ManualSorted.enru";
         var yapienrupath = "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/5000YapiSorted.enru";
         var essentialPath =
@@ -256,10 +257,11 @@ public  class Operations {
                 new EssentialWord(
                     manual.Item1, null,
                     result.Select(r => new EssentialTranslation(r, new List<EssentialPhrase>())).ToList()));
-            OpTools.Save(words, essentialPath);
+            ChaosHelper.SaveJson(words, essentialPath);
         }
 
         Console.WriteLine("Validated");
+        return Task.CompletedTask;
     }
 
     private static string[] GetNotFullMatchEnter(int i, string en, string yapi, string[] manuals) {

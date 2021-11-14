@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot
                 var value = section[key];
                 return int.Parse(value);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new InvalidCastException($"Cannot parse or found {key}");
             }

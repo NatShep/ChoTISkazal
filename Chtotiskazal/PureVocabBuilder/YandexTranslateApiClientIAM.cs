@@ -54,7 +54,7 @@ public class YandexTranslateApiClientIAM
 
             return deserialized.Translations?.FirstOrDefault().Text;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             IsOnline = false;
 

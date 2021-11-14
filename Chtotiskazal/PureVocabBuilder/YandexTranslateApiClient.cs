@@ -53,10 +53,9 @@ public class YandexTranslateApiClient
             var deserialized = JsonSerializer.Deserialize<YapiTransAnswer>(ans);
             return deserialized.Texts?.FirstOrDefault();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             IsOnline = false;
-
             return null;
         }
     }

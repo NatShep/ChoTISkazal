@@ -123,7 +123,6 @@ public class EssentialService {
                 dicword.Transcription = esWord.Transcription;
         }
 
-        int i = 0;
         var resultTranlsations = new List<DictionaryTranslation>();
         var examplesToAdd = new List<Example>();
         var essentialsObjectIds = new List<ObjectId>();

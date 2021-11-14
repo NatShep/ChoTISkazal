@@ -53,15 +53,7 @@ public static class OpTools {
                     .ToArray();
     }
 
-    public static (string en, string ru) Deconstruct(this Example example) {
-        var en = example.Direction == TranslationDirection.EnRu ? example.OriginPhrase : example.TranslatedPhrase;
-        var ru = example.Direction == TranslationDirection.EnRu ? example.TranslatedPhrase : example.OriginPhrase;
-        return (en, ru);
-    }
-    public static EssentialPhrase DeconstructToPhrase(this Example example) {
-        var (en, ru) = example.Deconstruct();
-        return new EssentialPhrase(en, ru);
-    }
+   
     public static (string, string[])[] ReadEnru(string path) {
         var lines = File.ReadAllLines(path);
         return lines.Where(c =>!string.IsNullOrWhiteSpace(c))
@@ -72,19 +64,7 @@ public static class OpTools {
                     .ToArray();
     }
     
-    public static void Save<T>(T value, string path) {
-        var options = new JsonSerializerOptions {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            WriteIndented = true,
-        };
-        File.WriteAllText(path, JsonSerializer.Serialize(value, options));
-    }
-    
-    public static T Load<T>(string path) {
-        var text  = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<T>(text);
-    }
+   
 }
 
 }
