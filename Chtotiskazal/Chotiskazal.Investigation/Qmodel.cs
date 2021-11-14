@@ -8,6 +8,8 @@ namespace Chotiskazal.Investigation
     {
         public ObjectId Id { get; set; }
         [BsonElement("e")] public string ExamName { get; set; }
+
+        public string GetNonCleanName() => ExamName.Replace("Clean ", "");
         [BsonElement("r")] public bool Result { get; set; }
 
         [BsonElement("pts")] public int PreviousExamDeltaInSecs { get; set; }
