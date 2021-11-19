@@ -35,28 +35,23 @@ class Program {
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/Final.essential";
 
         var esService = new EssentialService(_examplesRepo, _localDictionaryRepo, _addWordService, _learningSetRepo);
-
-        //var words = await esService.MergeEssentials(OpTools.Load<List<EssentialWord>>(essentialPath).Take(1000).ToList());
+        
         await esService.CreateLearningSet(
             new LearningSetDescription(
-                "top100", "The 100 most frequent words", "100 самых частых слов", "", "",
-                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(0).Take(100).ToList()));
+                "top2000", "The 1500-2000 most frequent words", "Частотные слова 1500..2000", "", "",
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(1500).Take(500).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
-                "top300", "The 300 most frequent words", "300 самых частых слов", "", "",
-                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(100).Take(200).ToList()));
+                "top3000", "The 2000-3000 most frequent words", "Частотные слова 2000..3000", "", "",
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(2000).Take(1000).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
-                "top600", "The 600 most frequent words", "600 самых частых слов", "", "",
-                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(300).Take(300).ToList()));
+                "top4000", "The 3000-4000 most frequent words", "Частотные слова 3000..4000", "", "",
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(3000).Take(1000).ToList()));
         await esService.CreateLearningSet(
             new LearningSetDescription(
-                "top1000", "The 1000 most frequent words", "600 самых частых слов", "", "",
-                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(600).Take(400).ToList()));
-        await esService.CreateLearningSet(
-            new LearningSetDescription(
-                "top1500", "The 1500 most frequent words", "1500 самых частых слов", "", "",
-                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(1000).Take(500).ToList()));
+                "top5000", "The 4000-5000 most frequent words", "Частотные слова 4000..5000", "", "",
+                ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath).Skip(4000).Take(1000).ToList()));
     }
 
     private static BotSettings ReadConfiguration() {
@@ -64,8 +59,8 @@ class Program {
         {
             var set = new BotSettings();
             Console.WriteLine("DEBUG SETTINGS APPLIED");
-            set.MongoConnectionString ="mongodb://localhost:27017/";
-            set.MongoDbName = "backuped";
+            set.MongoConnectionString ="<key>";
+            set.MongoDbName = "SayWhatDb";
             set.YadicapiKey = "<key>";
             set.YadicapiTimeout = TimeSpan.FromSeconds(5);
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Chotiskazal.Bot.Questions;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Dictionary;
@@ -13,44 +12,58 @@ namespace Chotiskazal.Investigation {
 
 class Program {
     static void Main() {
-        var client = new MongoClient("cd");
+        var client = new MongoClient("<key");
         var db = client.GetDatabase("SayWhatDb");
         var collection = db.GetCollection<Qmodel>("questionMetrics");
-        var count = collection.CountDocuments(new BsonDocument());
-        Console.WriteLine("Count: " + count);
+        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
 
-        
+        Console.WriteLine("Count: " + allMetrics.Count);
+
+        Console.WriteLine(GetScoreDistributionReport(allMetrics));
+
         Console.WriteLine("\r\n# Time metrics");
-         Console.WriteLine(GetTimeMetricsReport(collection));
-        
-         Console.WriteLine("\r\n# Score metrics");
-         Console.WriteLine(GetScoreMetricsReport(collection));
-        
-         Console.WriteLine("\r\n# Question metrics with clean questions");
-         Console.WriteLine(GetQuestionMetricsReport(collection, false));
-        
-         Console.WriteLine("\r\n# Question metrics without clean questions");
-         Console.WriteLine(GetQuestionMetricsReport(collection, true));
+        Console.WriteLine(GetTimeMetricsReport(allMetrics));
+
+        Console.WriteLine("\r\n# Score metrics");
+        Console.WriteLine(GetScoreMetricsReport(allMetrics));
+
+        Console.WriteLine("\r\n# Question metrics with clean questions");
+        Console.WriteLine(GetQuestionMetricsReport(allMetrics, false));
+
+        Console.WriteLine("\r\n# Question metrics without clean questions");
+        Console.WriteLine(GetQuestionMetricsReport(allMetrics, true));
 
         Console.WriteLine("\r\n# Question metrics by time");
-        
-        
-        Console.WriteLine(GetQuestionMetricsByTimeReport(collection));
+
+
+        Console.WriteLine(GetQuestionMetricsByTimeReport(allMetrics));
 
         Console.WriteLine("\r\n# Current questions");
         Console.WriteLine(GetCurrentQuestionParametersReport(db));
-        
-        
-        Console.WriteLine(GetTimeIntervalSLices(collection, 200));
 
-        Console.WriteLine(GetPauseData(collection, 200));
+        //Console.WriteLine(GetTimeIntervalSLices(allMetrics, 200));
 
+        //Console.WriteLine(GetPauseData(allMetrics, 0,5, 100));
+        Console.WriteLine("\r\n# Regression report");
+        Console.WriteLine(GetRegressionReport(allMetrics));
     }
 
-    private static string GetScoreMetricsReport(IMongoCollection<Qmodel> collection) {
-        var sb = new StringBuilder();
+    private static string GetScoreDistributionReport(List<Qmodel> allMetrics) {
+        var scores = allMetrics.GroupBy(a => (int)a.ScoreBefore)
+                               .Select(b => new { score = b.Key, count = b.Count() })
+                               .OrderBy(b => b.score)
+                               .ToList();
+        StringBuilder sb = new StringBuilder();
+        foreach (var score in scores)
+        {
+            sb.Append($"{score.score}\t{score.count}\r\n");
+        }
 
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+        return sb + "\r\n";
+    }
+
+    private static string GetScoreMetricsReport(List<Qmodel> allMetrics) {
+        var sb = new StringBuilder();
 
         sb.AppendLine("Passed: " + allMetrics.Count(a => a.Result));
         sb.AppendLine("Failed: " + allMetrics.Count(a => !a.Result));
@@ -137,7 +150,7 @@ class Program {
         }
     }
 
-    private static string GetTimeMetricsReport(IMongoCollection<Qmodel> collection) {
+    private static string GetTimeMetricsReport(List<Qmodel> allMetrics) {
         var buckets = new[] {
             new TimeBucket(0, 10),
             new TimeBucket(10, 60),
@@ -152,8 +165,6 @@ class Program {
             new TimeBucket(6 * 36 * 36 * 36 * 60, int.MaxValue),
         };
 
-
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
         foreach (var metric in allMetrics)
         {
             var buck = buckets.FirstOrDefault(
@@ -165,9 +176,8 @@ class Program {
         var s = string.Join("\r\n", buckets.Select(s => s.ToString()));
         return s;
     }
-        
-    private static string GetQuestionMetricsByTimeReport(IMongoCollection<Qmodel> collection) {
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+
+    private static string GetQuestionMetricsByTimeReport(List<Qmodel> allMetrics) {
         var allExamNames = allMetrics.Select(a => a.GetNonCleanName()).ToHashSet();
 
         var questionToTimeBuckets = new Dictionary<string, QuestionToTimeBucket>();
@@ -188,7 +198,7 @@ class Program {
 
         var sb = new StringBuilder();
         var maxNameLen = allExamNames.Max(a => a.Length) + 2;
-        foreach (var bucket in new[]{sum}.Concat(sorted))
+        foreach (var bucket in new[] { sum }.Concat(sorted))
         {
             sb.Append($"\r\n{bucket.QuestionName.PadRight(maxNameLen)}  {(int)bucket.Rate}% |");
             for (int i = 0; i < 10; i++)
@@ -221,7 +231,7 @@ class Program {
                 return 8;
             return 9;
         }
-        
+
         int ToCategory7(int deltaInSec) {
             if (deltaInSec < 10)
                 return 0;
@@ -237,7 +247,7 @@ class Program {
                 return 5;
             return 6;
         }
-        
+
         int ToCategory3min(int deltaInSec) {
             if (deltaInSec < 5)
                 return 0;
@@ -255,17 +265,16 @@ class Program {
         }
     }
 
-    private static string GetTimeIntervalSLices(IMongoCollection<Qmodel> collection,int countInBunch) {
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+    private static string GetTimeIntervalSLices(List<Qmodel> allMetrics, int countInBunch) {
         var intervals = GetTimeSeries(countInBunch, allMetrics);
         StringBuilder sb = new StringBuilder($"BunchSize: {countInBunch}\r\n Intervals ({intervals.Length}) :\r\n");
         foreach (var (interval, _) in intervals)
         {
-            var ts  = TimeSpan.FromSeconds(interval);
+            var ts = TimeSpan.FromSeconds(interval);
             string res = "";
             if (ts.TotalMinutes < 1)
                 res = interval + "s";
-            else if(ts.TotalHours <1)
+            else if (ts.TotalHours < 1)
                 res = ts.TotalMinutes.ToString("F1") + "m";
             else if (ts.TotalDays < 1)
                 res = (int)ts.TotalHours + "h";
@@ -275,16 +284,107 @@ class Program {
 
         return sb.ToString();
     }
-    
-    
-    private static string GetPauseData(IMongoCollection<Qmodel> collection,int countInBunch) {
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+
+    private static string GetPauseData(List<Qmodel> allMetrics, int minScore, int maxScore, int countInBunch) =>
+        GetPauseData(
+            allMetrics.Where(a => a.ScoreBefore >= minScore && a.ScoreBefore <= maxScore)
+                      .Where(a => a.ExamName.EndsWith("Eng Choose"))
+                      .ToList(), countInBunch);
+
+    private static string GetPauseData(List<Qmodel> allMetrics, int countInBunch) {
         var intervals = GetTimeSeries(countInBunch, allMetrics);
         var sb = new StringBuilder($"BunchSize: {countInBunch}\r\n Intervals ({intervals.Length}) :\r\n");
-        foreach (var (interval, percent) in intervals) 
+        foreach (var (interval, percent) in intervals)
             sb.AppendLine($"{interval}\t{percent:F2}");
 
         return sb.ToString();
+    }
+
+    private static string GetRegressionReport(List<Qmodel> allMetrics) {
+        var sb = new StringBuilder("Regression report: \r\n");
+        Regress(Math.E);
+        return sb.ToString();
+
+        void Regress(double logBase) {
+            sb.AppendLine(Measure(0, 5, 100));
+            sb.AppendLine(Measure(0, 5, 200));
+            sb.AppendLine(MeasureAuto(0, 5));
+            sb.AppendLine(MeasureAuto(1, 5));
+            sb.AppendLine(MeasureAuto(1, 6));
+            sb.AppendLine(MeasureAuto(2, 6));
+            sb.AppendLine(MeasureAuto(2, 7));
+            sb.AppendLine(MeasureAuto(2, 8));
+
+            sb.AppendLine(MeasureAuto(7, 10));
+            sb.AppendLine(MeasureAuto(0, 10));
+            sb.AppendLine(MeasureAuto(0, 20));
+
+            
+            sb.AppendLine("MOST INTERESTING IS " + MeasureAuto(2, 6));
+
+            var names = allMetrics.GroupBy(g => g.GetNonCleanName()).Select(g => g.Key).ToArray();
+
+            foreach (string name in names)
+            {
+                sb.AppendLine(MeasureAuto(0, 4, name));
+                sb.AppendLine(MeasureAuto(1, 5, name));
+                sb.AppendLine(MeasureAuto(2, 6, name));    
+                sb.AppendLine(MeasureAuto(3, 7, name));
+                sb.AppendLine(MeasureAuto(4, 8, name));    
+                sb.AppendLine(MeasureAuto(0, 10, name));    
+                sb.AppendLine(MeasureAuto(11, 20, name));
+                sb.AppendLine(MeasureAuto(0, 20, name));
+            }
+
+            
+            string MeasureAuto(int minScore, int maxScore, params string[] examNames) {
+                var samples = Where(minScore, maxScore);
+                if (examNames.Any())
+                    samples = samples.Where(s => examNames.Any(e => s.ExamName.Equals(e, StringComparison.InvariantCultureIgnoreCase))).ToList();
+                var bunchSize = samples.Count / 15.4;
+                if (bunchSize > 300)
+                    bunchSize = 300;
+                
+                return
+                    $"{string.Join("|", examNames),-30}\t{MeasureSamples(minScore, maxScore, samples, (int)bunchSize)}";
+            }
+
+            string MeasureSamples(int minScore, int maxScore, List<Qmodel> models, int bunchSize) => $"[{minScore}-{maxScore}]\t" +
+                                                                         LinearRegressionFor(models, bunchSize,logBase);
+            string Measure(int minScore, int maxScore, int bunchSize) => $"[{minScore}-{maxScore}]\t" +
+                                                                         LinearRegressionFor(
+                                                                             Where(minScore, maxScore), bunchSize,
+                                                                             logBase);
+
+            List<Qmodel> Where(int minScore, int maxScore) =>
+                allMetrics.Where(a => a.ScoreBefore >= minScore && a.ScoreBefore <= maxScore).ToList();
+        }
+    }
+
+    private static string LinearRegressionFor(List<Qmodel> allMetrics, int countInBunch, double logBase) {
+        var intervals = GetTimeSeries(countInBunch, allMetrics);
+        var points = new List<(double, double)>();
+        int prevVal = 0;
+
+        foreach (var (t, p) in intervals)
+        {
+            if (t == int.MaxValue)
+                continue;
+            var current = Math.Log((t == 0 ? 1 : t + prevVal) / 2.0, logBase);
+            if (double.IsNaN(current))
+            { }
+
+            prevVal = t;
+            points.Add((current, p));
+        }
+
+        //var sb = new StringBuilder(
+        //    $"Samples:{allMetrics.Count} BunchSize: {countInBunch}  Intervals ({intervals.Length}) :\r\n");
+        (double rsquared, double yintercept, double slope) = Helper.LinearRegression(points);
+        return
+            $"{allMetrics.Count:0000}\t{countInBunch:000}\t{intervals.Length:000}\t{rsquared:F2}\t{yintercept:F2}\t{slope:f2}";
+        //sb.AppendLine($"rsquared = {rsquared:F2} yintercept = {yintercept:F2} slope = {slope:F2}");
+        //return sb.ToString();
     }
 
     static (int, double)[] GetTimeSeries(int countInBunch, List<Qmodel> models) {
@@ -299,7 +399,7 @@ class Program {
                 passed++;
             if (count > countInBunch)
             {
-                values.Add((qmodel.PreviousExamDeltaInSecs, (100.0*passed)/count));
+                values.Add((qmodel.PreviousExamDeltaInSecs, (100.0 * passed) / count));
                 count = 0;
                 passed = 0;
             }
@@ -307,7 +407,7 @@ class Program {
 
         return values.ToArray();
     }
-    
+
     class QuestionToTimeBucket {
         public QuestionToTimeBucket(string questionName) { QuestionName = questionName; }
 
@@ -360,8 +460,7 @@ class Program {
         }
     }
 
-    private static string GetQuestionMetricsReport(IMongoCollection<Qmodel> collection, bool ignoreClean) {
-        var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
+    private static string GetQuestionMetricsReport(List<Qmodel> allMetrics, bool ignoreClean) {
         var allExamNames = allMetrics.Select(a => a.ExamName).ToHashSet();
 
         var group = ignoreClean
