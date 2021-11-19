@@ -43,12 +43,12 @@ internal class TranslateWordsFlow {
 
         // Search translations in local dictionary
 
-        Task<UserWordModel> getUserWordTask = null;
+        UserWordModel alreadyExistUserWord = null;
 
         if (!word.IsRussian())
-            getUserWordTask = _addWordService.GetWordNullByEngWord(Chat.User, word);
+            alreadyExistUserWord = await _addWordService.GetWordNullByEngWord(Chat.User, word);
 
-        var translations = await _addWordService.FindInDictionaryWithExamples(word);
+        var translations = await _addWordService.FindInLocalDictionaryWithExamples(word);
         if (!translations.Any()) // if not, search it in Ya dictionary
             translations = await _addWordService.TranslateAndAddToDictionary(word);
 
@@ -57,12 +57,7 @@ internal class TranslateWordsFlow {
             await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
             return null;
         }
-
-        UserWordModel alreadyExistUserWord = null;
-
-        if (getUserWordTask != null)
-            alreadyExistUserWord = await getUserWordTask;
-
+        
         // get button selection marks. It works only for english words!
         bool[] selectionMarks = GetSelectionMarks(translations, alreadyExistUserWord);
 
@@ -103,7 +98,7 @@ internal class TranslateWordsFlow {
     }
 
     private bool[] GetSelectionMarks(
-        IReadOnlyList<DictionaryTranslation> translations, UserWordModel? alreadyExistUserWord) {
+        IReadOnlyList<Translation> translations, UserWordModel? alreadyExistUserWord) {
         bool[] ans = new bool[translations.Count];
         if (alreadyExistUserWord == null)
             return ans;

@@ -35,7 +35,7 @@ namespace SayWhat.Bll
             }
             return (bestOne, bestOneResult);
         }
-        public static (DictionaryTranslation, StringsCompareResult) GetClosestTranslation(DictionaryTranslation[] translations, string translation)
+        public static (Translation, StringsCompareResult) GetClosestTranslation(Translation[] translations, string translation)
         {
             if(translations==null || translations.Length==0)
                 return (null, StringsCompareResult.NotEqual);

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
-using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
 namespace SayWhat.Bll.Services {
 
@@ -74,6 +74,34 @@ public class LocalDictionaryService {
         return _dicRepository.Add(word);
     }
     */
+
+    public async Task AppendRuTranslation(string en, params (string ru, ObjectId[] exampleIds)[] translations) {
+        var (localWord, _) = await GetTranslationWithExamplesByEnWord(en);
+        if (localWord == null)
+            throw new InvalidOperationException($"Word {en} not found in local dictionary");
+        var newTranslations = translations.Where(
+                                              t => !localWord.Translations.Any(
+                                                  l => l.Word.Equals(
+                                                      t.ru, StringComparison.InvariantCultureIgnoreCase)))
+                                          .ToList();
+        if (newTranslations.Any())
+        {
+            var localTranslations = localWord.Translations.ToList();
+            foreach (var newTranslation in newTranslations)
+            {
+                localTranslations.Add(
+                    new DictionaryTranslationDbEntity {
+                        Language = Language.Ru,
+                        Word = newTranslation.ru,
+                        Examples = Array.Empty<DictionaryReferenceToExample>()
+                    });
+            }
+
+            localWord.Translations = localTranslations.ToArray();
+            await _dicRepository.Update(localWord);
+        }
+    }
+
     public async Task<List<DictionaryWord>> GetAll() {
         var allWords  = await _dicRepository.GetAll();
         var allExamples = await _exampleRepository.GetAll();
@@ -97,32 +125,27 @@ public class LocalDictionaryService {
         return results.Translations.Select(t => t.Word).ToArray();
     }
 
-    public async Task<(DictionaryWord,  IReadOnlyList<DictionaryTranslation>)> GetTranslationsWithExamples(ObjectId wordId) {
-        var word = await _dicRepository.GetOrDefault(wordId);
-        var translations = await GetTranslationsWithExamples(word);
-        return (word, translations);
-    }
-    public async Task<IReadOnlyList<DictionaryTranslation>> GetTranslationsWithExamples(string enword) {
-        var (_, translations) = await GetWordInfo(enword);
+    public async Task<IReadOnlyList<Translation>> GetTranslationsWithExamplesByEnWord(string enword) {
+        var (_, translations) = await GetTranslationWithExamplesByEnWord(enword);
         return translations;
     }
     
-    public async Task<(DictionaryWord,  IReadOnlyList<DictionaryTranslation>)> GetWordInfo(string enword) {
+    public async Task<(DictionaryWord,  IReadOnlyList<Translation>)> GetTranslationWithExamplesByEnWord(string enword) {
         var word = await _dicRepository.GetOrDefault(enword);
         var translations = await GetTranslationsWithExamples(word);
         return (word, translations);
     }
 
-    private async Task<IReadOnlyList<DictionaryTranslation>> GetTranslationsWithExamples(DictionaryWord word) {
+    private async Task<IReadOnlyList<Translation>> GetTranslationsWithExamples(DictionaryWord word) {
         if (word == null)
-            return Array.Empty<DictionaryTranslation>();
+            return Array.Empty<Translation>();
 
-        var result = new List<DictionaryTranslation>();
+        var result = new List<Translation>();
         foreach (var translation in word.Translations)
         {
             var examples = await GetExamples(translation.Examples.Select(e => e.ExampleId));
             result.Add(
-                new DictionaryTranslation(
+                new Translation(
                     word.Word,
                     translation.Word,
                     word.Transcription,
@@ -138,18 +161,18 @@ public class LocalDictionaryService {
             ? await _exampleRepository.GetAll(examplesId) 
             : new List<Example>();
 
-    public async Task<IReadOnlyList<DictionaryTranslation>> GetTranslationsWithoutExamples(string enword) {
+    public async Task<IReadOnlyList<Translation>> GetTranslationsWithoutExamples(string enword) {
         var word = await _dicRepository.GetOrDefault(enword);
         if (word == null)
-            return new DictionaryTranslation[0];
+            return new Translation[0];
 
         return word.Translations
                    .Select(
-                       translation => new DictionaryTranslation(
+                       translation => new Translation(
                            originText: word.Word,
                            translatedText: translation.Word,
                            originTranscription: word.Transcription,
-                           tranlationDirection: word.Language == Language.En
+                           translationDirection: word.Language == Language.En
                                ? TranslationDirection.EnRu
                                : TranslationDirection.RuEn,
                            source: word.Source,

@@ -60,7 +60,7 @@ namespace SayWhat.MongoDAL.Tests
                 Transcription = "Stol",
                 Translations = new[]
                 {
-                    new DictionaryTranslation
+                    new DictionaryTranslationDbEntity
                     {
                         Language = Language.En,
                         Word = translation,

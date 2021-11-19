@@ -116,10 +116,10 @@ namespace Chotiskazal.Bot.InterfaceLang
                $"*{word.EscapeForMarkdown().Capitalize()}*" +
                $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
-        public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+        public string MessageAfterTranslationIsSelected(Translation translation)
 
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
-        public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
+        public string MessageAfterTranslationIsDeselected(Translation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
         public string LearnMoreWordsMarkdown(in int length)

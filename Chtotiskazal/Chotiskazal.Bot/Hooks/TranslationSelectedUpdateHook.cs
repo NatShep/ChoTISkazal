@@ -49,7 +49,7 @@ namespace Chotiskazal.Bot.Hooks
             
             // word is not cached
             // so we need to find already translated items
-            var allTranslations = await _addWordService.FindInDictionaryWithExamples(buttonData.Origin);
+            var allTranslations = await _addWordService.FindInLocalDictionaryWithExamples(buttonData.Origin);
             var originMessageButtons = update.CallbackQuery
                 .Message
                 ?.ReplyMarkup
@@ -101,7 +101,7 @@ namespace Chotiskazal.Bot.Hooks
                     .ToArray());
         }
 
-        private static bool[] GetSelectionMarks(IReadOnlyList<DictionaryTranslation> allTranslations, InlineKeyboardButton[] originMessageButtons)
+        private static bool[] GetSelectionMarks(IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
         {
             bool[] selectionMarks = new bool[allTranslations.Count];
             int i = 0;

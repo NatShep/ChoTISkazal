@@ -9,8 +9,8 @@ using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
-using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 using Language = SayWhat.MongoDAL.Language;
+using Translation = SayWhat.Bll.Dto.Translation;
 
 namespace SayWhat.Bll.Services {
 
@@ -31,29 +31,22 @@ public class AddWordService {
         _userService = userService;
     }
 
-    public async Task<IReadOnlyList<DictionaryTranslation>> TranslateAndAddToDictionary(string originWord) {
+    public async Task<IReadOnlyList<Translation>> TranslateAndAddToDictionary(string originWord) {
         originWord = originWord.ToLower();
 
-        if (originWord.Count(e => e == ' ') < 4)
-        {
-            IReadOnlyList<DictionaryTranslation> res = null;
-            if (originWord.IsRussian())
-                res = await TranslateRuEnWordAndAddItToDictionary(originWord);
-            else
-                res = await TranslateEnRuWordAndAddItToDictionary(originWord);
-
-            if (res != null)
-                return res;
-        }
-
+        if (originWord.Count(e => e == ' ') >= 4) return null;
         //todo go to translate api
-        return null;
+        
+        IReadOnlyList<Translation> res = null;
+        return originWord.IsRussian()
+            ? await TranslateRuEnWordAndAddItToDictionary(originWord)
+            : await TranslateEnRuWordAndAddItToDictionary(originWord);
     }
 
-    public async Task<IReadOnlyList<DictionaryTranslation>> GetOrDownloadTranslation(string enWord) {
+    public async Task<IReadOnlyList<Translation>> GetOrDownloadTranslation(string enWord) {
         if (enWord.IsRussian())
             throw new ArgumentException("Only en words allowed");
-        var translations = await FindInDictionaryWithExamples(enWord);
+        var translations = await FindInLocalDictionaryWithExamples(enWord);
         if (!translations.Any()) // if not, search it in Ya dictionary
             translations = await TranslateAndAddToDictionary(enWord);
 
@@ -64,12 +57,12 @@ public class AddWordService {
         return translations;
     }
 
-    private async Task<IReadOnlyList<DictionaryTranslation>> TranslateEnRuWordAndAddItToDictionary(string englishWord) {
+    private async Task<IReadOnlyList<Translation>> TranslateEnRuWordAndAddItToDictionary(string englishWord) {
         // Go to yandex api
         var yaResponse = await _yaDicClient.EnRuTranslateAsync(englishWord);
         if (yaResponse?.Any() != true)
-            return Array.Empty<DictionaryTranslation>();
-        var word = ConvertToDictionaryWord(englishWord, yaResponse, Language.En, Language.Ru);
+            return Array.Empty<Translation>();
+        var word = ChaosBllHelper.ConvertToDictionaryWord(englishWord, yaResponse, Language.En, Language.Ru);
         try
         {
             await _localDictionaryService.AddNewWord(word);
@@ -79,86 +72,25 @@ public class AddWordService {
             Console.WriteLine(e);
             throw;
         }
-        return ToDictionaryTranslations(word);
+        return word.ToDictionaryTranslations();
     }
 
-    private async Task<IReadOnlyList<DictionaryTranslation>> TranslateRuEnWordAndAddItToDictionary(string russianWord) {
+    private async Task<IReadOnlyList<Translation>> TranslateRuEnWordAndAddItToDictionary(string russianWord) {
         // Go to yandex api
         var yaResponse = await _yaDicClient.RuEnTranslateAsync(russianWord);
         if (yaResponse?.Any() != true)
-            return new DictionaryTranslation[0];
-        var word = ConvertToDictionaryWord(russianWord, yaResponse, Language.Ru, Language.En);
+            return Array.Empty<Translation>();
+        var word = ChaosBllHelper.ConvertToDictionaryWord(russianWord, yaResponse, Language.Ru, Language.En);
         await _localDictionaryService.AddNewWord(word);
-        return ToDictionaryTranslations(word);
+        return word.ToDictionaryTranslations();
     }
+    
+    public async Task<IReadOnlyList<Translation>> FindInLocalDictionaryWithExamples(string word)
+        => await _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.ToLower());
 
-    private static IReadOnlyList<DictionaryTranslation> ToDictionaryTranslations(DictionaryWord word) {
-        return word.Translations.Select(
-                       t => new DictionaryTranslation(
-                           originText: word.Word,
-                           translatedText: t.Word,
-                           originTranscription: word.Transcription,
-                           source: word.Source,
-                           tranlationDirection: word.Language == Language.En
-                               ? TranslationDirection.EnRu
-                               : TranslationDirection.RuEn,
-                           phrases: t.Examples.Select(e => e.ExampleOrNull).ToList()
-                       ))
-                   .ToArray();
-    }
-
-    private static DictionaryWord ConvertToDictionaryWord(
-        string originText, YaDefenition[] definitions,
-        Language langFrom,
-        Language langTo
-    ) {
-        if (langFrom == langTo)
-            throw new InvalidOperationException();
-
-        var variants = definitions.SelectMany(
-            r => r.Tr.Select(
-                tr => new {
-                    defenition = r,
-                    translation = tr,
-                }));
-
-        var word = new DictionaryWord {
-            Id = ObjectId.GenerateNewId(),
-            Language = langFrom,
-            Word = originText,
-            Source = TranslationSource.Yadic,
-            Transcription = definitions.FirstOrDefault()?.Ts,
-            Translations = variants.Select(
-                                       v => new SayWhat.MongoDAL.Dictionary.DictionaryTranslation {
-                                           Word = v.translation.Text,
-                                           Language = langTo,
-                                           Examples = v.translation.Ex?.Select(
-                                                           e =>
-                                                               new DictionaryReferenceToExample(
-                                                                   new Example {
-                                                                       Id = ObjectId.GenerateNewId(),
-                                                                       OriginWord = originText,
-                                                                       TranslatedWord = v.translation.Text,
-                                                                       Direction = langFrom == Language.En
-                                                                           ? TranslationDirection.EnRu
-                                                                           : TranslationDirection.RuEn,
-                                                                       OriginPhrase = e.Text,
-                                                                       TranslatedPhrase = e.Tr.First().Text,
-                                                                   }))
-                                                       .ToArray() ??
-                                                      Array.Empty<DictionaryReferenceToExample>()
-                                       })
-                                   .ToArray()
-        };
-        return word;
-    }
-
-    public async Task<IReadOnlyList<DictionaryTranslation>> FindInDictionaryWithExamples(string word)
-        => await _localDictionaryService.GetTranslationsWithExamples(word.ToLower());
-
-    public async Task AddTranslationToUser(UserModel user, DictionaryTranslation translation) {
+    public async Task AddTranslationToUser(UserModel user, Translation translation) {
         if (translation == null) return;
-        if (translation.TranlationDirection != TranslationDirection.EnRu)
+        if (translation.TranslationDirection != TranslationDirection.EnRu)
             throw new InvalidOperationException("Only en-ru direction is supported");
 
         var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
@@ -220,9 +152,9 @@ public class AddWordService {
         await _userService.Update(user);
     }
 
-    public async Task RemoveTranslationFromUser(UserModel user, DictionaryTranslation translation) {
+    public async Task RemoveTranslationFromUser(UserModel user, Translation translation) {
         if (translation == null) return;
-        if (translation.TranlationDirection != TranslationDirection.EnRu)
+        if (translation.TranslationDirection != TranslationDirection.EnRu)
             throw new InvalidOperationException("Only en-ru direction is supported");
 
         var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);

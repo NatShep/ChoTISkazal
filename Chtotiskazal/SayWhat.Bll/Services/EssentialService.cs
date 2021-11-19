@@ -8,7 +8,6 @@ using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.WordKits;
-using DictionaryTranslation = SayWhat.MongoDAL.Dictionary.DictionaryTranslation;
 
 namespace SayWhat.Bll.Services {
 
@@ -24,7 +23,7 @@ public class EssentialService {
         _addWordService = addWordService;
         _learningSetsRepo = learningSetsRepo;
     }
-
+    
     public async Task<List<WordInLearningSet>> MergeEssentials(IList<EssentialWord> esWords) {
         // для каждого слова - смотрим есть ли это слово в  бд
         // если нет - то создаем и добавляем фразы с ним связанные, сверху докатываем Yandex перевод из словаря
@@ -123,7 +122,7 @@ public class EssentialService {
                 dicword.Transcription = esWord.Transcription;
         }
 
-        var resultTranlsations = new List<DictionaryTranslation>();
+        var resultTranlsations = new List<DictionaryTranslationDbEntity>();
         var examplesToAdd = new List<Example>();
         var essentialsObjectIds = new List<ObjectId>();
         foreach (var translation in esWord.Translations)
@@ -190,12 +189,12 @@ public class EssentialService {
         };
     }
 
-    private (Example[] newExamplesForTranslation, DictionaryTranslation newTranslation)
+    private (Example[] newExamplesForTranslation, DictionaryTranslationDbEntity newTranslation)
         CreateNewTranslationModels(EssentialWord esWord, EssentialTranslation translation) {
         var newExamplesForTranslation = translation
                                         .Phrases
                                         .SelectToArray(p => p.ToExample(esWord, translation));
-        var newTranslation = new DictionaryTranslation {
+        var newTranslation = new DictionaryTranslationDbEntity {
             Language = Language.Ru,
             Word = translation.Ru,
             Examples = newExamplesForTranslation.SelectToArray(

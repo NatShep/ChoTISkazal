@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SayWhat.Bll;
+using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
@@ -11,7 +12,6 @@ using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.WordKits;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using DictionaryTranslation = SayWhat.Bll.Dto.DictionaryTranslation;
 
 namespace Chotiskazal.Bot.ChatFlows {
 
@@ -51,7 +51,7 @@ public class AddFromLearningSetFlow {
         else
             selector.Page = currentSet.LastSeenWordOffset;
 
-        var (word, translations) = await _localDictionaryService.GetWordInfo(selector.Current.Word);
+        var (word, translations) = await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
 
         await Chat.SendMarkdownMessageAsync(
             GetWordText(selector, word, translations, selector.Current),
@@ -107,7 +107,7 @@ public class AddFromLearningSetFlow {
             await Chat.ConfirmCallback(update.CallbackQuery.Id);
 
         DictionaryWord word = null;
-        IReadOnlyList<DictionaryTranslation> translations = null;
+        IReadOnlyList<Translation> translations = null;
         while (word == null)
         {
             if (!moveResult)
@@ -116,7 +116,7 @@ public class AddFromLearningSetFlow {
                 return false;
             }
 
-            (word, translations) = await _localDictionaryService.GetWordInfo(selector.Current.Word);
+            (word, translations) = await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
             if (word == null)
                 moveResult = await MoveOnNextWord(selector, true);
         }
@@ -174,7 +174,7 @@ public class AddFromLearningSetFlow {
     private string GetWordText(
         PaginationCollection<WordInLearningSet> collection,
         DictionaryWord dictionaryWord,
-        IReadOnlyList<DictionaryTranslation> translations,
+        IReadOnlyList<Translation> translations,
         WordInLearningSet wordInLearningSet) {
         var engWord = dictionaryWord.Word;
         var transcription = dictionaryWord.Transcription;
@@ -198,7 +198,7 @@ public class AddFromLearningSetFlow {
     }
 
     private static Example GetExampleOrNull(
-        WordInLearningSet wordInLearningSet, DictionaryTranslation[] allowedTranslations) {
+        WordInLearningSet wordInLearningSet, Translation[] allowedTranslations) {
         var allowed = allowedTranslations.SelectMany(t => t.Examples)
                                          .Where(e => wordInLearningSet.AllowedExamples.Contains(e.Id));
         var bestFit = allowed.Where(
@@ -212,8 +212,8 @@ public class AddFromLearningSetFlow {
                    .FirstOrDefault();
     }
 
-    private static DictionaryTranslation[] SearchForAllowedTranslations(
-        IReadOnlyList<DictionaryTranslation> translations, WordInLearningSet wordInLearningSet) {
+    private static Translation[] SearchForAllowedTranslations(
+        IReadOnlyList<Translation> translations, WordInLearningSet wordInLearningSet) {
         var allowedTranslations = translations.Where(
                                                   t =>
                                                       wordInLearningSet.AllowedTranslations.Any(

@@ -11,7 +11,7 @@ namespace Chotiskazal.Bot.ChatFlows
     public class LastTranslationHandler {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private readonly IReadOnlyList<DictionaryTranslation> _translations;
+        private readonly IReadOnlyList<Translation> _translations;
         private bool _isLastMessageInTheChat =true ;
 
         public string OriginWordText { get;  }
@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private bool[] _areSelected;
         
         public LastTranslationHandler(
-            IReadOnlyList<DictionaryTranslation> translations, 
+            IReadOnlyList<Translation> translations, 
             ChatRoom chat,
             AddWordService addWordService)
         {

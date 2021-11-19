@@ -100,10 +100,10 @@ public interface IInterfaceTexts {
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);
     string HereAreTheTranslationMarkdown(string word, string tr);
-    string MessageAfterTranslationIsSelected(DictionaryTranslation translation);
+    string MessageAfterTranslationIsSelected(Translation translation);
     string YouHaveLearnedWords(in int count);
     string YouForgotCountWords(in int forgottenWordsCount);
-    string MessageAfterTranslationIsDeselected(DictionaryTranslation allTranslation);
+    string MessageAfterTranslationIsDeselected(Translation allTranslation);
     string LearnMoreWordsMarkdown(in int length);
     string LearnSomeWordsMarkdown(in int length);
     string PageXofYMarkdown(in int number, in int count);

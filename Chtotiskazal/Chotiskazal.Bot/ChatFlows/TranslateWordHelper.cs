@@ -22,7 +22,7 @@ namespace Chotiskazal.Bot.ChatFlows
         public const string Separator = "@";
         public const string TranslationDataPrefix = "/tr";
         
-        static string CreateButtonDataFor(DictionaryTranslation translation, bool isSelected)
+        static string CreateButtonDataFor(Translation translation, bool isSelected)
             => TranslationDataPrefix 
                + translation.OriginText 
                + Separator 
@@ -40,14 +40,14 @@ namespace Chotiskazal.Bot.ChatFlows
                 return null;
             return new TranslationButtonData(splitted[0],splitted[1], splitted[2]=="1");
         }
-        public static InlineKeyboardButton CreateButtonFor(DictionaryTranslation translation, bool selected)
+        public static InlineKeyboardButton CreateButtonFor(Translation translation, bool selected)
             => new InlineKeyboardButton {
                 CallbackData = CreateButtonDataFor(translation,selected), 
                 Text = selected
                     ? $"{Emojis.Selected} {translation.TranslatedText}"
                     : translation.TranslatedText
             };
-        public static  int  FindIndexOf(IReadOnlyList<DictionaryTranslation> translations, string translation)
+        public static  int  FindIndexOf(IReadOnlyList<Translation> translations, string translation)
         {
             for (int i = 0; i < translations.Count; i++)
             {

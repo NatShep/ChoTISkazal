@@ -21,11 +21,11 @@ namespace SayWhat.Bll.Yapi
         [JsonPropertyName("ts")]
         public string Ts { get; set; }
         [JsonPropertyName("tr")]
-        public Translation[] Tr { get; set; }
+        public YaTranslation[] Tr { get; set; }
 
     }
 
-    public class Translation
+    public class YaTranslation
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
@@ -34,9 +34,9 @@ namespace SayWhat.Bll.Yapi
         [JsonPropertyName("gen")]
         public string Gen { get; set; }
         [JsonPropertyName("syn")]
-        public Synonim[] Syn { get; set; }
+        public YaSynonim[] Syn { get; set; }
         [JsonPropertyName("mean")]
-        public JustText[] Mean { get; set; }
+        public YaJustText[] Mean { get; set; }
         [JsonPropertyName("ex")]
         public YaExample[] Ex { get; set; }
         public List<Example> GetPhrases(string word)
@@ -57,7 +57,7 @@ namespace SayWhat.Bll.Yapi
 
     }
 
-    public class Synonim
+    public class YaSynonim
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
@@ -67,7 +67,7 @@ namespace SayWhat.Bll.Yapi
         public string Gen { get; set; }
     }
 
-    public class JustText
+    public class YaJustText
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
@@ -78,7 +78,7 @@ namespace SayWhat.Bll.Yapi
         [JsonPropertyName("text")]
         public string Text { get; set; }
         [JsonPropertyName("tr")]
-        public JustText[] Tr { get; set; }
+        public YaJustText[] Tr { get; set; }
     }
     
 }

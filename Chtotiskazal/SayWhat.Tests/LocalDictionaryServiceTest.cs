@@ -54,7 +54,7 @@ public class LocalDictionaryServiceTest {
         
         var word = CreateWord("table", "qweqwe", ("Стол", new[] { example }));
         await _service.AddNewWord(word);
-        var translations = await _service.GetTranslationsWithExamples("table");
+        var translations = await _service.GetTranslationsWithExamplesByEnWord("table");
         Assert.AreEqual(1, translations.Count);
         var translation = translations[0];
         Assert.AreEqual(word.Source, translation.Source);
@@ -75,7 +75,7 @@ public class LocalDictionaryServiceTest {
             Language = Language.En,
             Source = TranslationSource.Yadic,
             Transcription = transcription,
-            Translations = translations.SelectToArray(t=> new DictionaryTranslation {
+            Translations = translations.SelectToArray(t=> new DictionaryTranslationDbEntity {
                 Word = t.Item1,
                 Language = Language.Ru,
                 Examples = t.Item2.SelectToArray(i=>new DictionaryReferenceToExample(i))

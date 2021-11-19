@@ -17,11 +17,11 @@ namespace SayWhat.MongoDAL.Dictionary
         [BsonElement("l")]
         public Language Language { get; set; }
         [BsonElement("tr")]
-        public DictionaryTranslation[] Translations { get; set; }
+        public DictionaryTranslationDbEntity[] Translations { get; set; }
         [BsonElement("src")]
         public TranslationSource Source { get; set; }
 
-        public DictionaryTranslation GetTranslationOrNull(string ru) => 
+        public DictionaryTranslationDbEntity GetTranslationOrNull(string ru) => 
             Translations.FirstOrDefault(t => t.Word.Equals(ru, StringComparison.InvariantCultureIgnoreCase));
 
         public (int foundExamples, int lostExamples) LoadExamples(Dictionary<ObjectId, Example> examples) {
@@ -40,5 +40,6 @@ namespace SayWhat.MongoDAL.Dictionary
             }
             return (foundExamples, lostExamples);
         }
+        
     }
 }

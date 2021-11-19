@@ -2,7 +2,7 @@
 
 namespace SayWhat.MongoDAL.Dictionary
 {
-    public class DictionaryTranslation {
+    public class DictionaryTranslationDbEntity {
         
         // ReSharper disable once InconsistentNaming
         [BsonElement("w")]

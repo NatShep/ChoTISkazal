@@ -131,10 +131,10 @@ public class RussianTexts : IInterfaceTexts {
            $"*{word.EscapeForMarkdown().Capitalize()}*" +
            $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
 
-    public string MessageAfterTranslationIsSelected(DictionaryTranslation translation)
+    public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
 
-    public string MessageAfterTranslationIsDeselected(DictionaryTranslation translation)
+    public string MessageAfterTranslationIsDeselected(Translation translation)
         => $"Будто ничего и не было";
 
     public string LearnMoreWordsMarkdown(in int length)

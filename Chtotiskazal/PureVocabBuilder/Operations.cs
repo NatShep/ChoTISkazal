@@ -37,7 +37,7 @@ public  class Operations {
         var essentialPathWithExamplesResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/CheckPhrasePlease.essential";
 
-        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
+        var loaded = ChaosBllHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
         int good = 0;
         int optimized = 0;
         int saved = 0;
@@ -45,7 +45,7 @@ public  class Operations {
         int number = 1;
         foreach (var word in loaded)
         {
-            var yaTranlations = await _localDictionaryService.GetTranslationsWithExamples(word.En);
+            var yaTranlations = await _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.En);
             foreach (var translation in word.Translations)
             {
                 var yaTrans = yaTranlations.FirstOrDefault(
@@ -86,14 +86,14 @@ public  class Operations {
             word.Index = number;
             number++;
         }
-        ChaosHelper.SaveJson(loaded, essentialPathWithExamplesResult);
+        ChaosBllHelper.SaveJson(loaded, essentialPathWithExamplesResult);
     }
 
     private async Task CheckCophrasing(AllExamplesDictionary examplesDictionary) {
         var essentialPathResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/FilteredOnlyTranslations.essential";
 
-        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
+        var loaded = ChaosBllHelper.LoadJson<List<EssentialWord>>(essentialPathResult);
         int succ = 0;
         int fail = 0;
         int noCandidates = 0;
@@ -157,7 +157,7 @@ public  class Operations {
         var essentialPathResult =
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/FilteredOnlyTranslations.essential";
 
-        var loaded = ChaosHelper.LoadJson<List<EssentialWord>>(essentialPath);
+        var loaded = ChaosBllHelper.LoadJson<List<EssentialWord>>(essentialPath);
         foreach (string item in blackList)
         {
             var toRemove = loaded.FirstOrDefault(l => l.En == item);
@@ -216,7 +216,7 @@ public  class Operations {
         }
 
         Console.WriteLine("its done!");
-        ChaosHelper.SaveJson(loaded, essentialPathResult);
+        ChaosBllHelper.SaveJson(loaded, essentialPathResult);
     }
 
     private Task MergeUi() {
@@ -257,7 +257,7 @@ public  class Operations {
                 new EssentialWord(
                     manual.Item1, null,
                     result.Select(r => new EssentialTranslation(r, new List<EssentialPhrase>())).ToList()));
-            ChaosHelper.SaveJson(words, essentialPath);
+            ChaosBllHelper.SaveJson(words, essentialPath);
         }
 
         Console.WriteLine("Validated");
