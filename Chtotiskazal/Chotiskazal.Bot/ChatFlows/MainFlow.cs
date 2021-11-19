@@ -107,9 +107,10 @@ public class MainFlow {
             new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings),
             _addWordCommandHandler,
             new ShowLearningSetsBotCommandHandler(_learningSetService),
+            new ShowWellLearnedWordsCommandHandler(_usersWordsService,_wellKnownWordsUpdateHook),
             new SelectLearningSet(
                 _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
-            new StartBotCommandHandler(ShowMainMenu),
+            new StartBotCommandHandler(ShowMainMenu)
         };
     }
 

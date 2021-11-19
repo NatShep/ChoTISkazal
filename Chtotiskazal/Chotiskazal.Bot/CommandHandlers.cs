@@ -16,6 +16,8 @@ public interface IBotCommandHandler {
     Task Execute(string argument, ChatRoom chat);
 }
 
+
+
 public class HelpBotCommandHandler : IBotCommandHandler {
     public static IBotCommandHandler Instance { get; } = new HelpBotCommandHandler();
     private HelpBotCommandHandler() { }
@@ -47,7 +49,6 @@ public class AddBotCommandHandler : IBotCommandHandler {
     public Task Execute(string argument, ChatRoom chat) =>
         new TranslateWordsFlow(chat, _addWordsService, _translationSelectedUpdateHook).Enter(argument);
 }
-
 
 public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
     private readonly LearningSetService _learningSetService;
@@ -93,6 +94,19 @@ public class LearnBotCommandHandler : IBotCommandHandler {
 
     public Task Execute(string argument, ChatRoom chat) => new ExamFlow(
             chat, _userService, _usersWordsService, _examSettings)
+        .EnterAsync();
+}
+public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
+    private UsersWordsService _userWordsService;
+    private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
+    public ShowWellLearnedWordsCommandHandler(UsersWordsService userWordsService, LeafWellKnownWordsUpdateHook wellKnownWordsUpdateHook) {
+        _userWordsService = userWordsService;
+        _wellKnownWordsUpdateHook = wellKnownWordsUpdateHook;
+    }
+    public bool Acceptable(string text) => text == BotCommands.Words;
+    public string ParseArgument(string text) => null;
+    public Task Execute(string argument, ChatRoom chat) => new ShowWellKnownWordsFlow(
+            chat, _userWordsService, _wellKnownWordsUpdateHook)
         .EnterAsync();
 }
 
