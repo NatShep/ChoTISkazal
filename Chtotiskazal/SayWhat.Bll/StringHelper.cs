@@ -59,26 +59,27 @@ namespace SayWhat.Bll
             var m =CheckCloseness(wordA, wordB);
             return m == StringsCompareResult.Equal || m == StringsCompareResult.SmallMistakes;
         }
-        public static StringsCompareResult CheckCloseness(this string wordA, string wordB)
-        {
-            if(wordA==null || wordB==null)
-                return wordA==wordB? StringsCompareResult.Equal: StringsCompareResult.NotEqual;
-            
-            if (wordA.Length <= 4 || wordB.Length <= 4)
+
+        public static StringsCompareResult CheckCloseness(this string wordA, string wordB) {
+            if (wordA == null || wordB == null)
+                return wordA == wordB ? StringsCompareResult.Equal : StringsCompareResult.NotEqual;
+
+            if (wordA.Length <= 3 || wordB.Length <= 3)
                 return AreEqualIgnoreCase(wordA, wordB) ? StringsCompareResult.Equal : StringsCompareResult.NotEqual;
-            
+
             var distance = Fastenshtein.Levenshtein.Distance(wordA.ToLower(), wordB.ToLower());
             if (distance == 0)
                 return StringsCompareResult.Equal;
-            //small mistakes: one mistake for each 5 letters
+            //small mistakes: one mistake for each 4 letters
             //big   mistakes: one mistake for each 3 letters
             int length = Math.Min(wordA.Length, wordB.Length);
-            if (distance <= length / 5)
+            if (distance <= length / 4)
                 return StringsCompareResult.SmallMistakes;
             if (distance <= length / 3)
                 return StringsCompareResult.BigMistakes;
             return StringsCompareResult.NotEqual;
         }
+
         public static string Capitalize(this string word)
         {
             if (string.IsNullOrWhiteSpace(word))

@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
             await chat.SendMarkdownMessageAsync(sb.ToString());
 
-            var enter = await WaitForNonEmptyInput(chat);
+            var enter = await chat.WaitNonEmptyUserTextInputAsync();
             
             if (!enter.IsRussian())
             {
@@ -61,15 +61,6 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*",
                 chat.Texts);
-        }
-
-        private static async Task<string> WaitForNonEmptyInput(ChatRoom chat) {
-            while (true)
-            {
-                var enter = await chat.WaitUserTextInputAsync();
-                if (!string.IsNullOrWhiteSpace(enter))
-                    return enter;
-            }
         }
     }
 }

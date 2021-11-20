@@ -46,6 +46,15 @@ namespace Chotiskazal.Bot
             => _origin.WaitInlineIntKeyboardInput();
         public Task<string> WaitUserTextInputAsync()
             => _origin.WaitUserTextInputAsync();
+
+        public async Task<string> WaitNonEmptyUserTextInputAsync() {
+            while (true)
+            {
+                var input = await WaitUserTextInputAsync();
+                if (!string.IsNullOrEmpty(input))
+                    return input;
+            }
+        }
         public Task SendTyping()
             => _origin.SendTyping();
         public Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[] buttons)
