@@ -58,10 +58,10 @@ namespace Chotiskazal.Bot
             => _origin.AnswerCallbackQueryWithTooltip(callbackQueryId, s);
         public Task ConfirmCallback(string callbackQueryId)
             => _origin.ConfirmCallback(callbackQueryId);
+        
+        public Task EditMessageTextMarkdown(int messageMessageId, string s,
+                                                  InlineKeyboardMarkup inlineKeyboardButtons = null)
+            => _origin.EditMarkdownMessage(messageMessageId, s, inlineKeyboardButtons);
         #endregion
-
-        public async Task EditMessageTextMarkdown(int messageMessageId, string s,
-            InlineKeyboardMarkup inlineKeyboardButtons = null)
-            => await _origin.EditMarkdownMessage(messageMessageId, s, inlineKeyboardButtons);
     }
 }

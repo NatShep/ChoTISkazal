@@ -51,7 +51,8 @@ public class AddFromLearningSetFlow {
         else
             selector.Page = currentSet.LastSeenWordOffset;
 
-        var (word, translations) = await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
+        var (word, translations) =
+            await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
 
         await Chat.SendMarkdownMessageAsync(
             GetWordText(selector, word, translations, selector.Current),
@@ -95,12 +96,14 @@ public class AddFromLearningSetFlow {
         {
             await AddWordToUser(selector.Current);
             //Todo почему то не работает
-            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id, Chat.Texts.WordIsAddedForLearning(selector.Current.Word));
+            await Chat.AnswerCallbackQueryWithTooltip(
+                update.CallbackQuery.Id, Chat.Texts.WordIsAddedForLearning(selector.Current.Word));
             moveResult = await MoveOnNextWord(selector, true);
         }
         else if (update.CallbackQuery.Data == moveNextData)
         {
-            await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id, Chat.Texts.WordIsSkippedForLearning(selector.Current.Word));
+            await Chat.AnswerCallbackQueryWithTooltip(
+                update.CallbackQuery.Id, Chat.Texts.WordIsSkippedForLearning(selector.Current.Word));
             moveResult = await MoveOnNextWord(selector, true);
         }
         else
@@ -116,7 +119,8 @@ public class AddFromLearningSetFlow {
                 return false;
             }
 
-            (word, translations) = await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
+            (word, translations) =
+                await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
             if (word == null)
                 moveResult = await MoveOnNextWord(selector, true);
         }
@@ -128,7 +132,7 @@ public class AddFromLearningSetFlow {
         return true;
     }
 
-    private async Task SendAllWordsAreLearnedMessage(int messageId) => 
+    private async Task SendAllWordsAreLearnedMessage(int messageId) =>
         await Chat.EditMessageTextMarkdown(messageId, Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName));
 
     private async Task<bool> MoveOnNextWord(PaginationCollection<WordInLearningSet> selector, bool moveNext) {
@@ -146,7 +150,8 @@ public class AddFromLearningSetFlow {
         return false;
     }
 
-    private Task<bool> HasUserWord(WordInLearningSet current) => _usersWordsService.Contains(Chat.User, current.Word.ToLower());
+    private Task<bool> HasUserWord(WordInLearningSet current) =>
+        _usersWordsService.Contains(Chat.User, current.Word.ToLower());
 
 
     private async Task AddWordToUser(WordInLearningSet word) {
@@ -158,17 +163,23 @@ public class AddFromLearningSetFlow {
             await _addWordService.AddTranslationToUser(Chat.User, tranlsation);
     }
 
-    private InlineKeyboardButton[] GetWordKeyboard() =>
+    private InlineKeyboardButton[][] GetWordKeyboard() =>
         new[] {
-            new InlineKeyboardButton {
-                CallbackData = selectLearningSetData,
-                Text = $"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}"
+            new[] {
+                new InlineKeyboardButton {
+                    CallbackData = selectLearningSetData,
+                    Text = $"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}"
+                }
             },
-            new InlineKeyboardButton {
-                CallbackData = moveNextData,
-                Text = $"{Emojis.SoftNext}  {Chat.Texts.Skip}"
+            new[] {
+                new InlineKeyboardButton {
+                    CallbackData = moveNextData,
+                    Text = $"{Emojis.SoftNext}  {Chat.Texts.Skip}"
+                },
             },
-            InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
+            new[] {
+                InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
+            }
         };
 
     private string GetWordText(
