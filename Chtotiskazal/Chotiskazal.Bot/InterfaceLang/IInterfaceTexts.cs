@@ -96,8 +96,8 @@ public interface IInterfaceTexts {
     string Skip { get;  }
     string ChooseLearningSet { get;  }
     string LearningSetsButton { get; }
-    string RussianEnterExpected { get; }
-    string EnglishEnterExpected { get; }
+    string RussianInputExpected { get; }
+    string EnglishInputExpected { get; }
     string OutOfScopeWithCandidateMarkdown(string otherMeaning);
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);

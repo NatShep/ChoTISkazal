@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var enter = await chat.WaitNonEmptyUserTextInputAsync();
             if (enter.IsRussian())
             {
-                await chat.SendMessageAsync(chat.Texts.EnglishEnterExpected);
+                await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
                 return QuestionResult.RetryThisQuestion;
             }
             

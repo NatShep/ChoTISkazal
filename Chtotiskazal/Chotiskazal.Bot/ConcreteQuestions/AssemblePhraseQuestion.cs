@@ -34,12 +34,23 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync($"{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"" +  shuffled+ "\"*");
             var entry = await chat.WaitUserTextInputAsync();
-            entry = entry.Trim();
 
-            if (targetPhrase.OriginPhrase.AreEqualIgnoreCase(entry.Trim()))
-                return QuestionResult.Passed(chat.Texts);
-
+            if (entry.IsRussian())
+            {
+                await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
+                return QuestionResult.RetryThisQuestion;
+            }
             
+            var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
+            
+            if (closeness== StringsCompareResult.Equal)
+                return QuestionResult.Passed(chat.Texts);
+            
+            if (closeness == StringsCompareResult.SmallMistakes){
+                await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
+                return QuestionResult.RetryThisQuestion;
+            }
+
             return QuestionResult.Failed(
                 $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
                 chat.Texts);

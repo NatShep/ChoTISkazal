@@ -22,8 +22,8 @@ public class RussianTexts : IInterfaceTexts {
     public string SelectWordInLearningSet => "Хочу учить";
     public string Skip => "Пропустить";
     public string ChooseLearningSet => "Выберите набор слов для изучения";
-    public string RussianEnterExpected => "Ожидался ответ на русском"; 
-    public string EnglishEnterExpected => "Ожидался ответ на английском"; 
+    public string RussianInputExpected => "Ожидался ответ на русском"; 
+    public string EnglishInputExpected => "Ожидался ответ на английском"; 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его \\(имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 

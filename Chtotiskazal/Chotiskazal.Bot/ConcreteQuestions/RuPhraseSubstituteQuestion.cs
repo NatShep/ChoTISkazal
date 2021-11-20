@@ -38,7 +38,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             if (!enter.IsRussian())
             {
-                await chat.SendMessageAsync(chat.Texts.RussianEnterExpected);
+                await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
                 return QuestionResult.RetryThisQuestion;
             }
             
