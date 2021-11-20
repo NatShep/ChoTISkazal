@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 if (wordsInExample.Length < 2)
                     return QuestionResult.Impossible;
 
-                shuffled = string.Join(" ", wordsInExample.Randomize());
+                shuffled = string.Join(" ", wordsInExample.Shuffle());
                 if(shuffled!= targetPhrase.OriginPhrase)
                     break;
             }

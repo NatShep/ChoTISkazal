@@ -39,10 +39,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
                     .Any(t=>t.AreEqualIgnoreCase(phrase.TranslatedPhrase)))
                 .Select(e => e.Word)
-                .Randomize()
+                .Shuffle()
                 .Take(5)
                 .Append(phrase.OriginWord)
-                .Randomize()
+                .Shuffle()
                 .ToArray();
 
             var _ = await chat.SendMarkdownMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));

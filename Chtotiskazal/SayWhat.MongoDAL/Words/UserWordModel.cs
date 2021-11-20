@@ -123,7 +123,7 @@ public class UserWordModel {
     public Example GetRandomExample() =>
         Examples
             .ToList()
-            .GetRandomItem();
+            .GetRandomItemOrNull();
 
     public void OnQuestionPassed() {
         _absoluteScore += WordLeaningGlobalSettings.ScoresForPassedQuestion;

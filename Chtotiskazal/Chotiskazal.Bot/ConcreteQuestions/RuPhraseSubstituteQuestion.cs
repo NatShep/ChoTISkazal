@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions
@@ -12,45 +14,61 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
 
         public string Name => "Ru phrase substitute";
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
-            UserWordModel[] examList)
-        {
-            if (!word.Examples.Any())
+
+        public async Task<QuestionResult> Pass(
+            ChatRoom chat, UserWordModel word,
+            UserWordModel[] examList) {
+            var (phrase, translation) = word.GetExamplesThatLoadedAndFits().GetRandomItemOrNull();
+            if (phrase == null)
                 return QuestionResult.Impossible;
-
-            var phrase = word.GetRandomExample();
-
-            var replaced = phrase.TranslatedPhrase.Replace(phrase.TranslatedWord, "\\.\\.\\.");
-            if (replaced == phrase.TranslatedPhrase)
+            var (enPhrase,ruPhrase) = phrase.Deconstruct();
+            var replacedRuPhrase = ruPhrase.Replace(phrase.TranslatedWord, "\\.\\.\\.");
+            if (replacedRuPhrase == ruPhrase)
                 return QuestionResult.Impossible;
 
             var sb = new StringBuilder();
-            
-            sb.AppendLine($"*\"{phrase.OriginPhrase}\"*");
+            sb.AppendLine($"*\"{enPhrase}\"*");
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
-            sb.AppendLine($"*\"{replaced}\"*");
+            sb.AppendLine($"*\"{replacedRuPhrase}\"*");
             sb.AppendLine();
             sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
-            var msg = sb.ToString().Replace(".","\\.");
             await chat.SendMarkdownMessageAsync(sb.ToString());
 
+            var enter = await WaitForNonEmptyInput(chat);
+            
+            if (!enter.IsRussian())
+            {
+                await chat.SendMessageAsync(chat.Texts.RussianEnterExpected);
+                return QuestionResult.RetryThisQuestion;
+            }
+            
+            var comparation = translation.Word.CheckCloseness(enter.Trim());
+            
+            if (comparation == StringsCompareResult.Equal)
+                return QuestionResult.Passed(chat.Texts);
+
+            //if user enters whole word in phrase- it is ok!
+            if (enter.Contains(translation.Word, StringComparison.InvariantCultureIgnoreCase) 
+                && phrase.OriginPhrase.Contains(enter, StringComparison.InvariantCultureIgnoreCase))
+                return QuestionResult.Passed(chat.Texts);
+
+            if (comparation == StringsCompareResult.SmallMistakes)
+            {
+                await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
+                return QuestionResult.RetryThisQuestion;
+            }
+
+            
+            return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*",
+                chat.Texts);
+        }
+
+        private static async Task<string> WaitForNonEmptyInput(ChatRoom chat) {
             while (true)
             {
                 var enter = await chat.WaitUserTextInputAsync();
-                if (string.IsNullOrWhiteSpace(enter))
-                    continue;
-                var comparation = phrase.TranslatedWord.CheckCloseness(enter.Trim());
-
-                if (comparation== StringsCompareResult.Equal)
-                    return QuestionResult.Passed(chat.Texts);
-
-                if (comparation == StringsCompareResult.SmallMistakes) {
-                    await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
-                    return QuestionResult.RetryThisQuestion;
-                }
-                return QuestionResult.Failed(
-                    $"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*", 
-                    chat.Texts);
+                if (!string.IsNullOrWhiteSpace(enter))
+                    return enter;
             }
         }
     }

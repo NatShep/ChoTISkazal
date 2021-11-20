@@ -19,7 +19,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Select(e => e.Word)
                 .Take(5)
                 .Append(word.Word)
-                .Randomize()
+                .Shuffle()
                 .ToArray();
 
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +

@@ -11,10 +11,35 @@ using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.Bll {
 
 public static class ChaosBllHelper {
+    public static IEnumerable<(Example, UserWordTranslation)> GetExamplesThatLoadedAndFits(this UserWordModel wordModel) {
+        foreach (var translation in wordModel.Translations)
+        {
+            foreach (var example in translation.GetDownloadedExamples())
+            {
+                if (example.Fits(wordModel.Word, translation.Word))
+                    yield return (example, translation);
+            }
+        }
+        yield break;
+    }
+
+    public static bool Fits(string enWord, string ruWord, string enPhrase, string ruPhrase) {
+        if (!enPhrase.ToLower().Split(" ", StringSplitOptions.RemoveEmptyEntries).Contains(enWord))
+            return false;
+
+        return ruPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries)
+                       .Any(w => w.CheckCloseness(ruWord) != StringsCompareResult.NotEqual);
+    }
+    public static bool Fits(this Example example, string en, string ru) {
+        var (ourEn, ourRu) = example.Deconstruct();
+        return Fits(en, ru, ourEn, ourRu);
+    }
+
     public static IReadOnlyList<Translation> ToDictionaryTranslations(this DictionaryWord word) =>
         word.Translations.Select(
                 t => new Translation(

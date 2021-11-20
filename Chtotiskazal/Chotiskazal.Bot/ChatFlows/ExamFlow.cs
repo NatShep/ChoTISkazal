@@ -54,7 +54,7 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 var sb = new StringBuilder($"{Emojis.Learning} "+Chat.Texts.LearningCarefullyStudyTheListMarkdown +"\r\n\r\n```\r\n");
 
-                foreach (var pairModel in learningWords.Randomize())
+                foreach (var pairModel in learningWords.Shuffle())
                 {
                     sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.AllTranslationsAsSingleString.EscapeForMarkdown()}");
                 }

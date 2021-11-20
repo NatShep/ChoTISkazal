@@ -16,15 +16,14 @@ public class RussianTexts : IInterfaceTexts {
     public string OriginWas => "Правильный ответ";
     public string EnterMissingWord => "Введите пропущенное слово";
     public string TypoAlmostRight => "Очепяточка. Попробуем еще разок";
-
     public string InterfaceLanguageSetuped => "Язык интрфейса - русский.";
-
     public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
     public string JustOneLearnedWord => "Выучено только одно слово\\! Какая жалость\\.";
     public string SelectWordInLearningSet => "Хочу учить";
     public string Skip => "Пропустить";
     public string ChooseLearningSet => "Выберите набор слов для изучения";
-
+    public string RussianEnterExpected => "Ожидался ответ на русском"; 
+    public string EnglishEnterExpected => "Ожидался ответ на английском"; 
     public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
         => $"Перевод-то правильный, но учим мы не его \\(имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
 

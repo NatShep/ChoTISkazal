@@ -1,4 +1,7 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using MongoDB.Bson.Serialization.Attributes;
+using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.MongoDAL.Words
 {
@@ -21,5 +24,9 @@ namespace SayWhat.MongoDAL.Words
         public string Transcription   { get; set; }
         [BsonElement("e")]
         public UserWordTranslationReferenceToExample[] Examples { get; set; }
+
+        public IEnumerable<Example> GetDownloadedExamples() =>
+            Examples.Select(e => e.ExampleOrNull).Where(e => e != null);
+
     }
 }

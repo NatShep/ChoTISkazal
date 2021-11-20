@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var other = examList.SelectMany(e => e.Examples)
                 .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) && p.TranslatedPhrase!= targetPhrase.TranslatedPhrase)
-                .Randomize()
+                .Shuffle()
                 .Take(5)
                 .ToArray();
 
@@ -32,7 +32,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var variants = other
                 .Append(targetPhrase)
-                .Randomize()
+                .Shuffle()
                 .Select(e => e.OriginPhrase)
                 .ToArray();
             

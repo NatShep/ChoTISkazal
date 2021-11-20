@@ -7,13 +7,15 @@ namespace SayWhat.MongoDAL
     public static class Rand
     {
         public static readonly Random Rnd = new Random(DateTime.Now.Millisecond);
-        
-        public static T GetRandomItem<T>(this IList<T> origin)
-        {
+
+        public static T GetRandomItemOrNull<T>(this IEnumerable<T> origin) => origin.ToList().GetRandomItemOrNull();
+        public static T GetRandomItemOrNull<T>(this IList<T> origin) {
+            if (origin.Count == 0)
+                return default;
             var rnd = Rnd.Next(origin.Count);
             return origin[rnd];
         }
-        public static IEnumerable<T> Randomize<T>(this IEnumerable<T> origin)
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> origin)
         {
             var list = origin.ToList();
             while (list.Count>0)

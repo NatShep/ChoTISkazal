@@ -254,7 +254,7 @@ namespace Chotiskazal.Bot.Questions
         public IQuestion GetNextQuestionFor(bool isFirstExam, UserWordModel model)
         {
             if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.IncompleteWordMinScore)
-                return _simpleExamsList.GetRandomItem().Question;
+                return _simpleExamsList.GetRandomItemOrNull().Question;
 
             var score = model.AbsoluteScore - (isFirstExam ? (WordLeaningGlobalSettings.LearnedWordMinScore/2) : 0);
 

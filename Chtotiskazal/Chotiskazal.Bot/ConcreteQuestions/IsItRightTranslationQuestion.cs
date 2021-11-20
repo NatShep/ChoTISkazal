@@ -17,11 +17,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         {
             var translation = examList.SelectMany(e => e.TextTranslations)
                 .Where(e => word.Translations.All(t => t.Word != e))
-                .Randomize()
+                .Shuffle()
                 .Take(1)
                 .Union(word.TextTranslations)
                 .ToList()
-                .GetRandomItem();
+                .GetRandomItemOrNull();
             
             var msg = $"*\"{word.Word}\"*\r\n" +
                       $"    _{chat.Texts.translatesAs}_\r\n" +

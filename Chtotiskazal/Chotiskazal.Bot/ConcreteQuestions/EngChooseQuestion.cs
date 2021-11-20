@@ -16,15 +16,15 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
-            var originTranslation = word.Translations.ToList().GetRandomItem();
+            var originTranslation = word.Translations.ToList().GetRandomItemOrNull();
            
             var variants = examList.SelectMany(e => e.TextTranslations)
                 .Where(e => !word.TextTranslations.Contains(e))
                 .Distinct()
-                .Randomize()
+                .Shuffle()
                 .Take(5)
                 .Append(originTranslation.Word)
-                .Randomize()
+                .Shuffle()
                 .ToList();
 
             var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +

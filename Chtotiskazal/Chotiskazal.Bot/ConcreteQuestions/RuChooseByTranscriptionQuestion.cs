@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
-            var originTranslation = word.Translations.GetRandomItem();
+            var originTranslation = word.Translations.GetRandomItemOrNull();
             
             if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription!="")
                 return QuestionResult.Impossible;
@@ -23,7 +23,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .SelectMany(e => e.TextTranslations)
                 .Take(5)
                 .Append(originTranslation.Word)
-                .Randomize()
+                .Shuffle()
                 .ToList();
 
 

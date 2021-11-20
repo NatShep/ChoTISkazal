@@ -202,7 +202,7 @@ namespace SayWhat.Bll.Services
                 if (translations.Length <= maxTranslationSize)
                     continue;
 
-                var usedTranslations = translations.Randomize().Take(maxTranslationSize).ToArray();
+                var usedTranslations = translations.Shuffle().Take(maxTranslationSize).ToArray();
                 wordForLearning.Translations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
 
                 // Remove Phrases added as learning word 
@@ -225,9 +225,9 @@ namespace SayWhat.Bll.Services
 
             //Every learning word appears in exam from MIN to MAX times
             for (int i = 0; i < examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Randomize());
+                examsList.AddRange(learningWords.Shuffle());
             for (int i = 0; i < examSettings.MaxTimesThatLearningWordAppearsInExam - examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Randomize().Where(w => Rand.Next() % 2 == 0));
+                examsList.AddRange(learningWords.Shuffle().Where(w => Rand.Next() % 2 == 0));
             
             while (examsList.Count > examSettings.MaxExamSize) 
                 examsList.RemoveAt(examsList.Count - 1);

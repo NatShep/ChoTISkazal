@@ -15,12 +15,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
-            var translations = string.Join(", ",word.TextTranslations.Randomize().Take(3));
+            var translations = string.Join(", ",word.TextTranslations.Shuffle().Take(3));
             
             var variants = examList
                 .Where(e => e.AllTranslationsAsSingleString != word.AllTranslationsAsSingleString)
-                .Select(e => string.Join(", ", e.TextTranslations.Randomize().Take(3)))
-                .Randomize()
+                .Select(e => string.Join(", ", e.TextTranslations.Shuffle().Take(3)))
+                .Shuffle()
                 .Take(5)
                 .Append(translations)
                 .ToList();

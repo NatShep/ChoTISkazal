@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var otherExamples = examList
                 .SelectMany(e => e.Examples)
                 .Where(p => !p.TranslatedPhrase.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase))
-                .Randomize()
+                .Shuffle()
                 .Take(5)
                 .ToArray();
 
@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var variants = otherExamples
                 .Append(targetPhrase)
                 .Select(e => e.TranslatedPhrase)
-                .Randomize()
+                .Shuffle()
                 .ToArray();
             
             var msg = $"\\=\\=\\=\\=\\=\\>  *{targetPhrase.OriginPhrase}*  \\<\\=\\=\\=\\=\\=\\=\r\n" +

@@ -54,13 +54,7 @@ public class EssentialPhrase {
             return false;
         return true;
     }
-    public bool Fits(string enWord, string ruWord) {
-        if (!En.ToLower().Split(" ", StringSplitOptions.RemoveEmptyEntries).Contains(enWord))
-            return false;
-
-        return Ru.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-                 .Any(w => w.CheckCloseness(ruWord) != StringsCompareResult.NotEqual);
-    }
+    public bool Fits(string enWord, string ruWord) => ChaosBllHelper.Fits(enWord, ruWord, En, Ru);
 }
 
 }
