@@ -77,6 +77,16 @@ namespace Chotiskazal.Bot
             
             Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",true);
 
+            _botClient.SetMyCommandsAsync(new[] {
+                new BotCommand{Command = BotCommands.Help, Description  = "Help and instructions (Помощь и инстркции)"},
+                new BotCommand{Command = BotCommands.Start, Description = "Main menu (Главное меню)"},
+                new BotCommand{Command = BotCommands.Add, Description   = "Translator (Переводчик)"},
+                new BotCommand{Command = BotCommands.Learn, Description = "Learning translated words (Учить слова)"},
+                new BotCommand{Command = BotCommands.New, Description   = "Show learning sets (Показать наборы для изучения)"},
+                new BotCommand{Command = BotCommands.Stats, Description = "Your stats (Твоя статистика)"},
+                new BotCommand{Command = BotCommands.Words, Description = "Your learned words (Твои выученные слова)"},
+            }).Wait();
+            
             var allUpdates =_botClient.GetUpdatesAsync().Result;
             Botlog.WriteInfo($"{allUpdates.Length} messages were missed");
 
