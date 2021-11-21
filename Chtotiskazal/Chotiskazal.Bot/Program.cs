@@ -85,6 +85,7 @@ namespace Chotiskazal.Bot
                 new BotCommand{Command = BotCommands.New, Description   = "Show learning sets (Показать наборы для изучения)"},
                 new BotCommand{Command = BotCommands.Stats, Description = "Your stats (Твоя статистика)"},
                 new BotCommand{Command = BotCommands.Words, Description = "Your learned words (Твои выученные слова)"},
+                new BotCommand{Command = BotCommands.Chlang, Description = "Change interface language (Сменить язык интерфейса)"},
             }).Wait();
             
             var allUpdates =_botClient.GetUpdatesAsync().Result;

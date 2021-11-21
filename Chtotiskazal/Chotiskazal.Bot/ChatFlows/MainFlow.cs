@@ -110,7 +110,8 @@ public class MainFlow {
             new ShowWellLearnedWordsCommandHandler(_usersWordsService,_wellKnownWordsUpdateHook),
             new SelectLearningSet(
                 _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
-            new StartBotCommandHandler(ShowMainMenu)
+            new StartBotCommandHandler(ShowMainMenu),
+            new ChlangBotCommandHandler(_userService)
         };
     }
 

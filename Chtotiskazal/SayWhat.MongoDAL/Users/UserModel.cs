@@ -50,6 +50,10 @@ public class UserModel {
     [BsonElement("pc")] private int _pairsCount;
     [BsonElement("en_wtc")] private int _englishWordTranslationRequestsCount;
     [BsonElement("ru_wtc")] private int _russianWordTranslationRequestsCount;
+    
+    [BsonDefaultValue(false)]
+    [BsonIgnoreIfDefault]
+    [BsonElement("engInterface")] public bool IsEnglishInterface { get; set; }
 
     [BsonDefaultValue(null)]
     [BsonIgnoreIfDefault]
@@ -75,7 +79,7 @@ public class UserModel {
     [BsonElement("gs")] private double _gamingScore;
 
     #endregion
-
+    
 
     public DateTime LastActivity => _lastActivity;
     public int OutdatedWordsCount => _outdatedWordsCount;

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Chotiskazal.Bot.InterfaceLang;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
@@ -8,20 +9,17 @@ namespace Chotiskazal.Bot
 {
     public class ChatRoom
     {
-
-        public IInterfaceTexts Texts => _chlangHook.SelectedInterfaceLanguage;
         public  UserModel User { get; }
-        private ChatIO _origin;
-        private ChangeInterfaceLanguageHook _chlangHook;
+        private readonly ChatIO _origin;
+        public IInterfaceTexts Texts => User.IsEnglishInterface
+            ? (IInterfaceTexts)new EnglishTexts()
+            : (IInterfaceTexts)new RussianTexts();
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;
 
         public ChatRoom(ChatIO origin, UserModel user) {
-            
+            User = user ?? throw new ArgumentNullException(nameof(user));
             _origin = origin;
-            User = user;
-            _chlangHook = new ChangeInterfaceLanguageHook(origin);
-            origin.AddUpdateHook(_chlangHook);
         }
 
         #region wrap chat io
@@ -72,5 +70,7 @@ namespace Chotiskazal.Bot
                                                   InlineKeyboardMarkup inlineKeyboardButtons = null)
             => _origin.EditMarkdownMessage(messageMessageId, s, inlineKeyboardButtons);
         #endregion
+
+
     }
 }

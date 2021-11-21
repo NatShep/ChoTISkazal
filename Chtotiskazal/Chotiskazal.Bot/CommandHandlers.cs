@@ -33,6 +33,19 @@ public class HelpBotCommandHandler : IBotCommandHandler {
         });
 }
 
+public class ChlangBotCommandHandler : IBotCommandHandler {
+    private readonly UserService _userService;
+    public ChlangBotCommandHandler(UserService userService) => _userService = userService;
+    public bool Acceptable(string text) => text == BotCommands.Chlang;
+    public string ParseArgument(string text) => null;
+
+    public async Task Execute(string argument, ChatRoom chat) {
+        chat.User.IsEnglishInterface = !chat.User.IsEnglishInterface;
+        await _userService.Update(chat.User);
+        await chat.SendMessageAsync(chat.Texts.InterfaceLanguageSetuped);
+    }
+}
+
 public class AddBotCommandHandler : IBotCommandHandler {
     private readonly AddWordService _addWordsService;
     private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
@@ -66,10 +79,9 @@ public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
         foreach (var learningSet in allSets)
         {
             msg.AppendLine(
-                $"{BotCommands.LearningSetPrefix}_" 
-                + learningSet.ShortName + "   " 
-                + learningSet.EnName + "\r\n" 
-                + learningSet.EnDescription+"\r\n");
+                chat.User.IsEnglishInterface
+                    ? $"{BotCommands.LearningSetPrefix}_{learningSet.ShortName}   {learningSet.EnName}\r\n{learningSet.EnDescription}\r\n"
+                    : $"{BotCommands.LearningSetPrefix}_{learningSet.ShortName}   {learningSet.RuName}\r\n{learningSet.RuDescription}\r\n");
         }
         await chat.SendMessageAsync(msg.ToString());
     }
