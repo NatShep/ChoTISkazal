@@ -98,6 +98,9 @@ public interface IInterfaceTexts {
     string LearningSetsButton { get; }
     string RussianInputExpected { get; }
     string EnglishInputExpected { get; }
+    string TodaysGoal { get;  }
+    string Exams { get; }
+    string TodayGoalReached { get; }
     string OutOfScopeWithCandidateMarkdown(string otherMeaning);
     string YouHaveATypoLetsTryAgainMarkdown(string text);
     string FailedMistakenMarkdown(string text);

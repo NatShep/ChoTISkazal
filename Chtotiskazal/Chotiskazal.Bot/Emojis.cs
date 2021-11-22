@@ -1,7 +1,10 @@
-﻿namespace Chotiskazal.Bot
+﻿using System;
+
+namespace Chotiskazal.Bot
 {
     public static class Emojis
     {
+        public const string GreenCircle = "🟢";
         public const string MainMenu = "☰";
         public const string Learning = "☆";
         public const string Translate = "㊍";

@@ -123,14 +123,14 @@ public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
 }
 
 public class StatsBotCommandHandler : IBotCommandHandler {
-    public static IBotCommandHandler Instance { get; } = new StatsBotCommandHandler();
-    private StatsBotCommandHandler() { }
+    private readonly ExamSettings _settings;
+    public StatsBotCommandHandler(ExamSettings settings) { _settings = settings; }
     public bool Acceptable(string text) => text == BotCommands.Stats;
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>
         chat.SendMarkdownMessageAsync(
-            StatsRenderer.GetStatsText(chat).EscapeForMarkdown(),
+            StatsRenderer.GetStatsText(_settings,chat).EscapeForMarkdown(),
             new[] {
                 new[] {
                     InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),

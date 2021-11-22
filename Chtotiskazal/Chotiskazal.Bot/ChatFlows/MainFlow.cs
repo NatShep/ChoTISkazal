@@ -103,7 +103,7 @@ public class MainFlow {
 
         ChatIo.CommandHandlers = new[] {
             HelpBotCommandHandler.Instance,
-            StatsBotCommandHandler.Instance,
+            new StatsBotCommandHandler(_settings.ExamSettings),
             new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings),
             _addWordCommandHandler,
             new ShowLearningSetsBotCommandHandler(_learningSetService),

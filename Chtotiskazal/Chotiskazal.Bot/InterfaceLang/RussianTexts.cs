@@ -104,6 +104,9 @@ public class RussianTexts : IInterfaceTexts {
 
     public string NeedToAddMoreWordsBeforeLearning => "Нужно перевести больше слов дабы начать ботать";
 
+    public string TodaysGoal => "Цель на день";
+    public string Exams => "экзаменов";
+    public string TodayGoalReached => "Цель на день - достигнута!";
 
     public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
                                           "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +

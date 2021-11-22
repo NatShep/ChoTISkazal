@@ -65,7 +65,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     Text = Chat.Texts.StartButton
                 }, new InlineKeyboardButton
                 {
-                    CallbackData = "/start",
+                    CallbackData = BotCommands.Start,
                     Text = Chat.Texts.CancelButton,
                 }}});
                 var userInput = await Chat.WaitInlineKeyboardInput();
@@ -151,20 +151,38 @@ namespace Chotiskazal.Bot.ChatFlows
             var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User,10);
 
             //info after examination
-            var doneMessage = CreateLearningResultsMessage(
-                distinctLearningWords, 
-                originWordsScore,
-                questionsPassed, 
-                questionsCount, 
-                learningWords, 
-                gamingScoreBefore);
-            
-            await Chat.SendMarkdownMessageAsync(doneMessage.EscapeForMarkdown(),
-            new[]{new[] { InlineButtons.Exam($"🔁 {Chat.Texts.OneMoreLearnButton}")}, 
-                  new[] { InlineButtons.Stats(Chat.Texts),InlineButtons.Translation(Chat.Texts.TranslateButton+" "+Emojis.Translate)}});
-            
+            await SendExamResultToUser(
+                distinctLearningWords: distinctLearningWords, 
+                originWordsScore: originWordsScore, 
+                questionsPassed: questionsPassed, 
+                questionsCount: questionsCount, 
+                learningWords: learningWords, 
+                gamingScoreBefore: gamingScoreBefore);
+
             await updateUserTask;
             await finializeScoreUpdateTask;
+        }
+
+        private async Task SendExamResultToUser(
+            UserWordModel[] distinctLearningWords, Dictionary<string, double> originWordsScore, int questionsPassed, int questionsCount,
+            UserWordModel[] learningWords, double gamingScoreBefore) {
+            var doneMessage = CreateLearningResultsMessage(
+                distinctLearningWords,
+                originWordsScore,
+                questionsPassed,
+                questionsCount,
+                learningWords,
+                gamingScoreBefore);
+
+            await Chat.SendMarkdownMessageAsync(
+                doneMessage.EscapeForMarkdown(),
+                new[] {
+                    new[] { InlineButtons.Exam($"🔁 {Chat.Texts.OneMoreLearnButton}") },
+                    new[] {
+                        InlineButtons.Stats(Chat.Texts),
+                        InlineButtons.Translation(Chat.Texts.TranslateButton + " " + Emojis.Translate)
+                    }
+                });
         }
 
         private async Task<QuestionResult> PassWithRetries(
@@ -225,9 +243,17 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            var doneMessage = new StringBuilder($"*{Chat.Texts.LearningDone}:* {questionsPassed}/{questionsCount}\r\n" +
+            
+            var doneMessage = new StringBuilder();
+            
+            doneMessage.Append($"*{Chat.Texts.LearningDone}:* {questionsPassed}/{questionsCount}\r\n" +
                                                 $"*{Chat.Texts.WordsInTestCount}:* {learningWords.Length}\r\n");
-
+            
+            var todayStats =Chat.User.GetToday();
+            doneMessage.Append($"*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.GoalForDay} {Chat.Texts.Exams}*\r\n");
+            if (todayStats.LearningDone >= _examSettings.GoalForDay)
+                doneMessage.Append($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}\r\n");
+            
             if (newWellLearnedWords.Any())
             {
                 if (newWellLearnedWords.Count > 1)
@@ -254,6 +280,7 @@ namespace Chotiskazal.Bot.ChatFlows
             
             doneMessage.Append(($"\r\n*{Chat.Texts.EarnedScore}:* " + $"{(int)(Chat.User.GamingScore - gamingScoreBefore)}"));
             doneMessage.Append(($"\r\n*{Chat.Texts.TotalScore}:* {(int) Chat.User.GamingScore}\r\n"));
+            
 
             return doneMessage.ToString();
         }

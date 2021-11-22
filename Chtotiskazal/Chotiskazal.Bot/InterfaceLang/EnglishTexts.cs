@@ -21,6 +21,10 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ChooseLearningSet => "Choose learning set";
         public string RussianInputExpected => "Russian input is expected"; 
         public string EnglishInputExpected => "English input is expected";
+        public string TodaysGoal => "Goal for the day";
+        public string Exams => "exams";
+        public string TodayGoalReached => "You have reached the goal for the day";
+
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
             => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
         public string OutOfScopeTranslationMarkdown => "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";

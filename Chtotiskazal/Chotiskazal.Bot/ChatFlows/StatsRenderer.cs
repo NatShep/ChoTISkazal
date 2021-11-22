@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Chotiskazal.Bot.InterfaceLang;
+using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
@@ -17,26 +18,22 @@ namespace Chotiskazal.Bot.ChatFlows
         private const string S4 = "⬜️";
         private const string S5 = "🟩";
         
-        public static string GetStatsText(ChatRoom chat) =>
-            RenderStats(chat) +
+        public static string GetStatsText(ExamSettings settings, ChatRoom chat) =>
+            RenderStats(settings, chat) +
             $"```\r\n" +
-            Render7WeeksCalendar(chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.GameScoreChanging)).ToArray(), chat.Texts) +
+            Render7WeeksCalendar(settings, chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging)).ToArray(), chat.Texts) +
             $"```\r\n" +
             $"\r\n" +
             $"*{RenderRecomendations(chat.User, chat.Texts)}*";
-        private static string Render7WeeksCalendar(CalendarItem[] items, IInterfaceTexts texts)
+        private static string Render7WeeksCalendar(
+            ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts)
         {
             var today = DateTime.Today;
-            double minVal = double.MaxValue;
-            double maxVal = 0;
-            foreach (var item in items)
-            {
-                minVal = Math.Min(minVal, item.Score);
-                maxVal = Math.Max(maxVal, item.Score);
-            }
             var offsets = items.ToDictionary(
                 i => (int) (today - i.Date.Date).TotalDays,
-                k => (maxVal==minVal)? 1: (k.Score- minVal)/ (maxVal-minVal)
+                k => k.ExamsCount > examSettings.GoalForDay  
+                    ? 1
+                    : k.ExamsCount/ (double)examSettings.GoalForDay
             );
             //7 weeks. 42-49 days
             var minDay = today.AddDays(-49);
@@ -71,11 +68,11 @@ namespace Chotiskazal.Bot.ChatFlows
                 sb.Append("\r\n");
             }
             sb.Append("----------------------\r\n ");
-            sb.Append($"{texts.less} " + S1 + S2 + S3 + S4 + S5 + $" {texts.more}\r\n");
+            sb.Append($"{texts.less} {S1}{S2}{S3}{S4}{S5} {texts.more}\r\n");
             return sb.ToString();
         }
 
-        private static string RenderStats(ChatRoom chat) {
+        private static string RenderStats(ExamSettings settings, ChatRoom chat) {
             var lastMonth = chat.User.GetLastMonth();
             var lastDay = chat.User.GetToday();
             var statsText = $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
@@ -90,7 +87,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             $"{chat.Texts.StatsThisDay}:\r\n```" +
                             $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
                             $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
-                            $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}\r\n" +
+                            $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.GoalForDay}\r\n" +
                             $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
                             $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
             return statsText;
