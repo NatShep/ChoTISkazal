@@ -30,12 +30,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
                                                 $"{chat.Texts.WriteTheTranslationMarkdown}");
-            var translation = await chat.WaitUserTextInputAsync();
+            var entry = await chat.WaitUserTextInputAsync();
            
-            if (string.IsNullOrEmpty(translation))
+            if (string.IsNullOrEmpty(entry))
                 return QuestionResult.RetryThisQuestion;
-
-            var (text,comparation) =  translations.GetClosestTo(translation.Trim());
+            
+            if (!entry.IsRussian())
+            {
+                await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
+                return QuestionResult.RetryThisQuestion;
+            }
+            
+            var (text,comparation) =  translations.GetClosestTo(entry.Trim());
             
             switch (comparation)
             {
@@ -49,7 +55,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                         chat.Texts);
             }
             var allMeaningsOfWord = await _localDictionaryService.GetAllTranslationWords(word.Word);
-            var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(translation);
+            var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(entry);
             if (otherComparation == StringsCompareResult.Equal) 
             {
                 await chat.SendMarkdownMessageAsync(

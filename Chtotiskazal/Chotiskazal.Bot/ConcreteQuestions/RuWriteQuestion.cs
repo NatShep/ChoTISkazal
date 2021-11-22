@@ -47,7 +47,7 @@ static class RuWriteQuestionHelper {
     public static async Task<QuestionResult> PassRuWriteQuestion(
         ChatRoom chat,
         UserWordModel word,
-        string translationCaption,
+        string ruTranslationCaption,
         LocalDictionaryService localDictionaryService) {
         var wordsInPhraseCount = word.Word.Count(c => c == ' ');
         if (wordsInPhraseCount > 0 &&
@@ -55,14 +55,20 @@ static class RuWriteQuestionHelper {
             return QuestionResult.Impossible;
 
         await chat.SendMarkdownMessageAsync(
-            $"\\=\\=\\=\\=\\=\\>   *{translationCaption}*    \\<\\=\\=\\=\\=\\=\r\n" +
+            $"\\=\\=\\=\\=\\=\\>   *{ruTranslationCaption}*    \\<\\=\\=\\=\\=\\=\r\n" +
             chat.Texts.WriteTheTranslationMarkdown);
 
         var enUserEntry = await chat.WaitUserTextInputAsync();
 
         if (string.IsNullOrEmpty(enUserEntry))
             return QuestionResult.RetryThisQuestion;
-
+        
+        if (enUserEntry.IsRussian())
+        {
+            await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
+            return QuestionResult.RetryThisQuestion;
+        }
+        
         var comparation = word.Word.CheckCloseness(enUserEntry);
 
         if (comparation == StringsCompareResult.Equal)

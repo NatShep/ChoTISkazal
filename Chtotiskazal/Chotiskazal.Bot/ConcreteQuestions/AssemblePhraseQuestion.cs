@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (closeness== StringsCompareResult.Equal)
                 return QuestionResult.Passed(chat.Texts);
             
-            if (closeness == StringsCompareResult.SmallMistakes){
+            if (closeness == StringsCompareResult.BigMistakes){
                 await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
                 return QuestionResult.RetryThisQuestion;
             }
