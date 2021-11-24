@@ -198,7 +198,7 @@ namespace Chotiskazal.Bot.InterfaceLang
                                                       $"\r\nTranslate new words and pass exams.";
 
         public string Zen4PassExamsAndTranslateNewWords => "Pass exams and translate new words.";
-        public string Zen5PassExams => "I recommend to pass exams";
+        public string Zen5PassExams => "I recommend you to pass exams";
         public string Zen6YouNeedToLearn { get; } = $"Learning learning learning!";
         public object StatsYourStats => "Your stats";
         public object StatsWordsAdded => "Words added";

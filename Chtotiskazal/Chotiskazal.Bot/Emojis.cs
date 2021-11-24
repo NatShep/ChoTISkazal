@@ -18,7 +18,9 @@ namespace Chotiskazal.Bot
         public const string SoftPrev = "<<";
         public const string OpenQuote = "«";
         public const string CloseQuote = "»";
-        public static string NextButton = "⏭️";
+        public const string Fire = "🔥";
+        public const string GreenSquare = "🟩";
+        public static string NextButton  = "⏭️";
         public static string LearningSets = "§";
     }
 }
