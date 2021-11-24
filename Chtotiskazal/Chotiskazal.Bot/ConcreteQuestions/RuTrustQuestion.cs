@@ -13,11 +13,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru trust";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
-        {
-            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
-                      $"\\=\\=\\=\\=\\=\\>   *{word.AllTranslationsAsSingleString}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      ""+chat.Texts.DoYouKnowTranslation+"";
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
+            
+            var msg = QuestionMarkups.TranslateTemplate(word.AllTranslationsAsSingleString, chat.Texts.DoYouKnowTranslationMarkdown);
             var id = Rand.Next();
             
             await chat.SendMarkdownMessageAsync(msg,

@@ -27,14 +27,6 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (replaced == phrase.OriginPhrase)
                 return QuestionResult.Impossible;
             
-            var sb = new StringBuilder($"{QuestionHelper.QuestionPrefix}\r\n");
-            sb.AppendLine($"*\"{phrase.TranslatedPhrase}\"*");
-            sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
-            sb.AppendLine($"*\"{replaced}\"*");
-            sb.AppendLine();
-            sb.AppendLine($"{chat.Texts.ChooseMissingWord}:");
-
-
             var variants = examList
                 .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
                     .Any(t=>t.AreEqualIgnoreCase(phrase.TranslatedPhrase)))
@@ -45,7 +37,13 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Shuffle()
                 .ToArray();
 
-            var _ = await chat.SendMarkdownMessageAsync(sb.ToString(), InlineButtons.CreateVariants(variants));
+            var _ = await chat.SendMarkdownMessageAsync(
+                QuestionMarkups.TranslatesAsTemplate(
+                    phrase.TranslatedPhrase, 
+                    chat.Texts.translatesAs, 
+                    replaced, 
+                    chat.Texts.ChooseMissingWord)
+                , InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)

@@ -249,14 +249,6 @@ namespace Chotiskazal.Bot.ChatFlows
             doneMessage.Append($"*{Chat.Texts.LearningDone}:* {questionsPassed}/{questionsCount}\r\n" +
                                                 $"*{Chat.Texts.WordsInTestCount}:* {learningWords.Length}\r\n");
             
-            var todayStats =Chat.User.GetToday();
-            doneMessage.Append($"*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}*\r\n");
-            if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay) {
-                doneMessage.Append($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}\r\n");
-            }
-            if(Chat.User.Zen.NeedToAddNewWords)
-                doneMessage.Append(Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords);
-            
             if (newWellLearnedWords.Any())
             {
                 if (newWellLearnedWords.Count > 1)
@@ -265,7 +257,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     doneMessage.Append($"*\r\n{Chat.Texts.YouHaveLearnedOneWord}:*\r\n");
                 foreach (var word in newWellLearnedWords)
                 {
-                    doneMessage.Append("✅ " + word.Word + "\r\n");
+                    doneMessage.Append($"{Emojis.HeavyPlus} {word.Word}\r\n");
                 }
             }
 
@@ -277,13 +269,20 @@ namespace Chotiskazal.Bot.ChatFlows
                     doneMessage.Append($"\r\n*{Chat.Texts.YouForgotOneWord}:*\r\n");
                 foreach (var word in forgottenWords)
                 {
-                    doneMessage.Append("❗ " + word.Word + "\r\n\r\n");
+                    doneMessage.Append($"{Emojis.HeavyMinus} {word.Word}\r\n");
                 }
             }
             
-            doneMessage.Append(($"\r\n*{Chat.Texts.EarnedScore}:* " + $"{(int)(Chat.User.GamingScore - gamingScoreBefore)}"));
-            doneMessage.Append(($"\r\n*{Chat.Texts.TotalScore}:* {(int) Chat.User.GamingScore}\r\n"));
+            // doneMessage.Append(($"\r\n*{Chat.Texts.EarnedScore}:* " + $"{(int)(Chat.User.GamingScore - gamingScoreBefore)}"));
+            // doneMessage.Append(($"\r\n*{Chat.Texts.TotalScore}:* {(int) Chat.User.GamingScore}\r\n"));
             
+            var todayStats =Chat.User.GetToday();
+            doneMessage.Append($"\r\n*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}*\r\n");
+            if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay) 
+                doneMessage.Append($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}\r\n");
+            
+            if(Chat.User.Zen.NeedToAddNewWords)
+                doneMessage.Append($"\r\n{Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords}");
 
             return doneMessage.ToString();
         }

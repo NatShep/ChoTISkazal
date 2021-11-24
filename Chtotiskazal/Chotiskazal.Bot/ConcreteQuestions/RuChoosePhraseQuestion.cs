@@ -35,10 +35,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Shuffle()
                 .Select(e => e.OriginPhrase)
                 .ToArray();
-            
-            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
-                      $"\\=\\=\\=\\=\\=\\>  *{targetPhrase.TranslatedPhrase}*  \\<\\=\\=\\=\\=\\=\r\n" +
-                      ""+chat.Texts.ChooseTheTranslation+"";
+
+            var msg = QuestionMarkups.TranslateTemplate(targetPhrase.TranslatedPhrase, chat.Texts.ChooseTheTranslation);
             await chat.SendMarkdownMessageAsync(msg,
                 variants.Select((v, i) => new InlineKeyboardButton
                 {

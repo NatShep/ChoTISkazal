@@ -32,7 +32,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     break;
             }
 
-            await chat.SendMarkdownMessageAsync($"{QuestionHelper.QuestionPrefix}\r\n{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"" +  shuffled+ "\"*");
+            await chat.SendMarkdownMessageAsync(
+                QuestionMarkups.FreeTemplate($"{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"{shuffled}\"*"));
             var entry = await chat.WaitUserTextInputAsync();
 
             if (entry.IsRussian())

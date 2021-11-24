@@ -33,7 +33,7 @@ public class RussianTexts : IInterfaceTexts {
     public string FailedTranslationWasMarkdown => "Правильный перевод";
     public string ItIsNotRightTryAgain => "Неа. Давай попробуем еще раз";
     public string SeeTheTranslation => "Посмотреть перевод";
-    public string DoYouKnowTranslation { get; } = $"Вы знаете перевод?";
+    public string DoYouKnowTranslationMarkdown { get; } = $"Вы знаете перевод?";
     public string TranslationIs => "Правильный перевод";
     public string DidYouGuess => "Вы угадали?";
     public string IsItRightTranslation => "Это правильный перевод?";

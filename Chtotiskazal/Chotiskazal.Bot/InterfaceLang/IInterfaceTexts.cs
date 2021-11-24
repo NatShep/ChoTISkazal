@@ -20,7 +20,7 @@ public interface IInterfaceTexts {
     string FailedTranslationWasMarkdown { get; }
     string ItIsNotRightTryAgain { get; }
     string SeeTheTranslation { get; }
-    string DoYouKnowTranslation { get; }
+    string DoYouKnowTranslationMarkdown { get; }
     string TranslationIs { get; }
     string DidYouGuess { get; }
     string YesButton { get; }

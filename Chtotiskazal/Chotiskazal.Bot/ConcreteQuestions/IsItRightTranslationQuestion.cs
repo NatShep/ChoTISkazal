@@ -22,12 +22,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Union(word.TextTranslations)
                 .ToList()
                 .GetRandomItemOrNull();
-            
-            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
-                      $"*\"{word.Word}\"*\r\n" +
-                      $"    _{chat.Texts.translatesAs}_\r\n" +
-                      $"*\"{translation}\"*\r\n\r\n"+
-                             $"{chat.Texts.IsItRightTranslation}";
+
+            var msg = QuestionMarkups.TranslatesAsTemplate(
+                    word.Word,
+                    chat.Texts.translatesAs,
+                    translation,
+                    chat.Texts.IsItRightTranslation);
 
             await chat.SendMarkdownMessageAsync(msg,
                 new[] {

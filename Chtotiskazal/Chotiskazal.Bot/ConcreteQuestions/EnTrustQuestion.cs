@@ -14,15 +14,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public string Name => "Eng trust";
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
-            UserWordModel[] examList)
-        {
-            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
-                      $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
-                      ""+chat.Texts.DoYouKnowTranslation+"";
+            UserWordModel[] examList) {
+            var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.DoYouKnowTranslationMarkdown);
             var id = Rand.Next();
             await chat.SendMarkdownMessageAsync(msg,
-                new InlineKeyboardButton()
-                {
+                new InlineKeyboardButton {
                     CallbackData = id.ToString(),
                     Text =  chat.Texts.SeeTheTranslation 
                 });

@@ -55,9 +55,7 @@ static class RuWriteQuestionHelper {
             return QuestionResult.Impossible;
 
         await chat.SendMarkdownMessageAsync(
-            $"{QuestionHelper.QuestionPrefix}\r\n" +
-            $"\\=\\=\\=\\=\\=\\>   *{ruTranslationCaption}*    \\<\\=\\=\\=\\=\\=\r\n" +
-            chat.Texts.WriteTheTranslationMarkdown);
+            QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslationMarkdown));
 
         var enUserEntry = await chat.WaitUserTextInputAsync();
 

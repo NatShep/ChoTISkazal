@@ -26,12 +26,15 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string TodayGoalReached => "You have reached the goal for the day";
 
         public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\. Expected translations are";
-        public string OutOfScopeTranslationMarkdown => "Chosen translation is out of scope \\(but it is correct\\)\\. Expected translations are";
+            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\." +
+               $"\r\nExpected translations are";
+        public string OutOfScopeTranslationMarkdown 
+            => "Chosen translation is out of scope \\(but it is correct\\)\\." +
+               "\r\nExpected translations are";
         public string FailedTranslationWasMarkdown => "The translation was";
         public string ItIsNotRightTryAgain => "No. It is not right. Try again";
         public string SeeTheTranslation => "See the translation";
-        public string DoYouKnowTranslation { get; } = $"Do you know the translation?";
+        public string DoYouKnowTranslationMarkdown { get; } = $"Do you know the translation?";
         public string TranslationIs => "Translation is";
         public string DidYouGuess => "Did you guess?";
         public string IsItRightTranslation => "Is it right translation?";
@@ -39,7 +42,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ChooseWhichWordHasThisTranscription => "Choose which word has this transcription";
         public string RetryAlmostRightWithTypo => "Almost right. But you have a typo. Let's try again";
         public string ShowTheTranslationButton => "Show the translation";
-        public string WriteTheTranslationMarkdown { get; } = $"Write the translation\\.\\.\\. ";
+        public string WriteTheTranslationMarkdown  => $"Write the translation\\.\\.\\. ";
         public string RightTranslationWas => "The right translation was";
         public string CorrectTranslationButQuestionWasAbout => "Your translation was correct, but the question was about the word";
         public string LetsTryAgain => "Let's try again";

@@ -30,14 +30,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (enReplaced == enPhrase)
                 return QuestionResult.Impossible;
 
-            var sb = new StringBuilder($"{QuestionHelper.QuestionPrefix}\r\n");
-
-            sb.AppendLine($"*\"{ruPhrase}\"*");
-            sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
-            sb.AppendLine($"*\"{enReplaced}\"*");
-            sb.AppendLine();
-            sb.AppendLine($"{chat.Texts.EnterMissingWord}: ");
-            await chat.SendMarkdownMessageAsync(sb.ToString());
+            await chat.SendMarkdownMessageAsync(
+                QuestionMarkups.TranslatesAsTemplate(
+                    ruPhrase, 
+                    chat.Texts.translatesAs, 
+                    enReplaced, 
+                    chat.Texts.EnterMissingWord));
 
             var enter = await chat.WaitNonEmptyUserTextInputAsync();
             if (enter.IsRussian())

@@ -27,9 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList();
 
 
-            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
-                      $"\\=\\=\\=\\=\\=\\>   `{originTranslation.Transcription}`    \\<\\=\\=\\=\\=\\=\r\n" +
-                      ""+chat.Texts.ChooseWhichWordHasThisTranscription+"";
+            var msg = QuestionMarkups.TranscriptionTemplate(originTranslation.Transcription, chat.Texts.ChooseWhichWordHasThisTranscription);
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
