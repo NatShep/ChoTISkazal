@@ -28,7 +28,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
                 return QuestionResult.Impossible;
 
-            await chat.SendMarkdownMessageAsync($"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+            await chat.SendMarkdownMessageAsync($"{QuestionHelper.QuestionPrefix}\r\n" +
+                                                $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
                                                 $"{chat.Texts.WriteTheTranslationMarkdown}");
             var entry = await chat.WaitUserTextInputAsync();
            

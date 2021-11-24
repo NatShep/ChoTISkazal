@@ -15,7 +15,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
-            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItemOrNull().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
+                      $"\\=\\=\\=\\=\\=\\>   *{word.Translations.GetRandomItemOrNull().Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
                       ""+chat.Texts.DoYouKnowTranslation+"".Replace(".","\\.");
             var id = Rand.Next();
             

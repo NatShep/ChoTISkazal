@@ -23,7 +23,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList()
                 .GetRandomItemOrNull();
             
-            var msg = $"*\"{word.Word}\"*\r\n" +
+            var msg = $"{QuestionHelper.QuestionPrefix}\r\n" +
+                      $"*\"{word.Word}\"*\r\n" +
                       $"    _{chat.Texts.translatesAs}_\r\n" +
                       $"*\"{translation}\"*\r\n\r\n"+
                              $"{chat.Texts.IsItRightTranslation}";

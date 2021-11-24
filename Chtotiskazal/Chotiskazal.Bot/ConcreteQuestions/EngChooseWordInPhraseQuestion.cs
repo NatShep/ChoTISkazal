@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (replaced == phrase.OriginPhrase)
                 return QuestionResult.Impossible;
             
-            var sb = new StringBuilder();
+            var sb = new StringBuilder($"{QuestionHelper.QuestionPrefix}\r\n");
             sb.AppendLine($"*\"{phrase.TranslatedPhrase}\"*");
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
             sb.AppendLine($"*\"{replaced}\"*");

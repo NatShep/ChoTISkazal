@@ -30,7 +30,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (enReplaced == enPhrase)
                 return QuestionResult.Impossible;
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder($"{QuestionHelper.QuestionPrefix}\r\n");
 
             sb.AppendLine($"*\"{ruPhrase}\"*");
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");

@@ -27,7 +27,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.Impossible;
 
             var sb = new StringBuilder();
-            sb.AppendLine($"*\"{enPhrase}\"*");
+            sb.AppendLine($"{QuestionHelper.QuestionPrefix}\r\n" +
+                          $"*\"{enPhrase}\"*");
             sb.AppendLine($"    _{chat.Texts.translatesAs}_ ");
             sb.AppendLine($"*\"{replacedRuPhrase}\"*");
             sb.AppendLine();

@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .Shuffle()
                 .ToList();
 
-            var msg = $"\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
+            var msg = $"{QuestionHelper.QuestionPrefix}\r\n\\=\\=\\=\\=\\=\\>   *{word.Word}*    \\<\\=\\=\\=\\=\\=\r\n" +
                       ""+chat.Texts.ChooseTheTranslation+"";
             
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
