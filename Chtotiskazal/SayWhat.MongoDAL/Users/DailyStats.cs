@@ -69,11 +69,7 @@ namespace SayWhat.MongoDAL.Users
         public int LearningDone { get; set; }
         public double GameScoreChanging => _gameScoreChanging;
     }
-    [BsonIgnoreExtraElements]
-    public class TotalStats : StatsBase
-    {
-        
-    }
+   
     [BsonIgnoreExtraElements]
     public class DailyStats: StatsBase
     {

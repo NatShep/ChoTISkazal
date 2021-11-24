@@ -69,6 +69,8 @@ public interface IInterfaceTexts {
     object DontPeekUpward { get; }
     string NeedToAddMoreWordsBeforeLearning { get; }
     object less { get; }
+
+    string ZenRecomendationAfterExamWeNeedMoreNewWords { get; }
     string Zen1WeNeedMuchMoreNewWords { get; }
     string Zen2TranslateNewWords { get; }
     string Zen3TranslateNewWordsAndPassExams { get; }

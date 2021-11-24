@@ -250,9 +250,12 @@ namespace Chotiskazal.Bot.ChatFlows
                                                 $"*{Chat.Texts.WordsInTestCount}:* {learningWords.Length}\r\n");
             
             var todayStats =Chat.User.GetToday();
-            doneMessage.Append($"*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.GoalForDay} {Chat.Texts.Exams}*\r\n");
-            if (todayStats.LearningDone >= _examSettings.GoalForDay)
+            doneMessage.Append($"*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}*\r\n");
+            if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay) {
                 doneMessage.Append($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}\r\n");
+            }
+            if(Chat.User.Zen.NeedToAddNewWords)
+                doneMessage.Append(Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords);
             
             if (newWellLearnedWords.Any())
             {

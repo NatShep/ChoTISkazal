@@ -10,6 +10,6 @@
         public int MinTimesThatLearningWordAppearsInExam { get; set; } = 2;
         public int MaxTimesThatLearningWordAppearsInExam { get; set; } = 4;
         public int MaxExamSize { get; set; } = 32;
-        public int GoalForDay { get; set; } = 10;
+        public int ExamsCountGoalForDay { get; set; } = 10;
     }
 }

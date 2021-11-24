@@ -199,10 +199,10 @@ public class RussianTexts : IInterfaceTexts {
         "суб",
         "вск"
     };
-
-    public string Zen1WeNeedMuchMoreNewWords => "Нам нужно больше переводов!";
-    public string Zen2TranslateNewWords => "Лучше б вам слова переводить";
-    public string Zen3TranslateNewWordsAndPassExams => "Перводите и ботайте.";
+    public string ZenRecomendationAfterExamWeNeedMoreNewWords => $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.New}!";
+    public string Zen1WeNeedMuchMoreNewWords => $"Нам нужно сильно больше слов! Срочно нажимай {BotCommands.New}";
+    public string Zen2TranslateNewWords => $"Хватит ботать! Пора изучать новые слова в команде {BotCommands.New}";
+    public string Zen3TranslateNewWordsAndPassExams => "Отличный баланс новых слов и их выученности";
 
     public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +
                                                   $"\r\nПереводите и ботайте.";

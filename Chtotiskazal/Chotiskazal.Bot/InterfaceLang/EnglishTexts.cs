@@ -95,6 +95,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string NeedToAddMoreWordsBeforeLearning => "You need to add some more words before examination";
 
         public object less => "less";
+        public string ZenRecomendationAfterExamWeNeedMoreNewWords => $"Your words are well learned! It is time to press {BotCommands.New} and add 10-15 new words from word sets to learn";
 
         public string HelpMarkdown { get; } = "*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
                                               "1⃣ You can use me as a regular translator\\. " +
@@ -187,10 +188,11 @@ namespace Chotiskazal.Bot.InterfaceLang
             "sat",
             "sun"
         };
-
+        
+        
         public string Zen1WeNeedMuchMoreNewWords => "We need much more new words!";
-        public string Zen2TranslateNewWords => "Translate new words";
-        public string Zen3TranslateNewWordsAndPassExams => "Translate new words and pass exams.";
+        public string Zen2TranslateNewWords => "Add new words";
+        public string Zen3TranslateNewWordsAndPassExams => "Add new words and pass exams.";
 
         public string Zen3EverythingIsGood { get; } = $"Everything is perfect! " +
                                                       $"\r\nTranslate new words and pass exams.";

@@ -31,9 +31,9 @@ namespace Chotiskazal.Bot.ChatFlows
             var today = DateTime.Today;
             var offsets = items.ToDictionary(
                 i => (int) (today - i.Date.Date).TotalDays,
-                k => k.ExamsCount > examSettings.GoalForDay  
+                k => k.ExamsCount > examSettings.ExamsCountGoalForDay  
                     ? 1
-                    : k.ExamsCount/ (double)examSettings.GoalForDay
+                    : k.ExamsCount/ (double)examSettings.ExamsCountGoalForDay
             );
             //7 weeks. 42-49 days
             var minDay = today.AddDays(-49);
@@ -87,7 +87,7 @@ namespace Chotiskazal.Bot.ChatFlows
                             $"{chat.Texts.StatsThisDay}:\r\n```" +
                             $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
                             $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
-                            $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.GoalForDay}\r\n" +
+                            $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.ExamsCountGoalForDay}\r\n" +
                             $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
                             $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
             return statsText;
@@ -99,7 +99,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 return texts.Zen1WeNeedMuchMoreNewWords;
             if (user.Zen.Rate < -10)
                 return texts.Zen2TranslateNewWords;
-            if (user.Zen.Rate < -5)
+            if (user.Zen.NeedToAddNewWords)
                 return texts.Zen3TranslateNewWordsAndPassExams;
             if (user.Zen.Rate < 5)
                 return texts.Zen3EverythingIsGood;
