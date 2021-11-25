@@ -14,12 +14,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
-            var originTranslation = word.Translations.GetRandomItemOrNull();
+            var originTranslation = word.RuTranslations.GetRandomItemOrNull();
             
             if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription!="")
                 return QuestionResult.Impossible;
             
-            var variants = examList.Where(e=> e.Translations.All(t => t.Transcription != originTranslation.Transcription))
+            var variants = examList.Where(e=> e.RuTranslations.All(t => t.Transcription != originTranslation.Transcription))
                 .SelectMany(e => e.TextTranslations)
                 .Take(5)
                 .Append(originTranslation.Word)

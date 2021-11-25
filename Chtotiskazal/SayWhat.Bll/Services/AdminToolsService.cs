@@ -37,7 +37,7 @@ public class AdminToolsService {
                 }
                 else
                 {
-                    var hasSimilar = word.Translations.Any(
+                    var hasSimilar = word.RuTranslations.Any(
                         t => translations.Any(o => o.Equals(t.Word, StringComparison.InvariantCultureIgnoreCase)));
                     if (hasSimilar) continue;
 
@@ -63,14 +63,14 @@ public class AdminToolsService {
                 }
                 else
                 {
-                    var hasSimilar = word.Translations.Any(
+                    var hasSimilar = word.RuTranslations.Any(
                         t => translations.Any(o => o.Equals(t.Word, StringComparison.InvariantCultureIgnoreCase)));
                     if (hasSimilar) continue;
 
                     Console.WriteLine($"Misstranslation for {user.TelegramNick}:{word.Word}");
                     await _localDictionaryService.AppendRuTranslation(
                         word.Word,
-                        word.Translations.SelectToArray(t => (t.Word, t.Examples.SelectToArray(e => e.ExampleId))));
+                        word.RuTranslations.SelectToArray(t => (t.Word, t.Examples.SelectToArray(e => e.ExampleId))));
                 }
             }
         }

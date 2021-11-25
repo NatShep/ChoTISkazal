@@ -25,7 +25,7 @@ public class UserWordsRepoTests {
         var allWords = await _repo.GetAllUserWordsAsync(user);
         Assert.AreEqual(1, allWords.Count);
         Assert.AreEqual("table", allWords[0].Word);
-        Assert.AreEqual("стол", allWords[0].Translations[0].Word);
+        Assert.AreEqual("стол", allWords[0].RuTranslations[0].Word);
     }
 
     [TestCase(0, 0)]
@@ -70,7 +70,7 @@ public class UserWordsRepoTests {
             var origin = worstOnes[i];
             var current = allWords[i];
             Assert.AreEqual(origin.Word, current.Word);
-            Assert.AreEqual(origin.Translations[0].Word, current.Translations[0].Word);
+            Assert.AreEqual(origin.RuTranslations[0].Word, current.RuTranslations[0].Word);
         }
     }
 
@@ -113,7 +113,7 @@ public class UserWordsRepoTests {
         var word = await _repo.GetWordOrDefault(user, "table");
         Assert.IsNotNull(word);
         Assert.AreEqual("table", word.Word);
-        Assert.AreEqual("стол", word.Translations[0].Word);
+        Assert.AreEqual("стол", word.RuTranslations[0].Word);
     }
 
     [Test]
@@ -143,9 +143,9 @@ public class UserWordsRepoTests {
         await _repo.Update(word);
         var readWord = await _repo.GetWordOrDefault(user, "table");
         Assert.IsNotNull(readWord);
-        Assert.AreEqual(2, readWord.Translations.Length);
-        Assert.AreEqual("стол", readWord.Translations[1].Word);
-        Assert.AreEqual("таблица", readWord.Translations[0].Word);
+        Assert.AreEqual(2, readWord.RuTranslations.Length);
+        Assert.AreEqual("стол", readWord.RuTranslations[1].Word);
+        Assert.AreEqual("таблица", readWord.RuTranslations[0].Word);
     }
 }
 

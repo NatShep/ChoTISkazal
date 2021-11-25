@@ -375,11 +375,11 @@ public class UserModel {
                 months.Add(month, monthsStats);
             }
 
-            var eCount = word.Translations.Select(t => t.Examples.Length).Sum();
+            var eCount = word.RuTranslations.Select(t => t.Examples.Length).Sum();
             monthsStats.ExamplesAdded += eCount;
             dailyStats.ExamplesAdded += eCount;
-            monthsStats.PairsAdded += word.Translations.Length;
-            dailyStats.PairsAdded += word.Translations.Length;
+            monthsStats.PairsAdded += word.RuTranslations.Length;
+            dailyStats.PairsAdded += word.RuTranslations.Length;
             monthsStats.WordsAdded++;
             dailyStats.WordsAdded++;
 
@@ -391,7 +391,7 @@ public class UserModel {
             var wc = WordStatsChanging.CreateForNewWord(word.AbsoluteScore);
 
             var score = WordLeaningGlobalSettings.NewWordGamingScore +
-                        WordLeaningGlobalSettings.NewPairGamingScore * word.Translations.Length +
+                        WordLeaningGlobalSettings.NewPairGamingScore * word.RuTranslations.Length +
                         WordLeaningGlobalSettings.ScoresForPassedQuestion * word.QuestionPassed +
                         WordLeaningGlobalSettings.QuestionFailedGamingScore *
                         (word.QuestionAsked - word.QuestionPassed);

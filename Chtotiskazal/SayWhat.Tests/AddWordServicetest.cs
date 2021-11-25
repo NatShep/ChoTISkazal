@@ -47,8 +47,8 @@ public class AddWordServicetest {
         
         var word = await _userWordsRepo.GetWordOrDefault(user, "piss");
         
-        Assert.AreEqual(1, word.Translations.Length);
-        Assert.AreEqual("моча", word.Translations[0].Word);
+        Assert.AreEqual(1, word.RuTranslations.Length);
+        Assert.AreEqual("моча", word.RuTranslations[0].Word);
         
         
         await _service.RemoveTranslationFromUser(

@@ -17,7 +17,7 @@ namespace SayWhat.Bll {
 
 public static class ChaosBllHelper {
     public static IEnumerable<(Example, UserWordTranslation)> GetExamplesThatLoadedAndFits(this UserWordModel wordModel) {
-        foreach (var translation in wordModel.Translations)
+        foreach (var translation in wordModel.RuTranslations)
         {
             foreach (var example in translation.GetDownloadedExamples())
             {

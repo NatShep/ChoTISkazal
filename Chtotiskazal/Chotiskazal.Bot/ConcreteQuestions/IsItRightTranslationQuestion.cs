@@ -16,7 +16,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             UserWordModel[] examList)
         {
             var translation = examList.SelectMany(e => e.TextTranslations)
-                .Where(e => word.Translations.All(t => t.Word != e))
+                .Where(e => word.RuTranslations.All(t => t.Word != e))
                 .Shuffle()
                 .Take(1)
                 .Union(word.TextTranslations)

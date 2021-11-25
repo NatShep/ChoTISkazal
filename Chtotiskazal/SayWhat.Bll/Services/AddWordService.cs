@@ -115,8 +115,8 @@ public class AddWordService {
 
             user.OnNewWordAdded(
                 statsChanging: WordStatsChanging.CreateForNewWord(word.AbsoluteScore),
-                pairsCount: word.Translations.Length,
-                examplesCount: word.Translations.Sum(t => t.Examples?.Length ?? 0));
+                pairsCount: word.RuTranslations.Length,
+                examplesCount: word.RuTranslations.Sum(t => t.Examples?.Length ?? 0));
         }
         else
         {
@@ -166,7 +166,7 @@ public class AddWordService {
             return;
 
         user.OnPairRemoved(tr, alreadyExistsWord.Score - scoreBefore);
-        if (alreadyExistsWord.Translations.Length == 0)
+        if (alreadyExistsWord.RuTranslations.Length == 0)
         {
             await _usersWordsService.RemoveWord(alreadyExistsWord);
             user.OnWordRemoved(alreadyExistsWord);

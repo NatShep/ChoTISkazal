@@ -15,15 +15,15 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
-            var originalTranslation = word.Translations.GetRandomItemOrNull();
+            var originalTranslation = word.RuTranslations.GetRandomItemOrNull();
 
             if (originalTranslation==null || !originalTranslation.HasTranscription)
                 return QuestionResult.Impossible;
             
             var variants = examList
-                .SelectMany(e => e.Translations)
+                .SelectMany(e => e.RuTranslations)
                 .Select(e=>e.Transcription)
-                .Where(e => word.Translations.All(t => t.Transcription != e))
+                .Where(e => word.RuTranslations.All(t => t.Transcription != e))
                 .Distinct()
                 .Shuffle()
                 .Take(5)
@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (choice == null)
                 return QuestionResult.RetryThisQuestion;
 
-            return word.Translations.Any(t=>t.Transcription== variants[choice.Value]) 
+            return word.RuTranslations.Any(t=>t.Transcription== variants[choice.Value]) 
                 ? QuestionResult.Passed(chat.Texts) 
                 : QuestionResult.Failed(chat.Texts);
         }

@@ -40,7 +40,7 @@ public class RuWriteSingleTarnslationQuestion : IQuestion {
         ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) =>
         RuWriteQuestionHelper.PassRuWriteQuestion(
-            chat, word, word.Translations.GetRandomItemOrNull().Word, _localDictionaryService);
+            chat, word, word.RuTranslations.GetRandomItemOrNull().Word, _localDictionaryService);
 }
 
 static class RuWriteQuestionHelper {

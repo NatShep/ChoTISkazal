@@ -20,9 +20,7 @@ public class UserWordModel {
         _word = word;
         _currentOrderScore = rate;
         _absoluteScore = rate;
-        _translations = new[] {
-            new UserWordTranslation(translation),
-        };
+        RuTranslations = new[] { new UserWordTranslation(translation) };
     }
 
     public UserWordModel(
@@ -32,7 +30,7 @@ public class UserWordModel {
         _word = word;
         _translationDirection = direction;
         _absoluteScore = absScore;
-        _translations = new[] { translation };
+        RuTranslations = new[] { translation };
     }
 
     public UserWordModel() { }
@@ -81,7 +79,8 @@ public class UserWordModel {
     [BsonElement(UserWordsRepo.QuestionAskedFieldName)]
     private int _questionAsked;
 
-    [BsonElement("tr")] private UserWordTranslation[] _translations;
+    [BsonElement("tr")] 
+    public UserWordTranslation[] RuTranslations {get;set;}
 
     [BsonElement("t")] [BsonDefaultValue(UserWordType.UsualWord)] [BsonIgnoreIfDefault]
     private UserWordType _type = UserWordType.UsualWord;
@@ -94,7 +93,7 @@ public class UserWordModel {
 
     #endregion
 
-
+        
     public string Word => _word;
     public double CurrentOrderScore => _currentOrderScore;
     public double AbsoluteScore => _absoluteScore;
@@ -102,20 +101,15 @@ public class UserWordModel {
     public int QuestionAsked => _questionAsked;
     public DateTime? LastQuestionAskedTimestamp => _lastQuestionAskedTimestamp;
     public DateTime ScoreUpdatedTimestamp => _scoreUpdatedTimestamp;
-
-    public UserWordTranslation[] Translations
-    {
-        get => _translations;
-        set => _translations = value;
-    }
+    
     public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionAskedTimestamp ?? DateTime.Now);
-    public bool HasAnyExamples => Translations.Any(t => t.Examples?.Any() == true);
+    public bool HasAnyExamples => RuTranslations.Any(t => t.Examples?.Any() == true);
     public DateTime? LastExam => LastQuestionAskedTimestamp;
     public string AllTranslationsAsSingleString => string.Join(", ", TextTranslations);
-    public IEnumerable<string> TextTranslations => Translations.Select(t => t.Word);
+    public IEnumerable<string> TextTranslations => RuTranslations.Select(t => t.Word);
 
     public IEnumerable<Example> Examples =>
-        Translations
+        RuTranslations
             .SelectMany(t => t.Examples)
             .Select(t => t.ExampleOrNull)
             .Where(e => e != null);
@@ -162,20 +156,20 @@ public class UserWordModel {
     }
 
     public void AddTranslations(List<UserWordTranslation> newTranslates) {
-        newTranslates.AddRange(Translations);
-        _translations = newTranslates.ToArray();
+        newTranslates.AddRange(RuTranslations);
+        RuTranslations = newTranslates.ToArray();
     }
 
     public override string ToString() => $"{Word} {CurrentOrderScore} updated {ScoreUpdatedTimestamp}";
 
     public UserWordTranslation RemoveTranslation(string translationText) {
-        var tr = _translations.FirstOrDefault(i => i.Word.Equals(translationText));
+        var tr = RuTranslations.FirstOrDefault(i => i.Word.Equals(translationText));
         if (tr != null)
-            _translations = _translations.Where(t => t != tr).ToArray();
+            RuTranslations = RuTranslations.Where(t => t != tr).ToArray();
         return tr;
     }
 
-    public bool HasTranslation(string translatedText) => _translations.Any(t => t.Word.Equals(translatedText));
+    public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));
 }
 
 }

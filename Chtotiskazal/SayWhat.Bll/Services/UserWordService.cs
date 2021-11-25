@@ -38,7 +38,7 @@ namespace SayWhat.Bll.Services
 
             foreach (var word in words)
             {
-                foreach (var translation in word.Translations)
+                foreach (var translation in word.RuTranslations)
                 {
                     ids.AddRange(translation.Examples.Select(e => e.ExampleId));
                 }
@@ -48,7 +48,7 @@ namespace SayWhat.Bll.Services
 
             foreach (var word in words)
             {
-                foreach (var translation in word.Translations)
+                foreach (var translation in word.RuTranslations)
                 {
                     foreach (var example in translation.Examples)
                     {
@@ -203,7 +203,7 @@ namespace SayWhat.Bll.Services
                     continue;
 
                 var usedTranslations = translations.Shuffle().Take(maxTranslationSize).ToArray();
-                wordForLearning.Translations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
+                wordForLearning.RuTranslations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
 
                 // Remove Phrases added as learning word 
                 /*
