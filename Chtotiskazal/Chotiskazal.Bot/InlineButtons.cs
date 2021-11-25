@@ -11,7 +11,7 @@ public static class InlineButtons {
         Translation(texts.TranslateButton);
 
     public static InlineKeyboardButton Translation(string text) => new InlineKeyboardButton
-        { CallbackData = BotCommands.Add, Text = text };
+        { CallbackData = BotCommands.Translate, Text = text };
     public static InlineKeyboardButton LearningSets(string text)=> new InlineKeyboardButton
         { CallbackData = BotCommands.New, Text = text };
 

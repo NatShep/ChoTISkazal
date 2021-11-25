@@ -56,7 +56,7 @@ public class AddBotCommandHandler : IBotCommandHandler {
         _translationSelectedUpdateHook = translationSelectedUpdateHook;
     }
 
-    public bool Acceptable(string text) => text == BotCommands.Add;
+    public bool Acceptable(string text) => text == BotCommands.Translate;
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>

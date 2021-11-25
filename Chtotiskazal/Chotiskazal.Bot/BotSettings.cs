@@ -6,9 +6,8 @@ namespace Chotiskazal.Bot
 {
     public class BotSettings
     {
-        public BotSettings() {
-            
-        }
+        public BotSettings() {}
+        
         public BotSettings(IConfigurationRoot configuration)
         {
             YadicapiKey = configuration.GetSection("yadicapi").GetSection("key").Value;
@@ -22,7 +21,6 @@ namespace Chotiskazal.Bot
             ControlPanelChatId = configuration.GetSection("botHelper").GetSection("controlPanelChatId").Value;
             MongoConnectionString = configuration["dbString"];
             MongoDbName = configuration["dbName"];
-            HelpMessage = configuration["help-msg"];
             WelcomeMessage = configuration["welcome-msg"];
         }
 
@@ -53,15 +51,14 @@ namespace Chotiskazal.Bot
             
         }
         public ExamSettings ExamSettings { get; }
-        public string HelpMessage { get; }
         public string WelcomeMessage { get; }
         public string YadicapiKey { get; set; }
         public TimeSpan YadicapiTimeout { get; set; }
         public string YatransapiKey { get; }
         public TimeSpan YatransapiTimeout { get; }
-        public string TelegramToken { get; set; }
-        public string BotHelperToken { get; set; }
-        public string ControlPanelChatId { get; set; }
+        public string TelegramToken { get; }
+        public string BotHelperToken { get; }
+        public string ControlPanelChatId { get; }
         public string MongoConnectionString { get; set; }
         public string MongoDbName { get; set; }
 
