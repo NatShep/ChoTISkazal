@@ -30,6 +30,6 @@ public static class QuestionMarkups {
         $"    _{translatesAs}_ \r\n"+
         $"*\"{b}\"*\r\n" +
         $"\r\n"+
-        $"{instruction}: \r\n";
+        $"{instruction}\r\n";
 }
 }

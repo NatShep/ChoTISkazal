@@ -35,7 +35,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     ruPhrase, 
                     chat.Texts.translatesAs, 
                     enReplaced, 
-                    chat.Texts.EnterMissingWord));
+                    chat.Texts.EnterMissingWord+":"));
 
             var enter = await chat.WaitNonEmptyUserTextInputAsync();
             if (enter.IsRussian())

@@ -31,7 +31,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                         enPhrase,
                         chat.Texts.translatesAs,
                         replacedRuPhrase,
-                        chat.Texts.EnterMissingWord));
+                        chat.Texts.EnterMissingWord+":"));
 
             var enter = await chat.WaitNonEmptyUserTextInputAsync();
             

@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                     phrase.TranslatedPhrase, 
                     chat.Texts.translatesAs, 
                     replaced, 
-                    chat.Texts.ChooseMissingWord)
+                    chat.Texts.ChooseMissingWord+":")
                 , InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
