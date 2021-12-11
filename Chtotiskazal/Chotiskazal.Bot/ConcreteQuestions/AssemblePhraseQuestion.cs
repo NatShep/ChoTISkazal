@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -12,10 +13,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Assemble phrase";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
         {
             if (!word.HasAnyExamples)
-                return QuestionResult.Impossible;
+                return QuestionResultMarkdown.Impossible;
 
             var targetPhrase = word.GetRandomExample();
 
@@ -25,7 +26,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 var wordsInExample = targetPhrase.SplitWordsOfPhrase;
                 
                 if (wordsInExample.Length < 2)
-                    return QuestionResult.Impossible;
+                    return QuestionResultMarkdown.Impossible;
 
                 shuffled = string.Join(" ", wordsInExample.Shuffle());
                 if(shuffled!= targetPhrase.OriginPhrase)
@@ -33,27 +34,32 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
 
             await chat.SendMarkdownMessageAsync(
-                QuestionMarkups.FreeTemplate($"{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"{shuffled}\"*"));
+                QuestionMarkups.FreeTemplateMarkdown(
+                    chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown.AddEscaped(":")
+                        .AddNewLine() + MarkdownObject.Escaped(shuffled).ToSemiBold()));
             var entry = await chat.WaitUserTextInputAsync();
 
             if (entry.IsRussian())
             {
                 await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
             }
             
             var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
             
             if (closeness== StringsCompareResult.Equal)
-                return QuestionResult.Passed(chat.Texts);
+                return QuestionResultMarkdown.Passed(chat.Texts);
             
             if (closeness == StringsCompareResult.BigMistakes){
                 await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
             }
 
-            return QuestionResult.Failed(
-                $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
+            return QuestionResultMarkdown.Failed(MarkdownObject
+                                                     .Escaped($"{chat.Texts.FailedOriginExampleWas2Markdown}:")
+                                                     .AddNewLine() +
+                                                 MarkdownObject.Escaped($"\"{targetPhrase.OriginPhrase}\"")
+                                                     .ToSemiBold(),
                 chat.Texts);
         }
     }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -62,23 +63,26 @@ public class ShowWellKnownWordsFlow {
 
         if (wellKnownWords.Length == 0)
             return;
-        var msgWithWords = new StringBuilder();
-        foreach (var word in paginationForWords[0])
-        {
-            msgWithWords.Append(
-                $"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+
+        var msgWithWords = MarkdownObject.Empty();
+        foreach (var word in paginationForWords[0]) {
+            msgWithWords += MarkdownObject.Escaped($"{Emojis.SoftMark} ") +
+                              MarkdownObject.Escaped($"{word.Word}: ").ToSemiBold() +
+                              MarkdownObject.Escaped(word.AllTranslationsAsSingleString)
+                                  .AddNewLine();
         }
 
         if (paginationForWords.Count > 1)
-            msgWithWords.Append(Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count));
-
+            msgWithWords += Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count);
 
         InlineKeyboardButton[][] buttons = null;
         if (paginationForWords.Count > 1)
         {
             _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
             _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
-            _wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
+            
+            //TODO зачем это? Выше формируется строка с маркдаун форматированием, но где она применяется? 
+            //_wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
 
             buttons = new[] {
                 WellKnownWordsHelper.GetPagingKeys(),
@@ -92,7 +96,7 @@ public class ShowWellKnownWordsFlow {
                 new[] { InlineButtons.MainMenu($"{Chat.Texts.TranslateButton} {Emojis.Translate}") }
             };
 
-        await Chat.ChatIo.SendMarkdownMessageAsync(msgWithWords.ToString(), buttons);
+        await Chat.ChatIo.SendMarkdownMessageAsync(msgWithWords, buttons);
     }
 }
 

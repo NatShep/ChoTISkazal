@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
@@ -55,7 +56,7 @@ public class AddFromLearningSetFlow {
             await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
 
         await Chat.SendMarkdownMessageAsync(
-            GetWordText(selector, word, translations, selector.Current),
+            GetWordTextMarkdown(selector, word, translations, selector.Current),
             GetWordKeyboard());
 
         var continueAddWords = true;
@@ -127,13 +128,13 @@ public class AddFromLearningSetFlow {
 
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,
-            GetWordText(selector, word, translations, selector.Current),
+            GetWordTextMarkdown(selector, word, translations, selector.Current),
             GetWordKeyboard());
         return true;
     }
 
     private async Task SendAllWordsAreLearnedMessage(int messageId) =>
-        await Chat.EditMessageTextMarkdown(messageId, Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName));
+        await Chat.EditMessageTextMarkdown(messageId, MarkdownObject.Escaped(Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName)));
 
     private async Task<bool> MoveOnNextWord(PaginationCollection<WordInLearningSet> selector, bool moveNext) {
         for (int i = 0; i < selector.Count; i++)
@@ -182,7 +183,7 @@ public class AddFromLearningSetFlow {
             }
         };
 
-    private string GetWordText(
+    private MarkdownObject GetWordTextMarkdown(
         PaginationCollection<WordInLearningSet> collection,
         DictionaryWord dictionaryWord,
         IReadOnlyList<Translation> translations,
@@ -193,19 +194,21 @@ public class AddFromLearningSetFlow {
         var example = GetExampleOrNull(wordInLearningSet, allowedTranslations);
 
         var msg = new StringBuilder();
-        msg.AppendLine($"*{engWord.EscapeForMarkdown().Capitalize()}*");
+        
+        msg.AppendLine($"*{MarkdownObject.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
         if (!string.IsNullOrWhiteSpace(transcription))
-            msg.Append($"```\r\n[{transcription.EscapeForMarkdown()}]\r\n```");
+            msg.Append($"```\r\n[{MarkdownObject.Escaped(transcription).GetMarkdownString()}]\r\n```");
         msg.AppendLine(
-            $"\r\n*{string.Join("\r\n", allowedTranslations.Select(a => a.TranslatedText.EscapeForMarkdown().Capitalize()))}*");
+            $"\r\n*{string.Join("\r\n", allowedTranslations.Select(a => MarkdownObject.Escaped(a.TranslatedText.Capitalize()).GetMarkdownString()))}*");
         if (example != null)
             msg.Append(
                 $"```\r\n\r\n" +
-                $"{Emojis.OpenQuote}{example.OriginPhrase.EscapeForMarkdown()}{Emojis.CloseQuote}\r\n" +
-                $"{Emojis.OpenQuote}{example.TranslatedPhrase.EscapeForMarkdown()}{Emojis.CloseQuote}" +
+                $"{Emojis.OpenQuote}{MarkdownObject.Escaped(example.OriginPhrase).GetMarkdownString()}{Emojis.CloseQuote}\r\n" +
+                $"{Emojis.OpenQuote}{MarkdownObject.Escaped(example.TranslatedPhrase).GetMarkdownString()}{Emojis.CloseQuote}" +
                 $"\r\n```");
         msg.AppendLine($"\r\n{Chat.Texts.XofYMarkdown(collection.Page + 1, collection.Count)}");
-        return msg.ToString();
+    
+        return MarkdownObject.ByPassed(msg.ToString());
     }
 
     private static Example GetExampleOrNull(

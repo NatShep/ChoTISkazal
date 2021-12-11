@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -52,14 +53,17 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
-                var sb = new StringBuilder($"{Emojis.Learning} "+Chat.Texts.LearningCarefullyStudyTheListMarkdown +"\r\n\r\n```\r\n");
-
-                foreach (var pairModel in learningWords.Shuffle())
-                {
-                    sb.AppendLine($"{pairModel.Word.EscapeForMarkdown()}\t\t:{pairModel.AllTranslationsAsSingleString.EscapeForMarkdown()}");
+                var markdown = MarkdownObject.Escaped($"{Emojis.Learning} ") +
+                               Chat.Texts.LearningCarefullyStudyTheListMarkdown +
+                               MarkdownObject.Escaped("\r\n\r\n```\r\n");
+                
+                foreach (var pairModel in learningWords.Shuffle()) {
+                    markdown += MarkdownObject
+                        .Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}");
                 }
-                sb.AppendLine($"\r\n```\r\n\\.\\.\\. {Chat.Texts.thenClickStartMarkdown}");
-                await Chat.SendMarkdownMessageAsync(sb.ToString(),new[]{ new[]{ new InlineKeyboardButton
+                markdown += MarkdownObject.Escaped($"\r\n```\r\n... {Chat.Texts.thenClickStart}");
+
+                await Chat.SendMarkdownMessageAsync(markdown,new[]{ new[]{ new InlineKeyboardButton
                 {
                     CallbackData = "/startExamination",
                     Text = Chat.Texts.StartButton
@@ -92,7 +96,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var questionsCount = 0;
             var questionsPassed = 0;
             var wordQuestionNumber = 0;
-            QuestionResult lastExamResult = null;
+            QuestionResultMarkdown lastExamResultMarkdown = null;
 
             foreach (var word in learningAndAdvancedWords)
             {
@@ -107,7 +111,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     learnList = learningWords.Append(word).ToArray();
 
                 if (wordQuestionNumber > 1 && question.NeedClearScreen)
-                    await WriteDontPeakMessage(lastExamResult?.ResultsBeforeHideousText);
+                    await WriteDontPeakMessage(lastExamResultMarkdown?.ResultsBeforeHideousTextMarkdown.GetOrdinalString());
 
                 Chat.User.OnAnyActivity();
                 var originRate = word.Score;
@@ -138,10 +142,10 @@ namespace Chotiskazal.Bot.ChatFlows
                         throw new NotSupportedException(result.Results.ToString());
                 }
 
-                if (!string.IsNullOrWhiteSpace(result.OpenResultsText))
-                    await Chat.SendMarkdownMessageAsync(result.OpenResultsText);
+                if (!MarkdownObject.IsNullOrEmpty(result.OpenResultsTextMarkdown))
+                    await Chat.SendMarkdownMessageAsync(result.OpenResultsTextMarkdown);
 
-                lastExamResult = result;
+                lastExamResultMarkdown = result;
 
                 Botlog.RegisterExamInfo(Chat.User.TelegramId, started, questionsCount, questionsPassed);
             }
@@ -175,7 +179,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 gamingScoreBefore);
 
             await Chat.SendMarkdownMessageAsync(
-                doneMessage.EscapeForMarkdown(),
+                doneMessage,
                 new[] {
                     new[] { InlineButtons.Exam($"🔁 {Chat.Texts.OneMoreLearnButton}") },
                     new[] {
@@ -185,7 +189,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 });
         }
 
-        private async Task<QuestionResult> PassWithRetries(
+        private async Task<QuestionResultMarkdown> PassWithRetries(
             IQuestion question, 
             UserWordModel word, 
             UserWordModel[] learnList, 
@@ -202,7 +206,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     {
                         question = QuestionSelector.Singletone.GetNextQuestionFor(wordQuestionNumber == 0, word);
                         if(iteration>100)
-                            return QuestionResult.Failed("","");
+                            return QuestionResultMarkdown.Failed(MarkdownObject.Empty(),MarkdownObject.Empty());
                     }
                 }
                 else if (result.Results == ExamResult.Retry)
@@ -210,14 +214,14 @@ namespace Chotiskazal.Bot.ChatFlows
                     wordQuestionNumber++;
                     retrieNumber++;
                     if(retrieNumber>=4)
-                        return QuestionResult.Failed("","");
+                        return QuestionResultMarkdown.Failed(MarkdownObject.Empty(),MarkdownObject.Empty());
                 }
                 else return result;
             }
-            return QuestionResult.Failed("","");
+            return QuestionResultMarkdown.Failed(MarkdownObject.Empty(),MarkdownObject.Empty());
         }
 
-        private string CreateLearningResultsMessage(
+        private MarkdownObject CreateLearningResultsMessage(
             UserWordModel[] wordsInExam,
             Dictionary<string, double> originWordsScore, 
             int questionsPassed, 
@@ -243,33 +247,55 @@ namespace Chotiskazal.Bot.ChatFlows
                 }
             }
 
-            
-            var doneMessage = new StringBuilder();
-            
-            doneMessage.Append($"*{Chat.Texts.LearningDone}:* {questionsPassed}/{questionsCount}\r\n" +
-                                                $"*{Chat.Texts.WordsInTestCount}:* {learningWords.Length}\r\n");
-            
-            if (newWellLearnedWords.Any())
-            {
+            var doneMessageMarkdown = MarkdownObject.Escaped($"{Chat.Texts.LearningDone}:").ToSemiBold()
+                                          .AddEscaped($" {questionsPassed}/{questionsCount}")
+                                          .AddNewLine() +
+                                      MarkdownObject.Escaped($"{Chat.Texts.WordsInTestCount}:").ToSemiBold()
+                                          .AddEscaped($" {learningWords.Length}")
+                                          .AddNewLine();
+
+            if (newWellLearnedWords.Any()) {
                 if (newWellLearnedWords.Count > 1)
-                    doneMessage.Append($"*\r\n{Chat.Texts.YouHaveLearnedWords(newWellLearnedWords.Count)}:*\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown.AddNewLine() +
+                                          MarkdownObject
+                                              .Escaped($"{Chat.Texts.YouHaveLearnedWords(newWellLearnedWords.Count)}:")
+                                              .ToSemiBold()
+                                              .AddNewLine();
                 else
-                    doneMessage.Append($"*\r\n{Chat.Texts.YouHaveLearnedOneWord}:*\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown.AddNewLine() +
+                                         MarkdownObject
+                                             .Escaped($"{Chat.Texts.YouHaveLearnedOneWord}:")
+                                             .ToSemiBold()
+                                             .AddNewLine();
+                        
                 foreach (var word in newWellLearnedWords)
                 {
-                    doneMessage.Append($"{Emojis.HeavyPlus} {word.Word}\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown
+                        .AddEscaped($"{Emojis.HeavyPlus} ")
+                        .AddEscaped(word.Word)
+                        .AddNewLine();
                 }
             }
 
             if (forgottenWords.Any())
             {
                 if(forgottenWords.Count>1)
-                    doneMessage.Append($"\r\n*{Chat.Texts.YouForgotCountWords(forgottenWords.Count)}:*\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown
+                        .AddNewLine()
+                        .AddEscaped($"{Chat.Texts.YouForgotCountWords(forgottenWords.Count)}:").ToSemiBold()
+                        .AddNewLine();
                 else
-                    doneMessage.Append($"\r\n*{Chat.Texts.YouForgotOneWord}:*\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown
+                        .AddNewLine()
+                        .AddEscaped($"{Chat.Texts.YouForgotOneWord}:").ToSemiBold()
+                        .AddNewLine();
+                
                 foreach (var word in forgottenWords)
                 {
-                    doneMessage.Append($"{Emojis.HeavyMinus} {word.Word}\r\n");
+                    doneMessageMarkdown = doneMessageMarkdown
+                        .AddEscaped($"{Emojis.HeavyMinus} ")
+                        .AddEscaped(word.Word)
+                        .AddNewLine();
                 }
             }
             
@@ -277,14 +303,22 @@ namespace Chotiskazal.Bot.ChatFlows
             // doneMessage.Append(($"\r\n*{Chat.Texts.TotalScore}:* {(int) Chat.User.GamingScore}\r\n"));
             
             var todayStats =Chat.User.GetToday();
-            doneMessage.Append($"\r\n*{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}*\r\n");
-            if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay) 
-                doneMessage.Append($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}\r\n");
-            
-            if(Chat.User.Zen.NeedToAddNewWords)
-                doneMessage.Append($"\r\n{Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords}");
 
-            return doneMessage.ToString();
+            doneMessageMarkdown = doneMessageMarkdown.AddNewLine() +
+                                  MarkdownObject
+                                      .Escaped(
+                                          $"{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}")
+                                      .ToSemiBold().AddNewLine();
+            if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay)
+                doneMessageMarkdown = doneMessageMarkdown
+                    .AddEscaped($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}")
+                    .AddNewLine();
+
+            if (Chat.User.Zen.NeedToAddNewWords)
+                doneMessageMarkdown = doneMessageMarkdown.AddNewLine()
+                    .AddEscaped(Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords);
+
+            return doneMessageMarkdown;
         }
 
         private async Task WriteDontPeakMessage(string resultsBeforeHideousText)

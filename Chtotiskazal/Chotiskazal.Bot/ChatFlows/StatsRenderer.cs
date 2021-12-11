@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Interface;
+using Chotiskazal.Bot.Interface.InterfaceTexts;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
@@ -17,14 +18,18 @@ public static class StatsRenderer {
     private const string S5 = Emojis.GreenSquare;
     private const string S6 = Emojis.Fire;
 
-    public static string GetStatsText(ExamSettings settings, ChatRoom chat) =>
-        RenderStats(settings, chat) +
-        $"```\r\n" +
-        Render7WeeksCalendar(settings, chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging)).ToArray(), chat.Texts) +
-        $"```\r\n" +
-        $"\r\n" +
-        $"*{RenderRecomendations(chat.User, chat.Texts)}*";
-    private static string Render7WeeksCalendar(
+    public static MarkdownObject GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
+        RenderStatsMarkdown(settings, chat) +
+        MarkdownObject.ByPassed("```\r\n") +
+        Render7WeeksCalendarMarkdown(settings,
+            chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
+                .ToArray(), chat.Texts) +
+        MarkdownObject.ByPassed("```\r\n")
+            .AddNewLine() +
+        RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+
+    private static MarkdownObject Render7WeeksCalendarMarkdown(
+        
         ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts) {
         var today = DateTime.Today;
         var offsets = items.ToDictionary(
@@ -64,10 +69,10 @@ public static class StatsRenderer {
         }
         sb.Append("----------------------\r\n ");
         sb.Append($"{texts.less} {S1}{S2}{S3}{S4}{S5} {texts.more}\r\n");
-        return sb.ToString();
+        return MarkdownObject.ByPassed(sb.ToString());
     }
 
-    private static string RenderStats(ExamSettings settings, ChatRoom chat) {
+    private static MarkdownObject RenderStatsMarkdown(ExamSettings settings, ChatRoom chat) {
         var lastMonth = chat.User.GetLastMonth();
         var lastDay = chat.User.GetToday();
         var statsText = $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
@@ -85,24 +90,26 @@ public static class StatsRenderer {
                         $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.ExamsCountGoalForDay}\r\n" +
                         $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
                         $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
-        return statsText;
+       
+        return MarkdownObject.ByPassed(statsText);
     }
 
-    private static string RenderRecomendations(UserModel user, IInterfaceTexts texts) {
+    private static MarkdownObject RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
+     
         if (user.Zen.Rate < -15)
-            return texts.Zen1WeNeedMuchMoreNewWords;
+            return MarkdownObject.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
         else if (user.Zen.Rate < -10)
-            return texts.Zen2TranslateNewWords;
+            return MarkdownObject.Escaped(texts.Zen2TranslateNewWords);
         else if (user.Zen.Rate < -5)
-            return texts.Zen3TranslateNewWordsAndPassExams;
+            return MarkdownObject.Escaped(texts.Zen3TranslateNewWordsAndPassExams);
         else if (user.Zen.Rate < 5)
-            return texts.Zen3EverythingIsGood;
+            return MarkdownObject.Escaped(texts.Zen3EverythingIsGood);
         else if (user.Zen.Rate < 10)
-            return texts.Zen4PassExamsAndTranslateNewWords;
+            return MarkdownObject.Escaped(texts.Zen4PassExamsAndTranslateNewWords);
         else if (user.Zen.Rate < 20)
-            return texts.Zen5PassExams;
+            return MarkdownObject.Escaped(texts.Zen5PassExams);
         else
-            return texts.Zen6YouNeedToLearn;
+            return MarkdownObject.Escaped(texts.Zen6YouNeedToLearn);
     }
 }
 }

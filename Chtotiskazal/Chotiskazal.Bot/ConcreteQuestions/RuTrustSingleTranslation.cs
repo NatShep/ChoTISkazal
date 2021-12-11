@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -13,11 +14,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru trust single translation";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
             
             var msg = QuestionMarkups.TranslateTemplate(
-                word.RuTranslations.GetRandomItemOrNull().Word.Replace(".", "\\."), 
-                chat.Texts.DoYouKnowTranslationMarkdown);
+                word.RuTranslations.GetRandomItemOrNull().Word, 
+                chat.Texts.DoYouKnowTranslation);
             
             var id = Rand.Next();
             
@@ -36,14 +37,17 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     if (word.Word.AreEqualIgnoreCase(input))
-                        return QuestionResult.Passed(chat.Texts);
+                        return QuestionResultMarkdown.Passed(chat.Texts);
                     await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
                 }
             }
 
-            msg = ($"_{chat.Texts.TranslationIs} _\r\n" +
-                   $"*\"{word.Word}\"*\r\n\r\n" +
-                   $"{chat.Texts.DidYouGuess}").Replace(".", "\\.");
+            msg = MarkdownObject.Escaped(chat.Texts.TranslationIs).ToItalic()
+                      .AddNewLine() +
+                  MarkdownObject.Escaped($"\"{word.Word}\"").ToSemiBold()
+                      .AddNewLine()
+                      .AddNewLine().AddEscaped(chat.Texts.DidYouGuess);
+            
             await chat.SendMarkdownMessageAsync(msg,
                                 new[]{
                                     new[]{
@@ -61,12 +65,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.WaitInlineIntKeyboardInput();
             return choice == 1
-                ? QuestionResult.Passed(
-                    chat.Texts.PassedOpenIHopeYouWereHonestMarkdown,
-                    chat.Texts.PassedHideousWell2)
-                : QuestionResult.Failed(
-                    chat.Texts.FailedOpenButYouWereHonestMarkdown,
-                    chat.Texts.FailedHideousHonestyIsGoldMarkdown);
+                ? QuestionResultMarkdown.Passed(
+                    MarkdownObject.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest),
+                    MarkdownObject.Escaped(chat.Texts.PassedHideousWell2))
+                : QuestionResultMarkdown.Failed(
+                    MarkdownObject.Escaped(chat.Texts.FailedOpenButYouWereHonest),
+                    MarkdownObject.Escaped(chat.Texts.FailedHideousHonestyIsGold));
         }
     }
 }

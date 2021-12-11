@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -13,7 +14,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Choose";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
@@ -33,12 +34,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
 
             var selected = variants[choice.Value];
             return word.TextTranslations.Any(t=>t.AreEqualIgnoreCase(selected)) 
-                ? QuestionResult.Passed(chat.Texts) 
-                : QuestionResult.Failed(chat.Texts);
+                ? QuestionResultMarkdown.Passed(chat.Texts) 
+                : QuestionResultMarkdown.Failed(chat.Texts);
         }
     }
 }

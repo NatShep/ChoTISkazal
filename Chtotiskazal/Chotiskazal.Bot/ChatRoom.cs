@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Interface;
+using Chotiskazal.Bot.Interface.InterfaceTexts;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -11,9 +12,10 @@ namespace Chotiskazal.Bot
     {
         public  UserModel User { get; }
         private readonly ChatIO _origin;
+
         public IInterfaceTexts Texts => User.IsEnglishInterface
-            ? (IInterfaceTexts)new EnglishTexts()
-            : (IInterfaceTexts)new RussianTexts();
+            ? (IInterfaceTexts) new EnglishTexts()
+            : (IInterfaceTexts) new EnglishTexts();//RussianTexts();
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;
 
@@ -30,9 +32,9 @@ namespace Chotiskazal.Bot
             => _origin.SendMessageAsync(message, buttons);
         public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons)
             => _origin.SendMessageAsync(message, buttons);
-        public Task<int> SendMarkdownMessageAsync(string message, params InlineKeyboardButton[] buttons)
+        public Task<int> SendMarkdownMessageAsync(MarkdownObject message, params InlineKeyboardButton[] buttons)
             => _origin.SendMarkdownMessageAsync(message, buttons);
-        public Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
+        public Task<int> SendMarkdownMessageAsync(MarkdownObject message, InlineKeyboardButton[][] buttons)
             => _origin.SendMarkdownMessageAsync(message, buttons);
         public  Task<Update> WaitUserInputAsync()
             => _origin.WaitUserInputAsync();
@@ -66,7 +68,7 @@ namespace Chotiskazal.Bot
         public Task ConfirmCallback(string callbackQueryId)
             => _origin.ConfirmCallback(callbackQueryId);
         
-        public Task EditMessageTextMarkdown(int messageMessageId, string s,
+        public Task EditMessageTextMarkdown(int messageMessageId, MarkdownObject s,
                                                   InlineKeyboardMarkup inlineKeyboardButtons = null)
             => _origin.EditMarkdownMessage(messageMessageId, s, inlineKeyboardButtons);
         #endregion

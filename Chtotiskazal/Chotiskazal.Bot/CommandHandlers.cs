@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
@@ -130,7 +131,7 @@ public class StatsBotCommandHandler : IBotCommandHandler {
 
     public Task Execute(string argument, ChatRoom chat) =>
         chat.SendMarkdownMessageAsync(
-            StatsRenderer.GetStatsText(_settings,chat).EscapeForMarkdown(),
+            StatsRenderer.GetStatsTextMarkdown(_settings,chat),
             new[] {
                 new[] {
                     InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),

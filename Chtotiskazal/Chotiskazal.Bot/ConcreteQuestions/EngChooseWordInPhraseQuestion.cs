@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -14,18 +15,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Choose word in phrase";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return QuestionResult.Impossible;
+                return QuestionResultMarkdown.Impossible;
 
             var phrase = word.GetRandomExample();
 
-            var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "\\.\\.\\.");
+            var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
 
             if (replaced == phrase.OriginPhrase)
-                return QuestionResult.Impossible;
+                return QuestionResultMarkdown.Impossible;
             
             var variants = examList
                 .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
@@ -47,13 +48,15 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResult.Passed(chat.Texts.Passed1Markdown, 
+                return QuestionResultMarkdown.Passed(MarkdownObject.Escaped(chat.Texts.Passed1), 
                     chat.Texts);
-            
-            return QuestionResult.Failed($"{chat.Texts.OriginWas}:\r\n*\"{phrase.OriginPhrase}\"*", 
+
+            return QuestionResultMarkdown.Failed(
+                MarkdownObject.Escaped($"{chat.Texts.OriginWas}:").AddNewLine() +
+                MarkdownObject.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

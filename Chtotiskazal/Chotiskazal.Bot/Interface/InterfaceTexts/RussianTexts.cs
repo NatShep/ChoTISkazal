@@ -3,9 +3,9 @@ using SayWhat.Bll.Dto;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceLang {
+namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
-public class RussianTexts : IInterfaceTexts {
+/*public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
     public object less => "меньше";
 
@@ -220,6 +220,6 @@ public class RussianTexts : IInterfaceTexts {
     public object StatsActivityForLast7Weeks => "Активность за последние 7 недель";
 
     #endregion
-}
+}*/
 
 }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -19,26 +20,26 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Write";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var translations = word.TextTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
             if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
-                return QuestionResult.Impossible;
+                return QuestionResultMarkdown.Impossible;
 
 
-            await chat.SendMarkdownMessageAsync(QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.WriteTheTranslationMarkdown));
+            await chat.SendMarkdownMessageAsync(QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.WriteTheTranslation));
             var entry = await chat.WaitUserTextInputAsync();
            
             if (string.IsNullOrEmpty(entry))
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
             
             if (!entry.IsRussian())
             {
                 await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
-                return QuestionResult.RetryThisQuestion;
+                return QuestionResultMarkdown.RetryThisQuestion;
             }
             
             var (text,comparation) =  translations.GetClosestTo(entry.Trim());
@@ -46,33 +47,32 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             switch (comparation)
             {
                 case StringsCompareResult.Equal:
-                    return QuestionResult.Passed(chat.Texts);
+                    return QuestionResultMarkdown.Passed(chat.Texts);
                 case StringsCompareResult.SmallMistakes:
                     await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(text));
-                    return QuestionResult.RetryThisQuestion;
+                    return QuestionResultMarkdown.RetryThisQuestion;
                 case StringsCompareResult.BigMistakes:
-                    return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(text), 
+                    return QuestionResultMarkdown.Failed(MarkdownObject.Escaped(chat.Texts.FailedMistaken(text)), 
                         chat.Texts);
             }
             var allMeaningsOfWord = await _localDictionaryService.GetAllTranslationWords(word.Word);
             var (otherMeaning, otherComparation) = allMeaningsOfWord.GetClosestTo(entry);
-            if (otherComparation == StringsCompareResult.Equal) 
-            {
+            if (otherComparation == StringsCompareResult.Equal) {
                 await chat.SendMarkdownMessageAsync(
-                    $"{chat.Texts.OutOfScopeTranslationMarkdown}: " +
-                    $"*{word.AllTranslationsAsSingleString}*");
-                return QuestionResult.RetryThisQuestion;
+                    MarkdownObject.Escaped($"{chat.Texts.OutOfScopeTranslation}: ") +
+                    MarkdownObject.Escaped(word.AllTranslationsAsSingleString).ToSemiBold());
+                return QuestionResultMarkdown.RetryThisQuestion;
             }
-            if (otherComparation == StringsCompareResult.SmallMistakes)
-            {
+            if (otherComparation == StringsCompareResult.SmallMistakes) {
                 await chat.SendMarkdownMessageAsync(
-                    chat.Texts.OutOfScopeWithCandidateMarkdown(otherMeaning)+": "+
-                    "*\""+word.AllTranslationsAsSingleString+"\"*");
-                return QuestionResult.RetryThisQuestion;
+                    MarkdownObject.Escaped($"{chat.Texts.OutOfScopeWithCandidate(otherMeaning)}:") +
+                    MarkdownObject.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold());
+                return QuestionResultMarkdown.RetryThisQuestion;
             }
 
-            return QuestionResult.Failed(
-                chat.Texts.FailedTranslationWasMarkdown +$"\r\n*\"{word.AllTranslationsAsSingleString}\"*", 
+            return QuestionResultMarkdown.Failed(
+                MarkdownObject.Escaped(chat.Texts.FailedTranslationWas).AddNewLine()+
+                MarkdownObject.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

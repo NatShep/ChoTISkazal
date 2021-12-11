@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -10,9 +11,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
     public class IsItRightTranslationQuestion: IQuestion
     {
         public bool NeedClearScreen => false;
-        public string Name => "Eng is it right transltion";
+        public string Name => "Eng is it right translation";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var translation = examList.SelectMany(e => e.TextTranslations)
@@ -49,13 +50,13 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 choice == 0 && !word.TextTranslations.Contains(translation)
                 )
             {
-                return QuestionResult.Passed(chat.Texts);
+                return QuestionResultMarkdown.Passed(chat.Texts);
             }
-            else
-            {
-                return QuestionResult.Failed(
-                    $"{chat.Texts.Mistaken}\\.\r\n\"{word.Word}\" {chat.Texts.translatesAs} " +
-                    $"*\"{word.TextTranslations.FirstOrDefault()}\"* ", 
+            else {
+                return QuestionResultMarkdown.Failed(
+                    MarkdownObject.Escaped($"{chat.Texts.Mistaken}.").AddNewLine() +
+                    MarkdownObject.Escaped($"\"{word.Word}\" {chat.Texts.translatesAs} ") +
+                    MarkdownObject.Escaped($"\"{word.TextTranslations.FirstOrDefault()}\" ").ToSemiBold(), 
                     chat.Texts);
             }
         }
