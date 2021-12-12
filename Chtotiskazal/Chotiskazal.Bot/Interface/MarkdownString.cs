@@ -46,7 +46,7 @@ namespace Chotiskazal.Bot.Interface
 
         public static string ConvertToMarkdownString(string str) {
             var a = str.Replace(@"\", "\\\\")
-                    .Replace("'", "\\'")
+                    .Replace("`","\\`")
                     .Replace("*", "\\*")
                     .Replace("_", "\\_")
                     .Replace("{", "\\{")
@@ -76,6 +76,14 @@ public static class MarkdownExtension
         return MarkdownObject.ByPassed("*")+m+MarkdownObject.ByPassed("*") ;
     }
 
+    public static MarkdownObject ToPreFormattedMono(this MarkdownObject m) {
+        return MarkdownObject.ByPassed("```\r\n")+m+MarkdownObject.ByPassed("\r\n```") ;
+    }
+    
+    public static MarkdownObject ToMono(this MarkdownObject m) {
+        return MarkdownObject.ByPassed("```\r\n")+m+MarkdownObject.ByPassed("\r\n```") ;
+    }
+    
     public static MarkdownObject ToItalic(this MarkdownObject m) {
         return MarkdownObject.ByPassed("_")+m+MarkdownObject.ByPassed("_") ;
     }

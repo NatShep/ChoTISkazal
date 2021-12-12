@@ -144,13 +144,11 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public MarkdownObject LearnSomeWordsMarkdown(in int length)
             => MarkdownObject.Escaped($"You have learned {length} words. Let's do more!");
 
-        //TODO что это за символ?  `
         public MarkdownObject PageXofYMarkdown(in int number,in int count)
-            => MarkdownObject.Escaped($"\r\n`Page {number} of {count}...`");
+            => MarkdownObject.Escaped($"\r\nPage {number} of {count}...").ToMono();
 
-        //TODO что это за символ?  `
         public MarkdownObject XofYMarkdown(in int x,in int y)
-            => MarkdownObject.Escaped($"`{x} of {y}`");
+            => MarkdownObject.Escaped($"{x} of {y}").ToMono();
 
         public string WordIsAddedForLearning(string word) =>
             $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";

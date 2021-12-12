@@ -3,7 +3,7 @@ using Chotiskazal.Bot.Interface;
 
 namespace Chotiskazal.Bot.Questions {
 public static class QuestionMarkups {
-    private static readonly MarkdownObject QuestionHeader = MarkdownObject.Escaped("```\r\n---❔---\r\n```");
+    private static readonly MarkdownObject QuestionHeader = MarkdownObject.Escaped("---❔---").ToPreFormattedMono();
     public static MarkdownObject FreeTemplateMarkdown(MarkdownObject s) => QuestionHeader + MarkdownObject.ByPassed("\r\n") + s;
 
     public static MarkdownObject TranslateTemplate(string word, string instruction)

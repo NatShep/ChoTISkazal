@@ -55,13 +55,13 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 var markdown = MarkdownObject.Escaped($"{Emojis.Learning} ") +
                                Chat.Texts.LearningCarefullyStudyTheListMarkdown +
-                               MarkdownObject.Escaped("\r\n\r\n```\r\n");
+                               MarkdownObject.ByPassed("\r\n\r\n```\r\n");
                 
                 foreach (var pairModel in learningWords.Shuffle()) {
                     markdown += MarkdownObject
                         .Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}");
                 }
-                markdown += MarkdownObject.Escaped($"\r\n```\r\n... {Chat.Texts.thenClickStart}");
+                markdown += MarkdownObject.ByPassed("\r\n```\r\n").AddEscaped($"... {Chat.Texts.thenClickStart}");
 
                 await Chat.SendMarkdownMessageAsync(markdown,new[]{ new[]{ new InlineKeyboardButton
                 {

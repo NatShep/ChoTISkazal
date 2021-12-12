@@ -20,11 +20,10 @@ public static class StatsRenderer {
 
     public static MarkdownObject GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
         RenderStatsMarkdown(settings, chat) +
-        MarkdownObject.ByPassed("```\r\n") +
-        Render7WeeksCalendarMarkdown(settings,
-            chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
-                .ToArray(), chat.Texts) +
-        MarkdownObject.ByPassed("```\r\n")
+        Render7WeeksCalendarMarkdown(settings, chat.User.LastDaysStats
+                .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
+                .ToArray(), chat.Texts)
+            .ToPreFormattedMono()
             .AddNewLine() +
         RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
