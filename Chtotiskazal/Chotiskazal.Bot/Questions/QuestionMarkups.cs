@@ -37,6 +37,10 @@ public static class QuestionMarkups {
     public static MarkdownObject TranslatesAsTemplate(string a, string translatesAs, string b, string instruction)
         => QuestionHeader
                .AddNewLine() +
+           //todo cr - here and there. Sometimes you use .AddNewLine() and sometimes you use '+' operator
+           // it looks confusing. You can either - Create NewLine static property in MarkdownObjec
+           // either add methods like 'AddEscaped(...)', 'AddEscapedItalic()', AddEscapedBold etc
+           // but combination of these looks very confusing
            MarkdownObject.Escaped($"\"{a}\"").ToSemiBold()
                .AddNewLine() +
            MarkdownObject.ByPassed("    ") + MarkdownObject.Escaped(translatesAs).ToItalic()

@@ -36,6 +36,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             await chat.SendMarkdownMessageAsync(
                 QuestionMarkups.FreeTemplateMarkdown(
                     chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown.AddEscaped(":")
+                        //todo cr - consider an idea - make extension methods string.ToSemiBold() that gets raw string
+                        // and return escaped and semiBold markdown
+                        // as pattern MarkdownObject.Escaped(text).ToXXX() appears many times in your code
                         .AddNewLine() + MarkdownObject.Escaped(shuffled).ToSemiBold()));
             var entry = await chat.WaitUserTextInputAsync();
 

@@ -3,6 +3,8 @@ using Chotiskazal.Bot.Interface.InterfaceTexts;
 
 namespace Chotiskazal.Bot.Questions
 {
+// todo cr - rename back to QuestionResult as it is Result of The questions,
+// and Markdown text inside of it is just a detail 
     public class QuestionResultMarkdown
     {
         private readonly MarkdownObject _openResultsText;

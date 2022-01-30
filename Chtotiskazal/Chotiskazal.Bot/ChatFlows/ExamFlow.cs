@@ -53,14 +53,19 @@ namespace Chotiskazal.Bot.ChatFlows
             var learningWordsCount = learningWords.Length;
             if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             {
+                //todo cr - looks very dirty here. Not sure how to fix it, but it smels a little 
                 var markdown = MarkdownObject.Escaped($"{Emojis.Learning} ") +
                                Chat.Texts.LearningCarefullyStudyTheListMarkdown +
-                               MarkdownObject.ByPassed("\r\n\r\n```\r\n");
+                               // todo cr - why do we need ''' here?!?
+                               // looks wierd
+                               MarkdownObject.ByPassed("\r\n\r\n```\r\n"); 
                 
                 foreach (var pairModel in learningWords.Shuffle()) {
                     markdown += MarkdownObject
                         .Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}");
                 }
+                // todo cr and here we got ''' again. Did you mean that all body between ''' and ''' is usual string?
+                //then assemble it as usual string and then decorate the string with 'toMono' method
                 markdown += MarkdownObject.ByPassed("\r\n```\r\n").AddEscaped($"... {Chat.Texts.thenClickStart}");
 
                 await Chat.SendMarkdownMessageAsync(markdown,new[]{ new[]{ new InlineKeyboardButton

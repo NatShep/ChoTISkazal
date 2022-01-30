@@ -14,7 +14,8 @@ namespace Chotiskazal.Bot
         private readonly ChatIO _origin;
 
         public IInterfaceTexts Texts => User.IsEnglishInterface
-            ? (IInterfaceTexts) new EnglishTexts()
+            //todo cr: ??? -)
+            ? (IInterfaceTexts) new EnglishTexts()  
             : (IInterfaceTexts) new EnglishTexts();//RussianTexts();
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;

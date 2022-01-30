@@ -87,6 +87,8 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
 
         public string NoTranslationsFound => "No translations found. Check the word and try again";
 
+        //todo cr - here and there. No need to have postfix 'Markdown' in properties.
+        // Imagine - if all int-properties has postfix int, like "user.ageInt" - it is just redundant information
         public MarkdownObject LearningCarefullyStudyTheListMarkdown =>
             MarkdownObject.Escaped("Learning").ToSemiBold()
                 .AddNewLine()
@@ -114,7 +116,10 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
                                                        $"4⃣ Use {BotCommands.Help} command to see info how it works.\r\n\r\n" +
                                                        "\uD83D\uDE09Yes, it's free. We have done this bot for us and our friends. " +
                                                        "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!");
-
+        
+        //todo cr - there is big difference between => and {get;} = for markdown object
+        // For strings there was no difference - to return constant or... to return constant
+        // But for markdown - you will calculate the markdown every time client code request it
         public MarkdownObject MainMenuTextMarkdown =>
             MarkdownObject.Escaped("I am a translator and teacher.\r\n" +
                                    "First you can use me as a regular translator." +

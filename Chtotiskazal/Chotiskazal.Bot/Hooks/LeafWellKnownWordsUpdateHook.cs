@@ -18,6 +18,9 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
     public void SetWellKnownWords(List<List<UserWordModel>> wellKnownWords) => _pages.Set(wellKnownWords);
     public void SetNumberOfPaginate(int i) => _pages.Page = i;
+    //todo cr - never commit commented code.
+    //You need to ask about it, or delete it, or put //"todo comment"
+    //but never commit commented code
     // TODO зачем это?    
     //    public void SetBeginningMessage(string msg) { }
 

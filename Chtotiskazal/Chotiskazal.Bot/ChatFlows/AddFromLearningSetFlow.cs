@@ -182,7 +182,8 @@ public class AddFromLearningSetFlow {
                 InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
             }
         };
-
+    //todo cr - naming. Just GetWordText, or GetWordMarkdown. 
+    // GetWordTextMarkdown - it is just duplicating of info. Like GetWordTextStringMarkdownBold =)
     private MarkdownObject GetWordTextMarkdown(
         PaginationCollection<WordInLearningSet> collection,
         DictionaryWord dictionaryWord,
