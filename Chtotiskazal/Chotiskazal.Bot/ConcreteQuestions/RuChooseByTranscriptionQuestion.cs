@@ -12,12 +12,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru Choose By Transcription";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var originTranslation = word.RuTranslations.GetRandomItemOrNull();
             
             if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription!="")
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
             
             var variants = examList.Where(e=> e.RuTranslations.All(t => t.Transcription != originTranslation.Transcription))
                 .SelectMany(e => e.TextTranslations)
@@ -32,11 +32,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
 
             if (word.TextTranslations.Contains(variants[choice.Value]))
-                return QuestionResultMarkdown.Passed(chat.Texts);
-            return QuestionResultMarkdown.Failed(chat.Texts);
+                return QuestionResult.Passed(chat.Texts);
+            return QuestionResult.Failed(chat.Texts);
 
         }
         

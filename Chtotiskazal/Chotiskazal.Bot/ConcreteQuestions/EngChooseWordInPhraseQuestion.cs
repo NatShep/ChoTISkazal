@@ -15,18 +15,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Choose word in phrase";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             if (!word.Examples.Any())
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
 
             var phrase = word.GetRandomExample();
 
             var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
 
             if (replaced == phrase.OriginPhrase)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
             
             var variants = examList
                 .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
@@ -48,15 +48,15 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
 
             if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResultMarkdown.Passed(MarkdownObject.Escaped(chat.Texts.Passed1), 
+                return QuestionResult.Passed(Markdown.Escaped(chat.Texts.Passed1), 
                     chat.Texts);
 
-            return QuestionResultMarkdown.Failed(
-                MarkdownObject.Escaped($"{chat.Texts.OriginWas}:").AddNewLine() +
-                MarkdownObject.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
+            return QuestionResult.Failed(
+                Markdown.Escaped($"{chat.Texts.OriginWas}:").NewLine() +
+                Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

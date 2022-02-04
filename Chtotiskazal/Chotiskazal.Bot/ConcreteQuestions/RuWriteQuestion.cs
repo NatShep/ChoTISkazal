@@ -19,7 +19,7 @@ public class RuWriteQuestion : IQuestion {
     public bool NeedClearScreen => false;
     public string Name => "Ru Write";
 
-    public Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
+    public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
         RuWriteQuestionHelper.PassRuWriteQuestion(
             chat,
             word,
@@ -37,7 +37,7 @@ public class RuWriteSingleTarnslationQuestion : IQuestion {
     public bool NeedClearScreen => false;
     public string Name => "Ru Write Single Translation";
 
-    public Task<QuestionResultMarkdown> Pass(
+    public Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) =>
         RuWriteQuestionHelper.PassRuWriteQuestion(
@@ -45,7 +45,7 @@ public class RuWriteSingleTarnslationQuestion : IQuestion {
 }
 
 static class RuWriteQuestionHelper {
-    public static async Task<QuestionResultMarkdown> PassRuWriteQuestion(
+    public static async Task<QuestionResult> PassRuWriteQuestion(
         ChatRoom chat,
         UserWordModel word,
         string ruTranslationCaption,
@@ -53,7 +53,7 @@ static class RuWriteQuestionHelper {
         var wordsInPhraseCount = word.Word.Count(c => c == ' ');
         if (wordsInPhraseCount > 0 &&
             word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
-            return QuestionResultMarkdown.Impossible;
+            return QuestionResult.Impossible;
 
         await chat.SendMarkdownMessageAsync(
             QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslation));
@@ -61,27 +61,27 @@ static class RuWriteQuestionHelper {
         var enUserEntry = await chat.WaitUserTextInputAsync();
 
         if (string.IsNullOrEmpty(enUserEntry))
-            return QuestionResultMarkdown.RetryThisQuestion;
+            return QuestionResult.RetryThisQuestion;
         
         if (enUserEntry.IsRussian())
         {
             await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
-            return QuestionResultMarkdown.RetryThisQuestion;
+            return QuestionResult.RetryThisQuestion;
         }
         
         var comparation = word.Word.CheckCloseness(enUserEntry);
 
         if (comparation == StringsCompareResult.Equal)
-            return QuestionResultMarkdown.Passed(chat.Texts);
+            return QuestionResult.Passed(chat.Texts);
 
         if (comparation == StringsCompareResult.SmallMistakes)
         {
-            await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(word.Word));
-            return QuestionResultMarkdown.RetryThisQuestion;
+            await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(word.Word));
+            return QuestionResult.RetryThisQuestion;
         }
 
         if (comparation == StringsCompareResult.BigMistakes)
-            return QuestionResultMarkdown.Failed(MarkdownObject.Escaped(chat.Texts.FailedMistaken(word.Word)), MarkdownObject.Escaped(chat.Texts.Mistaken));
+            return QuestionResult.Failed(Markdown.Escaped(chat.Texts.FailedMistaken(word.Word)), Markdown.Escaped(chat.Texts.Mistaken));
         
         // ## Other translation case ##
 
@@ -104,18 +104,18 @@ static class RuWriteQuestionHelper {
             await chat.SendMessageAsync(
                 $"{chat.Texts.CorrectTranslationButQuestionWasAbout} \"{word.Word}\" - *{word.AllTranslationsAsSingleString}*'\r\n" +
                 chat.Texts.LetsTryAgain);
-            return QuestionResultMarkdown.RetryThisQuestion;
+            return QuestionResult.RetryThisQuestion;
         }
 
         var translates = string.Join(",", otherRuTranslationsOfUserInput);
        
-        MarkdownObject failedMessage = MarkdownObject.Empty();
+        Markdown failedMessage = Markdown.Empty;
         if (!string.IsNullOrWhiteSpace(translates))
-            failedMessage = MarkdownObject.Escaped($"{enUserEntry} {chat.Texts.translatesAs} {translates}").AddNewLine();
-        failedMessage += MarkdownObject.Escaped($"{chat.Texts.RightTranslationWas}: ") +
-                         MarkdownObject.Escaped($"\"{word.Word}\"").ToSemiBold();
+            failedMessage = Markdown.Escaped($"{enUserEntry} {chat.Texts.translatesAs} {translates}").NewLine();
+        failedMessage += Markdown.Escaped($"{chat.Texts.RightTranslationWas}: ") +
+                         Markdown.Escaped($"\"{word.Word}\"").ToSemiBold();
         
-        return QuestionResultMarkdown.Failed(
+        return QuestionResult.Failed(
             failedMessage,
             chat.Texts);
     }

@@ -147,7 +147,7 @@ public class MainFlow {
             var helpBtn = InlineButtons.HowToUse(Chat.Texts);
             var learningSetsBtn = InlineButtons.LearningSets($"{Chat.Texts.LearningSetsButton} {Emojis.LearningSets}");
 
-            await ChatIo.SendMarkdownMessageAsync(MarkdownObject.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuTextMarkdown,
+            await ChatIo.SendMessageAsync(Markdown.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuText,
                 new[] {
                     new[] { translationBtn },
                     new[] { examBtn },

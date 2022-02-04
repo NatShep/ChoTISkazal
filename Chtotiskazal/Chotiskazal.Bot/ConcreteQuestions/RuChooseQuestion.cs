@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "RuChoose";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var variants = examList.Where(e=>e.AllTranslationsAsSingleString!=word.AllTranslationsAsSingleString)
                 .Select(e => e.Word)
@@ -28,11 +28,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
             
             return variants[choice.Value].AreEqualIgnoreCase(word.Word) 
-                ? QuestionResultMarkdown.Passed(chat.Texts) 
-                : QuestionResultMarkdown.Failed(chat.Texts);
+                ? QuestionResult.Passed(chat.Texts) 
+                : QuestionResult.Failed(chat.Texts);
         }
     }
 }

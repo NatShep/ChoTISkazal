@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
-using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Interface.InterfaceTexts;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;

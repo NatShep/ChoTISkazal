@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Eng Choose";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
@@ -34,12 +34,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
 
             var selected = variants[choice.Value];
             return word.TextTranslations.Any(t=>t.AreEqualIgnoreCase(selected)) 
-                ? QuestionResultMarkdown.Passed(chat.Texts) 
-                : QuestionResultMarkdown.Failed(chat.Texts);
+                ? QuestionResult.Passed(chat.Texts) 
+                : QuestionResult.Failed(chat.Texts);
         }
     }
 }

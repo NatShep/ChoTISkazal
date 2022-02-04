@@ -15,10 +15,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
             var (phrase, translation) = word.GetExamplesThatLoadedAndFits().GetRandomItemOrNull();
             if (phrase == null)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
             var (enPhrase, ruPhrase) = phrase.Deconstruct();
             
             var allWordsWithPhraseOfSimilarTranslate = examList
@@ -29,7 +29,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var enReplaced = enPhrase.Replace(phrase.OriginWord, "...");
             if (enReplaced == enPhrase)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
 
             await chat.SendMarkdownMessageAsync(
                 QuestionMarkups.TranslatesAsTemplate(
@@ -42,27 +42,27 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (enter.IsRussian())
             {
                 await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
             }
             
             var (closestWord, comparation) = allWordsWithPhraseOfSimilarTranslate.GetClosestTo(enter.Trim());
             if (comparation == StringsCompareResult.Equal)
-                return QuestionResultMarkdown.Passed(chat.Texts);
+                return QuestionResult.Passed(chat.Texts);
             if (enter.Contains(word.Word, StringComparison.InvariantCultureIgnoreCase) && enPhrase.Contains(enter))
             {
                 //if user enters whole world (as it is in phrase) - it is ok
-                return QuestionResultMarkdown.Passed(chat.Texts);
+                return QuestionResult.Passed(chat.Texts);
             }
             
             if (comparation == StringsCompareResult.SmallMistakes)
             {
                 await chat.SendMessageAsync(chat.Texts.TypoAlmostRight);
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
             }
 
-            return QuestionResultMarkdown.Failed(
-                chat.Texts.FailedOriginExampleWasMarkdown.AddNewLine() +
-                MarkdownObject.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
+            return QuestionResult.Failed(
+                chat.Texts.FailedOriginExampleWas.NewLine() +
+                Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

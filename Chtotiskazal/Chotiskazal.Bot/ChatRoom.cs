@@ -15,6 +15,7 @@ namespace Chotiskazal.Bot
 
         public IInterfaceTexts Texts => User.IsEnglishInterface
             //todo cr: ??? -)
+            //todo answer: temporally hide RussianTexts
             ? (IInterfaceTexts) new EnglishTexts()  
             : (IInterfaceTexts) new EnglishTexts();//RussianTexts();
         public  ChatId ChatId => _origin.ChatId;
@@ -33,10 +34,10 @@ namespace Chotiskazal.Bot
             => _origin.SendMessageAsync(message, buttons);
         public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons)
             => _origin.SendMessageAsync(message, buttons);
-        public Task<int> SendMarkdownMessageAsync(MarkdownObject message, params InlineKeyboardButton[] buttons)
-            => _origin.SendMarkdownMessageAsync(message, buttons);
-        public Task<int> SendMarkdownMessageAsync(MarkdownObject message, InlineKeyboardButton[][] buttons)
-            => _origin.SendMarkdownMessageAsync(message, buttons);
+        public Task<int> SendMarkdownMessageAsync(Markdown message, params InlineKeyboardButton[] buttons)
+            => _origin.SendMessageAsync(message, buttons);
+        public Task<int> SendMarkdownMessageAsync(Markdown message, InlineKeyboardButton[][] buttons)
+            => _origin.SendMessageAsync(message, buttons);
         public  Task<Update> WaitUserInputAsync()
             => _origin.WaitUserInputAsync();
         public Task<string> WaitInlineKeyboardInput()
@@ -69,9 +70,9 @@ namespace Chotiskazal.Bot
         public Task ConfirmCallback(string callbackQueryId)
             => _origin.ConfirmCallback(callbackQueryId);
         
-        public Task EditMessageTextMarkdown(int messageMessageId, MarkdownObject s,
+        public Task EditMessageTextMarkdown(int messageMessageId, Markdown s,
                                                   InlineKeyboardMarkup inlineKeyboardButtons = null)
-            => _origin.EditMarkdownMessage(messageMessageId, s, inlineKeyboardButtons);
+            => _origin.EditMessageAsync(messageMessageId, s, inlineKeyboardButtons);
         #endregion
 
 

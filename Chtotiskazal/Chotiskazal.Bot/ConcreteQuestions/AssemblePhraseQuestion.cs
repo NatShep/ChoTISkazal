@@ -13,10 +13,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Assemble phrase";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
         {
             if (!word.HasAnyExamples)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
 
             var targetPhrase = word.GetRandomExample();
 
@@ -26,7 +26,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 var wordsInExample = targetPhrase.SplitWordsOfPhrase;
                 
                 if (wordsInExample.Length < 2)
-                    return QuestionResultMarkdown.Impossible;
+                    return QuestionResult.Impossible;
 
                 shuffled = string.Join(" ", wordsInExample.Shuffle());
                 if(shuffled!= targetPhrase.OriginPhrase)
@@ -35,34 +35,31 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             await chat.SendMarkdownMessageAsync(
                 QuestionMarkups.FreeTemplateMarkdown(
-                    chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown.AddEscaped(":")
-                        //todo cr - consider an idea - make extension methods string.ToSemiBold() that gets raw string
-                        // and return escaped and semiBold markdown
-                        // as pattern MarkdownObject.Escaped(text).ToXXX() appears many times in your code
-                        .AddNewLine() + MarkdownObject.Escaped(shuffled).ToSemiBold()));
+                    chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
+                        .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
+            
             var entry = await chat.WaitUserTextInputAsync();
 
             if (entry.IsRussian())
             {
                 await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
             }
             
             var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
             
             if (closeness== StringsCompareResult.Equal)
-                return QuestionResultMarkdown.Passed(chat.Texts);
+                return QuestionResult.Passed(chat.Texts);
             
             if (closeness == StringsCompareResult.BigMistakes){
                 await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
             }
 
-            return QuestionResultMarkdown.Failed(MarkdownObject
-                                                     .Escaped($"{chat.Texts.FailedOriginExampleWas2Markdown}:")
-                                                     .AddNewLine() +
-                                                 MarkdownObject.Escaped($"\"{targetPhrase.OriginPhrase}\"")
-                                                     .ToSemiBold(),
+            return QuestionResult.Failed(Markdown
+                                                     .Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
+                                                     .NewLine() +
+                                                 Markdown.Escaped($"\"{targetPhrase.OriginPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

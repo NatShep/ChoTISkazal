@@ -56,7 +56,7 @@ public class AddFromLearningSetFlow {
             await _localDictionaryService.GetTranslationWithExamplesByEnWord(selector.Current.Word);
 
         await Chat.SendMarkdownMessageAsync(
-            GetWordTextMarkdown(selector, word, translations, selector.Current),
+            GetWordMarkdown(selector, word, translations, selector.Current),
             GetWordKeyboard());
 
         var continueAddWords = true;
@@ -128,13 +128,13 @@ public class AddFromLearningSetFlow {
 
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,
-            GetWordTextMarkdown(selector, word, translations, selector.Current),
+            GetWordMarkdown(selector, word, translations, selector.Current),
             GetWordKeyboard());
         return true;
     }
 
     private async Task SendAllWordsAreLearnedMessage(int messageId) =>
-        await Chat.EditMessageTextMarkdown(messageId, MarkdownObject.Escaped(Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName)));
+        await Chat.EditMessageTextMarkdown(messageId, Markdown.Escaped(Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName)));
 
     private async Task<bool> MoveOnNextWord(PaginationCollection<WordInLearningSet> selector, bool moveNext) {
         for (int i = 0; i < selector.Count; i++)
@@ -182,9 +182,8 @@ public class AddFromLearningSetFlow {
                 InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
             }
         };
-    //todo cr - naming. Just GetWordText, or GetWordMarkdown. 
-    // GetWordTextMarkdown - it is just duplicating of info. Like GetWordTextStringMarkdownBold =)
-    private MarkdownObject GetWordTextMarkdown(
+    
+    private Markdown GetWordMarkdown(
         PaginationCollection<WordInLearningSet> collection,
         DictionaryWord dictionaryWord,
         IReadOnlyList<Translation> translations,
@@ -196,20 +195,20 @@ public class AddFromLearningSetFlow {
 
         var msg = new StringBuilder();
         
-        msg.AppendLine($"*{MarkdownObject.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
+        msg.AppendLine($"*{Markdown.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
         if (!string.IsNullOrWhiteSpace(transcription))
-            msg.Append($"```\r\n[{MarkdownObject.Escaped(transcription).GetMarkdownString()}]\r\n```");
+            msg.Append($"```\r\n[{Markdown.Escaped(transcription).GetMarkdownString()}]\r\n```");
         msg.AppendLine(
-            $"\r\n*{string.Join("\r\n", allowedTranslations.Select(a => MarkdownObject.Escaped(a.TranslatedText.Capitalize()).GetMarkdownString()))}*");
+            $"\r\n*{string.Join("\r\n", allowedTranslations.Select(a => Markdown.Escaped(a.TranslatedText.Capitalize()).GetMarkdownString()))}*");
         if (example != null)
             msg.Append(
                 $"```\r\n\r\n" +
-                $"{Emojis.OpenQuote}{MarkdownObject.Escaped(example.OriginPhrase).GetMarkdownString()}{Emojis.CloseQuote}\r\n" +
-                $"{Emojis.OpenQuote}{MarkdownObject.Escaped(example.TranslatedPhrase).GetMarkdownString()}{Emojis.CloseQuote}" +
+                $"{Emojis.OpenQuote}{Markdown.Escaped(example.OriginPhrase).GetMarkdownString()}{Emojis.CloseQuote}\r\n" +
+                $"{Emojis.OpenQuote}{Markdown.Escaped(example.TranslatedPhrase).GetMarkdownString()}{Emojis.CloseQuote}" +
                 $"\r\n```");
-        msg.AppendLine($"\r\n{Chat.Texts.XofYMarkdown(collection.Page + 1, collection.Count)}");
+        msg.AppendLine($"\r\n{Chat.Texts.XofY(collection.Page + 1, collection.Count)}");
     
-        return MarkdownObject.ByPassed(msg.ToString());
+        return Markdown.Bypassed(msg.ToString());
     }
 
     private static Example GetExampleOrNull(

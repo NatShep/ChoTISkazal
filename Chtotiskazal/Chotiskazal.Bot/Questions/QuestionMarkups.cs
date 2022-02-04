@@ -3,51 +3,48 @@ using Chotiskazal.Bot.Interface;
 
 namespace Chotiskazal.Bot.Questions {
 public static class QuestionMarkups {
-    private static readonly MarkdownObject QuestionHeader = MarkdownObject.Escaped("---❔---").ToPreFormattedMono();
-    public static MarkdownObject FreeTemplateMarkdown(MarkdownObject s) => QuestionHeader + MarkdownObject.ByPassed("\r\n") + s;
+    private static readonly Markdown QuestionHeader = Markdown.Escaped("---❔---").ToPreFormattedMono();
+    public static Markdown FreeTemplateMarkdown(Markdown s) => QuestionHeader + Markdown.Bypassed("\r\n") + s;
 
-    public static MarkdownObject TranslateTemplate(string word, string instruction)
+    public static Markdown TranslateTemplate(string word, string instruction)
         => QuestionHeader
-               .AddNewLine() +
-           MarkdownObject.Escaped(word).ToSemiBold()
-               .AddNewLine()
-               .AddNewLine()
-               .AddNewLine()
+               .NewLine() +
+                word.ToSemiBold()
+               .NewLine()
+               .NewLine()
+               .NewLine()
                .AddEscaped(instruction);
 
-    public static MarkdownObject TranslateTemplate(string word, string instruction, string example)
+    public static Markdown TranslateTemplate(string word, string instruction, string example)
         => QuestionHeader
-               .AddNewLine() +
-           MarkdownObject.Escaped(word).ToSemiBold()
-               .AddNewLine() +
-           MarkdownObject.ByPassed("    ") + MarkdownObject.Escaped(example).ToItalic()
-               .AddNewLine()
-               .AddNewLine()
-               .AddNewLine()
-               .AddEscaped(instruction);
-
-    public static MarkdownObject TranscriptionTemplate(string word, string instruction)
-        => QuestionHeader
-            .AddNewLine()
-            .AddEscaped($"'{word}'")
-            .AddNewLine()
-            .AddNewLine()
+            .NewLine()
+            .AddMarkdown(word.ToSemiBold()).NewLine()
+            .AddBypassed("    ")
+            .AddMarkdown(example.ToItalic()).NewLine()
+            .NewLine()
+            .NewLine()
             .AddEscaped(instruction);
 
-    public static MarkdownObject TranslatesAsTemplate(string a, string translatesAs, string b, string instruction)
+    public static Markdown TranscriptionTemplate(string word, string instruction)
         => QuestionHeader
-               .AddNewLine() +
-           //todo cr - here and there. Sometimes you use .AddNewLine() and sometimes you use '+' operator
-           // it looks confusing. You can either - Create NewLine static property in MarkdownObjec
-           // either add methods like 'AddEscaped(...)', 'AddEscapedItalic()', AddEscapedBold etc
-           // but combination of these looks very confusing
-           MarkdownObject.Escaped($"\"{a}\"").ToSemiBold()
-               .AddNewLine() +
-           MarkdownObject.ByPassed("    ") + MarkdownObject.Escaped(translatesAs).ToItalic()
-               .AddNewLine() +
-           MarkdownObject.Escaped($"\"{b}\"").ToSemiBold()
-               .AddNewLine()
-               .AddNewLine()
-               .AddEscaped(instruction);
+            .NewLine()
+            .AddEscaped($"'{word}'")
+            .NewLine()
+            .NewLine()
+            .AddEscaped(instruction);
+
+    public static Markdown TranslatesAsTemplate(string a, string translatesAs, string b, string instruction)
+        => QuestionHeader.NewLine()
+            .AddMarkdown($"\"{a}\"".ToSemiBold()).NewLine()
+            .AddBypassed("    ").AddMarkdown(translatesAs.ToItalic()).ToSemiBold().NewLine()
+            .AddMarkdown($"\"{b}\"".ToSemiBold()).NewLine()
+            .NewLine()
+            .AddEscaped(instruction);
 }
+
+//todo cr - here and there. Sometimes you use .AddNewLine() and sometimes you use '+' operator
+// it looks confusing. You can either - Create NewLine static property in MarkdownObjec
+// either add methods like 'AddEscaped(...)', 'AddEscapedItalic()', AddEscapedBold etc
+// but combination of these looks very confusing
+//TODO answer i need more time for this =) 
 }

@@ -55,25 +55,25 @@ public class ShowWellKnownWordsFlow {
         else if (wellKnownWords.Length == 1)
             msg.Append(Chat.Texts.JustOneLearnedWord);
         else if (wellKnownWords.Length <= 4)
-            msg.Append(Chat.Texts.LearnSomeWordsMarkdown(wellKnownWords.Length));
+            msg.Append(Chat.Texts.LearnSomeWords(wellKnownWords.Length));
         else
-            msg.Append(Chat.Texts.LearnMoreWordsMarkdown(wellKnownWords.Length));
+            msg.Append(Chat.Texts.LearnMoreWords(wellKnownWords.Length));
 
         msg.Append("*\r\n\r\n");
 
         if (wellKnownWords.Length == 0)
             return;
 
-        var msgWithWords = MarkdownObject.Empty();
+        var msgWithWords = Markdown.Empty;
         foreach (var word in paginationForWords[0]) {
-            msgWithWords += MarkdownObject.Escaped($"{Emojis.SoftMark} ") +
-                              MarkdownObject.Escaped($"{word.Word}: ").ToSemiBold() +
-                              MarkdownObject.Escaped(word.AllTranslationsAsSingleString)
-                                  .AddNewLine();
+            msgWithWords += Markdown.Escaped($"{Emojis.SoftMark} ") +
+                              Markdown.Escaped($"{word.Word}: ").ToSemiBold() +
+                              Markdown.Escaped(word.AllTranslationsAsSingleString)
+                                  .NewLine();
         }
 
         if (paginationForWords.Count > 1)
-            msgWithWords += Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count);
+            msgWithWords += Chat.Texts.PageXofY(1, paginationForWords.Count);
 
         InlineKeyboardButton[][] buttons = null;
         if (paginationForWords.Count > 1)
@@ -96,7 +96,7 @@ public class ShowWellKnownWordsFlow {
                 new[] { InlineButtons.MainMenu($"{Chat.Texts.TranslateButton} {Emojis.Translate}") }
             };
 
-        await Chat.ChatIo.SendMarkdownMessageAsync(msgWithWords, buttons);
+        await Chat.ChatIo.SendMessageAsync(msgWithWords, buttons);
     }
 }
 

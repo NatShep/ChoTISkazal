@@ -18,16 +18,16 @@ public static class StatsRenderer {
     private const string S5 = Emojis.GreenSquare;
     private const string S6 = Emojis.Fire;
 
-    public static MarkdownObject GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
+    public static Markdown GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
         RenderStatsMarkdown(settings, chat) +
         Render7WeeksCalendarMarkdown(settings, chat.User.LastDaysStats
                 .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
                 .ToArray(), chat.Texts)
             .ToPreFormattedMono()
-            .AddNewLine() +
+            .NewLine() +
         RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
-    private static MarkdownObject Render7WeeksCalendarMarkdown(
+    private static Markdown Render7WeeksCalendarMarkdown(
         
         ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts) {
         var today = DateTime.Today;
@@ -68,10 +68,10 @@ public static class StatsRenderer {
         }
         sb.Append("----------------------\r\n ");
         sb.Append($"{texts.less} {S1}{S2}{S3}{S4}{S5} {texts.more}\r\n");
-        return MarkdownObject.ByPassed(sb.ToString());
+        return Markdown.Bypassed(sb.ToString());
     }
 
-    private static MarkdownObject RenderStatsMarkdown(ExamSettings settings, ChatRoom chat) {
+    private static Markdown RenderStatsMarkdown(ExamSettings settings, ChatRoom chat) {
         var lastMonth = chat.User.GetLastMonth();
         var lastDay = chat.User.GetToday();
         var statsText = $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
@@ -90,25 +90,25 @@ public static class StatsRenderer {
                         $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
                         $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
        
-        return MarkdownObject.ByPassed(statsText);
+        return Markdown.Bypassed(statsText);
     }
 
-    private static MarkdownObject RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
+    private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
      
         if (user.Zen.Rate < -15)
-            return MarkdownObject.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
+            return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
         else if (user.Zen.Rate < -10)
-            return MarkdownObject.Escaped(texts.Zen2TranslateNewWords);
+            return Markdown.Escaped(texts.Zen2TranslateNewWords);
         else if (user.Zen.Rate < -5)
-            return MarkdownObject.Escaped(texts.Zen3TranslateNewWordsAndPassExams);
+            return Markdown.Escaped(texts.Zen3TranslateNewWordsAndPassExams);
         else if (user.Zen.Rate < 5)
-            return MarkdownObject.Escaped(texts.Zen3EverythingIsGood);
+            return Markdown.Escaped(texts.Zen3EverythingIsGood);
         else if (user.Zen.Rate < 10)
-            return MarkdownObject.Escaped(texts.Zen4PassExamsAndTranslateNewWords);
+            return Markdown.Escaped(texts.Zen4PassExamsAndTranslateNewWords);
         else if (user.Zen.Rate < 20)
-            return MarkdownObject.Escaped(texts.Zen5PassExams);
+            return Markdown.Escaped(texts.Zen5PassExams);
         else
-            return MarkdownObject.Escaped(texts.Zen6YouNeedToLearn);
+            return Markdown.Escaped(texts.Zen6YouNeedToLearn);
     }
 }
 }

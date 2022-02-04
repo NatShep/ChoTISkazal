@@ -26,7 +26,7 @@ public class HelpBotCommandHandler : IBotCommandHandler {
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) => chat.SendMarkdownMessageAsync(
-        chat.Texts.HelpMarkdown,
+        chat.Texts.Help,
         new[] {
             new[] {
                 InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}")

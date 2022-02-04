@@ -13,13 +13,13 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Trans Choose";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var originalTranslation = word.RuTranslations.GetRandomItemOrNull();
 
             if (originalTranslation==null || !originalTranslation.HasTranscription)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
             
             var variants = examList
                 .SelectMany(e => e.RuTranslations)
@@ -34,18 +34,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 .ToList();
             
             if (variants.Count <= 1)
-                return QuestionResultMarkdown.Impossible;
+                return QuestionResult.Impossible;
 
             var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.ChooseTheTranscription);
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
             var choice = await chat.TryWaitInlineIntKeyboardInput();
             if (choice == null)
-                return QuestionResultMarkdown.RetryThisQuestion;
+                return QuestionResult.RetryThisQuestion;
 
             return word.RuTranslations.Any(t=>t.Transcription== variants[choice.Value]) 
-                ? QuestionResultMarkdown.Passed(chat.Texts) 
-                : QuestionResultMarkdown.Failed(chat.Texts);
+                ? QuestionResult.Passed(chat.Texts) 
+                : QuestionResult.Failed(chat.Texts);
         }
     }
 }

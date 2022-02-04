@@ -11,7 +11,7 @@ namespace Chotiskazal.Bot.Questions
         public ClearScreenQuestionDecorator(IQuestion origin)=> _origin = origin;
 
         public string Name => "Clean "+ _origin.Name;
-        public Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
+        public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
             => _origin.Pass(chat, word, examList);
     }
 }

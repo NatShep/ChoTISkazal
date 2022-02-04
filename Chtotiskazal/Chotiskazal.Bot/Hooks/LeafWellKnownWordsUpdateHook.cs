@@ -18,11 +18,6 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
     public void SetWellKnownWords(List<List<UserWordModel>> wellKnownWords) => _pages.Set(wellKnownWords);
     public void SetNumberOfPaginate(int i) => _pages.Page = i;
-    //todo cr - never commit commented code.
-    //You need to ask about it, or delete it, or put //"todo comment"
-    //but never commit commented code
-    // TODO зачем это?    
-    //    public void SetBeginningMessage(string msg) { }
 
     public bool CanBeHandled(Update update) {
         var text = update.CallbackQuery?.Data;
@@ -41,16 +36,16 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
         else
             _pages.MoveNext();
 
-        var msg = MarkdownObject.Empty();
+        var msg = Markdown.Empty;
 
         foreach (var word in _pages.Current) {
             msg = msg.AddEscaped(Emojis.SoftMark) +
-                MarkdownObject.Escaped($"{word.Word}:").ToSemiBold()
+                Markdown.Escaped($"{word.Word}:").ToSemiBold()
                     .AddEscaped(word.AllTranslationsAsSingleString)
-                    .AddNewLine();
+                    .NewLine();
         }
 
-        msg += (Chat.Texts.PageXofYMarkdown(_pages.Page + 1, _pages.Count));
+        msg += (Chat.Texts.PageXofY(_pages.Page + 1, _pages.Count));
 
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,

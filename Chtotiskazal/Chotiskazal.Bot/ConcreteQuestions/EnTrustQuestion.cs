@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng trust";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList) {
             var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.DoYouKnowTranslation);
             var id = Rand.Next();
@@ -33,19 +33,18 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 {
                     if (word.TextTranslations.Any(a =>
                         input.AreEqualIgnoreCase(a)))
-                        return QuestionResultMarkdown.Passed(chat.Texts);
+                        return QuestionResult.Passed(chat.Texts);
 
                     await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
                 }
             }
 
-            await chat.SendMarkdownMessageAsync(MarkdownObject.Escaped(chat.Texts.TranslationIs).ToItalic()
-                    .AddNewLine() +
-                                                MarkdownObject.Escaped($"\"{word.AllTranslationsAsSingleString}\"")
-                                                    .ToSemiBold()
-                                                    .AddNewLine()
-                                                    .AddNewLine() +
-                                                MarkdownObject.Escaped(chat.Texts.DidYouGuess),
+            await chat.SendMarkdownMessageAsync(Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()
+                    .NewLine() +
+                                                Markdown.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold()
+                                                    .NewLine()
+                                                    .NewLine() +
+                                                Markdown.Escaped(chat.Texts.DidYouGuess),
                                             new[] {
                                                 new[] {
                                                     new InlineKeyboardButton {
@@ -62,10 +61,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var choice = await chat.WaitInlineIntKeyboardInput();
 
             return choice == 1 ? 
-                QuestionResultMarkdown.Passed(MarkdownObject.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest), 
-                    MarkdownObject.Escaped(chat.Texts.PassedHideousWell)) 
-                : QuestionResultMarkdown.Failed(MarkdownObject.Escaped(chat.Texts.FailedOpenButYouWereHonest), 
-                    MarkdownObject.Escaped(chat.Texts.FailedHideousHonestyIsGold));
+                QuestionResult.Passed(Markdown.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest), 
+                    Markdown.Escaped(chat.Texts.PassedHideousWell)) 
+                : QuestionResult.Failed(Markdown.Escaped(chat.Texts.FailedOpenButYouWereHonest), 
+                    Markdown.Escaped(chat.Texts.FailedHideousHonestyIsGold));
         }
     }
 }

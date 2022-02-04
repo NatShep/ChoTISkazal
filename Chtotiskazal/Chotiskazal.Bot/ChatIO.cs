@@ -60,16 +60,16 @@ public class ChatIO {
 
     public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons)
         => _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
-//Todo cr - rename to SendMessageAsync.
-    public async Task<int> SendMarkdownMessageAsync(MarkdownObject message, params InlineKeyboardButton[] buttons) {
+
+    public async Task<int> SendMessageAsync(Markdown message, params InlineKeyboardButton[] buttons) {
         var answer = await _client.SendTextMessageAsync(
             ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons.Select(b => new[] { b })),
             parseMode: ParseMode.MarkdownV2);
         return answer.MessageId;
     }
-//Todo cr - rename to SendMessageAsync.
-    public async Task<int> SendMarkdownMessageAsync(MarkdownObject message, InlineKeyboardButton[][] buttons)
+
+    public async Task<int> SendMessageAsync(Markdown message, InlineKeyboardButton[][] buttons)
         => (await _client.SendTextMessageAsync(
             ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons),
@@ -181,9 +181,9 @@ public class ChatIO {
             return false;
         }
     }
-//Todo cr - rename to EditMessage
-    public async Task<bool> EditMarkdownMessage(
-        int messageId, MarkdownObject newText, InlineKeyboardMarkup inlineKeyboard = null) {
+
+    public async Task<bool> EditMessageAsync(
+        int messageId, Markdown newText, InlineKeyboardMarkup inlineKeyboard = null) {
         try
         {
             await _client.EditMessageTextAsync(

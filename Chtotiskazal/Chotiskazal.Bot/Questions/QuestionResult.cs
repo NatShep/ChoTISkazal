@@ -3,38 +3,35 @@ using Chotiskazal.Bot.Interface.InterfaceTexts;
 
 namespace Chotiskazal.Bot.Questions
 {
-// todo cr - rename back to QuestionResult as it is Result of The questions,
-// and Markdown text inside of it is just a detail 
-    public class QuestionResultMarkdown
+    public class QuestionResult
     {
-        private readonly MarkdownObject _openResultsText;
-        private readonly MarkdownObject _resultsBeforeHideousText;
+        private readonly Markdown _openResultsText;
+        private readonly Markdown _resultsBeforeHideousText;
         public const string NoText = "";
         
-        
-        private QuestionResultMarkdown(MarkdownObject openResultsText, MarkdownObject resultsBeforeHideousText, ExamResult results)
+        private QuestionResult(Markdown openResultsText, Markdown resultsBeforeHideousText, ExamResult results)
         {
             _openResultsText = openResultsText;
             _resultsBeforeHideousText = resultsBeforeHideousText;
             Results = results;
         }
 
-        public static QuestionResultMarkdown Passed(MarkdownObject markdownText, IInterfaceTexts texts) 
-            => new QuestionResultMarkdown(markdownText, MarkdownObject.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
-        public static QuestionResultMarkdown Failed(MarkdownObject markdownText, IInterfaceTexts texts)
-            => new QuestionResultMarkdown(markdownText,MarkdownObject.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
-        public static QuestionResultMarkdown Passed(MarkdownObject text, MarkdownObject hideousText) 
-            => new QuestionResultMarkdown(text, hideousText, ExamResult.Passed);
-        public static QuestionResultMarkdown Failed(MarkdownObject text, MarkdownObject hideousText)
-            => new QuestionResultMarkdown(text, hideousText, ExamResult.Failed);
-        public static QuestionResultMarkdown Passed(IInterfaceTexts texts)=> new QuestionResultMarkdown(
-            texts.PassedDefaultMarkdown,
-            MarkdownObject.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
-        public static QuestionResultMarkdown Failed(IInterfaceTexts texts)=> new QuestionResultMarkdown(
-            texts.FailedDefaultMarkdown,
-            MarkdownObject.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
-        public static QuestionResultMarkdown RetryThisQuestion=> new QuestionResultMarkdown(MarkdownObject.Empty(),MarkdownObject.Empty(), ExamResult.Retry);
-        public static QuestionResultMarkdown Impossible => new QuestionResultMarkdown(MarkdownObject.Empty(),MarkdownObject.Empty(), ExamResult.Impossible);
+        public static QuestionResult Passed(Markdown markdownText, IInterfaceTexts texts) 
+            => new QuestionResult(markdownText, Markdown.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
+        public static QuestionResult Failed(Markdown markdownText, IInterfaceTexts texts)
+            => new QuestionResult(markdownText,Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
+        public static QuestionResult Passed(Markdown text, Markdown hideousText) 
+            => new QuestionResult(text, hideousText, ExamResult.Passed);
+        public static QuestionResult Failed(Markdown text, Markdown hideousText)
+            => new QuestionResult(text, hideousText, ExamResult.Failed);
+        public static QuestionResult Passed(IInterfaceTexts texts)=> new QuestionResult(
+            texts.PassedDefault,
+            Markdown.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
+        public static QuestionResult Failed(IInterfaceTexts texts)=> new QuestionResult(
+            texts.FailedDefault,
+            Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
+        public static QuestionResult RetryThisQuestion=> new QuestionResult(Markdown.Empty,Markdown.Empty, ExamResult.Retry);
+        public static QuestionResult Impossible => new QuestionResult(Markdown.Empty,Markdown.Empty, ExamResult.Impossible);
 
         private string Emoji => Results switch
         {
@@ -46,16 +43,16 @@ namespace Chotiskazal.Bot.Questions
         /// <summary>
         /// Text with results, showing after question before next question
         /// </summary>
-        public MarkdownObject OpenResultsTextMarkdown => MarkdownObject.IsNullOrEmpty(_openResultsText)
-            ?MarkdownObject.Empty()
-            :MarkdownObject.Escaped(Emoji+" ") +_openResultsText;
+        public Markdown OpenResultsTextMarkdown => Markdown.IsNullOrEmpty(_openResultsText)
+            ?Markdown.Empty
+            :Markdown.Escaped(Emoji+" ") +_openResultsText;
 
         /// <summary>
         /// Text with results, showing after question before next hideous question
         /// </summary>
-        public MarkdownObject ResultsBeforeHideousTextMarkdown => MarkdownObject.IsNullOrEmpty(_resultsBeforeHideousText)
-            ?MarkdownObject.Empty()
-            :MarkdownObject.Escaped(Emoji +" ") + _resultsBeforeHideousText;
+        public Markdown ResultsBeforeHideousTextMarkdown => Markdown.IsNullOrEmpty(_resultsBeforeHideousText)
+            ?Markdown.Empty
+            :Markdown.Escaped(Emoji +" ") + _resultsBeforeHideousText;
 
         public  ExamResult Results { get; }
 

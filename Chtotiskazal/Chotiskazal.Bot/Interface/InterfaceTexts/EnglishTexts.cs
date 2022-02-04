@@ -48,13 +48,13 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public string CorrectTranslationButQuestionWasAbout => "Your translation was correct, but the question was about the word";
         public string LetsTryAgain => "Let's try again";
         public string ChooseTheTranscription => "Choose the transcription";
-        public MarkdownObject WordsInPhraseAreShuffledWriteThemInOrderMarkdown =>
-           MarkdownObject.Escaped("Words in phrase are shuffled. Write them in correct order.");
+        public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
+           Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
 
-        public MarkdownObject YouHaveATypoLetsTryAgainMarkdown(string text)
-            => MarkdownObject.Escaped("You have a typo. Correct spelling is ") +
-               MarkdownObject.Escaped(text).ToSemiBold() +
-               MarkdownObject.Escaped(". Let's try again.");
+        public Markdown YouHaveATypoLetsTryAgain(string text)
+            => Markdown.Escaped("You have a typo. Correct spelling is ") +
+               Markdown.Escaped(text).ToSemiBold() +
+               Markdown.Escaped(". Let's try again.");
        
         #region questionResult
         public string Passed1 => "Ayeee!";
@@ -66,14 +66,12 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
 
         public string FailedMistaken(string text)
             => $"Mistaken. Correct spelling is '{text}'";
-        public MarkdownObject FailedOriginExampleWasMarkdown => MarkdownObject.Escaped("Wrong. Origin phrase was");
-
-        public string FailedOriginExampleWas2 => "Origin phrase was";
-        public MarkdownObject FailedOriginExampleWas2Markdown => MarkdownObject.Escaped("Origin phrase was");
-
-        public MarkdownObject FailedDefaultMarkdown => MarkdownObject.Escaped("Noo...");
-        public MarkdownObject PassedDefaultMarkdown => MarkdownObject.Escaped("It's right!");
-        public MarkdownObject IgnoredDefaultMarkdown => MarkdownObject.Escaped("So so...");
+        
+        public Markdown FailedOriginExampleWas { get; } = Markdown.Escaped("Wrong. Origin phrase was");
+        public Markdown FailedOriginExampleWas2 { get; } = Markdown.Escaped("Origin phrase was");
+        public Markdown FailedDefault { get; } = Markdown.Escaped("Noo...");
+        public Markdown PassedDefault { get; } = Markdown.Escaped("It's right!");
+        public Markdown IgnoredDefault { get; } = Markdown.Escaped("So so...");
         public string FailedHideousDefault => "Last answer was wrong";
         public string PassedHideousDefault => "Last answer was right";
 
@@ -87,11 +85,9 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
 
         public string NoTranslationsFound => "No translations found. Check the word and try again";
 
-        //todo cr - here and there. No need to have postfix 'Markdown' in properties.
-        // Imagine - if all int-properties has postfix int, like "user.ageInt" - it is just redundant information
-        public MarkdownObject LearningCarefullyStudyTheListMarkdown =>
-            MarkdownObject.Escaped("Learning").ToSemiBold()
-                .AddNewLine()
+        public Markdown LearningCarefullyStudyTheList { get; } =
+            Markdown.Escaped("Learning").ToSemiBold()
+                .NewLine()
                 .AddEscaped("Carefully study the words in the list below:");
 
         public string LearningDone => "Learning done";
@@ -107,7 +103,8 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public string less => "less";
         public string ZenRecomendationAfterExamWeNeedMoreNewWords => $"Your words are well learned! It is time to press {BotCommands.New} and add 10-15 new words from word sets to learn";
 
-        public MarkdownObject HelpMarkdown { get; } = MarkdownObject.Escaped("*Hello! I am a translator and teacher.*\r\n\r\n" +
+        public Markdown Help { get; } = Markdown.Escaped("Hello! I am a translator and teacher.\r\n\r\n" ).ToSemiBold()
+                                        .AddEscaped(
                                                        "1⃣ You can use me as a regular translator. " +
                                                        $"Just write the word for translation or use {BotCommands.Translate} command to begin translate.\r\n\r\n" +
                                                        "2⃣ Then, when you have time and mood, click on the _\"Learn\"_ button or " +
@@ -117,11 +114,8 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
                                                        "\uD83D\uDE09Yes, it's free. We have done this bot for us and our friends. " +
                                                        "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!");
         
-        //todo cr - there is big difference between => and {get;} = for markdown object
-        // For strings there was no difference - to return constant or... to return constant
-        // But for markdown - you will calculate the markdown every time client code request it
-        public MarkdownObject MainMenuTextMarkdown =>
-            MarkdownObject.Escaped("I am a translator and teacher.\r\n" +
+        public Markdown MainMenuText { get; } =
+            Markdown.Escaped("I am a translator and teacher.\r\n" +
                                    "First you can use me as a regular translator." +
                                    "After that " +
                                    "learn this words and it helps you to speak English easily.");
@@ -129,13 +123,13 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public string ActionIsNotAllowed => "action is not allowed";
         public string OopsSomethingGoesWrong => "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
 
-        public MarkdownObject HereAreTheTranslationMarkdown(string word, string tr)
-            => MarkdownObject.Escaped("Here are the translations.").ToItalic().AddNewLine() +
-               MarkdownObject.Escaped("Choose one of them to learn them in the future").ToItalic()
-                   .AddNewLine()
-                   .AddNewLine() +
-               MarkdownObject.Escaped(word.Capitalize()).ToSemiBold() +
-               MarkdownObject.ByPassed($"{(tr == null ? "\r\n" : $"\r\n```\r\n[{MarkdownObject.Escaped(tr).GetOrdinalString()}]\r\n```")}");
+        public Markdown HereAreTheTranslation(string word, string tr)
+            => Markdown.Escaped("Here are the translations.").ToItalic().NewLine() +
+               Markdown.Escaped("Choose one of them to learn them in the future").ToItalic()
+                   .NewLine()
+                   .NewLine() +
+               Markdown.Escaped(word.Capitalize()).ToSemiBold() +
+               Markdown.Escaped($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}").ToPreFormattedMono();
 
         public string MessageAfterTranslationIsSelected(Translation translation)
 
@@ -143,17 +137,17 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public string MessageAfterTranslationIsDeselected(Translation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
-        public MarkdownObject LearnMoreWordsMarkdown(in int length)
-            => MarkdownObject.Escaped($"Good job! You have learned {length} words!");
+        public Markdown LearnMoreWords(in int length)
+            => Markdown.Escaped($"Good job! You have learned {length} words!");
 
-        public MarkdownObject LearnSomeWordsMarkdown(in int length)
-            => MarkdownObject.Escaped($"You have learned {length} words. Let's do more!");
+        public Markdown LearnSomeWords(in int length)
+            => Markdown.Escaped($"You have learned {length} words. Let's do more!");
 
-        public MarkdownObject PageXofYMarkdown(in int number,in int count)
-            => MarkdownObject.Escaped($"\r\nPage {number} of {count}...").ToMono();
+        public Markdown PageXofY(in int number,in int count)
+            => Markdown.Escaped($"\r\nPage {number} of {count}...").ToMono();
 
-        public MarkdownObject XofYMarkdown(in int x,in int y)
-            => MarkdownObject.Escaped($"{x} of {y}").ToMono();
+        public Markdown XofY(in int x,in int y)
+            => Markdown.Escaped($"{x} of {y}").ToMono();
 
         public string WordIsAddedForLearning(string word) =>
             $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";

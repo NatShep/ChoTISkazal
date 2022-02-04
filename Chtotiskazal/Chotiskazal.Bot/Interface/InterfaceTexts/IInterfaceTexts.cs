@@ -15,7 +15,6 @@ public interface IInterfaceTexts {
     string OriginWas { get; }
     string EnterMissingWord { get; }
     string TypoAlmostRight { get; }
-    string FailedOriginExampleWas2 { get; }
     string OutOfScopeTranslation { get; }
     string FailedTranslationWas { get; }
     string ItIsNotRightTryAgain { get; }
@@ -106,21 +105,21 @@ public interface IInterfaceTexts {
     string LearningSetNotFound(string argument);
     string AllWordsAreLearnedMessage(string setShortName);
 
-    MarkdownObject FailedOriginExampleWasMarkdown { get; }
-    MarkdownObject FailedOriginExampleWas2Markdown { get; }
-    MarkdownObject WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; }
-    MarkdownObject FailedDefaultMarkdown { get; }
-    MarkdownObject PassedDefaultMarkdown { get; }
-    MarkdownObject IgnoredDefaultMarkdown { get; }
-    MarkdownObject LearningCarefullyStudyTheListMarkdown { get; }
-    MarkdownObject HelpMarkdown { get; }
-    MarkdownObject MainMenuTextMarkdown { get; }
-    MarkdownObject YouHaveATypoLetsTryAgainMarkdown(string text);
-    MarkdownObject HereAreTheTranslationMarkdown(string word, string tr);
-    MarkdownObject LearnMoreWordsMarkdown(in int length);
-    MarkdownObject LearnSomeWordsMarkdown(in int length);
-    MarkdownObject PageXofYMarkdown(in int number, in int count);
-    MarkdownObject XofYMarkdown(in int x, in int y);
+    Markdown FailedOriginExampleWas { get; }
+    Markdown FailedOriginExampleWas2 { get; }
+    Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }
+    Markdown FailedDefault { get; }
+    Markdown PassedDefault { get; }
+    Markdown IgnoredDefault { get; }
+    Markdown LearningCarefullyStudyTheList { get; }
+    Markdown Help { get; }
+    Markdown MainMenuText { get; }
+    Markdown YouHaveATypoLetsTryAgain(string text);
+    Markdown HereAreTheTranslation(string word, string tr);
+    Markdown LearnMoreWords(in int length);
+    Markdown LearnSomeWords(in int length);
+    Markdown PageXofY(in int number, in int count);
+    Markdown XofY(in int x, in int y);
 }
 
 }

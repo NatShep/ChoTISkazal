@@ -13,7 +13,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
         public bool NeedClearScreen => false;
         public string Name => "Eng is it right translation";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word,
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
         {
             var translation = examList.SelectMany(e => e.TextTranslations)
@@ -50,13 +50,13 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 choice == 0 && !word.TextTranslations.Contains(translation)
                 )
             {
-                return QuestionResultMarkdown.Passed(chat.Texts);
+                return QuestionResult.Passed(chat.Texts);
             }
             else {
-                return QuestionResultMarkdown.Failed(
-                    MarkdownObject.Escaped($"{chat.Texts.Mistaken}.").AddNewLine() +
-                    MarkdownObject.Escaped($"\"{word.Word}\" {chat.Texts.translatesAs} ") +
-                    MarkdownObject.Escaped($"\"{word.TextTranslations.FirstOrDefault()}\" ").ToSemiBold(), 
+                return QuestionResult.Failed(
+                    Markdown.Escaped($"{chat.Texts.Mistaken}.").NewLine() +
+                    Markdown.Escaped($"\"{word.Word}\" {chat.Texts.translatesAs} ") +
+                    Markdown.Escaped($"\"{word.TextTranslations.FirstOrDefault()}\" ").ToSemiBold(), 
                     chat.Texts);
             }
         }

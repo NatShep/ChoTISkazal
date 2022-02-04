@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Ru trust single translation";
 
-        public async Task<QuestionResultMarkdown> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
             
             var msg = QuestionMarkups.TranslateTemplate(
                 word.RuTranslations.GetRandomItemOrNull().Word, 
@@ -37,16 +37,16 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     if (word.Word.AreEqualIgnoreCase(input))
-                        return QuestionResultMarkdown.Passed(chat.Texts);
+                        return QuestionResult.Passed(chat.Texts);
                     await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
                 }
             }
 
-            msg = MarkdownObject.Escaped(chat.Texts.TranslationIs).ToItalic()
-                      .AddNewLine() +
-                  MarkdownObject.Escaped($"\"{word.Word}\"").ToSemiBold()
-                      .AddNewLine()
-                      .AddNewLine().AddEscaped(chat.Texts.DidYouGuess);
+            msg = Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()
+                      .NewLine() +
+                  Markdown.Escaped($"\"{word.Word}\"").ToSemiBold()
+                      .NewLine()
+                      .NewLine().AddEscaped(chat.Texts.DidYouGuess);
             
             await chat.SendMarkdownMessageAsync(msg,
                                 new[]{
@@ -65,12 +65,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
             var choice = await chat.WaitInlineIntKeyboardInput();
             return choice == 1
-                ? QuestionResultMarkdown.Passed(
-                    MarkdownObject.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest),
-                    MarkdownObject.Escaped(chat.Texts.PassedHideousWell2))
-                : QuestionResultMarkdown.Failed(
-                    MarkdownObject.Escaped(chat.Texts.FailedOpenButYouWereHonest),
-                    MarkdownObject.Escaped(chat.Texts.FailedHideousHonestyIsGold));
+                ? QuestionResult.Passed(
+                    Markdown.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest),
+                    Markdown.Escaped(chat.Texts.PassedHideousWell2))
+                : QuestionResult.Failed(
+                    Markdown.Escaped(chat.Texts.FailedOpenButYouWereHonest),
+                    Markdown.Escaped(chat.Texts.FailedHideousHonestyIsGold));
         }
     }
 }

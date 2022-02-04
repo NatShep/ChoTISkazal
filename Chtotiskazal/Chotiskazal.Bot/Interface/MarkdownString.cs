@@ -4,49 +4,45 @@ using System.Linq;
 
 namespace Chotiskazal.Bot.Interface 
 {
-    //Todo cr [optional] Maybe it is better to rename it to 'Markdown'? Obviously it is an object ;)
-    public class MarkdownObject {
-        //todo cr - rename to sumething like 'bypass string' or 'raw' string to identify it  
-        private readonly string _str;
+    public class Markdown {
+        private readonly string _rawStr;
         private readonly string _markdownString;
+        public static readonly Markdown Empty = new Markdown("", "");
         
-        private MarkdownObject(string str, string markdownString) {
-            _str = str;
+        private Markdown(string rawStr, string markdownString) {
+            _rawStr = rawStr;
             _markdownString = markdownString;
         }
         
-        public static MarkdownObject Escaped(string str) {
-            var escapedStr = MarkdownObject.ConvertToMarkdownString(str);
-            return new MarkdownObject(str, escapedStr);        
+        public static Markdown Escaped(string str) {
+            var escapedStr = ConvertToMarkdownString(str);
+            return new Markdown(str, escapedStr);        
         }
-        //todo cr as the markdown is immutable - make Empty just a static readonly property
-        //No need to create it every time
-        public static MarkdownObject Empty() {
-            return new MarkdownObject("", "");        
-        }
+     
         //todo cr [optional] - consider to move all following methods to expression body
-        //todo cr naming - Did you mean Bypassed? 
-        public static MarkdownObject ByPassed(string str) {
-            return new MarkdownObject(str, str);
+        //todo answer Escaped and Bypassed are method of creation Markdown. How To move them to expression?
+        public static Markdown Bypassed(string str) {
+            return new Markdown(str, str);
         }
         
-        public static MarkdownObject operator +(MarkdownObject s1, MarkdownObject s2) {
-            return MarkdownObject.ByPassed(s1.GetMarkdownString() + s2.GetMarkdownString());
+        public static Markdown operator +(Markdown s1, Markdown s2) {
+            return Bypassed(s1.GetMarkdownString() + s2.GetMarkdownString());
         }
         //todo cr - move to extension method, or instance method
-        public static bool IsNullOrEmpty(MarkdownObject s) {
-            return s == null || s._str == "";
+        //todo answer - how to move to extension. It use private field
+        public static bool IsNullOrEmpty(Markdown s) {
+            return s == null || s._rawStr == "";
         }
         
         public string GetOrdinalString() {
-            return _str;
+            return _rawStr;
         }
         
         public string GetMarkdownString() {
             return _markdownString;
         }
-        //todo cr - make it private
-        public static string ConvertToMarkdownString(string str) {
+
+        private static string ConvertToMarkdownString(string str) {
             var a = str.Replace(@"\", "\\\\")
                     .Replace("`","\\`")
                     .Replace("*", "\\*")
@@ -67,36 +63,4 @@ namespace Chotiskazal.Bot.Interface
             return a;
         }
     }
-//todo cr - move to separate file
-//todo cr - move all methods to "expression body"
-public static class MarkdownExtension 
-{
-    public static MarkdownObject AddNewLine(this MarkdownObject m) {
-        return m + MarkdownObject.ByPassed("\r\n");
-    }
-    
-    public static MarkdownObject ToSemiBold(this MarkdownObject m) {
-        return MarkdownObject.ByPassed("*")+m+MarkdownObject.ByPassed("*") ;
-    }
-    //todo cr - what is the difference between ToPreFormattedMono and ToMono methods?
-    public static MarkdownObject ToPreFormattedMono(this MarkdownObject m) {
-        return MarkdownObject.ByPassed("```\r\n")+m+MarkdownObject.ByPassed("\r\n```") ;
-    }
-    //
-    public static MarkdownObject ToMono(this MarkdownObject m) {
-        return MarkdownObject.ByPassed("```\r\n")+m+MarkdownObject.ByPassed("\r\n```") ;
-    }
-    
-    public static MarkdownObject ToItalic(this MarkdownObject m) {
-        return MarkdownObject.ByPassed("_")+m+MarkdownObject.ByPassed("_") ;
-    }
-    public static MarkdownObject AddEscaped(this MarkdownObject m , string s) {
-        return m+ MarkdownObject.Escaped(s) ;
-    }
-    //todo cr - did you mean AddBypassed?
-    public static MarkdownObject AddByPassed(this MarkdownObject m , string s) {
-        return m+ MarkdownObject.ByPassed(s);
-    }
-}
-
 }
