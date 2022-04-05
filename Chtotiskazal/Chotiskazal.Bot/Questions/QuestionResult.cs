@@ -43,14 +43,14 @@ namespace Chotiskazal.Bot.Questions
         /// <summary>
         /// Text with results, showing after question before next question
         /// </summary>
-        public Markdown OpenResultsTextMarkdown => Markdown.IsNullOrEmpty(_openResultsText)
+        public Markdown OpenResultsTextMarkdown => _openResultsText.IsNullOrEmpty()
             ?Markdown.Empty
             :Markdown.Escaped(Emoji+" ") +_openResultsText;
 
         /// <summary>
         /// Text with results, showing after question before next hideous question
         /// </summary>
-        public Markdown ResultsBeforeHideousTextMarkdown => Markdown.IsNullOrEmpty(_resultsBeforeHideousText)
+        public Markdown ResultsBeforeHideousTextMarkdown => _resultsBeforeHideousText.IsNullOrEmpty()
             ?Markdown.Empty
             :Markdown.Escaped(Emoji +" ") + _resultsBeforeHideousText;
 

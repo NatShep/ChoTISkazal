@@ -145,7 +145,7 @@ namespace Chotiskazal.Bot.ChatFlows
                         throw new NotSupportedException(result.Results.ToString());
                 }
 
-                if (!Markdown.IsNullOrEmpty(result.OpenResultsTextMarkdown))
+                if (!result.OpenResultsTextMarkdown.IsNullOrEmpty())
                     await Chat.SendMarkdownMessageAsync(result.OpenResultsTextMarkdown);
 
                 lastExamResult = result;
