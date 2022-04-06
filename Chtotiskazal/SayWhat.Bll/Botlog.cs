@@ -1,4 +1,5 @@
 ﻿﻿using System;
+ using SayWhat.Bll.Statistics;
  using SayWhat.MongoDAL.QuestionMetrics;
  using Serilog;
  using Serilog.Events;
@@ -8,9 +9,11 @@
 
  namespace SayWhat.Bll
 {
-    public static class Botlog{
-        
+
+public static class Botlog{
+            
         public static QuestionMetricRepo QuestionMetricRepo { get; set; }
+        public static BotStatisticCollector Collectors { get; } = new();
 
         private static ILogger _alarmLog;
         public static void CreateTelegramLogger(string apiKey, string chatId)
@@ -39,6 +42,7 @@
             _log.Error("msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
             if (writeToTelegram)
                 _alarmLog?.Error("❗ " + " msg {@ChatInfo} ", new {ChatInfo = chatId, msg});
+            Collectors.OnError();
         }
         public static void WriteInfo(string msg,bool writeToTelegram=false)
         {
@@ -59,18 +63,32 @@
         {
             _log.Information("Update metric info: {@metricInfo} ", new {UserTelegramId = userTelegramId, MetricId=metricId,Param=param,SwElapsed=swElapsed});
         }
-
+        
         public static void SaveQuestionMetricInfo(QuestionMetric questionMetric, string chatId)
         {
             _log.Information("Save question metric {@ChatInfo} {@questionMetric}", new {ChatInfo=chatId}, questionMetric);
             QuestionMetricRepo?.Add(questionMetric);
         }
 
+        public static void SaveTranslationRequstedMetrics(long? userTelegramId, bool isRussian) 
+            => Collectors.OnTranslationRequest(userTelegramId, isRussian);
+        
+        public static void SaveTranslationSelectedMetrics(long? userTelegramId) 
+            => Collectors.OnTranslationSelected(userTelegramId);
+
+        public static void SaveTranslationRemovedMetrics(long? userTelegramId) 
+            => Collectors.OnTranslationRemoved(userTelegramId);
+        public static void SaveAddWordFromLearningSet(long? userTelegramId) => Collectors.OnNewWordFromLearningSet(userTelegramId);
+        public static void SaveTranslationNotFound(long? userTelegramId) => Collectors.OnTranslationNotFound(userTelegramId);
+
+
         public static void RegisterExamInfo(long? userTelegramId, DateTime started, int questionsCount,
             int questionsPassed)
         {
             _log.Information("Register Exam {@ChatInfo} {@Exam}", new {ChatInfo = userTelegramId},
                 new {Started = started, QuestionsCount = questionsCount, QuestionPassed = questionsPassed});
+            Collectors.OnExam(userTelegramId, questionsCount, questionsPassed);
         }
-    }
+        
+}
 }

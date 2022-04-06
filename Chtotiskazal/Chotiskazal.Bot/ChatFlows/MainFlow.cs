@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
+using Telegram.Bot.Types;
 
 namespace Chotiskazal.Bot.ChatFlows {
 
@@ -39,6 +41,7 @@ public class MainFlow {
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
     private AddBotCommandHandler _addWordCommandHandler;
     public ChatIO ChatIo { get; }
+    public UserModel User => Chat?.User;
 
     public async Task Run() {
         try

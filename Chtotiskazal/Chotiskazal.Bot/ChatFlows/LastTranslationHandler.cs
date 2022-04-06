@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using Telegram.Bot.Types;
@@ -55,10 +56,15 @@ namespace Chotiskazal.Bot.ChatFlows
             _areSelected[index] = !_areSelected[index];
 
             if (_areSelected[index]) //if become selected
+            {
                 await _addWordService.AddTranslationToUser(Chat.User, _translations[index].GetEnRu());
-            else
+                Botlog.SaveTranslationSelectedMetrics(Chat.User.TelegramId);
+            }
+            else {
                 await _addWordService.RemoveTranslationFromUser(Chat.User, _translations[index].GetEnRu());
-            
+                Botlog.SaveTranslationRemovedMetrics(Chat.User.TelegramId);
+            }
+
             var buttons = CreateButtons();
 
             await Chat.EditMessageButtons(messageId,buttons.ToArray());

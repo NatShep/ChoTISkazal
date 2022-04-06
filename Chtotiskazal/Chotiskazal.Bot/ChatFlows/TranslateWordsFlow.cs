@@ -55,6 +55,7 @@ internal class TranslateWordsFlow {
         if (translations?.Any() != true)
         {
             await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
+            Botlog.SaveTranslationNotFound(Chat.User.TelegramId);
             return null;
         }
         
@@ -80,6 +81,7 @@ internal class TranslateWordsFlow {
         _translationSelectedUpdateHook.SetLastTranslationHandler(handler);
 
         await handler.SendTranslationMessage(word, transcription, selectionMarks);
+        Botlog.SaveTranslationRequstedMetrics(Chat.User.TelegramId, word.IsRussian());
 
         if (word.IsRussian()) Chat.User.OnRussianWordTranslationRequest();
         else Chat.User.OnEnglishWordTranslationRequest();

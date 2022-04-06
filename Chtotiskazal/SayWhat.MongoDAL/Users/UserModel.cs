@@ -79,8 +79,8 @@ public class UserModel {
     [BsonElement("gs")] private double _gamingScore;
 
     #endregion
-    
 
+    public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
     public int OutdatedWordsCount => _outdatedWordsCount;
     public long? TelegramId => _telegramId;

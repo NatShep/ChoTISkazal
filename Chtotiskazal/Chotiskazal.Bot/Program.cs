@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Statistics;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
@@ -102,6 +103,8 @@ namespace Chotiskazal.Bot
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
+            StatisticScheduler.Launch(TimeSpan.FromDays(1), () => 
+                Chats.ToArray().Select(c => c.Value.User).Where(c => c != null).ToArray());
             Botlog.WriteInfo($"... and here i go!",false);
             // workaround for infinity awaiting
              new TaskCompletionSource<bool>().Task.Wait();

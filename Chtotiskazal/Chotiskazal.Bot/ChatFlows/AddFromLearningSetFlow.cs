@@ -161,6 +161,7 @@ public class AddFromLearningSetFlow {
                 allowed => allowed.Equals(translation.TranslatedText, StringComparison.InvariantCultureIgnoreCase)));
         foreach (var tranlsation in allowedTranlsations)
             await _addWordService.AddTranslationToUser(Chat.User, tranlsation);
+        Botlog.SaveAddWordFromLearningSet(Chat.User.TelegramId);
     }
 
     private InlineKeyboardButton[][] GetWordKeyboard() =>
