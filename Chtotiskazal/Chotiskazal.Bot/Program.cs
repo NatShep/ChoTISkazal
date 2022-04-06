@@ -106,9 +106,7 @@ namespace Chotiskazal.Bot
             
             _botClient.StartReceiving();
             
-            ReportSenderJob.Launch(
-                TimeSpan.FromDays(1), 
-                telegramLogger, () => Chats.ToArray().Select(c => c.Value.User).Where(c => c != null).ToArray());
+            ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
             
             Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting
@@ -200,15 +198,16 @@ namespace Chotiskazal.Bot
         {
             var task = newMain.Run();
             task.ContinueWith(
-                (t) =>
+                t =>
                 {
-                    Reporter.ReportError(chat.Id, $"Main chatroom failed",t.Exception);
+                    Reporter.ReportError(chat.Id, $"Main chatroom failed", newMain.ChatIo?.TryGetChatHistory(), t.Exception);
                     Chats.TryRemove(chat.Id, out _);
                 }, TaskContinuationOptions.OnlyOnFaulted);
         }
         private static void BotClientOnOnUpdate(object sender, UpdateEventArgs e)
         {
             long? chatId = null;
+            MainFlow chatRoom = null;
             try
             {
                 Reporter.WriteInfo($"Trying to got query: {e.Update.Type}...");
@@ -217,7 +216,7 @@ namespace Chotiskazal.Bot
                 {
                     chatId = e.Update.Message.Chat?.Id;
                     Reporter.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
-                    var chatRoom = GetOrCreate(e.Update.Message.Chat);
+                    chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
                 else if (e.Update.CallbackQuery != null)
@@ -225,13 +224,13 @@ namespace Chotiskazal.Bot
                     chatId = e.Update.CallbackQuery.Message.Chat?.Id;
                     Reporter.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
 
-                    var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
+                    chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
             }
             catch (Exception ex)
             {
-                Reporter.ReportError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}", ex);
+                Reporter.ReportError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}",chatRoom?.ChatIo?.TryGetChatHistory(), ex);
             }
         }
 

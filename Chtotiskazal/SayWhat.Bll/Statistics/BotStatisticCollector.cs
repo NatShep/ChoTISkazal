@@ -10,17 +10,15 @@ public class BotStatisticCollector {
         => _current.OnTranslationRequest(userTelegramId, isRussian);
     public void OnTranslationSelected(long? userTelegramId) 
         => _current.OnTranslationSelected(userTelegramId);
-    public void OnExam(
-        long? userTelegramId,
-        int questionsCount,
-        int questionsPassed) 
+    public void OnExam(long? userTelegramId, int questionsCount, int questionsPassed) 
         => _current.OnExam(userTelegramId, questionsCount, questionsPassed);
     public void OnError() => _current.OnError();
     public void OnTranslationRemoved(long? userTelegramId) => _current.OnTranslationRemoved(userTelegramId);
-
     public void OnTranslationNotFound(long? userTelegramId) => _current.OnTranslationNotFound(userTelegramId);
     public void OnNewWordFromLearningSet(long? userTelegramId) => _current.OnNewWordFromLearningSet(userTelegramId);
     public void OnNewUser() => _current.OnNewUser();
+    public void OnUserInput(long? userTelegramId) => _current.OnUserInput(userTelegramId);
+    public void OnCommand(long chatIdIdentifier, string eCommand) => _current.OnCommand(chatIdIdentifier, eCommand);
 }
 }
 

@@ -9,6 +9,7 @@ public class BotStatisticMetrics {
     private HashSet<long> _usersThatTranslatedSomething = new(100);
     private HashSet<long> _usersThatChoosSomeTranslation = new(100);
     private HashSet<long> _usersThatPassedExams = new(100);
+    private HashSet<long> _userActivity = new(100);
     private int _questionsAsked;
     private int _questionsPassed;
     private int _examsFinished;
@@ -26,6 +27,7 @@ public class BotStatisticMetrics {
     public int TranslationRequested => _translationRequested;
     public int TranslationChoosen => _translationChoosen;
     public int Errors => _errors;
+    public int ActiveUsers => _userActivity.Count;
     public int UsersThatPassedExams => _usersThatPassedExams.Count;
     public int UsersThatChoosSomeTranslation => _usersThatChoosSomeTranslation.Count;
     public int UsersThatTranslatedSomething => _usersThatTranslatedSomething.Count;
@@ -41,12 +43,14 @@ public class BotStatisticMetrics {
     public void OnTranslationRequest(long? userTelegramId, bool isRussian) {
         if (userTelegramId.HasValue)
             _usersThatTranslatedSomething.Add(userTelegramId.Value);
+        OnUserInput(userTelegramId);
         _translationRequested++;
     }
 
     public void OnTranslationSelected(long? userTelegramId) {
         if (userTelegramId.HasValue)
             _usersThatChoosSomeTranslation.Add(userTelegramId.Value);
+        OnUserInput(userTelegramId);
         _translationChoosen++;
     }
     public void OnExam(
@@ -55,22 +59,32 @@ public class BotStatisticMetrics {
         int questionsPassed) {
         if (userTelegramId.HasValue)
             _usersThatPassedExams.Add(userTelegramId.Value);
+        OnUserInput(userTelegramId);
         _examsFinished++;
         _questionsAsked += questionsCount;
         _questionsPassed += questionsPassed;
     }
 
     public void OnTranslationRemoved(long? userTelegramId) {
+        OnUserInput(userTelegramId);
         _translationRemoved++;
     }
     public void OnTranslationNotFound(long? userTelegramId) {
+        OnUserInput(userTelegramId);
         _tranlationNotFound++;
     }
     public void OnNewWordFromLearningSet(long? userTelegramId) {
+        OnUserInput(userTelegramId);
         _wordsFromLearningSetAdded++;
     }
     public void OnNewUser() {
         _newUsers++;
     }
+    public void OnUserInput(long? userTelegramId) {
+        if(userTelegramId!=null)
+            _userActivity.Add(userTelegramId.Value);
+    }
+    public void OnCommand(long chatIdIdentifier, string eCommand) 
+        => OnUserInput(chatIdIdentifier);
 }
 }

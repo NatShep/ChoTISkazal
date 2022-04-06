@@ -63,12 +63,13 @@ public class MainFlow {
                 }
                 catch (ProcessInterruptedWithMenuCommand e)
                 {
+                    Reporter.ReportCommand(e.Command, ChatIo.ChatId.Identifier);
                     //main scenario may be interrupted with main menu command
                     mainMenuCommandOrNull = (e.Command, e.CommandHandler);
                 }
                 catch (Exception e)
                 {
-                    Reporter.ReportError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
+                    Reporter.ReportError(ChatIo.ChatId.Identifier, $"Main failure for{ChatIo.ChatId.Username}",ChatIo?.TryGetChatHistory(),e);
                     await ChatIo.SendMessageAsync(Chat.Texts.OopsSomethingGoesWrong);
                     throw;
                 }
@@ -76,7 +77,7 @@ public class MainFlow {
         }
         catch (Exception e)
         {
-            Reporter.ReportError(ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}");
+            Reporter.ReportError(ChatIo?.ChatId?.Identifier, $"Fatal on run",ChatIo?.TryGetChatHistory(), e);
             throw;
         }
     }

@@ -18,8 +18,9 @@ public class ChatIO {
     public IBotCommandHandler[] CommandHandlers { get; set; }
     public readonly ChatId ChatId;
     private readonly Channel<Update> _senderChannel;
-    private IChatUpdateHook[] _updateHooks = Array.Empty<IChatUpdateHook>();
+    private readonly SmallChatHistory _chatHistory = new SmallChatHistory(5);
 
+    private IChatUpdateHook[] _updateHooks = Array.Empty<IChatUpdateHook>();
     public ChatIO(TelegramBotClient client, Chat chat) {
         _client = client;
         ChatId = chat.Id;
@@ -27,12 +28,23 @@ public class ChatIO {
             new BoundedChannelOptions(3)
                 { SingleReader = true, SingleWriter = true });
     }
-    
+
+    public string[] TryGetChatHistory() {
+        try {
+            return _chatHistory.GetHistory();
+        }
+        catch (Exception e) {
+            Reporter.ReportError(ChatId.Identifier,"Cannot get chat history", e);
+            return Array.Empty<string>();
+        }
+    }
+
     public void AddUpdateHook(IChatUpdateHook hook)
         => _updateHooks = _updateHooks.Append(hook).ToArray();
 
     internal void OnUpdate(Update update) {
-        Reporter.WriteInfo($"Received msg from chat {ChatId.Identifier} {ChatId.Username}");
+        _chatHistory.OnInput(update);
+        Reporter.OnUserInput(ChatId.Identifier);
         foreach (var hook in _updateHooks)
         {
             if (hook.CanBeHandled(update))
@@ -41,26 +53,34 @@ public class ChatIO {
                 return;
             }
         }
-
         _senderChannel.Writer.TryWrite(update);
     }
 
-    public Task SendTooltip(string tooltip) => _client.SendTextMessageAsync(ChatId, tooltip);
+    public Task SendTooltip(string tooltip) {
+        _chatHistory.OnOutputTooltip(tooltip);
+        return _client.SendTextMessageAsync(ChatId, tooltip);
+    }
 
     public async Task<int> SendMessageAsync(string message) {
+        _chatHistory.OnOutputMessage(message);
         var ans = await _client.SendTextMessageAsync(ChatId, message);
         return ans.MessageId;
     }
 
-    public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons)
-        => _client.SendTextMessageAsync(
+    public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons) {
+        _chatHistory.OnOutputMessage(message,buttons);
+        return _client.SendTextMessageAsync(
             ChatId, message,
             replyMarkup: new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
+    }
 
-    public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons)
-        => _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
+    public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons) {
+        _chatHistory.OnOutputMessage(message,buttons);
+        return _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
+    }
 
     public async Task<int> SendMarkdownMessageAsync(string message, params InlineKeyboardButton[] buttons) {
+        _chatHistory.OnOutputMarkdownMessage(message, buttons);
         var answer = await _client.SendTextMessageAsync(
             ChatId, message,
             replyMarkup: new InlineKeyboardMarkup(buttons.Select(b => new[] { b })),
@@ -68,15 +88,19 @@ public class ChatIO {
         return answer.MessageId;
     }
 
-    public async Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons)
-        => (await _client.SendTextMessageAsync(
+    public async Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons) {
+        _chatHistory.OnOutputMardownMessage(message,buttons);
+
+        return (await _client.SendTextMessageAsync(
             ChatId, message,
             replyMarkup: new InlineKeyboardMarkup(buttons),
             parseMode: ParseMode.MarkdownV2)).MessageId;
+    }
 
     public async Task<Update> WaitUserInputAsync() {
         Reporter.WriteInfo($"Wait for update", ChatId);
         var upd = await _senderChannel.Reader.ReadAsync();
+        _chatHistory.OnInput(upd);
         string text = null;
         if (upd.CallbackQuery != null)
         {
@@ -93,12 +117,11 @@ public class ChatIO {
             if (botCommandHandler.Acceptable(text))
             {
                 var argument = botCommandHandler.ParseArgument(text);
-                Reporter.WriteInfo($"Interrupt flow with command {text}", ChatId);
                 throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
             }
         }
 
-        Reporter.WriteInfo($"Got update", ChatId);
+        Reporter.OnUserInput(ChatId.Identifier);
         return upd;
     }
 
@@ -106,8 +129,10 @@ public class ChatIO {
         while (true)
         {
             var res = await WaitUserInputAsync();
-            if (res.CallbackQuery != null)
-                return res.CallbackQuery.Data;
+            var data = res.CallbackQuery?.Data;
+            if (data != null) {
+                return data;
+            }
         }
     }
 
@@ -138,12 +163,15 @@ public class ChatIO {
         }
     }
 
-    public Task SendTyping()
-        => _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
+    public Task SendTyping() {
+        _chatHistory.OnSendTyping();
+        return _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
+    }
 
     public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[] buttons) {
         try
         {
+            _chatHistory.OnEditMessageButtons(buttons);
             await _client.EditMessageReplyMarkupAsync(
                 ChatId, messageId,
                 new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
@@ -158,6 +186,7 @@ public class ChatIO {
     public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[][] buttons) {
         try
         {
+            _chatHistory.OnEditMessageButtons(buttons);
             await _client.EditMessageReplyMarkupAsync(
                 ChatId, messageId,
                 new InlineKeyboardMarkup(buttons));
@@ -172,6 +201,7 @@ public class ChatIO {
     public async Task<bool> EditMessageText(int messageId, string newText) {
         try
         {
+            _chatHistory.OnEditMessageText(newText);
             await _client.EditMessageTextAsync(ChatId, messageId, newText);
             return true;
         }
@@ -185,6 +215,7 @@ public class ChatIO {
         int messageId, string newText, InlineKeyboardMarkup inlineKeyboard = null) {
         try
         {
+            _chatHistory.OnEditMarkdonMessageText(newText);
             await _client.EditMessageTextAsync(
                 ChatId, messageId, newText, parseMode: ParseMode.MarkdownV2, replyMarkup: inlineKeyboard);
             return true;
@@ -198,6 +229,7 @@ public class ChatIO {
     public async Task<bool> AnswerCallbackQueryWithTooltip(string callbackQueryId, string s) {
         try
         {
+            _chatHistory.OnAnswerWithTooltip(s);
             await _client.AnswerCallbackQueryAsync(callbackQueryId, s, false);
             return true;
         }
@@ -210,6 +242,7 @@ public class ChatIO {
     public async Task ConfirmCallback(string callbackQueryId) {
         try
         {
+            _chatHistory.InputConfirmCallback();
             await _client.AnswerCallbackQueryAsync(callbackQueryId);
         }
         catch (Exception)
