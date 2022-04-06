@@ -56,7 +56,7 @@ namespace Chotiskazal.Bot
             questionMetricsRepo.UpdateDb();
             learningSetsRepo.UpdateDb();
             
-            Botlog.QuestionMetricRepo = questionMetricsRepo;
+            Reporter.QuestionMetricRepo = questionMetricsRepo;
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
             _localDictionaryService    = new LocalDictionaryService(dictionaryRepo,examplesRepo);
@@ -71,12 +71,14 @@ namespace Chotiskazal.Bot
             QuestionSelector.Singletone = new QuestionSelector(_localDictionaryService);
     
             _botClient = new TelegramBotClient(_settings.TelegramToken);
+
+            var telegramLogger = TelegramLogger.CreateLogger(_settings.BotHelperToken, _settings.ControlPanelChatId);
             
-            Botlog.CreateTelegramLogger(_settings.BotHelperToken,_settings.ControlPanelChatId);
+            Reporter.SetTelegramLogger(telegramLogger);
 
             var me = _botClient.GetMeAsync().Result;
-            
-            Botlog.WriteInfo($"Waking up. I am {me.Id}:{me.Username} ",true);
+
+            Reporter.ReportBotWokeup(me.Id, me.Username);
 
             _botClient.SetMyCommandsAsync(new[] {
                 new BotCommand{Command = BotCommands.Help, Description  = "Help and instructions (Помощь и инстркции)"},
@@ -90,22 +92,25 @@ namespace Chotiskazal.Bot
             }).Wait();
             
             var allUpdates =_botClient.GetUpdatesAsync().Result;
-            Botlog.WriteInfo($"{allUpdates.Length} messages were missed");
+            Reporter.WriteInfo($"{allUpdates.Length} messages were missed");
 
             foreach (var update in allUpdates) 
                 OnBotWokeUp(update);
             if (allUpdates.Any())
             {
                 _botClient.MessageOffset = allUpdates.Last().Id + 1;
-                Botlog.WriteInfo($"{Chats.Count} users were waiting for us");
+                Reporter.WriteInfo($"{Chats.Count} users were waiting for us");
             }
             _botClient.OnUpdate+= BotClientOnOnUpdate;
             _botClient.OnMessage += Bot_OnMessage;
             
             _botClient.StartReceiving();
-            StatisticScheduler.Launch(TimeSpan.FromDays(1), () => 
-                Chats.ToArray().Select(c => c.Value.User).Where(c => c != null).ToArray());
-            Botlog.WriteInfo($"... and here i go!",false);
+            
+            ReportSenderJob.Launch(
+                TimeSpan.FromDays(1), 
+                telegramLogger, () => Chats.ToArray().Select(c => c.Value.User).Where(c => c != null).ToArray());
+            
+            Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting
              new TaskCompletionSource<bool>().Task.Wait();
              // it will never happens
@@ -173,7 +178,7 @@ namespace Chotiskazal.Bot
             }
             catch (Exception e)
             {
-                Botlog.WriteError(chat?.Id, "WokeUpfailed"+e, true);
+                Reporter.ReportError(chat?.Id, "WokeUp failed", e);
             }
         }
         private static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
@@ -197,7 +202,7 @@ namespace Chotiskazal.Bot
             task.ContinueWith(
                 (t) =>
                 {
-                    Botlog.WriteError(chat.Id, $"Faulted {t.Exception}",true);
+                    Reporter.ReportError(chat.Id, $"Main chatroom failed",t.Exception);
                     Chats.TryRemove(chat.Id, out _);
                 }, TaskContinuationOptions.OnlyOnFaulted);
         }
@@ -206,27 +211,27 @@ namespace Chotiskazal.Bot
             long? chatId = null;
             try
             {
-                Botlog.WriteInfo($"Trying to got query: {e.Update.Type}...");
+                Reporter.WriteInfo($"Trying to got query: {e.Update.Type}...");
 
                 if (e.Update.Message != null)
                 {
                     chatId = e.Update.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
+                    Reporter.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
                     var chatRoom = GetOrCreate(e.Update.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
                 else if (e.Update.CallbackQuery != null)
                 {
                     chatId = e.Update.CallbackQuery.Message.Chat?.Id;
-                    Botlog.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
+                    Reporter.WriteInfo($"Got query: {e.Update.Type}",chatId.ToString());
 
                     var chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
                     chatRoom?.ChatIo.OnUpdate(e.Update);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Botlog.WriteError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}",true);
+                Reporter.ReportError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}", ex);
             }
         }
 
@@ -234,7 +239,7 @@ namespace Chotiskazal.Bot
         {
             if (e.Message.Text != null)
             {
-                Botlog.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
+                Reporter.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.",e.Message.Chat.Id.ToString());
             }
         }
         

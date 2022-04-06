@@ -32,7 +32,7 @@ public class ChatIO {
         => _updateHooks = _updateHooks.Append(hook).ToArray();
 
     internal void OnUpdate(Update update) {
-        Botlog.WriteInfo($"Received msg from chat {ChatId.Identifier} {ChatId.Username}", false);
+        Reporter.WriteInfo($"Received msg from chat {ChatId.Identifier} {ChatId.Username}");
         foreach (var hook in _updateHooks)
         {
             if (hook.CanBeHandled(update))
@@ -75,7 +75,7 @@ public class ChatIO {
             parseMode: ParseMode.MarkdownV2)).MessageId;
 
     public async Task<Update> WaitUserInputAsync() {
-        Botlog.WriteInfo($"Wait for update", ChatId, false);
+        Reporter.WriteInfo($"Wait for update", ChatId);
         var upd = await _senderChannel.Reader.ReadAsync();
         string text = null;
         if (upd.CallbackQuery != null)
@@ -93,12 +93,12 @@ public class ChatIO {
             if (botCommandHandler.Acceptable(text))
             {
                 var argument = botCommandHandler.ParseArgument(text);
-                Botlog.WriteInfo($"Interrupt flow with command {text}", ChatId, false);
+                Reporter.WriteInfo($"Interrupt flow with command {text}", ChatId);
                 throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
             }
         }
 
-        Botlog.WriteInfo($"Got update", ChatId, false);
+        Reporter.WriteInfo($"Got update", ChatId);
         return upd;
     }
 

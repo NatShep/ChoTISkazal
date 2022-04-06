@@ -18,6 +18,7 @@ public class BotStatisticMetrics {
     private int _translationRemoved;
     private int _tranlationNotFound;
     private int _wordsFromLearningSetAdded;
+    private int _newUsers;
     public DateTime Since { get; }
     public int QuestionsAsked => _questionsAsked;
     public int QuestionsPassed => _questionsPassed;
@@ -31,17 +32,18 @@ public class BotStatisticMetrics {
     public int TranslationRemoved => _translationRemoved;
     public int TranlationNotFound => _tranlationNotFound;
     public int WordsFromLearningSetAdded => _wordsFromLearningSetAdded;
+    public int NewUsers => _newUsers;
 
     public void OnError() {
         _errors++;
     }
-    
+
     public void OnTranslationRequest(long? userTelegramId, bool isRussian) {
         if (userTelegramId.HasValue)
             _usersThatTranslatedSomething.Add(userTelegramId.Value);
         _translationRequested++;
     }
-    
+
     public void OnTranslationSelected(long? userTelegramId) {
         if (userTelegramId.HasValue)
             _usersThatChoosSomeTranslation.Add(userTelegramId.Value);
@@ -54,8 +56,8 @@ public class BotStatisticMetrics {
         if (userTelegramId.HasValue)
             _usersThatPassedExams.Add(userTelegramId.Value);
         _examsFinished++;
-        this._questionsAsked += questionsCount;
-        this._questionsPassed += questionsPassed;
+        _questionsAsked += questionsCount;
+        _questionsPassed += questionsPassed;
     }
 
     public void OnTranslationRemoved(long? userTelegramId) {
@@ -66,6 +68,9 @@ public class BotStatisticMetrics {
     }
     public void OnNewWordFromLearningSet(long? userTelegramId) {
         _wordsFromLearningSetAdded++;
+    }
+    public void OnNewUser() {
+        _newUsers++;
     }
 }
 }

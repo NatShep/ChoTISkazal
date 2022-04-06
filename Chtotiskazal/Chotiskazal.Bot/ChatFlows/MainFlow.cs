@@ -5,7 +5,6 @@ using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
-using Telegram.Bot.Types;
 
 namespace Chotiskazal.Bot.ChatFlows {
 
@@ -69,7 +68,7 @@ public class MainFlow {
                 }
                 catch (Exception e)
                 {
-                    Botlog.WriteError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}", true);
+                    Reporter.ReportError(ChatIo.ChatId.Identifier, $"{ChatIo.ChatId.Username} exception: {e}");
                     await ChatIo.SendMessageAsync(Chat.Texts.OopsSomethingGoesWrong);
                     throw;
                 }
@@ -77,7 +76,7 @@ public class MainFlow {
         }
         catch (Exception e)
         {
-            Botlog.WriteError(ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}", true);
+            Reporter.ReportError(ChatIo?.ChatId?.Identifier, $"Fatal on run: {e}");
             throw;
         }
     }
@@ -90,7 +89,7 @@ public class MainFlow {
             var addUserTask = _userService.AddUserFromTelegram(_userInfo);
             await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
             user = await addUserTask;
-            Botlog.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString(), true);
+            Reporter.WriteInfo($"New user {user.TelegramNick}", user.TelegramId.ToString());
         }
 
         Chat = new ChatRoom(ChatIo, user);

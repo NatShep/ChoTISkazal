@@ -85,7 +85,7 @@ class Program {
         _questionMetricsRepo.UpdateDb();
         _learningSetRepo.UpdateDb();
         
-        Botlog.QuestionMetricRepo = _questionMetricsRepo;
+        Reporter.QuestionMetricRepo = _questionMetricsRepo;
 
         _userWordService = new UsersWordsService(_userWordRepo, _examplesRepo);
         _localDictionaryService = new LocalDictionaryService(_localDictionaryRepo, _examplesRepo);

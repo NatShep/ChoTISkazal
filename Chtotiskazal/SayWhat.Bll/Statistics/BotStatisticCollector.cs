@@ -20,6 +20,7 @@ public class BotStatisticCollector {
 
     public void OnTranslationNotFound(long? userTelegramId) => _current.OnTranslationNotFound(userTelegramId);
     public void OnNewWordFromLearningSet(long? userTelegramId) => _current.OnNewWordFromLearningSet(userTelegramId);
+    public void OnNewUser() => _current.OnNewUser();
 }
 }
 

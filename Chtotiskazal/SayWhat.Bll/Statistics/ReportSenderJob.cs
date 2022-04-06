@@ -2,40 +2,41 @@ using System;
 using System.Text;
 using System.Timers;
 using SayWhat.MongoDAL.Users;
+using Serilog;
 
 namespace SayWhat.Bll.Statistics {
-public static class StatisticScheduler {
+public static class ReportSenderJob {
     private static DateTime _launchTime;
     private static Func<UserModel[]> _currentUsersLocator;
     private static Timer _timer;
-
-    public static void Launch(TimeSpan timeSpan, Func<UserModel[]> currentUsersLocator) {
+    private static ILogger _logger;
+    public static void Launch(TimeSpan timeSpan, ILogger logger, Func<UserModel[]> currentUsersLocator) {
         _launchTime = DateTime.Now;
         _timer = new Timer(timeSpan.TotalMilliseconds);
-        _timer.Elapsed += (sender, args) => {
+        _currentUsersLocator = currentUsersLocator;
+        if(logger==null)
+            return;
+        _timer.Elapsed += (_, _) => {
             var message = GetStatisticMessage(_currentUsersLocator());
-            Botlog.WriteInfo(message,true);
+            logger.Error(message);
         };
         _timer.Enabled = true;
     }
 
     private static  string GetStatisticMessage(UserModel[] currentUsers) {
-        var counters = Botlog.Collectors.Flush();
+        var counters = Reporter.Collector.Flush();
         var from = counters.Since;
         
         int activeUsers = 0;
-        int newUsers = 0;
-
+        
         foreach (var user in currentUsers) {
             if (user.LastActivity >= from)
                 activeUsers++;
-            if (user.Created >= from)
-                newUsers++;
         }
         
         var sb = new StringBuilder($"Stats for last {DateTime.Now- from}\r\n");
         sb.AppendLine($"Alive: {DateTime.Now- _launchTime}");
-        sb.AppendLine($"New    users: {newUsers}");
+        sb.AppendLine($"New    users: {counters.NewUsers}");
         sb.AppendLine($"Active users: {activeUsers}");
         sb.AppendLine($"Users in pool: {currentUsers.Length}");
         sb.AppendLine($"Errors: {counters.Errors}");

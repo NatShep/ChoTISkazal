@@ -58,11 +58,11 @@ namespace Chotiskazal.Bot.ChatFlows
             if (_areSelected[index]) //if become selected
             {
                 await _addWordService.AddTranslationToUser(Chat.User, _translations[index].GetEnRu());
-                Botlog.SaveTranslationSelectedMetrics(Chat.User.TelegramId);
+                Reporter.ReportTranslationPairSelected(Chat.User.TelegramId);
             }
             else {
                 await _addWordService.RemoveTranslationFromUser(Chat.User, _translations[index].GetEnRu());
-                Botlog.SaveTranslationRemovedMetrics(Chat.User.TelegramId);
+                Reporter.ReportTranslationPairRemoved(Chat.User.TelegramId);
             }
 
             var buttons = CreateButtons();

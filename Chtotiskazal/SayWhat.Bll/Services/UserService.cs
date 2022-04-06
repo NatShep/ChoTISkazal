@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.Bll.Services
@@ -28,12 +29,12 @@ namespace SayWhat.Bll.Services
                     telegramNick: info.UserNick, 
                     source:       UserSource.Telegram);
                 await _repository.Add(user);
-                Botlog.WriteInfo($"Register new user - {user.TelegramNick}",user.TelegramId.ToString(),true);
+                Reporter.ReportNewUser(user.TelegramNick, user.TelegramId.ToString());
                 return user;
             }
-            catch
+            catch(Exception e)
             {
-                Botlog.WriteError(info.TelegramId,$"Can't add new user {info.TelegramId}",true);
+                Reporter.ReportError(info.TelegramId,$"Can't add new user {info.TelegramId}",e);
                 return null;
             }
         }

@@ -121,14 +121,14 @@ namespace Chotiskazal.Bot.ChatFlows
                         questionsCount++;
                         questionsPassed++;
                         questionMetric.OnExamFinished(word.Score, true);
-                        Botlog.SaveQuestionMetricInfo(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
                         await succTask;
                         Chat.User.OnQuestionPassed(word.Score - originRate);
                         break;
                     case ExamResult.Failed:
                         var failureTask = _usersWordsService.RegisterFailure(word);
                         questionMetric.OnExamFinished(word.Score, false);
-                        Botlog.SaveQuestionMetricInfo(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
                         questionsCount++;
                         await failureTask;
                         Chat.User.OnQuestionFailed(word.Score - originRate);
@@ -143,7 +143,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
                 lastExamResult = result;
 
-                Botlog.RegisterExamInfo(Chat.User.TelegramId, started, questionsCount, questionsPassed);
+                Reporter.ReportExamPassed(Chat.User.TelegramId, started, questionsCount, questionsPassed);
             }
 
             Chat.User.OnLearningDone();
