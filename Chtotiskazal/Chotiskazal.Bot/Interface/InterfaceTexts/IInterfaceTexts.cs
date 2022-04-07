@@ -1,51 +1,46 @@
 ﻿using SayWhat.Bll.Dto;
 
-namespace Chotiskazal.Bot.InterfaceLang {
+// ReSharper disable InconsistentNaming
+
+namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
 public interface IInterfaceTexts {
     string more { get; }
     string[] ShortDayNames { get; }
-    string thenClickStartMarkdown { get; }
+    string thenClickStart { get; }
     string ChooseTheTranslation { get; }
     string translatesAs { get; }
     string ChooseMissingWord { get; }
-    string Passed1Markdown { get; }
+    string Passed1 { get; }
     string OriginWas { get; }
     string EnterMissingWord { get; }
     string TypoAlmostRight { get; }
-    object FailedOriginExampleWasMarkdown { get; }
-    object FailedOriginExampleWas2 { get; }
-    object FailedOriginExampleWas2Markdown { get; }
-    string OutOfScopeTranslationMarkdown { get; }
-    string FailedTranslationWasMarkdown { get; }
+    string OutOfScopeTranslation { get; }
+    string FailedTranslationWas { get; }
     string ItIsNotRightTryAgain { get; }
     string SeeTheTranslation { get; }
-    string DoYouKnowTranslationMarkdown { get; }
+    string DoYouKnowTranslation { get; }
     string TranslationIs { get; }
     string DidYouGuess { get; }
     string YesButton { get; }
     string NoButton { get; }
-    string PassedOpenIHopeYouWereHonestMarkdown { get; }
-    string PassedHideousWellMarkdown { get; }
+    string PassedOpenIHopeYouWereHonest { get; }
+    string PassedHideousWell { get; }
     string PassedHideousWell2 { get; }
-    string FailedOpenButYouWereHonestMarkdown { get; }
-    string FailedHideousHonestyIsGoldMarkdown { get; }
+    string FailedOpenButYouWereHonest { get; }
+    string FailedHideousHonestyIsGold { get; }
     string IsItRightTranslation { get; }
     string Mistaken { get; }
     string ChooseWhichWordHasThisTranscription { get; }
     string RetryAlmostRightWithTypo { get; }
     string ShowTheTranslationButton { get; }
-    string WriteTheTranslationMarkdown { get; }
+    string WriteTheTranslation { get; }
     string RightTranslationWas { get; }
     string CorrectTranslationButQuestionWasAbout { get; }
     string LetsTryAgain { get; }
     string ChooseTheTranscription { get; }
-    string WordsInPhraseAreShuffledWriteThemInOrderMarkdown { get; }
-    string FailedDefaultMarkdown { get; }
-    string PassedDefaultMarkdown { get; }
-    string IgnoredDefaultMarkdown { get; }
-    string FailedHideousDefaultMarkdown { get; }
-    string PassedHideousDefaultMarkdown { get; }
+    string FailedHideousDefault { get; }
+    string PassedHideousDefault { get; }
     string IgnoredHideousDefault { get; }
     string TranslateButton { get; }
     string ContinueTranslateButton { get; }
@@ -56,20 +51,18 @@ public interface IInterfaceTexts {
     string DidYouWriteSomething { get; }
     string EnterWordOrStart { get; }
     string NoTranslationsFound { get; }
-    string LearningCarefullyStudyTheListMarkdown { get; }
     string StartButton { get; }
     string CancelButton { get; }
-    object OneMoreLearnButton { get; }
-    object LearningDone { get; }
-    object WordsInTestCount { get; }
-    object YouHaveLearnedOneWord { get; }
-    object YouForgotOneWord { get; }
-    object EarnedScore { get; }
-    object TotalScore { get; }
-    object DontPeekUpward { get; }
+    string OneMoreLearnButton { get; }
+    string LearningDone { get; }
+    string WordsInTestCount { get; }
+    string YouHaveLearnedOneWord { get; }
+    string YouForgotOneWord { get; }
+    string EarnedScore { get; }
+    string TotalScore { get; }
+    string DontPeekUpward { get; }
     string NeedToAddMoreWordsBeforeLearning { get; }
-    object less { get; }
-
+    string less { get; }
     string ZenRecomendationAfterExamWeNeedMoreNewWords { get; }
     string Zen1WeNeedMuchMoreNewWords { get; }
     string Zen2TranslateNewWords { get; }
@@ -78,16 +71,14 @@ public interface IInterfaceTexts {
     string Zen4PassExamsAndTranslateNewWords { get; }
     string Zen5PassExams { get; }
     string Zen6YouNeedToLearn { get; }
-    object StatsYourStats { get; }
-    object StatsWordsAdded { get; }
-    object StatsLearnedWell { get; }
-    object StatsScore { get; }
-    object StatsExamsPassed { get; }
-    object StatsThisMonth { get; }
-    object StatsThisDay { get; }
-    object StatsActivityForLast7Weeks { get; }
-    string HelpMarkdown { get; }
-    string MainMenuTextMarkdown { get; }
+    string StatsYourStats { get; }
+    string StatsWordsAdded { get; }
+    string StatsLearnedWell { get; }
+    string StatsScore { get; }
+    string StatsExamsPassed { get; }
+    string StatsThisMonth { get; }
+    string StatsThisDay { get; }
+    string StatsActivityForLast7Weeks { get; }
     string ActionIsNotAllowed { get; }
     string OopsSomethingGoesWrong { get; }
     string InterfaceLanguageSetuped { get; }
@@ -103,22 +94,32 @@ public interface IInterfaceTexts {
     string TodaysGoal { get;  }
     string Exams { get; }
     string TodayGoalReached { get; }
-    string OutOfScopeWithCandidateMarkdown(string otherMeaning);
-    string YouHaveATypoLetsTryAgainMarkdown(string text);
-    string FailedMistakenMarkdown(string text);
-    string HereAreTheTranslationMarkdown(string word, string tr);
+    string OutOfScopeWithCandidate(string otherMeaning);
+    string FailedMistaken(string text);
     string MessageAfterTranslationIsSelected(Translation translation);
     string YouHaveLearnedWords(in int count);
     string YouForgotCountWords(in int forgottenWordsCount);
     string MessageAfterTranslationIsDeselected(Translation allTranslation);
-    string LearnMoreWordsMarkdown(in int length);
-    string LearnSomeWordsMarkdown(in int length);
-    string PageXofYMarkdown(in int number, in int count);
-    string XofYMarkdown(in int x, in int y);
     string WordIsAddedForLearning(string word);
     string WordIsSkippedForLearning(string word);
     string LearningSetNotFound(string argument);
     string AllWordsAreLearnedMessage(string setShortName);
+
+    Markdown FailedOriginExampleWas { get; }
+    Markdown FailedOriginExampleWas2 { get; }
+    Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }
+    Markdown FailedDefault { get; }
+    Markdown PassedDefault { get; }
+    Markdown IgnoredDefault { get; }
+    Markdown LearningCarefullyStudyTheList { get; }
+    Markdown Help { get; }
+    Markdown MainMenuText { get; }
+    Markdown YouHaveATypoLetsTryAgain(string text);
+    Markdown HereAreTheTranslation(string word, string tr);
+    Markdown LearnMoreWords(in int length);
+    Markdown LearnSomeWords(in int length);
+    Markdown PageXofY(in int number, in int count);
+    Markdown XofY(in int x, in int y);
 }
 
 }

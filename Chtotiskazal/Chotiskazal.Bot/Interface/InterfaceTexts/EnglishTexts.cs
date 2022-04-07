@@ -1,13 +1,14 @@
 ﻿using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceLang
+namespace Chotiskazal.Bot.Interface.InterfaceTexts
 {
     public class EnglishTexts : IInterfaceTexts
     {
         public string more => "more";
-        public string thenClickStartMarkdown => "then click start";
+        public string thenClickStart => "then click start";
         public string ChooseTheTranslation => "Choose the translation";
         public string translatesAs => "translates as";
         public string ChooseMissingWord => "Choose missing word";
@@ -25,16 +26,16 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string Exams => "exams";
         public string TodayGoalReached => "You have reached the goal for the day";
 
-        public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)\\." +
+        public string OutOfScopeWithCandidate(string otherMeaning)
+            => $"Chosen translation is out of scope (did you mean *\"{otherMeaning}\"*?)." +
                $"\r\nExpected translations are";
-        public string OutOfScopeTranslationMarkdown 
-            => "Chosen translation is out of scope \\(but it is correct\\)\\." +
+        public string OutOfScopeTranslation
+            => "Chosen translation is out of scope (but it is correct)." +
                "\r\nExpected translations are";
-        public string FailedTranslationWasMarkdown => "The translation was";
+        public string FailedTranslationWas => "The translation was";
         public string ItIsNotRightTryAgain => "No. It is not right. Try again";
         public string SeeTheTranslation => "See the translation";
-        public string DoYouKnowTranslationMarkdown { get; } = $"Do you know the translation?";
+        public string DoYouKnowTranslation { get; } = "Do you know the translation?";
         public string TranslationIs => "Translation is";
         public string DidYouGuess => "Did you guess?";
         public string IsItRightTranslation => "Is it right translation?";
@@ -42,36 +43,37 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string ChooseWhichWordHasThisTranscription => "Choose which word has this transcription";
         public string RetryAlmostRightWithTypo => "Almost right. But you have a typo. Let's try again";
         public string ShowTheTranslationButton => "Show the translation";
-        public string WriteTheTranslationMarkdown  => $"Write the translation\\.\\.\\. ";
+        public string WriteTheTranslation  => "Write the translation... ";
         public string RightTranslationWas => "The right translation was";
         public string CorrectTranslationButQuestionWasAbout => "Your translation was correct, but the question was about the word";
         public string LetsTryAgain => "Let's try again";
         public string ChooseTheTranscription => "Choose the transcription";
-        public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown => "Words in phrase are shuffled\\. Write them in correct order";
+        public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
+           Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
 
-        public string YouHaveATypoLetsTryAgainMarkdown(string text)
-            => $"You have a typo\\. Correct spelling is *\"{text}\"*\\. Let's try again\\.";
+        public Markdown YouHaveATypoLetsTryAgain(string text)
+            => Markdown.Escaped("You have a typo. Correct spelling is ") +
+               Markdown.Escaped(text).ToSemiBold() +
+               Markdown.Escaped(". Let's try again.");
        
         #region questionResult
-        public string Passed1Markdown => "Ayeee\\!";
-        public string PassedOpenIHopeYouWereHonestMarkdown => "Good\\. I hope you were honest";
-        public string PassedHideousWellMarkdown => "Well";
+        public string Passed1 => "Ayeee!";
+        public string PassedOpenIHopeYouWereHonest => "Good. I hope you were honest";
+        public string PassedHideousWell => "Well";
         public string PassedHideousWell2 => "Good";
-        public string FailedOpenButYouWereHonestMarkdown => "But you were honest\\.\\.\\.";
-        public string FailedHideousHonestyIsGoldMarkdown => "Honesty is gold";
+        public string FailedOpenButYouWereHonest => "But you were honest...";
+        public string FailedHideousHonestyIsGold => "Honesty is gold...";
 
-        public string FailedMistakenMarkdown(string text)
-            => $"Mistaken\\. Correct spelling is '{text}'";
-        public object FailedOriginExampleWasMarkdown => "Wrong\\. Origin phrase was";
-
-        public object FailedOriginExampleWas2 => "Origin phrase was";
-        public object FailedOriginExampleWas2Markdown => "Origin phrase was";
-
-        public string FailedDefaultMarkdown => "Noo\\.\\.\\.";
-        public string PassedDefaultMarkdown => "It's right\\!";
-        public string IgnoredDefaultMarkdown => "So so\\.\\.\\.";
-        public string FailedHideousDefaultMarkdown => "Last answer was wrong";
-        public string PassedHideousDefaultMarkdown => "Last answer was right";
+        public string FailedMistaken(string text)
+            => $"Mistaken. Correct spelling is '{text}'";
+        
+        public Markdown FailedOriginExampleWas { get; } = Markdown.Escaped("Wrong. Origin phrase was");
+        public Markdown FailedOriginExampleWas2 { get; } = Markdown.Escaped("Origin phrase was");
+        public Markdown FailedDefault { get; } = Markdown.Escaped("Noo...");
+        public Markdown PassedDefault { get; } = Markdown.Escaped("It's right!");
+        public Markdown IgnoredDefault { get; } = Markdown.Escaped("So so...");
+        public string FailedHideousDefault => "Last answer was wrong";
+        public string PassedHideousDefault => "Last answer was right";
 
         public string IgnoredHideousDefault => "Not really";
 
@@ -83,47 +85,51 @@ namespace Chotiskazal.Bot.InterfaceLang
 
         public string NoTranslationsFound => "No translations found. Check the word and try again";
 
-        public string LearningCarefullyStudyTheListMarkdown =>
-            "*Learning*\r\n"+
-            "Carefully study the words in the list below:";
+        public Markdown LearningCarefullyStudyTheList { get; } =
+            Markdown.Escaped("Learning").ToSemiBold()
+                .NewLine()
+                .AddEscaped("Carefully study the words in the list below:");
 
-        public object LearningDone => "Learning done";
-        public object WordsInTestCount => "Words in test";
-        public object YouHaveLearnedOneWord => "You have learned one word";
-        public object YouForgotOneWord => "You forgot one word";
-        public object EarnedScore => "Earned score";
-        public object TotalScore => "Total score";
-        public object DontPeekUpward => "Now try to answer without hints. Don't peek upward!";
+        public string LearningDone => "Learning done";
+        public string WordsInTestCount => "Words in test";
+        public string YouHaveLearnedOneWord => "You have learned one word";
+        public string YouForgotOneWord => "You forgot one word";
+        public string EarnedScore => "Earned score";
+        public string TotalScore => "Total score";
+        public string DontPeekUpward => "Now try to answer without hints. Don't peek upward!";
 
         public string NeedToAddMoreWordsBeforeLearning => "You need to add some more words before examination";
 
-        public object less => "less";
+        public string less => "less";
         public string ZenRecomendationAfterExamWeNeedMoreNewWords => $"Your words are well learned! It is time to press {BotCommands.New} and add 10-15 new words from word sets to learn";
 
-        public string HelpMarkdown { get; } = "*Hello\\! I am a translator and teacher\\.*\r\n\r\n" +
-                                              "1⃣ You can use me as a regular translator\\. " +
-                                              $"Just write the word for translation or use {BotCommands.Translate} command to begin translate\\.\r\n\r\n" +
-                                              "2⃣ Then, when you have time and mood, click on the _\"Learn\"_ button or " +
-                                              $"write {BotCommands.Learn} and start learning this words\\.\r\n\r\n" +
-                                              $"3⃣ Earn scores for your action and watch your progress using {BotCommands.Stats} command\\.\r\n\r\n" +
-                                              $"4⃣ Use {BotCommands.Help} command to see info how it works\\.\r\n\r\n" +
-                                              "\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. " +
-                                              "And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!";
-
-        public string MainMenuTextMarkdown =>
-            "I am a translator and teacher\\.\r\n" +
-            "First you can use me as a regular translator\\." +
-            "After that " +
-            "learn this words and it helps you to speak English easily\\.";
+        public Markdown Help { get; } = Markdown.Escaped("Hello! I am a translator and teacher.\r\n\r\n" ).ToSemiBold()
+                                        .AddEscaped(
+                                                       "1⃣ You can use me as a regular translator. " +
+                                                       $"Just write the word for translation or use {BotCommands.Translate} command to begin translate.\r\n\r\n" +
+                                                       "2⃣ Then, when you have time and mood, click on the _\"Learn\"_ button or " +
+                                                       $"write {BotCommands.Learn} and start learning this words.\r\n\r\n" +
+                                                       $"3⃣ Earn scores for your action and watch your progress using {BotCommands.Stats} command.\r\n\r\n" +
+                                                       $"4⃣ Use {BotCommands.Help} command to see info how it works.\r\n\r\n" +
+                                                       "\uD83D\uDE09Yes, it's free. We have done this bot for us and our friends. " +
+                                                       "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!");
+        
+        public Markdown MainMenuText { get; } =
+            Markdown.Escaped("I am a translator and teacher.\r\n" +
+                                   "First you can use me as a regular translator." +
+                                   "After that " +
+                                   "learn this words and it helps you to speak English easily.");
 
         public string ActionIsNotAllowed => "action is not allowed";
         public string OopsSomethingGoesWrong => "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
 
-        public string HereAreTheTranslationMarkdown(string word, string tr)
-            => $"_Here are the translations\\._ \r\n" +
-               $"_Choose one of them to learn them in the future_\r\n\r\n" +
-               $"*{word.EscapeForMarkdown().Capitalize()}*" +
-               $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
+        public Markdown HereAreTheTranslation(string word, string tr)
+            => Markdown.Escaped("Here are the translations.").ToItalic().NewLine() +
+               Markdown.Escaped("Choose one of them to learn them in the future").ToItalic()
+                   .NewLine()
+                   .NewLine() +
+               Markdown.Escaped(word.Capitalize()).ToSemiBold() +
+               Markdown.Escaped($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}").ToPreFormattedMono();
 
         public string MessageAfterTranslationIsSelected(Translation translation)
 
@@ -131,17 +137,17 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string MessageAfterTranslationIsDeselected(Translation translation)
             => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
-        public string LearnMoreWordsMarkdown(in int length)
-            => $"Good job\\! You have learned {length} words\\!";
+        public Markdown LearnMoreWords(in int length)
+            => Markdown.Escaped($"Good job! You have learned {length} words!");
 
-        public string LearnSomeWordsMarkdown(in int length)
-            =>$"You have learned {length} words\\. Let's do more\\!";
+        public Markdown LearnSomeWords(in int length)
+            => Markdown.Escaped($"You have learned {length} words. Let's do more!");
 
-        public string PageXofYMarkdown(in int number,in int count)
-            => $"\r\n`Page {number} of {count}\\.\\.\\.`";
-        
-        public string XofYMarkdown(in int x,in int y)
-            => $"`{x} of {y}`";
+        public Markdown PageXofY(in int number,in int count)
+            => Markdown.Escaped($"\r\nPage {number} of {count}...").ToMono();
+
+        public Markdown XofY(in int x,in int y)
+            => Markdown.Escaped($"{x} of {y}").ToMono();
 
         public string WordIsAddedForLearning(string word) =>
             $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
@@ -167,7 +173,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string NoButton => "No";
         public string StartButton => "Start";
         public string CancelButton => "Cancel";
-        public object OneMoreLearnButton => "One more learn";
+        public string OneMoreLearnButton => "One more learn";
         public string TranslateButton => "Translate";
         public string ContinueTranslateButton => "Continue";
         public string LearnButton => "Learn";
@@ -203,14 +209,14 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string Zen4PassExamsAndTranslateNewWords => "Pass exams and translate new words.";
         public string Zen5PassExams => "I recommend you to pass exams";
         public string Zen6YouNeedToLearn { get; } = $"Learning learning learning!";
-        public object StatsYourStats => "Your stats";
-        public object StatsWordsAdded => "Words added";
-        public object StatsLearnedWell => "Learned well";
-        public object StatsScore => "Score";
-        public object StatsExamsPassed => "Exams passed";
-        public object StatsThisMonth => "This month";
-        public object StatsThisDay => "This day";
-        public object StatsActivityForLast7Weeks => "Activity during last 7 weeks";
+        public string StatsYourStats => "Your stats";
+        public string StatsWordsAdded => "Words added";
+        public string StatsLearnedWell => "Learned well";
+        public string StatsScore => "Score";
+        public string StatsExamsPassed => "Exams passed";
+        public string StatsThisMonth => "This month";
+        public string StatsThisDay => "This day";
+        public string StatsActivityForLast7Weeks => "Activity during last 7 weeks";
 
         #endregion
     }

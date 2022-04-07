@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -79,20 +80,21 @@ public class ChatIO {
         return _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
     }
 
-    public async Task<int> SendMarkdownMessageAsync(string message, params InlineKeyboardButton[] buttons) {
+    public async Task<int> SendMessageAsync(Markdown message, params InlineKeyboardButton[] buttons) {
         _chatHistory.OnOutputMarkdownMessage(message, buttons);
+
         var answer = await _client.SendTextMessageAsync(
-            ChatId, message,
+            ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons.Select(b => new[] { b })),
             parseMode: ParseMode.MarkdownV2);
         return answer.MessageId;
     }
 
-    public async Task<int> SendMarkdownMessageAsync(string message, InlineKeyboardButton[][] buttons) {
-        _chatHistory.OnOutputMardownMessage(message,buttons);
+    public async Task<int> SendMessageAsync(Markdown message, InlineKeyboardButton[][] buttons) {
+        _chatHistory.OnOutputMarkdownMessage(message,buttons);
 
         return (await _client.SendTextMessageAsync(
-            ChatId, message,
+            ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons),
             parseMode: ParseMode.MarkdownV2)).MessageId;
     }
@@ -211,13 +213,12 @@ public class ChatIO {
         }
     }
 
-    public async Task<bool> EditMarkdownMessage(
-        int messageId, string newText, InlineKeyboardMarkup inlineKeyboard = null) {
+    public async Task<bool> EditMessageAsync(int messageId, Markdown newText, InlineKeyboardMarkup inlineKeyboard = null) {
         try
         {
-            _chatHistory.OnEditMarkdonMessageText(newText);
+            _chatHistory.OnEditMarkdownMessageText(newText);
             await _client.EditMessageTextAsync(
-                ChatId, messageId, newText, parseMode: ParseMode.MarkdownV2, replyMarkup: inlineKeyboard);
+                ChatId, messageId, newText.GetMarkdownString(), parseMode: ParseMode.MarkdownV2, replyMarkup: inlineKeyboard);
             return true;
         }
         catch (Exception)

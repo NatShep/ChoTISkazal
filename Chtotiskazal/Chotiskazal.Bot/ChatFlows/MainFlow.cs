@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
@@ -149,8 +150,7 @@ public class MainFlow {
             var helpBtn = InlineButtons.HowToUse(Chat.Texts);
             var learningSetsBtn = InlineButtons.LearningSets($"{Chat.Texts.LearningSetsButton} {Emojis.LearningSets}");
 
-            await ChatIo.SendMarkdownMessageAsync(
-                $"{Emojis.MainMenu} {Chat.Texts.MainMenuTextMarkdown}",
+            await ChatIo.SendMessageAsync(Markdown.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuText,
                 new[] {
                     new[] { translationBtn },
                     new[] { examBtn },

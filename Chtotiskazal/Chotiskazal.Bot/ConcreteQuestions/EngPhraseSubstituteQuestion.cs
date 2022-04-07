@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -26,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                                                        .Select(e => e.OriginWord)
                                                        .ToList();
 
-            var enReplaced = enPhrase.Replace(phrase.OriginWord, "\\.\\.\\.");
+            var enReplaced = enPhrase.Replace(phrase.OriginWord, "...");
             if (enReplaced == enPhrase)
                 return QuestionResult.Impossible;
 
@@ -60,7 +61,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
 
             return QuestionResult.Failed(
-                $"{chat.Texts.FailedOriginExampleWasMarkdown}\r\n*\"{phrase.OriginPhrase}\"*",
+                chat.Texts.FailedOriginExampleWas.NewLine() +
+                Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

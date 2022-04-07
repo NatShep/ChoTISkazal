@@ -105,7 +105,7 @@ namespace Chotiskazal.Bot.ChatFlows
         {
             _areSelected = selectionMarks;
             _originMessageId = await Chat.SendMarkdownMessageAsync(
-                Chat.Texts.HereAreTheTranslationMarkdown(markdownMessage, transcription), 
+                Chat.Texts.HereAreTheTranslation(markdownMessage, transcription), 
                 CreateButtons().ToArray());
         }
     }

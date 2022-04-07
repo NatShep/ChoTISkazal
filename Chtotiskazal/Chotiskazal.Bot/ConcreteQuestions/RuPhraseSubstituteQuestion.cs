@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -22,7 +23,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if (phrase == null)
                 return QuestionResult.Impossible;
             var (enPhrase,ruPhrase) = phrase.Deconstruct();
-            var replacedRuPhrase = ruPhrase.Replace(phrase.TranslatedWord, "\\.\\.\\.");
+            var replacedRuPhrase = ruPhrase.Replace(phrase.TranslatedWord, "...");
             if (replacedRuPhrase == ruPhrase)
                 return QuestionResult.Impossible;
 
@@ -57,8 +58,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 return QuestionResult.RetryThisQuestion;
             }
 
-            
-            return QuestionResult.Failed($"{chat.Texts.FailedOriginExampleWas2} *\"{phrase.TranslatedPhrase}\"*",
+            return QuestionResult.Failed(chat.Texts.FailedOriginExampleWas2 +
+                                                 Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }
