@@ -30,7 +30,7 @@ public static class Reporter {
     public static void WriteInfo(string msg) => _log.Information(msg);
     public static void WriteInfo(string msg, string chatId) => _log.Information(msg + " {@ChatInfo}", new { ChatInfo = chatId });
 
-    public static void ReportError(long? chatId, string msg) {
+    private static void ReportError(long? chatId, string msg) {
         _log.Error("msg {@ChatInfo} ", new { ChatInfo = chatId, msg });
         _telegramLog?.Error("❗ " + " msg {@ChatInfo} ", new { ChatInfo = chatId, msg });
         Collector.OnError();

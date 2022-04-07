@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using Chotiskazal.Bot.Interface;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -13,12 +14,11 @@ public class SmallChatHistory {
         _buffer = new ConcurrentQueue<string>();
     }
     public string[] GetHistory() => _buffer.ToArray();
-    
     public void OnInput(Update update) => SaveInput(ToMessage(update));
     public void OnEditMessageButtons(InlineKeyboardButton[] buttons) => SaveOutput($"Edit buttons [{buttons.Length}]");
     public void OnEditMessageButtons(InlineKeyboardButton[][] buttons) => SaveOutput($"Edit buttons [{buttons.Length} lines]");
     public void OnEditMessageText(string newText) => SaveOutput($"Edit: {newText}");
-    public void OnEditMarkdonMessageText(string newText) => SaveOutput($"Edit mrkd: {newText}");
+    public void OnEditMarkdownMessageText(Markdown newText) => SaveOutput($"Edit mrkd: {newText.GetMarkdownString()}");
     public void OnSendTyping() => SaveOutput("Typing...");
     public void OnAnswerWithTooltip(string s) => SaveOutput($"tooltip: {s}");
     public void InputConfirmCallback() { }
@@ -26,8 +26,8 @@ public class SmallChatHistory {
     public void OnOutputMessage(string message) => SaveOutput($"msg: {message}");
     public void OnOutputMessage(string message, InlineKeyboardButton[] buttons) => SaveOutput($"msg: {message} [{buttons.Length}]");
     public void OnOutputMessage(string message, InlineKeyboardButton[][] buttons) => SaveOutput($"msg: {message} [{buttons.Length} lines]");
-    public void OnOutputMarkdownMessage(string message, InlineKeyboardButton[] buttons) => SaveOutput($"msg mrkd: {message} [{buttons.Length}]");
-    public void OnOutputMardownMessage(string message, InlineKeyboardButton[][] buttons) => SaveOutput($"msg mrkd: {message} [{buttons.Length} lines]");
+    public void OnOutputMarkdownMessage(Markdown message, InlineKeyboardButton[] buttons) => SaveOutput($"msg mrkd: {message.GetMarkdownString()} [{buttons.Length}]");
+    public void OnOutputMarkdownMessage(Markdown message, InlineKeyboardButton[][] buttons) => SaveOutput($"msg mrkd: {message.GetMarkdownString()} [{buttons.Length} lines]");
     
     private void SaveInput(string message) => Save($"[User {DateTime.Now.ToShortTimeString()}] {message}");
     private void SaveOutput(string message) => Save($"[Bot {DateTime.Now.ToShortTimeString()}] {message}");
