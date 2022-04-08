@@ -38,6 +38,7 @@ namespace Chotiskazal.Bot.InterfaceLang
         public string TranslationIs => "Translation is";
         public string DidYouGuess => "Did you guess?";
         public string IsItRightTranslation => "Is it right translation?";
+        public string WriteMissingLettersOrTheWholeWord => "Write missing letters or the whole word";
         public string Mistaken => "Mistaken";
         public string ChooseWhichWordHasThisTranscription => "Choose which word has this transcription";
         public string RetryAlmostRightWithTypo => "Almost right. But you have a typo. Let's try again";

@@ -52,6 +52,31 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 1.3,
             frequency: 4);
 
+        
+        private ExamAndPreferredScore _engWriteMissingLetter =>
+            new ExamAndPreferredScore(
+                question: new EngWriteMissingLettersQuestion(),
+                expectedScore: 2.3,
+                frequency: 14);
+        
+        private ExamAndPreferredScore _ruWriteMissingLetter =>
+            new ExamAndPreferredScore(
+                question: new RuWriteMissingLettersQuestion(),
+                expectedScore: 2.3,
+                frequency: 14);
+        
+        private ExamAndPreferredScore _engWriteMissingLetterHideous =>
+            new ExamAndPreferredScore(
+                question: new ClearScreenQuestionDecorator(new EngWriteMissingLettersQuestion()),
+                expectedScore: 2.5,
+                frequency: 14);
+        
+        private ExamAndPreferredScore _ruWriteMissingLetterHideous =>
+            new ExamAndPreferredScore(
+                question: new ClearScreenQuestionDecorator(new RuWriteMissingLettersQuestion()),
+                expectedScore: 2.5,
+                frequency: 14);
+        
         private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
             new EngChooseWordInPhraseQuestion(), 2, 20);
 
@@ -81,6 +106,7 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2.6,
             frequency: 12);
 
+        
         private ExamAndPreferredScore EngWrite(LocalDictionaryService service) =>
             new ExamAndPreferredScore(
                 question: new EngWriteQuestion(service),
@@ -191,6 +217,8 @@ namespace Chotiskazal.Bot.Questions
             };
             _intermidiateExamsList = new[]
             {
+                _engWriteMissingLetter,
+                _ruWriteMissingLetter,
                 _engChoose,
                 _ruChoose,
                 _ruPhraseChoose,
@@ -209,6 +237,10 @@ namespace Chotiskazal.Bot.Questions
             };
             _advancedExamsList = new[]
             {
+                _engWriteMissingLetter,
+                _ruWriteMissingLetter,
+                _engWriteMissingLetterHideous,
+                _ruWriteMissingLetterHideous,
                 _engChoose,
                 _ruChoose,
                 _engPhraseChoose,

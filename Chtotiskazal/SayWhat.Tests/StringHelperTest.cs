@@ -4,6 +4,43 @@ using SayWhat.Bll;
 namespace SayWhat.MongoDAL.Tests {
 
 public class StringHelperTest {
+    [TestCase("Something",0, "")]
+    [TestCase("Something",1, "g")]
+    [TestCase("Something",2, "ng")]
+    [TestCase("Something",7, "mething")]
+    [TestCase("a",1, "a")]
+    [TestCase("",0, "")]
+    public void TailTest(string origin, int count, string expected) => Assert.AreEqual(origin.Tail(count), expected);
+
+    [TestCase("S",'S')]
+    [TestCase("Something",'S')]
+    public void FirstSymbolTest(string origin, char expected) => Assert.AreEqual(origin.FirstSymbol(), expected);
+    
+    [TestCase("S",'S')]
+    [TestCase("Something",'g')]
+    public void LastSymbolTest(string origin, char expected) => Assert.AreEqual(origin.LastSymbol(), expected);
+    
+    [TestCase("S",3,"SSS")]
+    [TestCase("Something", 0, "")]
+    [TestCase("Something", 1, "Something")]
+    [TestCase("Something", 2, "SomethingSomething")]
+    public void RepeatString(string origin, int count, string expected) => Assert.AreEqual(origin.Repeat(count), expected);
+    
+    [TestCase('S',3,"SSS")]
+    [TestCase('S',0,"")]
+    [TestCase('S',1,"S")]
+    public void RepeatChar(char origin, int count, string expected) => Assert.AreEqual(origin.Repeat(count), expected);
+
+    [TestCase("origin", "o****n","rigi")]
+    [TestCase("an", "a*","n")]
+    [TestCase("supermegapuperword", "su**************rd","permegapuperwo")]
+    public void GetWithStarredBody(string origin, string expected, string body) {
+        var actual = origin.GetWithStarredBody(out var actualBody);
+        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(body, actualBody);
+
+    }
+    
     [TestCase("origin", "Origin")]
     [TestCase("ВАСЯ", "Вася")]
     [TestCase("петька", "Петька")]
@@ -21,7 +58,6 @@ public class StringHelperTest {
     [TestCase("meaningfull", "meaningful")]
     [TestCase("meaningfull", "meanignfull")]
     [TestCase("meaningfull", "meaningful")]
-    [TestCase("meaningfull", "meninful")]
     [TestCase("meaningfull", "meaninful")]
     [TestCase("безболезненный", "безболезненый")]
     public void CheckMistakes_returnsSmallMistakes(string wordA, string wordB)

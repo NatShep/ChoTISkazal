@@ -31,6 +31,7 @@ public interface IInterfaceTexts {
     string FailedOpenButYouWereHonestMarkdown { get; }
     string FailedHideousHonestyIsGoldMarkdown { get; }
     string IsItRightTranslation { get; }
+    string WriteMissingLettersOrTheWholeWord { get; }
     string Mistaken { get; }
     string ChooseWhichWordHasThisTranscription { get; }
     string RetryAlmostRightWithTypo { get; }

@@ -37,6 +37,7 @@ public class RussianTexts : IInterfaceTexts {
     public string TranslationIs => "Правильный перевод";
     public string DidYouGuess => "Вы угадали?";
     public string IsItRightTranslation => "Это правильный перевод?";
+    public string WriteMissingLettersOrTheWholeWord => "Вставьте пропущенные буквы или напишите слово целиком";
     public string Mistaken => "Ошибочка";
     public string ChooseWhichWordHasThisTranscription => "Выберите слово к которому подходит эта транскрипция";
     public string RetryAlmostRightWithTypo => "Опечатка. Давайте заново.";

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SayWhat.Bll.Dto;
 
 namespace SayWhat.Bll
@@ -14,6 +15,36 @@ namespace SayWhat.Bll
     }
     public static class StringHelper
     {
+        public static string GetWithStarredBody(this string origin, out string replacedBody) {
+            switch (origin.Length) {
+                case <= 3:
+                    replacedBody = origin.Substring(1);
+                    return origin.FirstSymbol() + '*'.Repeat(origin.Length-1);
+                case <= 9:
+                    replacedBody = origin.Substring(1, origin.Length - 2);
+                    return origin.FirstSymbol() + '*'.Repeat(origin.Length - 2) + origin.LastSymbol();
+                default:
+                    replacedBody = origin.Substring(2, origin.Length - 4);
+                    return origin.Substring(0,2) + '*'.Repeat(origin.Length - 4) + origin.Tail(2);
+            }
+        }
+        
+        public static string Repeat(this string targetString, int count) {
+            var sb = new StringBuilder();
+            for (int i = 0; i < count; i++) {
+                sb.Append(targetString);
+            }
+            return sb.ToString();
+        }
+        
+        public static char FirstSymbol(this string targetString) => targetString[0];     
+
+        public static char LastSymbol(this string targetString) => targetString[^1];
+
+        public static string Tail(this string targetString, int count) => targetString.Substring(targetString.Length-count);
+
+        public static string Repeat(this char targetChar, int count) => new(targetChar, count);     
+        
         public static string EscapeForMarkdown(this string targetString) 
             => targetString.Replace(".", "\\.").Replace("-", "\\-").Replace("!","\\!");
 
