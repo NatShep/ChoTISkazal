@@ -89,6 +89,7 @@ namespace Chotiskazal.Bot
                 new BotCommand{Command = BotCommands.Stats, Description = "Your stats (Твоя статистика)"},
                 new BotCommand{Command = BotCommands.Words, Description = "Your learned words (Твои выученные слова)"},
                 new BotCommand{Command = BotCommands.Chlang, Description = "Change interface language (Сменить язык интерфейса)"},
+                new BotCommand{Command = BotCommands.Report, Description = "Report an bug or inaccuracy  (Сообщить об ошибке или неточности)"},
             }).Wait();
             
             var allUpdates =_botClient.GetUpdatesAsync().Result;

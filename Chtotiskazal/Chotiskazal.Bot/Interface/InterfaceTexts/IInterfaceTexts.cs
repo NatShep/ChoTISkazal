@@ -104,7 +104,8 @@ public interface IInterfaceTexts {
     string WordIsSkippedForLearning(string word);
     string LearningSetNotFound(string argument);
     string AllWordsAreLearnedMessage(string setShortName);
-
+    string ReportWasSentEnterAdditionalInformationAboutTheReport { get; }
+    string ThankYouForYourCommentInReport { get; }
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
     Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }

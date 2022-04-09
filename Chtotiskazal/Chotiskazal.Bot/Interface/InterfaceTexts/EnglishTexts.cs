@@ -119,6 +119,15 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
                                    "First you can use me as a regular translator." +
                                    "After that " +
                                    "learn this words and it helps you to speak English easily.");
+        /*Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!
+
+ Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий: */
+        public string ReportWasSentEnterAdditionalInformationAboutTheReport { get; } =
+            "The report has been sent to the developers. When they wake up, they will definitely watch it!\r\n\r\n" +
+            "To better understand what happened, you can send any additional comment by reply message:";
+        public string ThankYouForYourCommentInReport { get; } =
+            "Thanks! You can continue working with the bot as if nothing had happened ";
+
 
         public string ActionIsNotAllowed => "action is not allowed";
         public string OopsSomethingGoesWrong => "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";

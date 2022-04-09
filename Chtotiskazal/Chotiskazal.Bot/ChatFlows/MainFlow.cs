@@ -115,7 +115,8 @@ public class MainFlow {
             new SelectLearningSet(
                 _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
             new StartBotCommandHandler(ShowMainMenu),
-            new ChlangBotCommandHandler(_userService)
+            new ChlangBotCommandHandler(_userService),
+            ReportBotCommandHandler.Instance,
         };
     }
 

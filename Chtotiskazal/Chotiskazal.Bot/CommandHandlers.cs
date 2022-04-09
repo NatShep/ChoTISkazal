@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Hooks;
 using Chotiskazal.Bot.Interface;
+using Microsoft.VisualBasic;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
@@ -192,4 +193,26 @@ public class SelectLearningSet : IBotCommandHandler {
     }
 }
 
+public class ReportBotCommandHandler : IBotCommandHandler {
+    public static readonly ReportBotCommandHandler Instance = new ReportBotCommandHandler();
+    private ReportBotCommandHandler() {}
+    public bool Acceptable(string text) => text == BotCommands.Report;
+    public string ParseArgument(string text) => null;
+
+    public async Task Execute(string argument, ChatRoom chat) {
+        var history = chat.ChatIo.TryGetChatHistory();
+        var header = $"sent by @{chat.User.TelegramNick}\r\n:" +
+                     $"{chat.User.TelegramId}:{chat.User.TelegramFirstName}-{chat.User.TelegramLastName}\r\n";
+        var message = Markdown.Escaped($"Report {header}")
+                              .NewLine()
+                              .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToPreFormattedMono());
+        Reporter.ReportUserIssue(message.GetMarkdownString());
+        await chat.SendMessageAsync(chat.Texts.ReportWasSentEnterAdditionalInformationAboutTheReport);
+        
+        var userComments = await chat.WaitUserTextInputAsync();
+        Reporter.ReportUserIssue($"Comment: {header}\r\n '\r\n{userComments}\r\n'");
+        await chat.SendMessageAsync(chat.Texts.ThankYouForYourCommentInReport);
+
+    }
+}
 }

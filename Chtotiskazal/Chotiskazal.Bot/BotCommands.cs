@@ -10,6 +10,8 @@ public class BotCommands {
     public const string Start = "/start";
     public const string Words = "/mywords";
     public const string LearningSetPrefix = "/set";
+    public const string Report = "/report";
+
 }
 
 }

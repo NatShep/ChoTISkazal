@@ -38,6 +38,11 @@ public static class Reporter {
 
     public static void ReportError(long? chatId, string msg, Exception e) => ReportError(chatId, msg + $".\r\n Exception:\r\n{e}");
 
+    public static void ReportUserIssue(string msg) {
+            _log.Error($"Report {msg} ");
+            _telegramLog?.Error($"❗{msg}");
+    }
+    
     public static void ReportError(long? chatId, string msg, string[] history, Exception e) {
         if (history == null)
             ReportError(chatId, msg, e);
