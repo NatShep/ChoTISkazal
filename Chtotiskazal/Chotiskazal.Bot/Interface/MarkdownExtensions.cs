@@ -18,6 +18,8 @@ public static class MarkdownExtension {
     }
 
     public static Markdown ToItalic(this Markdown m) {
+        if (m.IsEmpty())
+            return m;
         return Markdown.Bypassed("_") + m + Markdown.Bypassed("_");
     }
 
