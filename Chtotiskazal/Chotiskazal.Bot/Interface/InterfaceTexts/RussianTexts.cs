@@ -5,6 +5,8 @@ using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
+//todo cr - we cannot release without russian texts
+
 /*public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
     public object less => "меньше";
