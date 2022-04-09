@@ -58,7 +58,16 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 await chat.SendMessageAsync(chat.Texts.TypoAlmostRight);
                 return QuestionResult.RetryThisQuestion;
             }
-
+            //if user enters whole phrase - it is ok
+            var phraseCloseness = enPhrase.CheckCloseness(enter.Trim());
+            if(phraseCloseness == StringsCompareResult.Equal)
+                return QuestionResult.Passed(chat.Texts);
+            if(phraseCloseness == StringsCompareResult.SmallMistakes)
+            {
+                await chat.SendMessageAsync(chat.Texts.TypoAlmostRight);
+                return QuestionResult.RetryThisQuestion;
+            }
+            
             return QuestionResult.Failed(
                 $"{chat.Texts.FailedOriginExampleWasMarkdown}\r\n*\"{phrase.OriginPhrase}\"*",
                 chat.Texts);
