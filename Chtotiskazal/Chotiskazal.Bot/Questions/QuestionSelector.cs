@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Chotiskazal.Bot.ConcreteQuestions;
+using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
@@ -53,29 +54,47 @@ namespace Chotiskazal.Bot.Questions
             frequency: 4);
 
         
-        private ExamAndPreferredScore _engWriteMissingLetter =>
+        private ExamAndPreferredScore _engEasyWriteMissingLetter =>
             new ExamAndPreferredScore(
-                question: new EngWriteMissingLettersQuestion(),
+                question: new EngWriteMissingLettersQuestion(StarredHardness.Easy),
+                expectedScore: 2.1,
+                frequency: 7);
+        private ExamAndPreferredScore _ruEasyWriteMissingLetter =>
+            new ExamAndPreferredScore(
+                question: new RuWriteMissingLettersQuestion(StarredHardness.Easy),
+                expectedScore: 2.1,
+                frequency: 7);
+        private ExamAndPreferredScore _engEasyWriteMissingLetterHideous =>
+            new ExamAndPreferredScore(
+                question: new ClearScreenQuestionDecorator(new EngWriteMissingLettersQuestion(StarredHardness.Easy)),
                 expectedScore: 2.3,
-                frequency: 14);
-        
-        private ExamAndPreferredScore _ruWriteMissingLetter =>
+                frequency: 7);
+        private ExamAndPreferredScore _ruEasyWriteMissingLetterHideous =>
             new ExamAndPreferredScore(
-                question: new RuWriteMissingLettersQuestion(),
+                question: new ClearScreenQuestionDecorator(new RuWriteMissingLettersQuestion(StarredHardness.Easy)),
                 expectedScore: 2.3,
-                frequency: 14);
+                frequency: 7);
         
-        private ExamAndPreferredScore _engWriteMissingLetterHideous =>
+        private ExamAndPreferredScore _engHardWriteMissingLetter =>
             new ExamAndPreferredScore(
-                question: new ClearScreenQuestionDecorator(new EngWriteMissingLettersQuestion()),
-                expectedScore: 2.5,
-                frequency: 14);
-        
-        private ExamAndPreferredScore _ruWriteMissingLetterHideous =>
+                question: new EngWriteMissingLettersQuestion(StarredHardness.Hard),
+                expectedScore: 2.6,
+                frequency: 7);
+        private ExamAndPreferredScore _ruHardWriteMissingLetter =>
             new ExamAndPreferredScore(
-                question: new ClearScreenQuestionDecorator(new RuWriteMissingLettersQuestion()),
-                expectedScore: 2.5,
-                frequency: 14);
+                question: new RuWriteMissingLettersQuestion(StarredHardness.Hard),
+                expectedScore: 2.6,
+                frequency: 7);
+        private ExamAndPreferredScore _engHardWriteMissingLetterHideous =>
+            new ExamAndPreferredScore(
+                question: new ClearScreenQuestionDecorator(new EngWriteMissingLettersQuestion(StarredHardness.Hard)),
+                expectedScore: 2.8,
+                frequency: 7);
+        private ExamAndPreferredScore _ruHardWriteMissingLetterHideous =>
+            new ExamAndPreferredScore(
+                question: new ClearScreenQuestionDecorator(new RuWriteMissingLettersQuestion(StarredHardness.Hard)),
+                expectedScore: 2.8,
+                frequency: 7);
         
         private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
             new EngChooseWordInPhraseQuestion(), 2, 20);
@@ -217,8 +236,10 @@ namespace Chotiskazal.Bot.Questions
             };
             _intermidiateExamsList = new[]
             {
-                _engWriteMissingLetter,
-                _ruWriteMissingLetter,
+                _engEasyWriteMissingLetter,
+                _ruEasyWriteMissingLetter,
+                _engHardWriteMissingLetter,
+                _ruHardWriteMissingLetter,
                 _engChoose,
                 _ruChoose,
                 _ruPhraseChoose,
@@ -237,10 +258,14 @@ namespace Chotiskazal.Bot.Questions
             };
             _advancedExamsList = new[]
             {
-                _engWriteMissingLetter,
-                _ruWriteMissingLetter,
-                _engWriteMissingLetterHideous,
-                _ruWriteMissingLetterHideous,
+                _engEasyWriteMissingLetter,
+                _ruEasyWriteMissingLetter,
+                _engEasyWriteMissingLetterHideous,
+                _ruEasyWriteMissingLetterHideous,
+                _engHardWriteMissingLetter,
+                _ruHardWriteMissingLetter,
+                _engHardWriteMissingLetterHideous,
+                _ruHardWriteMissingLetterHideous,
                 _engChoose,
                 _ruChoose,
                 _engPhraseChoose,

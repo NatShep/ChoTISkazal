@@ -13,22 +13,31 @@ namespace SayWhat.Bll
         BigMistakes  = 1,
         NotEqual = 0,
     }
+public enum StarredHardness {
+    Hard, Easy
+}
     public static class StringHelper
     {
-        public static string GetWithStarredBody(this string origin, out string replacedBody) {
-            switch (origin.Length) {
-                case <= 3:
-                    replacedBody = origin.Substring(1);
-                    return origin.FirstSymbol() + '*'.Repeat(origin.Length-1);
-                case <= 9:
-                    replacedBody = origin.Substring(1, origin.Length - 2);
-                    return origin.FirstSymbol() + '*'.Repeat(origin.Length - 2) + origin.LastSymbol();
-                default:
-                    replacedBody = origin.Substring(2, origin.Length - 4);
-                    return origin.Substring(0,2) + '*'.Repeat(origin.Length - 4) + origin.Tail(2);
-            }
+        private static string GetWithStarredBody(this string origin, int start, int finish, out string replacedBody) {
+            var size = origin.Length - start - finish;
+            replacedBody = origin.Substring(start, size);
+            return origin.Substring(0, start) + '*'.Repeat(size) + origin.Tail(finish);
         }
-        
+        public static string GetWithStarredBody(this string origin, StarredHardness hardness, out string replacedBody) {
+            return hardness == StarredHardness.Easy
+                ? origin.Length switch {
+                    <= 3 => GetWithStarredBody(origin, 1, 0, out replacedBody),
+                    <= 5 => GetWithStarredBody(origin, 1, 1, out replacedBody),
+                    <= 9 => GetWithStarredBody(origin, 2, 2, out replacedBody),
+                    _ => GetWithStarredBody(origin, 2, 2, out replacedBody)
+                }
+                : origin.Length switch {
+                    <= 7 => GetWithStarredBody(origin, 1, 0, out replacedBody),
+                    <= 11 => GetWithStarredBody(origin, 2, 0, out replacedBody),
+                    _ => GetWithStarredBody(origin, 2, 1, out replacedBody)
+                };
+        }
+
         public static string Repeat(this string targetString, int count) {
             var sb = new StringBuilder();
             for (int i = 0; i < count; i++) {
@@ -41,7 +50,7 @@ namespace SayWhat.Bll
 
         public static char LastSymbol(this string targetString) => targetString[^1];
 
-        public static string Tail(this string targetString, int count) => targetString.Substring(targetString.Length-count);
+        public static string Tail(this string targetString, int count) => count==0? string.Empty: targetString.Substring(targetString.Length-count);
 
         public static string Repeat(this char targetChar, int count) => new(targetChar, count);     
         

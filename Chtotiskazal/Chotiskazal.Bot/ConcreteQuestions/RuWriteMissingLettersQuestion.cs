@@ -7,6 +7,11 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions {
 public class RuWriteMissingLettersQuestion : IQuestion {
+    private readonly StarredHardness _hardness;
+    public RuWriteMissingLettersQuestion(StarredHardness hardness) {
+        _hardness = hardness;
+
+    }
     public bool NeedClearScreen => false;
 
     public string Name => "Ru write mising";
@@ -21,7 +26,7 @@ public class RuWriteMissingLettersQuestion : IQuestion {
         if (ruWord == null)
             return QuestionResult.Impossible;
 
-        string starred = engWord.GetWithStarredBody(out var body);
+        string starred = engWord.GetWithStarredBody(_hardness, out var body);
 
         var msg = QuestionMarkups.TranslatesAsTemplate(
             ruWord,

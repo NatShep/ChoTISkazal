@@ -31,16 +31,26 @@ public class StringHelperTest {
     [TestCase('S',1,"S")]
     public void RepeatChar(char origin, int count, string expected) => Assert.AreEqual(origin.Repeat(count), expected);
 
-    [TestCase("origin", "o****n","rigi")]
+    [TestCase("origin", "or**in","ig")]
     [TestCase("an", "a*","n")]
+    [TestCase("Namaste", "Na***te", "mas")]
     [TestCase("supermegapuperword", "su**************rd","permegapuperwo")]
-    public void GetWithStarredBody(string origin, string expected, string body) {
-        var actual = origin.GetWithStarredBody(out var actualBody);
+    public void GetWithStarredBodyEasy(string origin, string expected, string body) {
+        var actual = origin.GetWithStarredBody(StarredHardness.Easy, out var actualBody);
         Assert.AreEqual(expected, actual);
         Assert.AreEqual(body, actualBody);
-
     }
-    
+
+    [TestCase("origin", "o*****", "rigin")]
+    [TestCase("an", "a*", "n")]
+    [TestCase("Namaste", "N******", "amaste")]
+    [TestCase("supermegapuperword", "su***************d", "permegapuperwor")]
+    public void GetWithStarredBodyHard(string origin, string expected, string body) {
+        var actual = origin.GetWithStarredBody(StarredHardness.Hard, out var actualBody);
+        Assert.AreEqual(expected, actual);
+        Assert.AreEqual(body, actualBody);
+    }
+
     [TestCase("origin", "Origin")]
     [TestCase("ВАСЯ", "Вася")]
     [TestCase("петька", "Петька")]
