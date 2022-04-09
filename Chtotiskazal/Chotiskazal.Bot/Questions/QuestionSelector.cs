@@ -198,12 +198,12 @@ namespace Chotiskazal.Bot.Questions
         private readonly ExamAndPreferredScore _isItRightTranslationExam = new ExamAndPreferredScore(
             question:new IsItRightTranslationQuestion(), 
             expectedScore:1.6,
-            frequency:10);
+            frequency:7);
         
         private readonly ExamAndPreferredScore _hideousIsItRightTranslationExam = new ExamAndPreferredScore(
             question: new ClearScreenQuestionDecorator(new IsItRightTranslationQuestion()), 
             expectedScore:2.3,
-            frequency:10);
+            frequency:7);
         
         private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new ExamAndPreferredScore(
             question:new EngChooseMultipleTranslationsQuestion(),  
