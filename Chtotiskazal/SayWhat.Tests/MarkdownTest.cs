@@ -84,8 +84,71 @@ public class MarkdownTest {
     public void AddItalicTest(string s1, string s2, string expected) {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
-        Assert.AreEqual(expected,m1.AddMarkdown(s2.ToItalic()).GetMarkdownString());
+        Assert.AreEqual(expected,m1.AddMarkdown(s2.ToItalicMarkdown()).GetMarkdownString());
         Assert.AreEqual(expected,(m1+m2.ToItalic()).GetMarkdownString());
+    }
+    
+    [TestCase("markdown1", "markdown2","*markdown1markdown2*")]
+    [TestCase("","","")]
+    public void ToSemiboldTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected, m1.AddMarkdown(m2).ToSemiBold().GetMarkdownString());
+        Assert.AreEqual(expected,m1.AddEscaped(s2).ToSemiBold().GetMarkdownString());
+        Assert.AreEqual(expected,(m1+m2).ToSemiBold().GetMarkdownString());
+    }
+    
+    [TestCase("markdown1", "markdown2","markdown1*markdown2*")]
+    [TestCase("markdown1", "markd*own2","markdown1*markd\\*own2*")]
+    [TestCase("markdown1", "*markdown2*","markdown1*\\*markdown2\\**")]
+    [TestCase("","","")]
+    public void AddSemiboldTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected,m1.AddMarkdown(s2.ToSemiBoldMarkdown()).GetMarkdownString());
+        Assert.AreEqual(expected,(m1+m2.ToSemiBold()).GetMarkdownString());
+    }
+    
+    [TestCase("markdown1", "markdown2","`\r\nmarkdown1markdown2\r\n`")]
+    [TestCase("","","")]
+    public void ToMonoTextTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected, m1.AddMarkdown(m2).ToMono().GetMarkdownString());
+        Assert.AreEqual(expected,m1.AddEscaped(s2).ToMono().GetMarkdownString());
+        Assert.AreEqual(expected,(m1+m2).ToMono().GetMarkdownString());
+    }
+    
+    [TestCase("markdown1", "markdown2","markdown1`\r\nmarkdown2\r\n`")]
+    [TestCase("markdown1", "markd*own2","markdown1`\r\nmarkd\\*own2\r\n`")]
+    [TestCase("markdown1", "*markdown2*","markdown1`\r\n\\*markdown2\\*\r\n`")]
+    [TestCase("","","")]
+    public void AddMonoTextTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected,m1.AddMarkdown(s2.ToMonoMarkdown()).GetMarkdownString());
+        Assert.AreEqual(expected,(m1+m2.ToMono()).GetMarkdownString());
+    }
+    
+    [TestCase("markdown1", "markdown2","```\r\nmarkdown1markdown2\r\n```")]
+    [TestCase("","","")]
+    public void ToPreFormattedMonoTextTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected, m1.AddMarkdown(m2).ToPreFormattedMono().GetMarkdownString());
+        Assert.AreEqual(expected,m1.AddEscaped(s2).ToPreFormattedMono().GetMarkdownString());
+        Assert.AreEqual(expected,(m1+m2).ToPreFormattedMono().GetMarkdownString());
+    }
+
+    [TestCase("markdown1", "markdown2", "markdown1```\r\nmarkdown2\r\n```")]
+    [TestCase("markdown1", "markd*own2", "markdown1```\r\nmarkd\\*own2\r\n```")]
+    [TestCase("markdown1", "*markdown2*", "markdown1```\r\n\\*markdown2\\*\r\n```")]
+    [TestCase("", "", "")]
+    public void AddPreFormattedMonoTextTest(string s1, string s2, string expected) {
+        var m1 = Markdown.Escaped(s1);
+        var m2 = Markdown.Escaped(s2);
+        Assert.AreEqual(expected,m1.AddMarkdown(s2.ToPreFormattedMonoMarkdown()).GetMarkdownString());
+        Assert.AreEqual(expected, (m1 + m2.ToPreFormattedMono()).GetMarkdownString());
     }
 }
 }

@@ -6,14 +6,20 @@ public static class MarkdownExtension {
 
     
     public static Markdown ToSemiBold(this Markdown m) {
+        if (m.IsEmpty())
+            return m;
         return Markdown.Bypassed("*") + m + Markdown.Bypassed("*");
     }
 
     public static Markdown ToPreFormattedMono(this Markdown m) {
+        if (m.IsEmpty())
+            return m;
         return Markdown.Bypassed("```\r\n") + m + Markdown.Bypassed("\r\n```");
     }
 
     public static Markdown ToMono(this Markdown m) {
+        if (m.IsEmpty())
+            return m;
         return Markdown.Bypassed("`\r\n") + m + Markdown.Bypassed("\r\n`");
     }
 

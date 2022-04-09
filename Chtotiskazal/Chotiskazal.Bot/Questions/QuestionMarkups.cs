@@ -9,7 +9,7 @@ public static class QuestionMarkups {
     public static Markdown TranslateTemplate(string word, string instruction)
         => QuestionHeader
                .NewLine() +
-                word.ToSemiBold()
+                word.ToSemiBoldMarkdown()
                .NewLine()
                .NewLine()
                .NewLine()
@@ -18,9 +18,9 @@ public static class QuestionMarkups {
     public static Markdown TranslateTemplate(string word, string instruction, string example)
         => QuestionHeader
             .NewLine()
-            .AddMarkdown(word.ToSemiBold()).NewLine()
+            .AddMarkdown(word.ToSemiBoldMarkdown()).NewLine()
             .AddBypassed("    ")
-            .AddMarkdown(example.ToItalic()).NewLine()
+            .AddMarkdown(example.ToItalicMarkdown()).NewLine()
             .NewLine()
             .NewLine()
             .AddEscaped(instruction);
@@ -35,9 +35,9 @@ public static class QuestionMarkups {
 
     public static Markdown TranslatesAsTemplate(string a, string translatesAs, string b, string instruction)
         => QuestionHeader.NewLine()
-            .AddMarkdown($"\"{a}\"".ToSemiBold()).NewLine()
-            .AddBypassed("    ").AddMarkdown(translatesAs.ToItalic()).ToSemiBold().NewLine()
-            .AddMarkdown($"\"{b}\"".ToSemiBold()).NewLine()
+            .AddMarkdown($"\"{a}\"".ToSemiBoldMarkdown()).NewLine()
+            .AddBypassed("    ").AddMarkdown(translatesAs.ToItalicMarkdown()).ToSemiBold().NewLine()
+            .AddMarkdown($"\"{b}\"".ToSemiBoldMarkdown()).NewLine()
             .NewLine()
             .AddEscaped(instruction);
 }
