@@ -12,8 +12,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public string Name => "Trans Choose";
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
-            UserWordModel[] examList)
+        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
             var originalTranslation = word.RuTranslations.GetRandomItemOrNull();
 

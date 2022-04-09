@@ -1,23 +1,29 @@
-using System.Threading.Tasks;
-using Chotiskazal.Bot.Questions;
-using SayWhat.Bll;
+using System.Collections.Generic;
+using System.Linq;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions {
 public static class QuestionHelper {
-    public static async Task<QuestionResult> TryReplyWriteQuestionIfResultIsCorrectOrSemiCorrect(ChatRoom chat, string correctSpelling, StringsCompareResult inputCloseness) {
-        switch (inputCloseness) {
-            case StringsCompareResult.Equal:
-                return QuestionResult.Passed(chat.Texts);
-            case StringsCompareResult.SmallMistakes:
-                await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(correctSpelling));
-                return QuestionResult.RetryThisQuestion;
-            case StringsCompareResult.BigMistakes:
-                return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(correctSpelling),
-                    chat.Texts);
-            default:
-                return null;
-        }
-    }
+    public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
+        => list
+           .Where(p => p.Word != englishWord)
+           .Select(e => e.Word)
+           .Shuffle()
+           .Take(count)
+           .Append(englishWord)
+           .Shuffle()
+           .ToArray();
+    
+    public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation, int count)
+        => list
+           .SelectMany(e => e.TextTranslations)
+           .Where(e=>e != translation.Word)
+           .Distinct()
+           .Shuffle()
+           .Take(count)
+           .Append(translation.Word)
+           .Shuffle()
+           .ToArray();
 }
-}
+}   

@@ -180,14 +180,18 @@ namespace Chotiskazal.Bot.Questions
             expectedScore: 2.6,
             frequency:10);
 
+        private readonly ExamAndPreferredScore _engChooseByTranscriptionExam = new ExamAndPreferredScore(
+            question: new TranscriptionChooseEngQuestion(),
+            expectedScore: 2.7,
+            frequency: 7);
 
         private readonly ExamAndPreferredScore _ruChooseByTranscriptionExam = new ExamAndPreferredScore(
-            question: new RuChooseByTranscriptionQuestion(),
+            question: new TranscriptionChooseRuQuestion(),
             expectedScore: 3.3,
-            frequency: 10);
+            frequency: 7);
         
         private readonly ExamAndPreferredScore _hideousRuChooseByTranscriptionExam = new ExamAndPreferredScore(
-            question: new ClearScreenQuestionDecorator(new RuChooseByTranscriptionQuestion()),
+            question: new ClearScreenQuestionDecorator(new TranscriptionChooseRuQuestion()),
             expectedScore: 4,
             frequency: 10);
         
@@ -250,6 +254,7 @@ namespace Chotiskazal.Bot.Questions
                 _ruTrustSingle,
                 _ruTrustSingleHideous,
                 _hideousEngTrust,
+                _engChooseByTranscriptionExam,
                 _ruChooseByTranscriptionExam,
                 _transcriptionExam,
                 _isItRightTranslationExam,
@@ -291,6 +296,7 @@ namespace Chotiskazal.Bot.Questions
                 _engChooseWordInPhrase,
                 _clearEngChooseWordInPhrase,
                 _assemblePhraseExam,
+                _engChooseByTranscriptionExam,
                _ruChooseByTranscriptionExam,
                _hideousRuChooseByTranscriptionExam,
                _hideousTranscriptionExam,

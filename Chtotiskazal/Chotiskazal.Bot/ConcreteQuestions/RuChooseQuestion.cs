@@ -15,13 +15,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
-            var variants = examList.Where(e=>e.AllTranslationsAsSingleString!=word.AllTranslationsAsSingleString)
-                .Select(e => e.Word)
-                .Take(5)
-                .Append(word.Word)
-                .Shuffle()
-                .ToArray();
-
+            string[] variants = QuestionHelper.GetEngVariants(examList, word.Word, 5);
 
             var msg = QuestionMarkups.TranslateTemplate(word.AllTranslationsAsSingleString, chat.Texts.ChooseTheTranslation);
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
