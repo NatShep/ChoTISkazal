@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -44,17 +45,19 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
             
-            if (closeness== StringsCompareResult.Equal)
-                return QuestionResult.Passed(chat.Texts);
-            
-            if (closeness == StringsCompareResult.BigMistakes){
-                await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
-                return QuestionResult.RetryThisQuestion;
+            switch (closeness) {
+                case StringsCompareResult.Equal:
+                    return QuestionResult.Passed(chat.Texts);
+                case StringsCompareResult.SmallMistakes:
+                case StringsCompareResult.BigMistakes:
+                    await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
+                    return QuestionResult.RetryThisQuestion;
+                case StringsCompareResult.NotEqual:
+                default:
+                    return QuestionResult.Failed(
+                        $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
+                        chat.Texts);
             }
-
-            return QuestionResult.Failed(
-                $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
-                chat.Texts);
         }
     }
 }
