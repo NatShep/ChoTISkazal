@@ -57,9 +57,17 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
                 return QuestionResult.RetryThisQuestion;
             }
-
+            //if user enters whole phrase - it is ok!
+            
+            var phraseComparation = ruPhrase.CheckCloseness(enter.Trim());
+            if (phraseComparation == StringsCompareResult.Equal)
+                return QuestionResult.Passed(chat.Texts);
+            if (phraseComparation == StringsCompareResult.SmallMistakes) {
+                await chat.SendMessageAsync(chat.Texts.RetryAlmostRightWithTypo);
+                return QuestionResult.RetryThisQuestion;
+            }
             return QuestionResult.Failed(chat.Texts.FailedOriginExampleWas2 +
-                                                 Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(),
+                                         Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(),
                 chat.Texts);
         }
     }

@@ -12,7 +12,7 @@ namespace Chotiskazal.Investigation {
 
 class Program {
     static void Main() {
-        var client = new MongoClient("<key");
+        var client = new MongoClient("key");
         var db = client.GetDatabase("SayWhatDb");
         var collection = db.GetCollection<Qmodel>("questionMetrics");
         var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
