@@ -43,7 +43,8 @@ namespace Chotiskazal.Bot.Interface
         }
 
         private static string ConvertToMarkdownString(string str) {
-            var a = str.Replace(@"\", "\\\\")
+            var a = str
+                    .Replace(@"\", "\\\\") 
                     .Replace("`","\\`")
                     .Replace("*", "\\*")
                     .Replace("_", "\\_")
@@ -58,7 +59,10 @@ namespace Chotiskazal.Bot.Interface
                     .Replace("-", "\\-")
                     .Replace(".", "\\.")
                     .Replace("!", "\\!")
-                    .Replace("\"", "\\\"")
+                    .Replace("=", "\\=")
+                    .Replace(">", "\\>")
+                    .Replace("|", "\\|")
+                    .Replace("~", "\\~")
                 ;
             return a;
         }
