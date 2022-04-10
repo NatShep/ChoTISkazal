@@ -1,5 +1,8 @@
+using System.Text;
+using Chotiskazal.Bot;
 using Chotiskazal.Bot.Interface;
 using NUnit.Framework;
+using NUnit.Framework.Internal.Execution;
 using SayWhat.Bll;
 
 namespace SayWhat.MongoDAL.Tests {
@@ -149,6 +152,20 @@ public class MarkdownTest {
         var m2 = Markdown.Escaped(s2);
         Assert.AreEqual(expected,m1.AddMarkdown(s2.ToPreFormattedMonoMarkdown()).GetMarkdownString());
         Assert.AreEqual(expected, (m1 + m2.ToPreFormattedMono()).GetMarkdownString());
+    }
+
+    [TestCase("markdown1","```\r\nmarkdown1\r\n```")]
+    public void StringBuilderCompositionMethodTest(string s, string expected) {
+        var sb = new StringBuilder();
+        sb.Append($"```\r\n{Markdown.Escaped(s).GetMarkdownString()}\r\n```");
+        Assert.AreEqual(expected,sb.ToString().ToBypassedMarkdown().GetMarkdownString());
+    }
+    
+    public void UseEmojimarkdownTest() {
+        foreach (var element in Emojis.Elements) {
+            Assert.AreEqual(element, element.ToEscapedMarkdown().GetMarkdownString());
+            Assert.AreEqual(element, element.ToBypassedMarkdown().GetMarkdownString());
+        }
     }
 }
 }
