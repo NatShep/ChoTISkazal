@@ -4,7 +4,7 @@ using Chotiskazal.Bot.Interface;
 namespace Chotiskazal.Bot.Questions {
 public static class QuestionMarkups {
     private static readonly Markdown QuestionHeader = Markdown.Escaped("---❔---").ToPreFormattedMono();
-    public static Markdown FreeTemplateMarkdown(Markdown s) => QuestionHeader + Markdown.Bypassed("\r\n") + s;
+    public static Markdown FreeTemplateMarkdown(Markdown s) => QuestionHeader + Markdown.Escaped("\r\n") + s;
 
     public static Markdown TranslateTemplate(string word, string instruction)
         => QuestionHeader
