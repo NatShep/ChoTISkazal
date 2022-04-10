@@ -53,7 +53,7 @@ public class MarkdownTest {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
         Assert.AreEqual(expected,m1.AddEscaped(s2).GetMarkdownString());
-        // it seems better:   m1.AddMarkdown(s2.ToEscapedMarkdown));
+        Assert.AreEqual(expected, m1.AddMarkdown(s2.ToEscapedMarkdown()).GetMarkdownString());
     }
     
     [TestCase("markdown1", "markdown2","markdown1markdown2")]
@@ -64,7 +64,7 @@ public class MarkdownTest {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
         Assert.AreEqual(expected,m1.AddBypassed(s2).GetMarkdownString());
-        // it seems better:   m1.AddMarkdown(s2.ToBypassedMarkdown));
+        Assert.AreEqual(expected, m1.AddMarkdown(s2.ToBypassedMarkdown()).GetMarkdownString());
     }
     
     [TestCase("markdown1", "markdown2","_markdown1markdown2_")]

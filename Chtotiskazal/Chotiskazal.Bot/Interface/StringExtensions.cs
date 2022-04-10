@@ -15,5 +15,13 @@ public static class StringExtensions {
     public static Markdown ToMonoMarkdown(this string s) {
         return Markdown.Escaped(s).ToMono();
     }
+
+    public static Markdown ToBypassedMarkdown(this string s) {
+        return Markdown.Bypassed(s);
+    }
+    
+    public static  Markdown ToEscapedMarkdown(this string s) {
+        return Markdown.Escaped(s);
+    }
 }
 }
