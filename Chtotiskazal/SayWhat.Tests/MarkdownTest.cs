@@ -11,6 +11,7 @@ public class MarkdownTest {
     [TestCase("Word.", "Word\\.")]
     [TestCase(".Word.", "\\.Word\\.")]
     [TestCase("*Word*", "\\*Word\\*")]
+    [TestCase("\\*Word\\*", "\\\\\\*Word\\\\\\*")]
     [TestCase("Wo*rd", "Wo\\*rd")]
     [TestCase("*Word", "\\*Word")]
     [TestCase("Word*", "Word\\*")]
@@ -21,6 +22,7 @@ public class MarkdownTest {
     [TestCase("Word.", "Word.")]
     [TestCase(".Word.", ".Word.")]
     [TestCase("*Word*", "*Word*")]
+    [TestCase("\\*Word\\*", "\\*Word\\*")]
     [TestCase("", "")]
 
     public void GetOrdinaryStringWhenEscaped(string origin, string expected) => Assert.AreEqual(expected, Markdown.Escaped(origin).GetOrdinalString());
@@ -28,15 +30,17 @@ public class MarkdownTest {
     [TestCase("Word.", "Word.")]
     [TestCase(".Word.", ".Word.")]
     [TestCase("*Word*", "*Word*")]
+    [TestCase("\\*Word\\*", "\\*Word\\*")]
     [TestCase("", "")]
-    public void GetMarkdownStringWhenByPasssed(string origin, string expected) => Assert.AreEqual(expected, Markdown.Bypassed(origin).GetMarkdownString());
+    public void GetMarkdownStringWhenBypassed(string origin, string expected) => Assert.AreEqual(expected, Markdown.Bypassed(origin).GetMarkdownString());
 
     [TestCase("Word.", "Word.")]
     [TestCase(".Word.", ".Word.")]
     [TestCase("*Word*", "*Word*")]
+    [TestCase("\\*Word\\*", "\\*Word\\*")]
     [TestCase("", "")]
 
-    public void GetOrdinaryStringWhenByPasssed(string origin, string expected) => Assert.AreEqual(expected, Markdown.Bypassed(origin).GetOrdinalString());
+    public void GetOrdinaryStringWhenBypassed(string origin, string expected) => Assert.AreEqual(expected, Markdown.Bypassed(origin).GetOrdinalString());
 
     [TestCase("markdown1", "markdown2","markdown1markdown2")]
     [TestCase("markdown1", "*markdown2","markdown1\\*markdown2")]
