@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Chotiskazal.Bot\Chotiskazal.Bot.csproj" />
       <ProjectReference Include="..\SayWhat.Bll\SayWhat.Bll.csproj" />
       <ProjectReference Include="..\SayWhat.MongoDAL\SayWhat.MongoDAL.csproj" />
     </ItemGroup>

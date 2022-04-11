@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -45,40 +46,42 @@ public class ShowWellKnownWordsFlow {
             paginationForWords.Add(wellKnownWords.Skip(i).Take(10).ToList());
             i += 10;
         }
-
-        var msg = new StringBuilder();
-        msg.Append("*");
-
+        
+        var message = Markdown.Empty;
+        
         if (!wellKnownWords.Any())
-            msg.Append(Chat.Texts.NoWellKnownWords);
+            message.AddEscaped(Chat.Texts.NoWellKnownWords);
         else if (wellKnownWords.Length == 1)
-            msg.Append(Chat.Texts.JustOneLearnedWord);
+            message.AddEscaped(Chat.Texts.JustOneLearnedWord);
         else if (wellKnownWords.Length <= 4)
-            msg.Append(Chat.Texts.LearnSomeWordsMarkdown(wellKnownWords.Length));
+            message.AddMarkdown(Chat.Texts.LearnSomeWords(wellKnownWords.Length));
         else
-            msg.Append(Chat.Texts.LearnMoreWordsMarkdown(wellKnownWords.Length));
+            message.AddMarkdown(Chat.Texts.LearnMoreWords(wellKnownWords.Length));
 
-        msg.Append("*\r\n\r\n");
+        message = message.ToSemiBold().NewLine().NewLine();
 
         if (wellKnownWords.Length == 0)
             return;
-        var msgWithWords = new StringBuilder();
-        foreach (var word in paginationForWords[0])
-        {
-            msgWithWords.Append(
-                $"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+
+        var msgWithWords = Markdown.Empty;
+        foreach (var word in paginationForWords[0]) {
+            msgWithWords += Markdown.Escaped($"{Emojis.SoftMark} ") +
+                              Markdown.Escaped($"{word.Word}: ").ToSemiBold() +
+                              Markdown.Escaped(word.AllTranslationsAsSingleString)
+                                  .NewLine();
         }
 
         if (paginationForWords.Count > 1)
-            msgWithWords.Append(Chat.Texts.PageXofYMarkdown(1, paginationForWords.Count));
-
+            msgWithWords += Chat.Texts.PageXofY(1, paginationForWords.Count);
 
         InlineKeyboardButton[][] buttons = null;
         if (paginationForWords.Count > 1)
         {
             _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
             _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
-            _wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
+            
+            //TODO зачем это? Выше формируется строка с маркдаун форматированием, но где она применяется? 
+            //_wellKnownWordsUpdateHook.SetBeginningMessage(message.GetMarkdownString());
 
             buttons = new[] {
                 WellKnownWordsHelper.GetPagingKeys(),
@@ -92,7 +95,7 @@ public class ShowWellKnownWordsFlow {
                 new[] { InlineButtons.MainMenu($"{Chat.Texts.TranslateButton} {Emojis.Translate}") }
             };
 
-        await Chat.ChatIo.SendMarkdownMessageAsync(msgWithWords.ToString(), buttons);
+        await Chat.ChatIo.SendMessageAsync(msgWithWords, buttons);
     }
 }
 

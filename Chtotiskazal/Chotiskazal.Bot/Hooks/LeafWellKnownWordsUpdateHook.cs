@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
+using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types;
@@ -17,7 +18,6 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
     public void SetWellKnownWords(List<List<UserWordModel>> wellKnownWords) => _pages.Set(wellKnownWords);
     public void SetNumberOfPaginate(int i) => _pages.Page = i;
-    public void SetBeginningMessage(string msg) { }
 
     public bool CanBeHandled(Update update) {
         var text = update.CallbackQuery?.Data;
@@ -36,18 +36,20 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
         else
             _pages.MoveNext();
 
-        var msg = new StringBuilder();
+        var msg = Markdown.Empty;
 
-        foreach (var word in _pages.Current)
-        {
-            msg.Append($"{Emojis.SoftMark} *{word.Word}:* {word.AllTranslationsAsSingleString}\r\n");
+        foreach (var word in _pages.Current) {
+            msg = msg.AddEscaped(Emojis.SoftMark) +
+                Markdown.Escaped($"{word.Word}:").ToSemiBold()
+                    .AddEscaped(word.AllTranslationsAsSingleString)
+                    .NewLine();
         }
 
-        msg.Append(Chat.Texts.PageXofYMarkdown(_pages.Page + 1, _pages.Count));
+        msg += (Chat.Texts.PageXofY(_pages.Page + 1, _pages.Count));
 
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,
-            msg.ToString(),
+            msg,
             new[] {
                 WellKnownWordsHelper.GetPagingKeys(),
                 new[] {

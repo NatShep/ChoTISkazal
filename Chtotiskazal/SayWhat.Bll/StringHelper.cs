@@ -14,9 +14,6 @@ namespace SayWhat.Bll
     }
     public static class StringHelper
     {
-        public static string EscapeForMarkdown(this string targetString) 
-            => targetString.Replace(".", "\\.").Replace("-", "\\-").Replace("!","\\!");
-
         public static (string, StringsCompareResult) GetClosestTo(this IReadOnlyList<string> translations, string translation)
         {
             if(translations==null || translations.Count==0)

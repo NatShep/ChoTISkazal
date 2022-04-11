@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Chotiskazal.Bot.InterfaceLang;
+using Chotiskazal.Bot.Interface;
+using Chotiskazal.Bot.Interface.InterfaceTexts;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
@@ -17,14 +18,17 @@ public static class StatsRenderer {
     private const string S5 = Emojis.GreenSquare;
     private const string S6 = Emojis.Fire;
 
-    public static string GetStatsText(ExamSettings settings, ChatRoom chat) =>
-        RenderStats(settings, chat) +
-        $"```\r\n" +
-        Render7WeeksCalendar(settings, chat.User.LastDaysStats.Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging)).ToArray(), chat.Texts) +
-        $"```\r\n" +
-        $"\r\n" +
-        $"*{RenderRecomendations(chat.User, chat.Texts)}*";
-    private static string Render7WeeksCalendar(
+    public static Markdown GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
+        RenderStatsMarkdown(settings, chat) +
+        Render7WeeksCalendarMarkdown(settings, chat.User.LastDaysStats
+                .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
+                .ToArray(), chat.Texts)
+            .ToPreFormattedMono()
+            .NewLine() +
+        RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+
+    private static Markdown Render7WeeksCalendarMarkdown(
+        
         ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts) {
         var today = DateTime.Today;
         var offsets = items.ToDictionary(
@@ -38,14 +42,14 @@ public static class StatsRenderer {
             undoneInLastWeek = (7 - (int)minDay.DayOfWeek);
 
 
-        var sb = new StringBuilder("----------------------\r\n");
+        var sbWithMarkwownFormatted = new StringBuilder("----------------------\r\n");
 
         for (int day = 0; day < 7; day++) {
-            sb.Append(texts.ShortDayNames[day] + " ");
+            sbWithMarkwownFormatted.Append(Markdown.Escaped(texts.ShortDayNames[day] + " ").GetMarkdownString());
             for (int week = 7; week > 0; week--) {
                 var offset = 7 * week - undoneInLastWeek - day - 1;
                 if (offset < 0)
-                    sb.Append(Empty);
+                    sbWithMarkwownFormatted.Append(Empty);
                 else if (offsets.TryGetValue(offset, out var v)) {
                     var symbol
                         = v < 0.1 ? S1
@@ -54,55 +58,61 @@ public static class StatsRenderer {
                         : v < 1.0 ? S4
                         : v <= 2.0 ? S5
                         : S6;
-                    sb.Append(symbol);
+                    sbWithMarkwownFormatted.Append(symbol);
                 }
                 else
-                    sb.Append(S0);
+                    sbWithMarkwownFormatted.Append(S0);
             }
 
-            sb.Append("\r\n");
+            sbWithMarkwownFormatted.Append("\r\n");
         }
-        sb.Append("----------------------\r\n ");
-        sb.Append($"{texts.less} {S1}{S2}{S3}{S4}{S5} {texts.more}\r\n");
-        return sb.ToString();
+        sbWithMarkwownFormatted.Append("----------------------\r\n ");
+        sbWithMarkwownFormatted.Append($"{Markdown.Escaped(texts.less).GetMarkdownString()} {S1}{S2}{S3}{S4}{S5} {Markdown.Escaped(texts.more).GetMarkdownString()}\r\n");
+        return Markdown.Bypassed(sbWithMarkwownFormatted.ToString());
     }
 
-    private static string RenderStats(ExamSettings settings, ChatRoom chat) {
+    private static Markdown RenderStatsMarkdown(ExamSettings settings, ChatRoom chat) {
         var lastMonth = chat.User.GetLastMonth();
         var lastDay = chat.User.GetToday();
-        var statsText = $"{chat.Texts.StatsYourStats}: \r\n```\r\n" +
-                        $"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
-                        $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
-                        $"  {chat.Texts.StatsScore}: {(int)chat.User.GamingScore}\r\n```\r\n" +
-                        $"{chat.Texts.StatsThisMonth}:\r\n```" +
-                        $"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
-                        $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
-                        $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
-                        $"  {chat.Texts.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n```\r\n" +
-                        $"{chat.Texts.StatsThisDay}:\r\n```" +
-                        $"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
-                        $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
-                        $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.ExamsCountGoalForDay}\r\n" +
-                        $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n```\r\n" +
-                        $" {chat.Texts.StatsActivityForLast7Weeks}:\r\n";
-        return statsText;
+
+        var statsTextMarkdown = Markdown.Escaped(chat.Texts.StatsYourStats + ":\r\n") +
+                                Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
+                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                                                 $"  {chat.Texts.StatsScore}: {(int) chat.User.GamingScore}\r\n")
+                                    .ToPreFormattedMono() +
+                                Markdown.Escaped($"{chat.Texts.StatsThisMonth}:\r\n") +
+                                Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
+                                                 $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
+                                                 $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
+                                                 $"  {chat.Texts.StatsScore}: {(int) lastMonth.GameScoreChanging}\r\n")
+                                    .ToPreFormattedMono() +
+                                Markdown.Escaped($"{chat.Texts.StatsThisDay}:\r\n") +
+                                Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
+                                                 $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
+                                                 $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.ExamsCountGoalForDay}\r\n" +
+                                                 $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n")
+                                    .ToPreFormattedMono() +
+                                Markdown.Escaped($" {chat.Texts.StatsActivityForLast7Weeks}:\r\n");
+
+        return statsTextMarkdown;
     }
 
-    private static string RenderRecomendations(UserModel user, IInterfaceTexts texts) {
+    private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
+     
         if (user.Zen.Rate < -15)
-            return texts.Zen1WeNeedMuchMoreNewWords;
+            return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
         else if (user.Zen.Rate < -10)
-            return texts.Zen2TranslateNewWords;
+            return Markdown.Escaped(texts.Zen2TranslateNewWords);
         else if (user.Zen.Rate < -5)
-            return texts.Zen3TranslateNewWordsAndPassExams;
+            return Markdown.Escaped(texts.Zen3TranslateNewWordsAndPassExams);
         else if (user.Zen.Rate < 5)
-            return texts.Zen3EverythingIsGood;
+            return Markdown.Escaped(texts.Zen3EverythingIsGood);
         else if (user.Zen.Rate < 10)
-            return texts.Zen4PassExamsAndTranslateNewWords;
+            return Markdown.Escaped(texts.Zen4PassExamsAndTranslateNewWords);
         else if (user.Zen.Rate < 20)
-            return texts.Zen5PassExams;
+            return Markdown.Escaped(texts.Zen5PassExams);
         else
-            return texts.Zen6YouNeedToLearn;
+            return Markdown.Escaped(texts.Zen6YouNeedToLearn);
     }
 }
 }

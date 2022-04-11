@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -55,7 +56,7 @@ static class RuWriteQuestionHelper {
             return QuestionResult.Impossible;
 
         await chat.SendMarkdownMessageAsync(
-            QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslationMarkdown));
+            QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslation));
 
         var enUserEntry = await chat.WaitUserTextInputAsync();
 
@@ -75,12 +76,12 @@ static class RuWriteQuestionHelper {
 
         if (comparation == StringsCompareResult.SmallMistakes)
         {
-            await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(word.Word));
+            await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(word.Word));
             return QuestionResult.RetryThisQuestion;
         }
 
         if (comparation == StringsCompareResult.BigMistakes)
-            return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(word.Word), chat.Texts.Mistaken);
+            return QuestionResult.Failed(Markdown.Escaped(chat.Texts.FailedMistaken(word.Word)), Markdown.Escaped(chat.Texts.Mistaken));
         
         // ## Other translation case ##
 
@@ -107,10 +108,13 @@ static class RuWriteQuestionHelper {
         }
 
         var translates = string.Join(",", otherRuTranslationsOfUserInput);
-        string failedMessage = "";
+       
+        Markdown failedMessage = Markdown.Empty;
         if (!string.IsNullOrWhiteSpace(translates))
-            failedMessage = $"{enUserEntry} {chat.Texts.translatesAs} {translates}\r\n";
-        failedMessage += $"{chat.Texts.RightTranslationWas}: *\"{word.Word}\"*";
+            failedMessage = Markdown.Escaped($"{enUserEntry} {chat.Texts.translatesAs} {translates}").NewLine();
+        failedMessage += Markdown.Escaped($"{chat.Texts.RightTranslationWas}: ") +
+                         Markdown.Escaped($"\"{word.Word}\"").ToSemiBold();
+        
         return QuestionResult.Failed(
             failedMessage,
             chat.Texts);

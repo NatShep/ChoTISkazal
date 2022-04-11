@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -34,7 +35,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
 
             await chat.SendMarkdownMessageAsync(
-                QuestionMarkups.FreeTemplate($"{chat.Texts.WordsInPhraseAreShuffledWriteThemInOrderMarkdown}:\r\n*\"{shuffled}\"*"));
+                QuestionMarkups.FreeTemplateMarkdown(
+                    chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
+                        .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
+            
             var entry = await chat.WaitUserTextInputAsync();
 
             if (entry.IsRussian())
@@ -55,7 +59,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 case StringsCompareResult.NotEqual:
                 default:
                     return QuestionResult.Failed(
-                        $"{chat.Texts.FailedOriginExampleWas2Markdown}:\r\n*\"{targetPhrase.OriginPhrase}\"*", 
+                        Markdown.Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
+                            .NewLine()
+                            .AddMarkdown($"\"{targetPhrase.OriginPhrase}\"".ToSemiBoldMarkdown()),
                         chat.Texts);
             }
         }

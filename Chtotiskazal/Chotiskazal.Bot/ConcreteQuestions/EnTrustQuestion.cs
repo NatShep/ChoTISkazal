@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.MongoDAL;
@@ -15,7 +16,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList) {
-            var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.DoYouKnowTranslationMarkdown);
+            var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.DoYouKnowTranslation);
             var id = Rand.Next();
             await chat.SendMarkdownMessageAsync(msg,
                 new InlineKeyboardButton {
@@ -38,9 +39,12 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 }
             }
 
-            await chat.SendMarkdownMessageAsync($"_{chat.Texts.TranslationIs}_ \r\n" +
-                                        $"*\"{word.AllTranslationsAsSingleString}\"*\r\n\r\n" +
-                                        $"{chat.Texts.DidYouGuess}",
+            await chat.SendMarkdownMessageAsync(Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()
+                    .NewLine() +
+                                                Markdown.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold()
+                                                    .NewLine()
+                                                    .NewLine() +
+                                                Markdown.Escaped(chat.Texts.DidYouGuess),
                                             new[] {
                                                 new[] {
                                                     new InlineKeyboardButton {
@@ -57,8 +61,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var choice = await chat.WaitInlineIntKeyboardInput();
 
             return choice == 1 ? 
-                QuestionResult.Passed(chat.Texts.PassedOpenIHopeYouWereHonestMarkdown, chat.Texts.PassedHideousWellMarkdown ) 
-                : QuestionResult.Failed(chat.Texts.FailedOpenButYouWereHonestMarkdown, chat.Texts.FailedHideousHonestyIsGoldMarkdown);
+                QuestionResult.Passed(Markdown.Escaped(chat.Texts.PassedOpenIHopeYouWereHonest), 
+                    Markdown.Escaped(chat.Texts.PassedHideousWell)) 
+                : QuestionResult.Failed(Markdown.Escaped(chat.Texts.FailedOpenButYouWereHonest), 
+                    Markdown.Escaped(chat.Texts.FailedHideousHonestyIsGold));
         }
     }
 }
