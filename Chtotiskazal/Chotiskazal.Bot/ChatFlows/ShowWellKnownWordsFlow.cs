@@ -46,20 +46,19 @@ public class ShowWellKnownWordsFlow {
             paginationForWords.Add(wellKnownWords.Skip(i).Take(10).ToList());
             i += 10;
         }
-
-        var msg = new StringBuilder();
-        msg.Append("*");
-
+        
+        var message = Markdown.Empty;
+        
         if (!wellKnownWords.Any())
-            msg.Append(Chat.Texts.NoWellKnownWords);
+            message.AddEscaped(Chat.Texts.NoWellKnownWords);
         else if (wellKnownWords.Length == 1)
-            msg.Append(Chat.Texts.JustOneLearnedWord);
+            message.AddEscaped(Chat.Texts.JustOneLearnedWord);
         else if (wellKnownWords.Length <= 4)
-            msg.Append(Chat.Texts.LearnSomeWords(wellKnownWords.Length));
+            message.AddMarkdown(Chat.Texts.LearnSomeWords(wellKnownWords.Length));
         else
-            msg.Append(Chat.Texts.LearnMoreWords(wellKnownWords.Length));
+            message.AddMarkdown(Chat.Texts.LearnMoreWords(wellKnownWords.Length));
 
-        msg.Append("*\r\n\r\n");
+        message = message.ToSemiBold().NewLine().NewLine();
 
         if (wellKnownWords.Length == 0)
             return;
@@ -82,7 +81,7 @@ public class ShowWellKnownWordsFlow {
             _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
             
             //TODO зачем это? Выше формируется строка с маркдаун форматированием, но где она применяется? 
-            //_wellKnownWordsUpdateHook.SetBeginningMessage(msg.ToString());
+            //_wellKnownWordsUpdateHook.SetBeginningMessage(message.GetMarkdownString());
 
             buttons = new[] {
                 WellKnownWordsHelper.GetPagingKeys(),

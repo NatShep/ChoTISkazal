@@ -65,8 +65,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             }
             if (otherComparation == StringsCompareResult.SmallMistakes) {
                 await chat.SendMarkdownMessageAsync(
-                    Markdown.Escaped($"{chat.Texts.OutOfScopeWithCandidate(otherMeaning)}:") +
-                    Markdown.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold());
+                    chat.Texts.OutOfScopeWithCandidate(otherMeaning)
+                        .AddEscaped(": ")
+                        .AddMarkdown($"\"{word.AllTranslationsAsSingleString}\"".ToSemiBoldMarkdown()));
                 return QuestionResult.RetryThisQuestion;
             }
 
