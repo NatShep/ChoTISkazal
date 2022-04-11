@@ -5,11 +5,11 @@ using SayWhat.Bll.Dto;
 
 namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
-/*public class RussianTexts : IInterfaceTexts {
+public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
-    public object less => "меньше";
+    public string less => "меньше";
 
-    public string thenClickStartMarkdown => "затем нажмите 'старт'";
+    public string thenClickStart => "then click start";
     public string ChooseTheTranslation => "Выберите перевод";
     public string translatesAs => "переводится как";
     public string ChooseMissingWord => "Выберите пропущенное слово";
@@ -17,23 +17,28 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
     public string EnterMissingWord => "Введите пропущенное слово";
     public string TypoAlmostRight => "Очепяточка. Попробуем еще разок";
     public string InterfaceLanguageSetuped => "Язык интрфейса - русский.";
-    public string NoWellKnownWords => "Выученных слов нет\\! Нажми \"учить\" и проходи тесты\\.";
-    public string JustOneLearnedWord => "Выучено только одно слово\\! Какая жалость\\.";
+    public string NoWellKnownWords => "Выученных слов нет! Нажми \"учить\" и проходи тесты.";
+    public string JustOneLearnedWord => "Выучено только одно слово! Какая жалость.";
     public string SelectWordInLearningSet => "Хочу учить";
     public string Skip => "Пропустить";
     public string ChooseLearningSet => "Выберите набор слов для изучения";
-    public string RussianInputExpected => "Ожидался ответ на русском"; 
-    public string EnglishInputExpected => "Ожидался ответ на английском"; 
-    public string OutOfScopeWithCandidateMarkdown(string otherMeaning)
-        => $"Перевод-то правильный, но учим мы не его \\(имелось ввиду *\"{otherMeaning}\"*?)\\. Ожидаемые переводы";
-
-    public string OutOfScopeTranslationMarkdown { get; }
-        = $"Перевод то правильный, но учим мы не его\\. Ожидаемые переводы";
-
-    public string FailedTranslationWasMarkdown => "Правильный перевод";
+    public string RussianInputExpected => "Ожидался ответ на русском";
+    public string EnglishInputExpected => "Ожидался ответ на английском";
+    public string TodaysGoal => "Цель на день";
+    public string Exams => "экзаменов";
+    public string TodayGoalReached => "Цель на день - достигнута!";
+    public Markdown OutOfScopeWithCandidate(string otherMeaning) {
+        return Markdown.Escaped("Перевод-то правильный, но учим мы не его (имелось ввиду ")
+            .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
+            .AddEscaped("?).\r\nОжидаемые переводы");
+    }
+    public string OutOfScopeTranslation { get; }
+        = "Перевод то правильный, но учим мы не его. " +
+          "\r\nОжидаемые переводы";
+    public string FailedTranslationWas => "Правильный перевод";
     public string ItIsNotRightTryAgain => "Неа. Давай попробуем еще раз";
     public string SeeTheTranslation => "Посмотреть перевод";
-    public string DoYouKnowTranslationMarkdown { get; } = $"Вы знаете перевод?";
+    public string DoYouKnowTranslation => "Вы знаете перевод?";
     public string TranslationIs => "Правильный перевод";
     public string DidYouGuess => "Вы угадали?";
     public string IsItRightTranslation => "Это правильный перевод?";
@@ -41,48 +46,39 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
     public string ChooseWhichWordHasThisTranscription => "Выберите слово к которому подходит эта транскрипция";
     public string RetryAlmostRightWithTypo => "Опечатка. Давайте заново.";
     public string ShowTheTranslationButton => "Показать перевод";
-    public string WriteTheTranslationMarkdown { get; } = $"Напишите перевод\\.\\.\\. ";
+    public string WriteTheTranslation => "Напишите перевод... ";
     public string RightTranslationWas => "А правильный перевод это";
-
     public string CorrectTranslationButQuestionWasAbout => "Перевод то верный, но вопрос был о слове";
-
     public string LetsTryAgain => "Давайте еще разок";
     public string ChooseTheTranscription => "Выберите транскрипцию";
-    public string WordsInPhraseAreShuffledWriteThemInOrderMarkdown =>
-        "Слава во фразе перепутаны местами\\. Напишите эту фразу";
 
-
-    public string YouHaveATypoLetsTryAgainMarkdown(string text)
-        => $"Ошибочка\\. Правильно будет *\"{text}\"*\\. Давайте еще разок\\.";
-
+    public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
+       Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
+    public Markdown YouHaveATypoLetsTryAgain(string text)
+        => Markdown.Escaped("Ошибочка\\. Правильно будет ")
+            .AddMarkdown(text.ToSemiBoldMarkdown())
+            .AddEscaped(". Давайте еще разок.");
 
     #region questionResult
 
-    public string Passed1Markdown => "Дыа\\!";
-    public string PassedOpenIHopeYouWereHonestMarkdown => "Надеюсь вы были честны с собой";
-    public string PassedHideousWellMarkdown => "Неплохо";
+    public string Passed1 => "Дыа!";
+    public string PassedOpenIHopeYouWereHonest => "Надеюсь вы были честны с собой";
+    public string PassedHideousWell => "Неплохо";
     public string PassedHideousWell2 => "Отлично";
-    public string FailedOpenButYouWereHonestMarkdown => "Вы хотя бы были честны\\.\\.\\.";
-    public string FailedHideousHonestyIsGoldMarkdown => "Искренность \\- золото";
-
-    public string FailedMistakenMarkdown(string text)
-        => $"Ой ой ой\\. Правильно будет \\- *\"{text}\"*";
-
-    public object FailedOriginExampleWas2Markdown => "Неа\\. Фраза была";
-    public object FailedOriginExampleWasMarkdown => "Фраза была";
-    public object FailedOriginExampleWas2 => "Фраза была";
-    public string FailedDefaultMarkdown => "Ой не\\.\\.\\.";
-    public string PassedDefaultMarkdown => "И это правильный ответ";
-    public string IgnoredDefaultMarkdown => "Ну такое \\.\\.\\.";
-
-    public string FailedHideousDefaultMarkdown => "Последний ответ был не верен";
-    public string PassedHideousDefaultMarkdown => "Последний ответ был верен";
-
+    public string FailedOpenButYouWereHonest => "Вы хотя бы были честны...";
+    public string FailedHideousHonestyIsGold => "Искренность - золото";
+    public string FailedMistaken(string text) => $"Ой ой ой. Правильно будет - '{text}'";
+    public Markdown FailedOriginExampleWas => Markdown.Escaped("Неа. Фраза была");
+    public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Фраза была");
+    public Markdown FailedDefault => Markdown.Escaped("Ой не...");
+    public Markdown PassedDefault => Markdown.Escaped("И это правильный ответ!");
+    public Markdown IgnoredDefault => Markdown.Escaped("Ну такое...");
+    public string FailedHideousDefault => "Последний ответ был не верен";
+    public string PassedHideousDefault => "Последний ответ был верен";
     public string IgnoredHideousDefault => "Ну не совсем";
 
     #endregion
-
-
+    
     public string DidYouWriteSomething => "Вы что то писали? Всё это время я спал...";
 
     public string EnterWordOrStart =>
@@ -90,48 +86,51 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
 
-    public string LearningCarefullyStudyTheListMarkdown =>
-        "*Ботаем*\r\n\r\n" +
-        "Внимательно посмотрите слова из списка\\:";
+    public Markdown LearningCarefullyStudyTheList =>
+        Markdown.Escaped("Ботаем").ToSemiBold()
+            .NewLine()
+            .AddEscaped("Внимательно посмотрите слова из списка:");
 
-    public object LearningDone => "Ботанье завершено";
-    public object WordsInTestCount => "Слов в тренировке";
-    public object YouHaveLearnedOneWord => "Вы выботали одно слово";
-    public object YouForgotOneWord => "Одно слово у вас позабылось";
-    public object EarnedScore => "Заработано очков";
-    public object TotalScore => "Всего очков";
-    public object DontPeekUpward => "Попробуйте ответить не подглядывая на верх!";
+    public string LearningDone => "Ботанье завершено";
+    public string WordsInTestCount => "Слов в тренировке";
+    public string YouHaveLearnedOneWord => "Вы выботали одно слово";
+    public string YouForgotOneWord => "Одно слово у вас позабылось";
+    public string EarnedScore => "Заработано очков";
+    public string TotalScore => "Всего очков";
+    public string DontPeekUpward => "Попробуйте ответить не подглядывая на верх!";
 
     public string NeedToAddMoreWordsBeforeLearning => "Нужно перевести больше слов дабы начать ботать";
 
-    public string TodaysGoal => "Цель на день";
-    public string Exams => "экзаменов";
-    public string TodayGoalReached => "Цель на день - достигнута!";
+    public Markdown Help => Markdown
+        .Escaped("Привет! Я переводчик и учитель.*\r\n\r\n").ToSemiBold()
+        .AddEscaped(
+                  "1⃣ Можешь использовать меня как русско-английский переводчик. " + 
+                  $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода.\r\n\r\n" +
+                  "2⃣ Затем, когда будет времечко нажми на кнопку ")
+        .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
+        .AddEscaped($" или набери команду {BotCommands.Learn}, что бы начать учить переведенные ранее слова.\r\n\r\n" +
+                    $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
+                    $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
+                    "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
+                    "Надеюсь это порадует вас и вы выучите миллион слов. Мои создатели проверили - это работает!");
 
-    public string HelpMarkdown { get; } = "*Привет\\! Я переводчик и учитель\\.*\r\n\r\n" +
-                                          "1⃣ Можешь использовать меня как русско\\-английский переводчик\\. " +
-                                          $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода\\.\r\n\r\n" +
-                                          $"2⃣ Затем, когда будет времечко нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
-                                          $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова\\.\r\n\r\n" +
-                                          $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}\\.\r\n\r\n" +
-                                          $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение\\.\r\n\r\n" +
-                                          "\uD83D\uDE09Да, я бесплатен\\. Меня сделали для себя и для друзей\\. " +
-                                          "Надеюсь это порадует вас и вы выучите миллион слов\\. Мои создатели проверили \\- это работает\\!";
-
-    public string MainMenuTextMarkdown { get; } = "Я переводчик и учитель " +
-                                                  "Можешь использовать меня как русско\\-английский переводчик\\.\r\n\r\n" +
-                                                  $"Затем, когда будет свободная минутка, нажми на кнопку *\"Ботать {Emojis.Learning}\"* или " +
-                                                  $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова";
+    public Markdown MainMenuText =>
+        Markdown.Escaped("Я переводчик и учитель.\r\n" +
+                         "Можешь использовать меня как русско-английский переводчик.\r\n\r\n" +
+                         $"Затем, когда будет свободная минутка, нажми на кнопку \"Ботать {Emojis.Learning}\" или " +
+                         $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова");
 
     public string ActionIsNotAllowed => "Действие не разрешено";
     public string OopsSomethingGoesWrong =>
         "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
 
-    public string HereAreTheTranslationMarkdown(string word, string tr)
-        => $"_Вот что я перевел\\._ \r\n" +
-           $"_Выберите один или несколько переводов, дабы заботать их в будущем_\r\n\r\n" +
-           $"*{word.EscapeForMarkdown().Capitalize()}*" +
-           $"{(tr == null ? "\r\n" : $"\r\n```\r\n[{tr.EscapeForMarkdown()}]\r\n```")}";
+    public Markdown HereAreTheTranslation(string word, string tr)
+        => Markdown.Escaped("Вот что я перевел.\r\n" +
+                            "Выберите один или несколько переводов, дабы заботать их в будущем").ToItalic()
+            .NewLine()
+            .NewLine()
+            .AddMarkdown($"{word.Capitalize()}".ToSemiBoldMarkdown())
+            .AddMarkdown($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}".ToPreFormattedMonoMarkdown());
 
     public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
@@ -139,17 +138,17 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
     public string MessageAfterTranslationIsDeselected(Translation translation)
         => $"Будто ничего и не было";
 
-    public string LearnMoreWordsMarkdown(in int length)
-        => $"Молодец\\! Ты выучил {length} слов\\! Давай еще\\!";
+    public Markdown LearnMoreWords(in int length)
+        => Markdown.Escaped($"Молодец! Ты выучил {length} слов! Давай еще!");
 
-    public string LearnSomeWordsMarkdown(in int length)
-        => $"Выучено слов: {length}\\. Давай еще\\!";
+    public Markdown LearnSomeWords(in int length)
+        => Markdown.Escaped($"Выучено слов: {length}. Давай еще!");
 
-    public string PageXofYMarkdown(in int number, in int count)
-        => $"\r\n`Страница {number} из {count}\\.\\.\\.`";
+    public Markdown PageXofY(in int number, in int count)
+        => Markdown.Escaped($"\r\nСтраница {number} из {count}...").ToMono();
 
-    public string XofYMarkdown(in int number, in int y) 
-        => $"\r\n`Слово {number} из {y}\\.\\.\\.`";
+    public Markdown XofY(in int number, in int y)
+        => Markdown.Escaped($"\r\nСлово {number} из {y}...").ToMono();
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
@@ -159,14 +158,13 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
     public string LearningSetNotFound(string argument) => $"Набор слов '{argument}' не найден";
 
+    public string AllWordsAreLearnedMessage(string setShortName) =>
+        $"Все слова из набора '{setShortName}' были добавлены";
     public string YouHaveLearnedWords(in int count)
         => $"Выучено слов: {count}";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";
-    
-    public string AllWordsAreLearnedMessage(string setShortName) =>
-        $"Все слова из набора '{setShortName}' были добавлены";
 
     #region buttons
 
@@ -174,10 +172,9 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
     public string NoButton => "Нет";
     public string StartButton => "Start";
     public string CancelButton => "Отмена";
-    public object OneMoreLearnButton => "Еще разок";
+    public string OneMoreLearnButton => "Еще разок";
     public string TranslateButton => "Перевод";
     public string ContinueTranslateButton => "Продолжить";
-
     public string LearnButton => "Ботать";
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
@@ -190,7 +187,8 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
     #region stats
 
-    public string[] ShortDayNames { get; } = {
+    public string[] ShortDayNames { get; } =
+    {
         "пон",
         "вт ",
         "срд",
@@ -199,7 +197,10 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
         "суб",
         "вск"
     };
-    public string ZenRecomendationAfterExamWeNeedMoreNewWords => $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.New}!";
+
+    public string ZenRecomendationAfterExamWeNeedMoreNewWords =>
+        $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.New}!";
+
     public string Zen1WeNeedMuchMoreNewWords => $"Нам нужно сильно больше слов! Срочно нажимай {BotCommands.New}";
     public string Zen2TranslateNewWords => $"Хватит ботать! Пора изучать новые слова в команде {BotCommands.New}";
     public string Zen3TranslateNewWordsAndPassExams => "Отличный баланс новых слов и их выученности";
@@ -209,17 +210,16 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts {
 
     public string Zen4PassExamsAndTranslateNewWords => "Тренируйтесь и переводите.";
     public string Zen5PassExams => "Вам бы поботать";
-    public string Zen6YouNeedToLearn { get; } = $"Только ботать! Только хардкор";
-    public object StatsYourStats => "Ваши статы";
-    public object StatsWordsAdded => "Добавлено слов";
-    public object StatsLearnedWell => "Выучено";
-    public object StatsScore => "Очки";
-    public object StatsExamsPassed => "Проведено тернировок";
-    public object StatsThisMonth => "В это месяце";
-    public object StatsThisDay => "Сегодня";
-    public object StatsActivityForLast7Weeks => "Активность за последние 7 недель";
+    public string Zen6YouNeedToLearn => "Только ботать! Только хардкор";
+    public string StatsYourStats => "Ваши статы";
+    public string StatsWordsAdded => "Добавлено слов";
+    public string StatsLearnedWell => "Выучено";
+    public string StatsScore => "Очки";
+    public string StatsExamsPassed => "Проведено тернировок";
+    public string StatsThisMonth => "В это месяце";
+    public string StatsThisDay => "Сегодня";
+    public string StatsActivityForLast7Weeks => "Активность за последние 7 недель";
 
     #endregion
-}*/
-
+}
 }

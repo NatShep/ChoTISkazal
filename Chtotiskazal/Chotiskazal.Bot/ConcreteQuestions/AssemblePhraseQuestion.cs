@@ -1,5 +1,3 @@
-
-
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
@@ -60,10 +58,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
                 case StringsCompareResult.NotEqual:
                 default:
                     return QuestionResult.Failed(
-                        Markdown
-                            .Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
-                            .NewLine() +
-                        Markdown.Escaped($"\"{targetPhrase.OriginPhrase}\"").ToSemiBold(), 
+                        Markdown.Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
+                            .NewLine()
+                            .AddMarkdown($"\"{targetPhrase.OriginPhrase}\"".ToSemiBoldMarkdown()),
                         chat.Texts);
             }
         }

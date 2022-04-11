@@ -194,22 +194,22 @@ public class AddFromLearningSetFlow {
         var allowedTranslations = SearchForAllowedTranslations(translations, wordInLearningSet);
         var example = GetExampleOrNull(wordInLearningSet, allowedTranslations);
 
-        var msg = new StringBuilder();
+        var msgWithMarkdownFormatted = new StringBuilder();
         
-        msg.AppendLine($"*{Markdown.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
+        msgWithMarkdownFormatted.AppendLine($"*{Markdown.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
         if (!string.IsNullOrWhiteSpace(transcription))
-            msg.Append($"```\r\n[{Markdown.Escaped(transcription).GetMarkdownString()}]\r\n```");
-        msg.AppendLine(
+            msgWithMarkdownFormatted.Append($"```\r\n[{Markdown.Escaped(transcription).GetMarkdownString()}]\r\n```");
+        msgWithMarkdownFormatted.AppendLine(
             $"\r\n*{string.Join("\r\n", allowedTranslations.Select(a => Markdown.Escaped(a.TranslatedText.Capitalize()).GetMarkdownString()))}*");
         if (example != null)
-            msg.Append(
+            msgWithMarkdownFormatted.Append(
                 $"```\r\n\r\n" +
                 $"{Emojis.OpenQuote}{Markdown.Escaped(example.OriginPhrase).GetMarkdownString()}{Emojis.CloseQuote}\r\n" +
                 $"{Emojis.OpenQuote}{Markdown.Escaped(example.TranslatedPhrase).GetMarkdownString()}{Emojis.CloseQuote}" +
                 $"\r\n```");
-        msg.AppendLine($"\r\n{Chat.Texts.XofY(collection.Page + 1, collection.Count)}");
+        msgWithMarkdownFormatted.AppendLine($"\r\n{Chat.Texts.XofY(collection.Page + 1, collection.Count).GetMarkdownString()}");
     
-        return Markdown.Bypassed(msg.ToString());
+        return Markdown.Bypassed(msgWithMarkdownFormatted.ToString());
     }
 
     private static Example GetExampleOrNull(

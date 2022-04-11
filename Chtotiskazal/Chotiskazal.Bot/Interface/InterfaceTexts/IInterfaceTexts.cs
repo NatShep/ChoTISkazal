@@ -94,7 +94,7 @@ public interface IInterfaceTexts {
     string TodaysGoal { get;  }
     string Exams { get; }
     string TodayGoalReached { get; }
-    string OutOfScopeWithCandidate(string otherMeaning);
+    Markdown OutOfScopeWithCandidate(string otherMeaning);
     string FailedMistaken(string text);
     string MessageAfterTranslationIsSelected(Translation translation);
     string YouHaveLearnedWords(in int count);

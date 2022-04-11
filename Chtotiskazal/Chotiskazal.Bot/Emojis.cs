@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Chotiskazal.Bot
 {
@@ -22,5 +23,9 @@ namespace Chotiskazal.Bot
         public const string GreenSquare = "🟩";
         public static string NextButton  = "⏭️";
         public static string LearningSets = "§";
+
+        public static List<string> Elements = new List<string>()
+            {"🟢",  "☰", "☆", "㊍", "✅", "❌", "☑️", "✓", "➖",  "➕", ">>", "<<", "«", "»", "🔥", "🟩", 
+                "⏭️", "§"};
     }
 }
