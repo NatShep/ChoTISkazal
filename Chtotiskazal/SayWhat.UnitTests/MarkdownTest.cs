@@ -4,6 +4,7 @@ using Chotiskazal.Bot.Interface;
 using NUnit.Framework;
 using NUnit.Framework.Internal.Execution;
 using SayWhat.Bll;
+using SayWhat.Bll.Strings;
 
 namespace SayWhat.MongoDAL.Tests {
 
@@ -71,7 +72,7 @@ public class MarkdownTest {
     [TestCase("", "","")]
     public void AddEscapedTextToMarkdownTest(string s1, string s2, string expected) {
         var m1 = Markdown.Escaped(s1);
-        Assert.AreEqual(expected,m1.AddEscaped(s2).GetMarkdownString());
+        Assert.AreEqual(expected, m1.AddEscaped(s2).GetMarkdownString());
         Assert.AreEqual(expected, m1.AddMarkdown(s2.ToEscapedMarkdown()).GetMarkdownString());
     }
     
@@ -91,8 +92,8 @@ public class MarkdownTest {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
         Assert.AreEqual(expected, m1.AddMarkdown(m2).ToItalic().GetMarkdownString());
-        Assert.AreEqual(expected,m1.AddEscaped(s2).ToItalic().GetMarkdownString());
-        Assert.AreEqual(expected,(m1+m2).ToItalic().GetMarkdownString());
+        Assert.AreEqual(expected, m1.AddEscaped(s2).ToItalic().GetMarkdownString());
+        Assert.AreEqual(expected, (m1+m2).ToItalic().GetMarkdownString());
     }
     
     [TestCase("markdown1", "markdown2","markdown1_markdown2_")]

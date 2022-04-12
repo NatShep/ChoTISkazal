@@ -1,9 +1,10 @@
-﻿using SayWhat.Bll;
+﻿using Chotiskazal.Bot.Interface;
+using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.Interface.InterfaceTexts {
+namespace Chotiskazal.Bot.InterfaceTexts {
 
 public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
@@ -42,6 +43,7 @@ public class RussianTexts : IInterfaceTexts {
     public string TranslationIs => "Правильный перевод";
     public string DidYouGuess => "Вы угадали?";
     public string IsItRightTranslation => "Это правильный перевод?";
+    public string WriteMissingLettersOrTheWholeWord => "Напиши пропущенные буквы или все слово";
     public string Mistaken => "Ошибочка";
     public string ChooseWhichWordHasThisTranscription => "Выберите слово к которому подходит эта транскрипция";
     public string RetryAlmostRightWithTypo => "Опечатка. Давайте заново.";

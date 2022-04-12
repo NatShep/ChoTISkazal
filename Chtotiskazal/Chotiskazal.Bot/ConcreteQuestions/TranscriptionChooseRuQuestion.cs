@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
@@ -6,11 +7,11 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions
 {
-    public class RuChooseByTranscriptionQuestion:IQuestion
+    public class TranscriptionChooseRuQuestion:IQuestion
     {
         public bool NeedClearScreen => false;
 
-        public string Name => "Ru Choose By Transcription";
+        public string Name => "Choose Ru By Transcription";
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {
@@ -18,15 +19,11 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             
             if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription!="")
                 return QuestionResult.Impossible;
+
+            string[] variants = examList
+                                .Where(e => !e.ContainsTranscription(originTranslation.Transcription))
+                                .GetRuVariants(originTranslation, 5);
             
-            var variants = examList.Where(e=> e.RuTranslations.All(t => t.Transcription != originTranslation.Transcription))
-                .SelectMany(e => e.TextTranslations)
-                .Take(5)
-                .Append(originTranslation.Word)
-                .Shuffle()
-                .ToList();
-
-
             var msg = QuestionMarkups.TranscriptionTemplate(originTranslation.Transcription, chat.Texts.ChooseWhichWordHasThisTranscription);
             await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
 
@@ -39,6 +36,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             return QuestionResult.Failed(chat.Texts);
 
         }
-        
+       
+
     }
 }

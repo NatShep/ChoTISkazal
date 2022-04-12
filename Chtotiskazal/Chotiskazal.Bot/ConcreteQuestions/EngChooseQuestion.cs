@@ -18,15 +18,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             UserWordModel[] examList)
         {
             var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
-           
-            var variants = examList.SelectMany(e => e.TextTranslations)
-                .Where(e => !word.TextTranslations.Contains(e))
-                .Distinct()
-                .Shuffle()
-                .Take(5)
-                .Append(originTranslation.Word)
-                .Shuffle()
-                .ToList();
+
+            var variants = examList.GetRuVariants(originTranslation, 5);
 
             var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.ChooseTheTranslation);
             

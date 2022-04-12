@@ -1,8 +1,9 @@
-﻿using SayWhat.Bll.Dto;
+﻿using Chotiskazal.Bot.Interface;
+using SayWhat.Bll.Dto;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.Interface.InterfaceTexts {
+namespace Chotiskazal.Bot.InterfaceTexts {
 
 public interface IInterfaceTexts {
     string more { get; }
@@ -30,6 +31,7 @@ public interface IInterfaceTexts {
     string FailedOpenButYouWereHonest { get; }
     string FailedHideousHonestyIsGold { get; }
     string IsItRightTranslation { get; }
+    string WriteMissingLettersOrTheWholeWord { get; }
     string Mistaken { get; }
     string ChooseWhichWordHasThisTranscription { get; }
     string RetryAlmostRightWithTypo { get; }

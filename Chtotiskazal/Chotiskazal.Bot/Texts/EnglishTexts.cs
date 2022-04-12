@@ -1,9 +1,10 @@
-﻿using SayWhat.Bll;
+﻿using Chotiskazal.Bot.Interface;
+using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.Interface.InterfaceTexts
+namespace Chotiskazal.Bot.InterfaceTexts
 {
     public class EnglishTexts : IInterfaceTexts {
         public string more => "more";
@@ -42,6 +43,7 @@ namespace Chotiskazal.Bot.Interface.InterfaceTexts
         public string TranslationIs => "Translation is";
         public string DidYouGuess => "Did you guess?";
         public string IsItRightTranslation => "Is it right translation?";
+        public string WriteMissingLettersOrTheWholeWord => "Write missing letters or the whole word";
         public string Mistaken => "Mistaken";
         public string ChooseWhichWordHasThisTranscription => "Choose which word has this transcription";
         public string RetryAlmostRightWithTypo => "Almost right. But you have a typo. Let's try again";

@@ -107,7 +107,7 @@ public class UserWordModel {
     public DateTime? LastExam => LastQuestionAskedTimestamp;
     public string AllTranslationsAsSingleString => string.Join(", ", TextTranslations);
     public IEnumerable<string> TextTranslations => RuTranslations.Select(t => t.Word);
-
+    public bool ContainsTranscription(string transcription) => RuTranslations.Any(r => r.Transcription == transcription);
     public IEnumerable<Example> Examples =>
         RuTranslations
             .SelectMany(t => t.Examples)
