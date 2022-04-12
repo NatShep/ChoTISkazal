@@ -177,6 +177,7 @@ public class MarkdownTest {
         Assert.AreEqual(expected,sb.ToString().ToBypassedMarkdown().GetMarkdownString());
     }
     
+    [Test]
     public void UseEmojimarkdownTest() {
         foreach (var element in Emojis.Elements) {
             Assert.AreEqual(element, element.ToEscapedMarkdown().GetMarkdownString());

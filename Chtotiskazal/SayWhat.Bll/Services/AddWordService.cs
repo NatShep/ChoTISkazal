@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using SayWhat.Bll.Strings;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;

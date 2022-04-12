@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using Chotiskazal.Bot.Interface;
-using Chotiskazal.Bot.Interface.InterfaceTexts;
+using Chotiskazal.Bot.InterfaceTexts;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;

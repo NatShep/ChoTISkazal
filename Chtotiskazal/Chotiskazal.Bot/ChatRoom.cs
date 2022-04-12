@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Interface;
-using Chotiskazal.Bot.Interface.InterfaceTexts;
+using Chotiskazal.Bot.InterfaceTexts;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;

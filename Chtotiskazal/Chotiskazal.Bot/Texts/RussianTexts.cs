@@ -1,6 +1,7 @@
 ﻿using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Strings;
 
 // ReSharper disable InconsistentNaming
 

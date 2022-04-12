@@ -1,5 +1,6 @@
 ﻿using Chotiskazal.Bot.Interface;
-using Chotiskazal.Bot.Interface.InterfaceTexts;
+using Chotiskazal.Bot.InterfaceTexts;
+using SayWhat.Bll.Strings;
 
 namespace Chotiskazal.Bot.Questions
 {
@@ -18,15 +19,19 @@ namespace Chotiskazal.Bot.Questions
 
         public static QuestionResult Passed(Markdown markdownText, IInterfaceTexts texts) 
             => new QuestionResult(markdownText, Markdown.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
-        public static QuestionResult Failed(Markdown markdownText, IInterfaceTexts texts)
-            => new QuestionResult(markdownText,Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
         public static QuestionResult Passed(Markdown text, Markdown hideousText) 
             => new QuestionResult(text, hideousText, ExamResult.Passed);
-        public static QuestionResult Failed(Markdown text, Markdown hideousText)
-            => new QuestionResult(text, hideousText, ExamResult.Failed);
+        public static QuestionResult Passed(string text, Markdown hideousText) 
+            => new QuestionResult(text.ToBypassedMarkdown(), hideousText, ExamResult.Passed);
         public static QuestionResult Passed(IInterfaceTexts texts)=> new QuestionResult(
             texts.PassedDefault,
             Markdown.Escaped(texts.PassedHideousDefault), ExamResult.Passed);
+        public static QuestionResult Failed(Markdown text, Markdown hideousText)
+            => new QuestionResult(text, hideousText, ExamResult.Failed);
+        public static QuestionResult Failed(Markdown markdownText, IInterfaceTexts texts)
+            => new QuestionResult(markdownText,Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
+        public static QuestionResult Failed(string text, IInterfaceTexts texts)
+            => new QuestionResult(text.ToBypassedMarkdown(),Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);
         public static QuestionResult Failed(IInterfaceTexts texts)=> new QuestionResult(
             texts.FailedDefault,
             Markdown.Escaped(texts.FailedHideousDefault), ExamResult.Failed);

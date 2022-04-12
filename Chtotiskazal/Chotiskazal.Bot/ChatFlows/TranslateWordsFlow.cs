@@ -6,6 +6,7 @@ using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows {

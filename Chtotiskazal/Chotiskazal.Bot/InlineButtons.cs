@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Chotiskazal.Bot.Interface.InterfaceTexts;
+using Chotiskazal.Bot.InterfaceTexts;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot {

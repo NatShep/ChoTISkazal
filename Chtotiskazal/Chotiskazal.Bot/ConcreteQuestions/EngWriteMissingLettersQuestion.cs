@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
@@ -49,12 +50,12 @@ public class EngWriteMissingLettersQuestion : IQuestion {
             case StringsCompareResult.Equal:
                 return QuestionResult.Passed(chat.Texts);
             case StringsCompareResult.SmallMistakes:
-                await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgainMarkdown(ruWord));
+                await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(ruWord));
                 return QuestionResult.RetryThisQuestion;
             case StringsCompareResult.BigMistakes:
-                return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(ruWord), chat.Texts);
+                return QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord),chat.Texts);
         }
-        return QuestionResult.Failed(chat.Texts.FailedMistakenMarkdown(ruWord), chat.Texts);
+        return QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord),chat.Texts);
 
     }
 }
