@@ -22,7 +22,7 @@
         public const double WellDoneWordMinScore = 8.0;
         public const double LearnedWordMinScore = 4.0;
         public const double IncompleteWordMinScore = 2.66;
-        public const double FamiliarWordMinScore = 1.33;
+        public const double FamiliarWordMinScore = 1.6;
 
         //scores:
         public static double NewWordGamingScore { get; set; } = 4;

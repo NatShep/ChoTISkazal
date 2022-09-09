@@ -1,0 +1,33 @@
+{
+  "yadicapi": {
+    "key": "___",
+    "timeout": "00:00:05"
+  },
+  "yatransapi": {
+    "key": "__",
+    "timeout": "00:00:05"
+  },
+  "telegramToken": "__",
+  "botHelper": {
+    "botHelperToken": "__",
+    "controlPanelChatId": "__"
+  },
+  "dbString": "__",
+  "dbName":   "__",
+  "help-msg": "*Hello\\! I am a translator and teacher\\.*\r\n\r\n1⃣ You can use me as a regular translator\\. Just write the word for translation or use /add command to begin translate\\.\r\n\r\n2⃣ Then, when you have time and mood, click on the *\"Learn\"* button or write /learn and start learning this words\\.\r\n\r\n3⃣ Earn scores for your action and watch your progress using /stats command\\.\r\n\r\n4⃣ Use /help command to see info how it works\\.\r\n\r\n\uD83D\uDE09Yes, it's free\\. We have done this bot for us and our friends\\. And we hope it makes you a little bit happy and gonna learn billion of words\\. We ve checked it\\!",
+  "welcome-msg": "Hi. i am ChtoTiSkazal bot. And I will help you learn English, my Russian-speaking friend",
+  "examSettings":
+  {
+    "MinAdvancedQuestionsCount":"8",
+    "MaxAdvancedQuestionsCount": "20",
+    "MinNewLearningWordsCountInOneExam": "3",
+    "MaxNewLearningWordsCountInOneExam": "5",
+    "MaxExamSize": "25",
+    "ExamsCountGoalForDay": "10",
+    "MaxLearningWordsCountInOneExam": "5",
+    "MinAdvancedExamMinQuestionAskedForOneWordCount": "2",
+    "MaxAdvancedExamMinQuestionAskedForOneWordCount": "4",
+	"MinBestLearnedWords":"2",
+	"MinimumQuestionAsked":"6"
+  }
+}

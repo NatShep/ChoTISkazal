@@ -27,14 +27,15 @@ namespace Chotiskazal.Bot
         private ExamSettings ReadExamSettings(IConfigurationSection secton) =>
             new ExamSettings
             {
-                MinAdvancedExamMinQuestionAskedCount = ReadInt(secton, "MinAdvancedExamMinQuestionAskedCount"),
-                MaxAdvancedExamMinQuestionAskedCount = ReadInt(secton,"MaxAdvancedExamMinQuestionAskedCount"),
+                MinAdvancedExamMinQuestionAskedForOneWordCount = ReadInt(secton, "MinAdvancedExamMinQuestionAskedForOneWordCount"),
+                MaxAdvancedExamMinQuestionAskedForOneWordCount = ReadInt(secton,"MaxAdvancedExamMinQuestionAskedForOneWordCount"),
+                MinAdvancedQuestionsCount = ReadInt(secton,"MinAdvancedQuestionsCount"),
                 MaxAdvancedQuestionsCount = ReadInt(secton,"MaxAdvancedQuestionsCount"),
-                MinLearningWordsCountInOneExam = ReadInt(secton,"MinLearningWordsCountInOneExam"),
                 MaxLearningWordsCountInOneExam = ReadInt(secton,"MaxLearningWordsCountInOneExam"),
-                MinTimesThatLearningWordAppearsInExam = ReadInt(secton,"MinTimesThatLearningWordAppearsInExam"),
-                MaxTimesThatLearningWordAppearsInExam = ReadInt(secton,"MaxTimesThatLearningWordAppearsInExam"),
-                MaxExamSize = ReadInt(secton,"MaxExamSize"),
+                MaxExamSize = ReadInt(secton,"MaxExamSize"), 
+                MinNewLearningWordsCountInOneExam = ReadInt(secton,"MinNewLearningWordsCountInOneExam"), 
+                MaxNewLearningWordsCountInOneExam = ReadInt(secton,"MaxNewLearningWordsCountInOneExam"), 
+                ExamsCountGoalForDay = ReadInt(secton,"ExamsCountGoalForDay"), 
             };
 
         private int ReadInt(IConfigurationSection section, string key) {
@@ -56,8 +57,8 @@ namespace Chotiskazal.Bot
         public TimeSpan YadicapiTimeout { get; set; }
         public string YatransapiKey { get; }
         public TimeSpan YatransapiTimeout { get; }
-        public string TelegramToken { get; }
-        public string BotHelperToken { get; }
+        public string TelegramToken { get; set; }
+        public string BotHelperToken { get; set; }
         public string ControlPanelChatId { get; }
         public string MongoConnectionString { get; set; }
         public string MongoDbName { get; set; }

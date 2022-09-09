@@ -39,26 +39,36 @@ namespace Chotiskazal.Bot.ChatFlows
                 await Chat.SendMessageAsync(Chat.Texts.NeedToAddMoreWordsBeforeLearning);
                 return;
             }
+            Console.WriteLine("Начало экзамена");
+
             
             var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  Chat.SendTyping();
 
-            var c = Rand.RandomIn(_examSettings.MinLearningWordsCountInOneExam,
-                _examSettings.MaxLearningWordsCountInOneExam);
+            //TODO newLearnig words - это было ранее все слова. теперь это только новые слова. 
+            //Теперь список экзаменов составляется из нескольких частей
+            //Поправить вывод количества слов в экзамене после его прохождения
+            //Добавить сортировку для ВСЕХ слов
+            
+            var count = Rand.RandomIn(_examSettings.MinNewLearningWordsCountInOneExam,
+                _examSettings.MaxNewLearningWordsCountInOneExam);
             await startupScoreUpdate;
             await typing;
-            var learningWords 
-                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(Chat.User, c, 3);
-      
-            var learningWordsCount = learningWords.Length;
-            if (learningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
+            var newLearningWords 
+                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(Chat.User, count, 3); //TODO What is 3?!
+            
+            Console.WriteLine($"Количество худших слов: {newLearningWords.Length}");
+            Console.WriteLine(string.Join(" \r\n", newLearningWords.ToList()));
+
+            var learningWordsCount = newLearningWords.Length;
+            if (newLearningWords.Average(w => w.AbsoluteScore) <= WordLeaningGlobalSettings.FamiliarWordMinScore)
             { 
                 var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold() +
                              Chat.Texts.LearningCarefullyStudyTheList
                                  .NewLine()
                                  .NewLine();
                    
-                var messageWithListOfWords = learningWords.Shuffle()
+                var messageWithListOfWords = newLearningWords.Shuffle()
                     .Aggregate(Markdown.Empty, (current, pairModel) => 
                         current + Markdown.Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}\r\n"));
 
@@ -81,9 +91,12 @@ namespace Chotiskazal.Bot.ChatFlows
             }
             var started = DateTime.Now;
 
+            var examsForNewWords = CreateExamListForNewWords(newLearningWords, _examSettings);
+            Console.WriteLine($"Количество экзаменов для новых слов {examsForNewWords.Count}");
+
             var learningAndAdvancedWords
                 = (await _usersWordsService.AppendAdvancedWordsToExamList(
-                    Chat.User, learningWords, _examSettings));
+                    Chat.User, newLearningWords, _examSettings, examsForNewWords));
             
             var distinctLearningWords = learningAndAdvancedWords.Distinct().ToArray();
             
@@ -94,13 +107,14 @@ namespace Chotiskazal.Bot.ChatFlows
                     originWordsScore.Add(word.Word,word.AbsoluteScore);
             }
 
+            //begin testing
             var gamingScoreBefore = Chat.User.GamingScore;
 
             var questionsCount = 0;
             var questionsPassed = 0;
             var wordQuestionNumber = 0;
             QuestionResult lastExamResult = null;
-
+            
             foreach (var word in learningAndAdvancedWords)
             {
                 var allLearningWordsWereShowedAtLeastOneTime = wordQuestionNumber < learningWordsCount;
@@ -108,10 +122,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
                 wordQuestionNumber++;
 
-                var learnList = learningWords;
+                var learnList = newLearningWords;
 
-                if (!learningWords.Contains(word))
-                    learnList = learningWords.Append(word).ToArray();
+                if (!newLearningWords.Contains(word))
+                    learnList = newLearningWords.Append(word).ToArray();
 
                 if (wordQuestionNumber > 1 && question.NeedClearScreen)
                     await WriteDontPeakMessage(lastExamResult?.ResultsBeforeHideousTextMarkdown.GetOrdinalString());
@@ -163,7 +177,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 originWordsScore: originWordsScore, 
                 questionsPassed: questionsPassed, 
                 questionsCount: questionsCount, 
-                learningWords: learningWords, 
+                learningWords: newLearningWords, 
                 gamingScoreBefore: gamingScoreBefore);
 
             await updateUserTask;
@@ -332,6 +346,19 @@ namespace Chotiskazal.Bot.ChatFlows
                 $"\r\n\r\n{emptySymbol}‎\r\n{emptySymbol}‎\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n{emptySymbol}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n{resultsBeforeHideousText}\r\n\r\n" +
                 $"{Chat.Texts.DontPeekUpward}\r\n");
             await Chat.SendMessageAsync("\U0001F648");
+        }
+        
+        private List<UserWordModel> CreateExamListForNewWords(UserWordModel[] learningWords, ExamSettings examSettings) {
+            var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
+
+            //Every learning word appears in exam from MIN to MAX times
+            for (int i = 0; i < examSettings.MinNewLearningWordsCountInOneExam; i++) 
+                examsList.AddRange(learningWords.Shuffle());
+            for (int i = 0; i < examSettings.MaxNewLearningWordsCountInOneExam - examSettings.MinNewLearningWordsCountInOneExam; i++) 
+                examsList.AddRange(learningWords.Shuffle().Where(w => Rand.Next() % 2 == 0));
+            while (examsList.Count > examSettings.MaxExamSize) 
+                examsList.RemoveAt(examsList.Count - 1);
+            return examsList;
         }
     }
 }

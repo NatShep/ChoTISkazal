@@ -28,6 +28,13 @@ public class UserWordsRepo : IMongoRepo {
            .Sort($"{{{CurrentScoreFieldName}:1}}")
            .Limit(maxCount)
            .ToListAsync();
+    
+    public Task<List<UserWordModel>> GetWellLearnedOld(UserModel user, int maxCount)
+        => Collection
+            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
+            .Sort($"{{{CurrentScoreFieldName}:1}}")
+            .Limit(maxCount)
+            .ToListAsync();
 
     public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount, int minimumLearnRate)
         => Collection
@@ -39,15 +46,38 @@ public class UserWordsRepo : IMongoRepo {
            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
            .Limit(maxCount)
            .ToListAsync();
+    
+    public Task<List<UserWordModel>> GetWellLearned(UserModel user, int maxCount)
+        => Collection
+            .Find(
+                Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.LearnedWordMinScore),
+                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
+                ))
+            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: -1}}")
+            .Limit(maxCount)
+            .ToListAsync();
 
-    public Task<List<UserWordModel>> Get(UserModel user, int maxCount, int minimumQuestionAsked)
+    public Task<List<UserWordModel>> GetBestLearned(UserModel user, int maxCount)
+        => Collection
+            .Find(
+                Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
+                ))
+            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: -1}}")
+            .Limit(maxCount)
+            .ToListAsync();
+    
+    public Task<List<UserWordModel>> GetLastAsked(UserModel user, int maxCount, int minimumQuestionAsked)
         => Collection
            .Find(
                Builders<UserWordModel>.Filter.And(
                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
                    Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
                ))
-           .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:1}}")
+           .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:-1}}")
            .Limit(maxCount)
            .ToListAsync();
 

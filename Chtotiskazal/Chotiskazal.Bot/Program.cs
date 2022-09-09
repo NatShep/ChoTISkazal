@@ -38,7 +38,7 @@ namespace Chotiskazal.Bot
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
             
-            _settings = ReadConfiguration(substitudeDebugConfig: false);
+            _settings = ReadConfiguration(substitudeDebugConfig: true);
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);
@@ -128,8 +128,10 @@ namespace Chotiskazal.Bot
                 if (substitudeDebugConfig)
                 {
                     Console.WriteLine("DEBUG SETTINGS APPLIED");
-                    set.MongoConnectionString = "mongodb://localhost:27017/";
-                    set.MongoDbName = "swdumbp";
+                 //   set.MongoConnectionString = "mongodb://localhost:27017/";
+               //     set.MongoDbName = "swdumbp";
+                    set.TelegramToken = "1432654477:AAH_I6i_4A_ZSYdaRHE-xL78ELDByVUUefc";
+                //    set.BotHelperToken = "1432654477:AAEBG9SxdMJ1pB-rbKW8487HJ-WqF2XReLE";
                 }
 
                 return set;
