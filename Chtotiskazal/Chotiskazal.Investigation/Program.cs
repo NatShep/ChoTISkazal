@@ -28,15 +28,18 @@ class Program {
         Console.WriteLine(GetScoreMetricsReport(allMetrics));
 
         Console.WriteLine("\r\n# Question metrics with clean questions");
-        Console.WriteLine(GetQuestionMetricsReport(allMetrics, false));
+        Console.WriteLine(QuestionMetricsReports.GetQuestionMetricsReport(allMetrics, false));
 
-        Console.WriteLine("\r\n# Question metrics without clean questions");
-        Console.WriteLine(GetQuestionMetricsReport(allMetrics, true));
+        Console.WriteLine("\r\n# Question metrics without clean questions.");
+        Console.WriteLine(QuestionMetricsReports.GetQuestionMetricsReport(allMetrics, true));
+
+        Console.WriteLine("\r\n# Weighted Question metrics without clean questions.");
+        Console.WriteLine(QuestionMetricsReports.GetWeightedQuestionMetricsReport(allMetrics));
 
         Console.WriteLine("\r\n# Question metrics by time");
 
 
-        Console.WriteLine(GetQuestionMetricsByTimeReport(allMetrics));
+        Console.WriteLine(QuestionMetricsReports.GetQuestionMetricsByTimeReport(allMetrics));
 
         Console.WriteLine("\r\n# Current questions");
         Console.WriteLine(GetCurrentQuestionParametersReport(db));
@@ -54,8 +57,7 @@ class Program {
                                .OrderBy(b => b.score)
                                .ToList();
         StringBuilder sb = new StringBuilder();
-        foreach (var score in scores)
-        {
+        foreach (var score in scores) {
             sb.Append($"{score.score}\t{score.count}\r\n");
         }
 
@@ -81,8 +83,7 @@ class Program {
                             .ToList();
 
 
-        for (int i = 0; i < 20; i++)
-        {
+        for (int i = 0; i < 20; i++) {
             var a = res.FirstOrDefault(s => s.score == i);
             if (a == null)
                 sb.Append("| --- ");
@@ -94,182 +95,67 @@ class Program {
         return s;
     }
 
-    class TimeBucket {
-        public int SecLow;
-        public int SecHi;
-
-        public int Count;
-        public int Passed;
-        public int[] CountByScore = new int[15];
-        public int[] PassedByScore = new int[15];
-
-        public void Put(double score, bool result) {
-            Count++;
-
-            var item = (int)score;
-            if (item >= CountByScore.Length)
-                item = CountByScore.Length - 1;
-
-            CountByScore[item]++;
-            if (result)
-            {
-                Passed++;
-                PassedByScore[item]++;
-            }
-        }
-
-        public TimeBucket(int secLow, int secHi) {
-            SecLow = secLow;
-            SecHi = secHi;
-        }
-
-        public override string ToString() {
-            if (Count == 0)
-                return TimeSpan.FromSeconds(SecLow) + " - " + TimeSpan.FromSeconds(SecHi) + ":   NA";
-
-            var sb = new StringBuilder(
-                TimeSpan.FromSeconds(SecLow) +
-                " - " +
-                TimeSpan.FromSeconds(SecHi) +
-                ":   " +
-                Passed * 100 / Count +
-                " ");
-
-            for (int i = 0; i < CountByScore.Length - 1; i += 2)
-            {
-                var count = CountByScore[i] + CountByScore[i + 1];
-                var score = PassedByScore[i] + PassedByScore[i + 1];
-
-                if (count < 3)
-                    sb.Append("| --- ");
-                else
-                    sb.Append($"| {score * 100 / count:000} ");
-            }
-
-            return sb.ToString();
-        }
-    }
 
     private static string GetTimeMetricsReport(List<Qmodel> allMetrics) {
         var buckets = new[] {
-            new TimeBucket(0, 10),
-            new TimeBucket(10, 60),
-            new TimeBucket(60, 6 * 60),
-            new TimeBucket(6 * 60, 36 * 60),
-            new TimeBucket(36 * 60, 6 * 36 * 60),
+            /*
+             *  0   - 20
+                10  - 40 *
+                20  - 120
+                40 - 2*6*20 *
+                6*20 - 720
+                2*6*20 - 2*720 *
+                6*6*20 - 6*720
+                2*720 - 12*720  *
+                6*720 - 36*720 
+                12*720  - 2 * 36 * 720 *
+                36*720 - 6 * 36 * 720
+                2* 36 * 720 - 12*36*720 *
+                6 * 36 * 720 - 36*36*720
+             */
 
-            new TimeBucket(6 * 36 * 60, 36 * 36 * 60),
-            new TimeBucket(36 * 36 * 60, 6 * 36 * 36 * 60),
-            new TimeBucket(6 * 36 * 36 * 60, 36 * 36 * 36 * 60),
-            new TimeBucket(36 * 36 * 36 * 60, 6 * 36 * 36 * 36 * 60),
-            new TimeBucket(6 * 36 * 36 * 36 * 60, int.MaxValue),
+            new TimeBucket(0, 10), //
+            new TimeBucket(0, 20),
+            new TimeBucket(10, 40), //
+            new TimeBucket(20, 120),
+            new TimeBucket(40, 240), //
+            new TimeBucket(120, 720),
+            new TimeBucket(240, 1440), //
+            new TimeBucket(720, 3 * 1440),
+            new TimeBucket(1440, 6 * 1440), //
+            new TimeBucket(3 * 1440, 18 * 1440),
+            new TimeBucket(6 * 1440, 2 * 18 * 1440), //
+            new TimeBucket(18 * 1440, 6 * 18 * 1440),
+            new TimeBucket(2 * 18 * 1440, 12 * 18 * 1440), //
+            new TimeBucket(4 * 18 * 1440, 6 * 18 * 1440), //
+            new TimeBucket(6 * 18 * 1440, 36 * 18 * 1440),
+            new TimeBucket(12 * 18 * 1440, 3 * 36 * 18 * 1440), //
+            new TimeBucket(36 * 18 * 1440, 6 * 36 * 18 * 1440),
+            new TimeBucket(2 * 36 * 18 * 1440, 12 * 36 * 18 * 1440), //
+
+            new TimeBucket(6 * 36 * 18 * 1440, int.MaxValue),
+
+            //new TimeBucket(12*18*1440, int.MaxValue),
         };
 
-        foreach (var metric in allMetrics)
-        {
-            var buck = buckets.FirstOrDefault(
+        foreach (var metric in allMetrics) {
+            var bucks = buckets.Where(
                 b =>
                     b.SecHi > metric.PreviousExamDeltaInSecs && b.SecLow <= metric.PreviousExamDeltaInSecs);
-            buck?.Put(metric.ScoreBefore, metric.Result);
+            foreach (var buck in bucks) {
+                buck.Put(metric.ScoreBefore, metric.Result);
+            }
         }
 
         var s = string.Join("\r\n", buckets.Select(s => s.ToString()));
         return s;
     }
 
-    private static string GetQuestionMetricsByTimeReport(List<Qmodel> allMetrics) {
-        var allExamNames = allMetrics.Select(a => a.GetNonCleanName()).ToHashSet();
-
-        var questionToTimeBuckets = new Dictionary<string, QuestionToTimeBucket>();
-
-        foreach (string allExamName in allExamNames)
-        {
-            questionToTimeBuckets.Add(allExamName, new QuestionToTimeBucket(allExamName));
-        }
-
-        foreach (var metric in allMetrics)
-        {
-            var name = metric.GetNonCleanName();
-            questionToTimeBuckets[name].Put(ToCategory7(metric.PreviousExamDeltaInSecs), metric.Result);
-        }
-
-        var sorted = questionToTimeBuckets.Values.OrderBy(v => v.Rate).ToArray();
-        var sum = sorted.Aggregate((a, b) => a.Sum(b, "Aggregate"));
-
-        var sb = new StringBuilder();
-        var maxNameLen = allExamNames.Max(a => a.Length) + 2;
-        foreach (var bucket in new[] { sum }.Concat(sorted))
-        {
-            sb.Append($"\r\n{bucket.QuestionName.PadRight(maxNameLen)}  {(int)bucket.Rate}% |");
-            for (int i = 0; i < 10; i++)
-            {
-                var passed = bucket.GetPercent(i);
-                sb.AppendTableItem(passed);
-            }
-        }
-
-        return sb + "\r\n";
-
-        int ToCategory10(int deltaInSec) {
-            if (deltaInSec < 10)
-                return 0;
-            if (deltaInSec < 60)
-                return 1;
-            if (deltaInSec < 6 * 60)
-                return 2;
-            if (deltaInSec < 36 * 60)
-                return 3;
-            if (deltaInSec < 6 * 36 * 60)
-                return 4;
-            if (deltaInSec < 36 * 36 * 60)
-                return 5;
-            if (deltaInSec < 6 * 36 * 36 * 60)
-                return 6;
-            if (deltaInSec < 36 * 36 * 36 * 60)
-                return 7;
-            if (deltaInSec < 6 * 36 * 36 * 36 * 60)
-                return 8;
-            return 9;
-        }
-
-        int ToCategory7(int deltaInSec) {
-            if (deltaInSec < 10)
-                return 0;
-            if (deltaInSec < 60)
-                return 1;
-            if (deltaInSec < 36 * 60)
-                return 2;
-            if (deltaInSec < 36 * 36 * 60)
-                return 3;
-            if (deltaInSec < 36 * 36 * 36 * 60)
-                return 4;
-            if (deltaInSec < 6 * 36 * 36 * 36 * 60)
-                return 5;
-            return 6;
-        }
-
-        int ToCategory3min(int deltaInSec) {
-            if (deltaInSec < 5)
-                return 0;
-            if (deltaInSec < 10)
-                return 1;
-            if (deltaInSec < 20)
-                return 2;
-            if (deltaInSec < 30)
-                return 3;
-            if (deltaInSec < 60)
-                return 4;
-            if (deltaInSec < 120)
-                return 5;
-            return 6;
-        }
-    }
 
     private static string GetTimeIntervalSLices(List<Qmodel> allMetrics, int countInBunch) {
         var intervals = GetTimeSeries(countInBunch, allMetrics);
         StringBuilder sb = new StringBuilder($"BunchSize: {countInBunch}\r\n Intervals ({intervals.Length}) :\r\n");
-        foreach (var (interval, _) in intervals)
-        {
+        foreach (var (interval, _) in intervals) {
             var ts = TimeSpan.FromSeconds(interval);
             string res = "";
             if (ts.TotalMinutes < 1)
@@ -319,38 +205,37 @@ class Program {
             sb.AppendLine(MeasureAuto(0, 10));
             sb.AppendLine(MeasureAuto(0, 20));
 
-            
             sb.AppendLine("MOST INTERESTING IS " + MeasureAuto(2, 6));
 
-            var names = allMetrics.GroupBy(g => g.GetNonCleanName()).Select(g => g.Key).ToArray();
+            var names = allMetrics.GroupBy(g => Helper.GetNonCleanName(g.ExamName)).Select(g => g.Key).ToArray();
 
-            foreach (string name in names)
-            {
-                sb.AppendLine(MeasureAuto(0, 4, name));
-                sb.AppendLine(MeasureAuto(1, 5, name));
-                sb.AppendLine(MeasureAuto(2, 6, name));    
-                sb.AppendLine(MeasureAuto(3, 7, name));
-                sb.AppendLine(MeasureAuto(4, 8, name));    
-                sb.AppendLine(MeasureAuto(0, 10, name));    
-                sb.AppendLine(MeasureAuto(11, 20, name));
-                sb.AppendLine(MeasureAuto(0, 20, name));
+            foreach (string name in names) {
+                var normalName = Helper.MapExamName(name);
+                sb.AppendLine(MeasureAuto(0, 4, normalName));
+                sb.AppendLine(MeasureAuto(1, 5, normalName));
+                sb.AppendLine(MeasureAuto(2, 6, normalName));
+                sb.AppendLine(MeasureAuto(3, 7, normalName));
+                sb.AppendLine(MeasureAuto(4, 8, normalName));
+                sb.AppendLine(MeasureAuto(0, 10, normalName));
+                sb.AppendLine(MeasureAuto(11, 20, normalName));
+                sb.AppendLine(MeasureAuto(0, 20, normalName));
             }
 
-            
+
             string MeasureAuto(int minScore, int maxScore, params string[] examNames) {
                 var samples = Where(minScore, maxScore);
                 if (examNames.Any())
-                    samples = samples.Where(s => examNames.Any(e => s.ExamName.Equals(e, StringComparison.InvariantCultureIgnoreCase))).ToList();
+                    samples = samples.Where(s => examNames.Any(e => Helper.MapExamName(s.ExamName).Equals(e, StringComparison.InvariantCultureIgnoreCase))).ToList();
                 var bunchSize = samples.Count / 15.4;
                 if (bunchSize > 300)
                     bunchSize = 300;
-                
+
                 return
                     $"{string.Join("|", examNames),-30}\t{MeasureSamples(minScore, maxScore, samples, (int)bunchSize)}";
             }
 
             string MeasureSamples(int minScore, int maxScore, List<Qmodel> models, int bunchSize) => $"[{minScore}-{maxScore}]\t" +
-                                                                         LinearRegressionFor(models, bunchSize,logBase);
+                                                                                                     LinearRegressionFor(models, bunchSize, logBase);
             string Measure(int minScore, int maxScore, int bunchSize) => $"[{minScore}-{maxScore}]\t" +
                                                                          LinearRegressionFor(
                                                                              Where(minScore, maxScore), bunchSize,
@@ -366,13 +251,11 @@ class Program {
         var points = new List<(double, double)>();
         int prevVal = 0;
 
-        foreach (var (t, p) in intervals)
-        {
+        foreach (var (t, p) in intervals) {
             if (t == int.MaxValue)
                 continue;
             var current = Math.Log((t == 0 ? 1 : t + prevVal) / 2.0, logBase);
-            if (double.IsNaN(current))
-            { }
+            if (double.IsNaN(current)) { }
 
             prevVal = t;
             points.Add((current, p));
@@ -392,13 +275,11 @@ class Program {
         List<(int, double)> values = new List<(int, double)>();
         int count = 0;
         int passed = 0;
-        foreach (var qmodel in orderedByPause)
-        {
+        foreach (var qmodel in orderedByPause) {
             count++;
             if (qmodel.Result)
                 passed++;
-            if (count > countInBunch)
-            {
+            if (count > countInBunch) {
                 values.Add((qmodel.PreviousExamDeltaInSecs, (100.0 * passed) / count));
                 count = 0;
                 passed = 0;
@@ -406,103 +287,6 @@ class Program {
         }
 
         return values.ToArray();
-    }
-
-    class QuestionToTimeBucket {
-        public QuestionToTimeBucket(string questionName) { QuestionName = questionName; }
-
-        public string QuestionName { get; }
-        public int Count { get; private set; }
-        public int Passed { get; private set; }
-        public int[] CountByScore = new int[10];
-        public int[] PassedByScore = new int[10];
-
-        public int? GetPercent(int timeCategory) {
-            if (timeCategory < 0)
-                return null;
-            if (timeCategory >= CountByScore.Length)
-                return null;
-            var count = CountByScore[timeCategory];
-            if (count < 5)
-                return null;
-            return 100 * PassedByScore[timeCategory] / count;
-        }
-
-        public double Rate => 100.0 * Passed / Count;
-
-        public void Put(int timeBucket, bool result) {
-            Count++;
-
-            var item = timeBucket;
-            if (item >= CountByScore.Length)
-                item = CountByScore.Length - 1;
-
-            CountByScore[item]++;
-            if (result)
-            {
-                Passed++;
-                PassedByScore[item]++;
-            }
-        }
-
-        public QuestionToTimeBucket Sum(QuestionToTimeBucket other, string name) {
-            var result = new QuestionToTimeBucket(name) {
-                Count = Count + other.Count,
-                Passed = Passed + other.Passed,
-            };
-            for (int i = 0; i < CountByScore.Length; i++)
-            {
-                result.CountByScore[i] = CountByScore[i] + other.CountByScore[i];
-                result.PassedByScore[i] = PassedByScore[i] + other.PassedByScore[i];
-            }
-
-            return result;
-        }
-    }
-
-    private static string GetQuestionMetricsReport(List<Qmodel> allMetrics, bool ignoreClean) {
-        var allExamNames = allMetrics.Select(a => a.ExamName).ToHashSet();
-
-        var group = ignoreClean
-            ? allMetrics.GroupBy(a => a.GetNonCleanName())
-            : allMetrics.GroupBy(a => a.ExamName);
-
-        var res = group.Select(
-                           a => new {
-                               exam = a.Key,
-                               percent = a.Passed(),
-                               count = a.Count(),
-                               scores = a.GroupBy(b => (int)(b.ScoreBefore / 2) * 2)
-                                         .Select(
-                                             a => new {
-                                                 score = a.Key,
-                                                 percent = a.Passed(),
-                                                 count = a.Count(),
-                                             })
-                                         .OrderBy(c => c.score)
-                                         .ToList()
-                           })
-                       .OrderBy(r => r.percent)
-                       .ToList();
-        var maxNameLen = allExamNames.Max(a => a.Length) + 2;
-
-        var sb = new StringBuilder(
-            " NAME                              " +
-            "passed in count | 0-1 | 2-3 | 4-5 | 6-7 | 8-9 | 10-11 | Оценка" +
-            "\r\n----------------------------------------------------------" +
-            "-------------------------------");
-        foreach (var type in res)
-        {
-            sb.Append("\r\n" + type.exam.PadRight(maxNameLen) + $" ({type.percent:000}% in {type.count:000}) :");
-            for (int i = 0; i < 12; i += 2)
-            {
-                var a = type.scores.FirstOrDefault(s => s.score == i && s.count > 2);
-                sb.AppendTableItem(a?.percent);
-            }
-        }
-
-        var s = sb.ToString();
-        return s;
     }
 
 
@@ -514,8 +298,7 @@ class Program {
             .AllQuestions;
         var maxNameLen = allQuestions.Max(a => a.Question.Name.Length) + 2;
 
-        foreach (var q in allQuestions)
-        {
+        foreach (var q in allQuestions) {
             sb2.Append(
                 $"\r\n{q.Question.Name.PadRight(maxNameLen)}  {q.ExpectedScore}  {q.Question.GetType().Name}");
         }
@@ -524,5 +307,6 @@ class Program {
         return s;
     }
 }
+
 
 }
