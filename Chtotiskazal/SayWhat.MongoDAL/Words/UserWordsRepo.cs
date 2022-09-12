@@ -22,21 +22,21 @@ public class UserWordsRepo : IMongoRepo {
 
     public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
 
-    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount)
+    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count)
         => Collection
            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
            .Sort($"{{{CurrentScoreFieldName}:1}}")
-           .Limit(maxCount)
+           .Limit(count)
            .ToListAsync();
     
-    public Task<List<UserWordModel>> GetWellLearnedOld(UserModel user, int maxCount)
+    public Task<List<UserWordModel>> GetWellLearnedOld(UserModel user, int count)
         => Collection
             .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
             .Sort($"{{{CurrentScoreFieldName}:1}}")
-            .Limit(maxCount)
+            .Limit(count)
             .ToListAsync();
 
-    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int maxCount, int minimumLearnRate)
+    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count, int minimumLearnRate)
         => Collection
            .Find(
                Builders<UserWordModel>.Filter.And(
@@ -44,7 +44,7 @@ public class UserWordsRepo : IMongoRepo {
                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
                ))
            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
-           .Limit(maxCount)
+           .Limit(count)
            .ToListAsync();
     
     public Task<List<UserWordModel>> GetWellLearned(UserModel user, int maxCount)

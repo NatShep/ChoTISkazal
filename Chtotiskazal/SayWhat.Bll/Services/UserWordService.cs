@@ -62,8 +62,8 @@ namespace SayWhat.Bll.Services
         {
             if (maxCount <= 0)
                 return new UserWordModel[0];
-
-            var words = await _userWordsRepository.GetLastAsked(user, maxCount, minimumQuestionAsked);
+            
+            var words = await _userWordsRepository.GetLastAsked(user, maxCount/2, minimumQuestionAsked);
             words.AddRange(await _userWordsRepository.GetWellLearned(user, maxCount/2));
             words.AddRange(await _userWordsRepository.GetBestLearned(user, minBestLearnedWords ));
 
@@ -218,21 +218,13 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
 
-        public async Task<IReadOnlyList<UserWordModel>> AppendAdvancedWordsToExamList(UserModel user, UserWordModel[] learningWords, ExamSettings examSettings, List<UserWordModel> examsList)
+        public async Task<UserWordModel[]> AppendAdvancedWordsToExamList(UserModel user, ExamSettings examSettings, int count)
         {
-            //TODO нормальный нейминг. Это максимальо количество экзаменов
-            var advancedlistMaxCount = Math.Min(Rand.RandomIn(examSettings.MinAdvancedQuestionsCount, examSettings.MaxAdvancedQuestionsCount),
-                examSettings.MaxExamSize - examsList.Count);
-            
-            if (advancedlistMaxCount <= examSettings.MinAdvancedQuestionsCount) 
-                advancedlistMaxCount = examSettings.MinAdvancedQuestionsCount;
+            Console.WriteLine($"Количество мест для продвинутых слов: {count}");
 
-            Console.WriteLine($" Максимальное Количество экзаменов для продвинутых  слов {advancedlistMaxCount}");
-            
-            // TODO тут вместо макс количество экзаменов, должно быть макс количество слов
             var advancedList = await GetWordsWithExamples(
                 user: user,
-                maxCount: advancedlistMaxCount,
+                maxCount: count,
                 minimumQuestionAsked: examSettings.MinimumQuestionAsked,
                 minBestLearnedWords: examSettings.MinBestLearnedWords);
           
@@ -242,13 +234,8 @@ namespace SayWhat.Bll.Services
                     examSettings.MaxAdvancedExamMinQuestionAskedForOneWordCount);
 
             Console.WriteLine($"Минимальное кол во повтора продвинутых слов {minimumTimesThatWordHasToBeAsked}");
-            
-            examsList.AddRange(advancedList);
-            
-            Console.WriteLine($"Количество экзаменов для advanced слов: {advancedList.Count}");
-            Console.WriteLine(string.Join(" \r\n", advancedList.ToList()));
-            
-            return examsList;
+
+            return advancedList.ToArray();
         }
         
         public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 

@@ -24,7 +24,7 @@
     "MaxNewLearningWordsCountInOneExam": "5",
     "MaxExamSize": "25",
     "ExamsCountGoalForDay": "10",
-    "MaxLearningWordsCountInOneExam": "5",
+    "MaxLearningWordsCountInOneExam": "13",
     "MinAdvancedExamMinQuestionAskedForOneWordCount": "2",
     "MaxAdvancedExamMinQuestionAskedForOneWordCount": "4",
 	"MinBestLearnedWords":"2",
