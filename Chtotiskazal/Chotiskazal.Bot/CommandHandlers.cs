@@ -163,6 +163,7 @@ public class SelectLearningSet : IBotCommandHandler {
     private readonly UserService _userService;
     private readonly UsersWordsService _usersWordsService;
     private readonly AddWordService _addWordService;
+
     public SelectLearningSet(LearningSetService learningSetService, LocalDictionaryService localDictionaryService, UserService userService, UsersWordsService usersWordsService, AddWordService addWordService) {
         _learningSetService = learningSetService;
         _localDictionaryService = localDictionaryService;
@@ -171,7 +172,8 @@ public class SelectLearningSet : IBotCommandHandler {
         _addWordService = addWordService;
     }
 
-    public bool Acceptable(string text) => text.StartsWith(Prefix);
+    public bool Acceptable(string text) => text?.StartsWith(Prefix) == true;
+
     public string ParseArgument(string text) => text[Prefix.Length..].Trim();
 
     public async Task Execute(string argument, ChatRoom chat) {

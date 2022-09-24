@@ -113,13 +113,16 @@ public class ChatIO {
         {
             text = upd.Message?.Text;
         }
-
-        foreach (var botCommandHandler in CommandHandlers)
+        
+        if(text!=null)
         {
-            if (botCommandHandler.Acceptable(text))
+            foreach (var botCommandHandler in CommandHandlers)
             {
-                var argument = botCommandHandler.ParseArgument(text);
-                throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
+                if (botCommandHandler.Acceptable(text))
+                {
+                    var argument = botCommandHandler.ParseArgument(text);
+                    throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
+                }
             }
         }
 
