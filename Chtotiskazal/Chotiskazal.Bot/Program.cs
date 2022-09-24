@@ -42,7 +42,7 @@ namespace Chotiskazal.Bot
             var yandexDictionaryClient   = new YandexDictionaryApiClient(_settings.YadicapiKey,   _settings.YadicapiTimeout);
             var client = new MongoClient(_settings.MongoConnectionString);
             var db = client.GetDatabase(_settings.MongoDbName);
-            //StatsMigrator.Do(db).Wait();
+
             var userWordRepo   = new UserWordsRepo(db);
             var dictionaryRepo = new LocalDictionaryRepo(db);
             var userRepo       = new UsersRepo(db);

@@ -30,13 +30,14 @@ public static class Reporter {
     public static void WriteInfo(string msg) => _log.Information(msg);
     public static void WriteInfo(string msg, string chatId) => _log.Information(msg + " {@ChatInfo}", new { ChatInfo = chatId });
 
-    private static void ReportError(long? chatId, string msg) {
+    public static void ReportError(long? chatId, string msg) {
         _log.Error("msg {@ChatInfo} ", new { ChatInfo = chatId, msg });
         _telegramLog?.Error("❗ " + " msg {@ChatInfo} ", new { ChatInfo = chatId, msg });
         Collector.OnError();
     }
 
-    public static void ReportError(long? chatId, string msg, Exception e) => ReportError(chatId, msg + $".\r\n Exception:\r\n{e}");
+    public static void ReportError(long? chatId, string msg, Exception e) 
+        => ReportError(chatId, msg + $".\r\n Exception:\r\n{e}");
 
     public static void ReportUserIssue(string msg) {
             _log.Error($"Report {msg} ");
@@ -53,7 +54,7 @@ public static class Reporter {
                 $"{string.Join("\r\n", history)}\r\n" +
                 "-----\r\n" +
                 "Exception:\r\n" +
-                $"{e}");
+                e?.ToString()??"none");
     }
 
     public static void ReportQuestionDone(QuestionMetric questionMetric, string chatId) {

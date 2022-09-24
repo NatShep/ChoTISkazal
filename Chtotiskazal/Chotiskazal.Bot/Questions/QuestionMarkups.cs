@@ -1,4 +1,3 @@
-using System.Text;
 using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Strings;
 
@@ -19,9 +18,11 @@ public static class QuestionMarkups {
     public static Markdown TranslateTemplate(string word, string instruction, string example)
         => QuestionHeader
             .NewLine()
-            .AddMarkdown(word.ToSemiBoldMarkdown()).NewLine()
+            .AddMarkdown(word.ToSemiBoldMarkdown())
+            .NewLine()
             .AddBypassed("    ")
-            .AddMarkdown(example.ToItalicMarkdown()).NewLine()
+            .AddMarkdown(example.ToItalicMarkdown())
+            .NewLine()
             .NewLine()
             .NewLine()
             .AddEscaped(instruction);

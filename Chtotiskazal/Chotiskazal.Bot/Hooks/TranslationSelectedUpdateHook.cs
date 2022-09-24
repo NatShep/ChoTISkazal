@@ -62,9 +62,12 @@ namespace Chotiskazal.Bot.Hooks
                 await Chat.ConfirmCallback(update.CallbackQuery.Id);
                 return;
             }
-
+            
             if (originMessageButtons.Length < allTranslations.Count)
             {
+                // Такое может произойти если  в оригинальном сообщении была слишком длинная кнопка (и она вырезана)
+                // Или что то поменялось в бд.
+                // Это редкий случай поэтому особая обработка не делается
                 await Chat.ConfirmCallback(update.CallbackQuery.Id);
                 return;
             }

@@ -70,17 +70,27 @@ namespace Chotiskazal.Bot.ChatFlows
             await Chat.EditMessageButtons(messageId,buttons.ToArray());
         }
 
-        private IEnumerable<InlineKeyboardButton[]> CreateButtons()
-        {
-            var buttons = _translations.Select((t, i) => new[] {AddWordHelper.CreateButtonFor(t, _areSelected[i])});
-
+        private IList<InlineKeyboardButton[]> CreateButtons() {
+            var buttons = new List<InlineKeyboardButton[]>();
+            var i = 0;
+            foreach (var translation in _translations) {
+                var button = AddWordHelper.CreateButtonFor(translation, _areSelected[i]);
+                if (button.CallbackData.Length >= InlineButtons.MaxDataStringLength) 
+                {
+                    Reporter.ReportError(Chat.ChatId.Identifier, $"Too long button data: '{button.Text}':'{button.CallbackData}'");
+                }
+                else 
+                {
+                    buttons.Add(new[]{button});
+                }
+                i++;
+            }
             if (_isLastMessageInTheChat)
-                buttons = buttons
-                    .Append(new[]
-                    {
-                        InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"), 
-                        InlineButtons.Translation($"{Chat.Texts.ContinueTranslateButton} {Emojis.Translate}")
-                    });
+                buttons.Add(new[]
+                {
+                    InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"), 
+                    InlineButtons.Translation($"{Chat.Texts.ContinueTranslateButton} {Emojis.Translate}")
+                });
             return buttons;
         }
 
@@ -94,7 +104,7 @@ namespace Chotiskazal.Bot.ChatFlows
             {
                 //hide "menu" and "translation" buttons
                 var buttons = CreateButtons();
-                var t = Chat.EditMessageButtons(_originMessageId.Value, buttons.ToArray());
+                var _ = Chat.EditMessageButtons(_originMessageId.Value, buttons.ToArray());
             }
         }
         /// <summary>

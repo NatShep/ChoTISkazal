@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
@@ -70,6 +71,7 @@ public class ChatIO {
 
     public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons) {
         _chatHistory.OnOutputMessage(message,buttons);
+        AssertTooLongButtonData(buttons);
         return _client.SendTextMessageAsync(
             ChatId, message,
             replyMarkup: new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
@@ -77,6 +79,7 @@ public class ChatIO {
 
     public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons) {
         _chatHistory.OnOutputMessage(message,buttons);
+        AssertTooLongButtonData(buttons.SelectMany(b=>b));
         return _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
     }
 
@@ -92,11 +95,17 @@ public class ChatIO {
 
     public async Task<int> SendMessageAsync(Markdown message, InlineKeyboardButton[][] buttons) {
         _chatHistory.OnOutputMarkdownMessage(message,buttons);
-
+        AssertTooLongButtonData(buttons.SelectMany(b=>b));
         return (await _client.SendTextMessageAsync(
             ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons),
             parseMode: ParseMode.MarkdownV2)).MessageId;
+    }
+    private void AssertTooLongButtonData(IEnumerable<InlineKeyboardButton> selectMany) {
+        foreach (var button in selectMany) {
+            if(button.CallbackData?.Length>=InlineButtons.MaxDataStringLength)
+                Reporter.ReportError(ChatId.Identifier, $"Too long button data: Text:'{button.Text}'  Data:'{button.CallbackData}'");
+        }
     }
 
     public async Task<Update> WaitUserInputAsync() {
@@ -177,6 +186,7 @@ public class ChatIO {
         try
         {
             _chatHistory.OnEditMessageButtons(buttons);
+            AssertTooLongButtonData(buttons);
             await _client.EditMessageReplyMarkupAsync(
                 ChatId, messageId,
                 new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
@@ -192,6 +202,7 @@ public class ChatIO {
         try
         {
             _chatHistory.OnEditMessageButtons(buttons);
+            AssertTooLongButtonData(buttons.SelectMany(b=>b));
             await _client.EditMessageReplyMarkupAsync(
                 ChatId, messageId,
                 new InlineKeyboardMarkup(buttons));
