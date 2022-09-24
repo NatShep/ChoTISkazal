@@ -39,7 +39,7 @@ public class EngWriteMissingLettersQuestion : IQuestion {
             return QuestionResult.RetryThisQuestion;
 
         if (!entry.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
+            await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
             return QuestionResult.RetryThisQuestion;
         }
         var bodyCloseness = entry.CheckCloseness(body);
