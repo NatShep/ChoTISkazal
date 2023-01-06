@@ -82,10 +82,7 @@ namespace Chotiskazal.Bot.ChatFlows
             Console.WriteLine($" Максимальное Количество экзаменов для продвинутых  слов {advancedlistMaxCountQuestions}");
 
             Console.WriteLine($"Минимальное кол во повтора продвинутых слов {minimumTimesThatWordHasToBeAsked}");*/
-            
-            Console.WriteLine($"Количество advanced слов: {advancedWords.Length}");
-            Console.WriteLine(string.Join(" \r\n", advancedWords.ToList()));
-            
+
             var examAdvancedWords = CreateExamListForNewWords(advancedWords, _examSettings);
             Console.WriteLine($"Количество экзаменов для advanced слов: {examAdvancedWords.Count}");
 
@@ -109,9 +106,14 @@ namespace Chotiskazal.Bot.ChatFlows
             var questionsPassed = 0;
             var wordQuestionNumber = 0;
             QuestionResult lastExamResult = null;
-            
-            foreach (var word in examsWords.Shuffle())
-            {
+
+            var previousWord = new UserWordModel();
+            foreach (var word in examsWords.Shuffle()) {
+                //exclude the next same exam
+                if (previousWord == word)
+                    continue;
+                previousWord = word;
+
                 var allLearningWordsWereShowedAtLeastOneTime = wordQuestionNumber < learningWordsCount;
                 var question =
                     QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);

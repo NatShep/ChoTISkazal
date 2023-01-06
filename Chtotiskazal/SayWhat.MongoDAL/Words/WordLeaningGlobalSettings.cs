@@ -5,7 +5,7 @@
         /// <summary>
         /// If question failed - Absolute score reduced to {PenaltyScore} 
         /// </summary>
-        public const double PenaltyScore = 3.0;
+        public const double PenaltyScore = 6.0;
         /// <summary>
         /// Absolute score reduced by {AgingFactor} per day in AgedScore calculation
         /// </summary>

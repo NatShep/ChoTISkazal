@@ -40,6 +40,8 @@ namespace Chotiskazal.Bot.ChatFlows
                 return null;
             return new TranslationButtonData(splitted[0],splitted[1], splitted[2]=="1");
         }
+        
+        
         public static InlineKeyboardButton CreateButtonFor(Translation translation, bool selected)
             => new InlineKeyboardButton {
                 CallbackData = CreateButtonDataFor(translation,selected), 

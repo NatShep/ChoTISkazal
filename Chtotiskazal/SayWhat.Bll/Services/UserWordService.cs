@@ -64,13 +64,30 @@ namespace SayWhat.Bll.Services
                 return new UserWordModel[0];
             
             var words = await _userWordsRepository.GetLastAsked(user, maxCount/2, minimumQuestionAsked);
-            words.AddRange(await _userWordsRepository.GetWellLearned(user, maxCount/2));
-            words.AddRange(await _userWordsRepository.GetBestLearned(user, minBestLearnedWords ));
+            
+            //Console.WriteLine($"Количество lasted слов: {words.Count}");
+            //Console.WriteLine(string.Join(" \r\n", words.ToList()));
+            
+            var wellKnownWords = await _userWordsRepository.GetWellLearned(user, maxCount/2);
+            
+            //Console.WriteLine($"Количество wellKnownWords слов: {wellKnownWords.Count}");
+            //Console.WriteLine(string.Join(" \r\n", wellKnownWords.ToList()));
+            
+            words.AddRange(wellKnownWords);
+            if (wellKnownWords.Count < maxCount / 2) {
+                words.AddRange(await _userWordsRepository.GetNotWellLearned(user, maxCount/2 - wellKnownWords.Count));
+            }
 
+            var bestKnownWords = (await _userWordsRepository.GetAllBestLearned(user)).Shuffle().Take(maxCount).ToList();
+            
+            //Console.WriteLine($"Количество bestKnownWords слов: {bestKnownWords.Count}");
+            //Console.WriteLine(string.Join(" \r\n", bestKnownWords.ToList()));
+
+            words.AddRange(bestKnownWords);
+            
             await IncludeExamples(words);
             return words;
         }
-
 
         public async Task RegisterFailure(UserWordModel userWordModelForLearning)
         {

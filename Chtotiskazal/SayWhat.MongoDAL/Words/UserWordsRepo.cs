@@ -55,19 +55,29 @@ public class UserWordsRepo : IMongoRepo {
                     Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.LearnedWordMinScore),
                     Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
                 ))
-            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: -1}}")
+            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
             .Limit(maxCount)
             .ToListAsync();
-
-    public Task<List<UserWordModel>> GetBestLearned(UserModel user, int maxCount)
+    
+    public Task<List<UserWordModel>> GetNotWellLearned(UserModel user, int maxCount)
         => Collection
             .Find(
                 Builders<UserWordModel>.Filter.And(
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
+                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.LearnedWordMinScore)
                 ))
             .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: -1}}")
             .Limit(maxCount)
+            .ToListAsync();
+
+    public Task<List<UserWordModel>> GetAllBestLearned(UserModel user)
+        => Collection
+            .Find(
+                Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName,
+                        WordLeaningGlobalSettings.WellDoneWordMinScore)
+                ))
             .ToListAsync();
     
     public Task<List<UserWordModel>> GetLastAsked(UserModel user, int maxCount, int minimumQuestionAsked)
@@ -75,8 +85,9 @@ public class UserWordsRepo : IMongoRepo {
            .Find(
                Builders<UserWordModel>.Filter.And(
                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                   Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked)
-               ))
+                   Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked),
+                   Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
+    ))
            .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:-1}}")
            .Limit(maxCount)
            .ToListAsync();

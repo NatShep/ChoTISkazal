@@ -129,10 +129,11 @@ public class UserWordModel {
     }
 
     public void OnQuestionFailed() {
-        if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
-            _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
+         if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
+             _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
 
-        _absoluteScore = (int)Math.Round(AbsoluteScore * WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed);
+        _absoluteScore = (int)Math.Round(_absoluteScore * WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed);
+        
         if (_absoluteScore < 0)
             _absoluteScore = 0;
 
@@ -160,14 +161,14 @@ public class UserWordModel {
         RuTranslations = newTranslates.ToArray();
     }
 
-    public override string ToString() => $"{Word} {CurrentOrderScore} updated {ScoreUpdatedTimestamp}";
-
     public UserWordTranslation RemoveTranslation(string translationText) {
         var tr = RuTranslations.FirstOrDefault(i => i.Word.Equals(translationText));
         if (tr != null)
             RuTranslations = RuTranslations.Where(t => t != tr).ToArray();
         return tr;
     }
+    public override string ToString() => $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
+    
 
     public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));
 }
