@@ -58,16 +58,36 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public async Task<IReadOnlyList<UserWordModel>> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked)
+        public async Task<IReadOnlyList<UserWordModel>> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked, int  minBestLearnedWords)
         {
             if (maxCount <= 0)
                 return new UserWordModel[0];
+            
+            var words = await _userWordsRepository.GetLastAsked(user, maxCount/2, minimumQuestionAsked);
+            
+            //Console.WriteLine($"Количество lasted слов: {words.Count}");
+            //Console.WriteLine(string.Join(" \r\n", words.ToList()));
+            
+            var wellKnownWords = await _userWordsRepository.GetWellLearned(user, maxCount/2);
+            
+            //Console.WriteLine($"Количество wellKnownWords слов: {wellKnownWords.Count}");
+            //Console.WriteLine(string.Join(" \r\n", wellKnownWords.ToList()));
+            
+            words.AddRange(wellKnownWords);
+            if (wellKnownWords.Count < maxCount / 2) {
+                words.AddRange(await _userWordsRepository.GetNotWellLearned(user, maxCount/2 - wellKnownWords.Count));
+            }
 
-            var words = await _userWordsRepository.Get(user, maxCount, minimumQuestionAsked);
+            var bestKnownWords = (await _userWordsRepository.GetAllBestLearned(user)).Shuffle().Take(maxCount).ToList();
+            
+            //Console.WriteLine($"Количество bestKnownWords слов: {bestKnownWords.Count}");
+            //Console.WriteLine(string.Join(" \r\n", bestKnownWords.ToList()));
+
+            words.AddRange(bestKnownWords);
+            
             await IncludeExamples(words);
             return words;
         }
-
 
         public async Task RegisterFailure(UserWordModel userWordModelForLearning)
         {
@@ -215,34 +235,24 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
 
-        public async Task<IReadOnlyList<UserWordModel>> AppendAdvancedWordsToExamList(UserModel user, UserWordModel[] learningWords, ExamSettings examSettings)
+        public async Task<UserWordModel[]> AppendAdvancedWordsToExamList(UserModel user, ExamSettings examSettings, int count)
         {
-            //Get exam list and test words
-            var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
+            Console.WriteLine($"Количество мест для продвинутых слов: {count}");
 
-            //Every learning word appears in exam from MIN to MAX times
-            for (int i = 0; i < examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Shuffle());
-            for (int i = 0; i < examSettings.MaxTimesThatLearningWordAppearsInExam - examSettings.MinTimesThatLearningWordAppearsInExam; i++) 
-                examsList.AddRange(learningWords.Shuffle().Where(w => Rand.Next() % 2 == 0));
-            
-            while (examsList.Count > examSettings.MaxExamSize) 
-                examsList.RemoveAt(examsList.Count - 1);
-            var advancedlistMaxCount = Math.Min(Rand.UpTo(examSettings.MaxAdvancedQuestionsCount),
-                examSettings.MaxExamSize - examsList.Count);
-            if (advancedlistMaxCount <= 0)
-                return examsList;
-
-            var minimumTimesThatWordHasToBeAsked =
-                Rand.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedCount,
-                    examSettings.MaxAdvancedExamMinQuestionAskedCount);
-            
             var advancedList = await GetWordsWithExamples(
                 user: user,
-                maxCount: advancedlistMaxCount,
-                minimumQuestionAsked: minimumTimesThatWordHasToBeAsked);
-            examsList.AddRange(advancedList);
-            return examsList;
+                maxCount: count,
+                minimumQuestionAsked: examSettings.MinimumQuestionAsked,
+                minBestLearnedWords: examSettings.MinBestLearnedWords);
+          
+            //TODO Подобрать количество экзаменов для advanced слов
+            var minimumTimesThatWordHasToBeAsked =
+                Rand.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedForOneWordCount,
+                    examSettings.MaxAdvancedExamMinQuestionAskedForOneWordCount);
+
+            Console.WriteLine($"Минимальное кол во повтора продвинутых слов {minimumTimesThatWordHasToBeAsked}");
+
+            return advancedList.ToArray();
         }
         
         public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
