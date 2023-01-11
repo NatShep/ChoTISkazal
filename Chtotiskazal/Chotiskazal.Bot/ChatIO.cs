@@ -103,7 +103,7 @@ public class ChatIO {
     }
     private void AssertTooLongButtonData(IEnumerable<InlineKeyboardButton> selectMany) {
         foreach (var button in selectMany) {
-            if(button.CallbackData?.Length>=InlineButtons.MaxDataStringLength)
+            if(button.CallbackData?.Length>=InlineButtons.MaxCallbackDataByteSizeUtf8)
                 Reporter.ReportError(ChatId.Identifier, $"Too long button data: Text:'{button.Text}'  Data:'{button.CallbackData}'");
         }
     }

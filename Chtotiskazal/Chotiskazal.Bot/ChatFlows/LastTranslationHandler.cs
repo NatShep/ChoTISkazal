@@ -75,16 +75,17 @@ namespace Chotiskazal.Bot.ChatFlows
             var i = 0;
             foreach (var translation in _translations) {
                 var button = AddWordHelper.CreateButtonFor(translation, _areSelected[i]);
-                if (button.CallbackData.Length >= InlineButtons.MaxDataStringLength) 
+                if (System.Text.ASCIIEncoding.ASCII.GetByteCount(button.CallbackData) > InlineButtons.MaxCallbackDataByteSizeUtf8) 
                 {
                     Reporter.ReportError(Chat.ChatId.Identifier, $"Too long button data: '{button.Text}':'{button.CallbackData}'");
                 }
                 else 
                 {
                     buttons.Add(new[]{button});
+                    i++;
                 }
-                i++;
             }
+            if (i == 0) return buttons;
             if (_isLastMessageInTheChat)
                 buttons.Add(new[]
                 {
@@ -114,9 +115,15 @@ namespace Chotiskazal.Bot.ChatFlows
         public async Task SendTranslationMessage(string markdownMessage, string transcription, bool[] selectionMarks)
         {
             _areSelected = selectionMarks;
+            var buttons = CreateButtons().ToArray();
+            if (!buttons.Any()) {
+                await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
+                Reporter.ReportTranslationNotFound(Chat.User.TelegramId);
+                return;
+            }
+            
             _originMessageId = await Chat.SendMarkdownMessageAsync(
-                Chat.Texts.HereAreTheTranslation(markdownMessage, transcription), 
-                CreateButtons().ToArray());
+                Chat.Texts.HereAreTheTranslation(markdownMessage, transcription), buttons);
         }
     }
 }
