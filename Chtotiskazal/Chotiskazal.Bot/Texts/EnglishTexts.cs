@@ -89,6 +89,8 @@ namespace Chotiskazal.Bot.InterfaceTexts
 
         public string NoTranslationsFound => "No translations found. Check the word and try again";
 
+        public string PhraseBecomeSoon => "There is no phrase interpreter. It is are coming soon";
+
         public Markdown LearningCarefullyStudyTheList =>
             Markdown.Escaped("Learning").ToSemiBold()
                 .NewLine()

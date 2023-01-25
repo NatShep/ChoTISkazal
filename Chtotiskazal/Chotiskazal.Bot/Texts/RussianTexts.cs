@@ -89,6 +89,8 @@ public class RussianTexts : IInterfaceTexts {
         "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
+    
+    public string PhraseBecomeSoon => "Сейчас я не умею переводить фразы. Но скоро это станет возможным!";
 
     public Markdown LearningCarefullyStudyTheList =>
         Markdown.Escaped("Ботаем").ToSemiBold()

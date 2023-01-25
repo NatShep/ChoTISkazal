@@ -13,6 +13,7 @@ using SayWhat.Bll.Statistics;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.LongDataForTranslationButton;
 using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
@@ -27,6 +28,7 @@ namespace Chotiskazal.Bot
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, MainFlow> Chats = new ConcurrentDictionary<long,MainFlow>();
         private static AddWordService _addWordService;
+        private static LongDataForButtonService _longDataForButtonService;
         private static LocalDictionaryService _localDictionaryService;
         private static UsersWordsService _userWordService;
         private static BotSettings _settings;
@@ -49,6 +51,8 @@ namespace Chotiskazal.Bot
             var examplesRepo   = new ExamplesRepo(db);
             var questionMetricsRepo = new QuestionMetricRepo(db);
             var learningSetsRepo = new LearningSetsRepo(db);
+            var longDataForButtonReo = new LongDataForButtonRepo(db);
+            
             userWordRepo.UpdateDb();
             dictionaryRepo.UpdateDb();
             userRepo.UpdateDb();
@@ -67,6 +71,7 @@ namespace Chotiskazal.Bot
                 yandexDictionaryClient,
                 _localDictionaryService, 
                 _userService);
+            _longDataForButtonService = new LongDataForButtonService(longDataForButtonReo);
             
             QuestionSelector.Singletone = new QuestionSelector(_localDictionaryService);
     
@@ -253,7 +258,8 @@ namespace Chotiskazal.Bot
                 _userWordService, 
                 _userService,
                 _localDictionaryService,
-                _learningSetService);
+                _learningSetService,
+                _longDataForButtonService);
             Chats.TryAdd(chat.Id, newChatRoom);
             return newChatRoom;
         }

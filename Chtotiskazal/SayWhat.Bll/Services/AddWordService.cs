@@ -35,7 +35,7 @@ public class AddWordService {
     public async Task<IReadOnlyList<Translation>> TranslateAndAddToDictionary(string originWord) {
         originWord = originWord.ToLower();
 
-        if (originWord.Count(e => e == ' ') >= 4) return null;
+        if (originWord.Count(e => e == ' ') >= 3) return null;
         //todo go to translate api
         
         IReadOnlyList<Translation> res = null;

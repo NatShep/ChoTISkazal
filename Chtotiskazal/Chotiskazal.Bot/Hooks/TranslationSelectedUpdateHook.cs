@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
@@ -13,13 +14,16 @@ namespace Chotiskazal.Bot.Hooks
     {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
+        private readonly LongDataForButtonService _longDataForButtonService;
         
         public TranslationSelectedUpdateHook(
             AddWordService addWordService, 
-            ChatRoom chat)
+            ChatRoom chat,
+            LongDataForButtonService longDataForButtonService)
         {
             Chat = chat;
             _addWordService = addWordService;
+            _longDataForButtonService = longDataForButtonService;
         }
 
         public void SetLastTranslationHandler(LastTranslationHandler handler) => _cachedHandlerTranslationOrNull = handler;
@@ -28,11 +32,13 @@ namespace Chotiskazal.Bot.Hooks
         
         public bool CanBeHandled(Update update) => 
             update.CallbackQuery?.Data!=null 
-            && update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefix);
+            && (update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefix)
+                ||
+                update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefixForLargeSize));
 
         public async Task Handle(Update update)
         {
-            var buttonData = AddWordHelper.ParseQueryDataOrNull(update.CallbackQuery.Data);
+            var buttonData = await AddWordHelper.ParseQueryDataOrNull(_longDataForButtonService, update.CallbackQuery.Data);
             if (buttonData == null)
             {
                 await Chat.ConfirmCallback(update.CallbackQuery.Id);
@@ -72,7 +78,7 @@ namespace Chotiskazal.Bot.Hooks
                 return;
             }
 
-            var selectionMarks = GetSelectionMarks(allTranslations, originMessageButtons);
+            var selectionMarks = await GetSelectionMarks(_longDataForButtonService, allTranslations, originMessageButtons);
 
             var index = AddWordHelper.FindIndexOf(allTranslations, buttonData.Translation);
             if(index==-1)
@@ -97,20 +103,27 @@ namespace Chotiskazal.Bot.Hooks
                 await Chat.AnswerCallbackQueryWithTooltip(update.CallbackQuery.Id,
                     Chat.Texts.MessageAfterTranslationIsDeselected(allTranslations[index]));
             }
+
+            var buttons = new List<InlineKeyboardButton[]>();
+            foreach (var translation in allTranslations) {
+                var translationIndex = AddWordHelper.FindIndexOf(allTranslations, translation.TranslatedText);
+                var button = await AddWordHelper.CreateButtonFor(
+                    _longDataForButtonService, translation, selectionMarks[translationIndex]);
+                buttons.Add(new[]{button});
+            }
+            
             await Chat.EditMessageButtons(
                 update.CallbackQuery.Message.MessageId,
-                allTranslations
-                    .Select((t, i) => AddWordHelper.CreateButtonFor(t, selectionMarks[i]))
-                    .ToArray());
+                buttons.ToArray());
         }
 
-        private static bool[] GetSelectionMarks(IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
+        private static async Task<bool[]> GetSelectionMarks(LongDataForButtonService longDataForButtonService, IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
         {
             bool[] selectionMarks = new bool[allTranslations.Count];
             int i = 0;
             foreach (var originMessageButton in originMessageButtons)
             {
-                var data = AddWordHelper.ParseQueryDataOrNull(originMessageButton.CallbackData);
+                var data = await AddWordHelper.ParseQueryDataOrNull(longDataForButtonService, originMessageButton.CallbackData);
                 if (data != null)
                 {
                     if (allTranslations[i].TranslatedText.Equals(data.Translation) && data.IsSelected)

@@ -14,15 +14,18 @@ namespace Chotiskazal.Bot.ChatFlows {
 internal class TranslateWordsFlow {
     private ChatRoom Chat { get; }
     private readonly AddWordService _addWordService;
+    private readonly LongDataForButtonService _longDataForButtonService;
     private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
     public TranslateWordsFlow(
         ChatRoom chat,
         AddWordService addWordService,
-        TranslationSelectedUpdateHook translationUpdateHookHandler
+        TranslationSelectedUpdateHook translationUpdateHookHandler,
+        LongDataForButtonService longDataForButtonService
     ) {
         Chat = chat;
         _addWordService = addWordService;
+        _longDataForButtonService = longDataForButtonService;
         _translationSelectedUpdateHook = translationUpdateHookHandler;
     }
 
@@ -46,14 +49,22 @@ internal class TranslateWordsFlow {
 
         UserWordModel alreadyExistUserWord = null;
 
+        // Search word in UserWord Table for English Word
         if (!word.IsRussian())
             alreadyExistUserWord = await _addWordService.GetWordNullByEngWord(Chat.User, word);
 
+        // Search or get translation for word
         var translations = await _addWordService.FindInLocalDictionaryWithExamples(word);
         if (!translations.Any()) // if not, search it in Ya dictionary
             translations = await _addWordService.TranslateAndAddToDictionary(word);
 
-        if (translations?.Any() != true)
+        if (translations is null) {
+            await Chat.SendMessageAsync(Chat.Texts.PhraseBecomeSoon);
+            Reporter.ReportTranslationNotFound(Chat.User.TelegramId);
+            return null; 
+        }
+        
+        if (translations.Any() != true)
         {
             await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
             Reporter.ReportTranslationNotFound(Chat.User.TelegramId);
@@ -77,7 +88,8 @@ internal class TranslateWordsFlow {
         var handler = new LastTranslationHandler(
             translations: translations,
             chat: Chat,
-            addWordService: _addWordService);
+            addWordService: _addWordService,
+            longDataForButtonService: _longDataForButtonService);
 
         _translationSelectedUpdateHook.SetLastTranslationHandler(handler);
 
