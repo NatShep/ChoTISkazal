@@ -14,16 +14,16 @@ namespace Chotiskazal.Bot.Hooks
     {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private readonly LongDataForButtonService _longDataForButtonService;
+        private readonly CallbackDataForButtonService _callbackDataForButtonService;
         
         public TranslationSelectedUpdateHook(
             AddWordService addWordService, 
             ChatRoom chat,
-            LongDataForButtonService longDataForButtonService)
+            CallbackDataForButtonService callbackDataForButtonService)
         {
             Chat = chat;
             _addWordService = addWordService;
-            _longDataForButtonService = longDataForButtonService;
+            _callbackDataForButtonService = callbackDataForButtonService;
         }
 
         public void SetLastTranslationHandler(LastTranslationHandler handler) => _cachedHandlerTranslationOrNull = handler;
@@ -32,13 +32,13 @@ namespace Chotiskazal.Bot.Hooks
         
         public bool CanBeHandled(Update update) => 
             update.CallbackQuery?.Data!=null 
-            && (update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefix)
+            && (update.CallbackQuery.Data.StartsWith(_callbackDataForButtonService.TranslationDataPrefix)
                 ||
-                update.CallbackQuery.Data.StartsWith(AddWordHelper.TranslationDataPrefixForLargeSize));
+                update.CallbackQuery.Data.StartsWith(_callbackDataForButtonService.TranslationDataPrefixForLargeSize));
 
         public async Task Handle(Update update)
         {
-            var buttonData = await AddWordHelper.ParseQueryDataOrNull(_longDataForButtonService, update.CallbackQuery.Data);
+            var buttonData = await _callbackDataForButtonService.ParseQueryDataOrNull(update.CallbackQuery.Data);
             if (buttonData == null)
             {
                 await Chat.ConfirmCallback(update.CallbackQuery.Id);
@@ -78,7 +78,7 @@ namespace Chotiskazal.Bot.Hooks
                 return;
             }
 
-            var selectionMarks = await GetSelectionMarks(_longDataForButtonService, allTranslations, originMessageButtons);
+            var selectionMarks = await GetSelectionMarks(_callbackDataForButtonService, allTranslations, originMessageButtons);
 
             var index = AddWordHelper.FindIndexOf(allTranslations, buttonData.Translation);
             if(index==-1)
@@ -108,7 +108,7 @@ namespace Chotiskazal.Bot.Hooks
             foreach (var translation in allTranslations) {
                 var translationIndex = AddWordHelper.FindIndexOf(allTranslations, translation.TranslatedText);
                 var button = await AddWordHelper.CreateButtonFor(
-                    _longDataForButtonService, translation, selectionMarks[translationIndex]);
+                    _callbackDataForButtonService, translation, selectionMarks[translationIndex]);
                 buttons.Add(new[]{button});
             }
             
@@ -117,13 +117,13 @@ namespace Chotiskazal.Bot.Hooks
                 buttons.ToArray());
         }
 
-        private static async Task<bool[]> GetSelectionMarks(LongDataForButtonService longDataForButtonService, IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
+        private static async Task<bool[]> GetSelectionMarks(CallbackDataForButtonService callbackDataForButtonService, IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
         {
             bool[] selectionMarks = new bool[allTranslations.Count];
             int i = 0;
             foreach (var originMessageButton in originMessageButtons)
             {
-                var data = await AddWordHelper.ParseQueryDataOrNull(longDataForButtonService, originMessageButton.CallbackData);
+                var data = await callbackDataForButtonService.ParseQueryDataOrNull(originMessageButton.CallbackData);
                 if (data != null)
                 {
                     if (allTranslations[i].TranslatedText.Equals(data.Translation) && data.IsSelected)

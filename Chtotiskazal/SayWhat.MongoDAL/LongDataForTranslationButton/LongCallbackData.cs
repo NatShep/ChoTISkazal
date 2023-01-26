@@ -4,8 +4,8 @@ using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.MongoDAL.LongDataForTranslationButton {
 [BsonIgnoreExtraElements]
-public class LongDataForButton {
-    public LongDataForButton(string word, string translation) {
+public class LongCallbackData {
+    public LongCallbackData(string word, string translation) {
         Id = ObjectId.GenerateNewId();
         _word = word;
         _translation = translation;

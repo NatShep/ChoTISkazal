@@ -50,13 +50,13 @@ public class ChlangBotCommandHandler : IBotCommandHandler {
 
 public class AddBotCommandHandler : IBotCommandHandler {
     private readonly AddWordService _addWordsService;
-    private readonly LongDataForButtonService _longDataForButtonService;
+    private readonly CallbackDataForButtonService _callbackDataForButtonService;
     private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
     public AddBotCommandHandler(
-        AddWordService addWordsService, LongDataForButtonService longDataForButtonService, TranslationSelectedUpdateHook translationSelectedUpdateHook) {
+        AddWordService addWordsService, CallbackDataForButtonService callbackDataForButtonService, TranslationSelectedUpdateHook translationSelectedUpdateHook) {
         _addWordsService = addWordsService;
-        _longDataForButtonService = longDataForButtonService;
+        _callbackDataForButtonService = callbackDataForButtonService;
         _translationSelectedUpdateHook = translationSelectedUpdateHook;
     }
 
@@ -64,7 +64,7 @@ public class AddBotCommandHandler : IBotCommandHandler {
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>
-        new TranslateWordsFlow(chat, _addWordsService, _translationSelectedUpdateHook, _longDataForButtonService).Enter(argument);
+        new TranslateWordsFlow(chat, _addWordsService, _translationSelectedUpdateHook, _callbackDataForButtonService).Enter(argument);
 }
 
 public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
