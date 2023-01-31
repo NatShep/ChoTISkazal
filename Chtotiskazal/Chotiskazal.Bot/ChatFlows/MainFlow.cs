@@ -19,7 +19,7 @@ public class MainFlow {
         UserService userService,
         LocalDictionaryService localDictionaryService,
         LearningSetService learningSetService,
-        CallbackDataForButtonService callbackDataForButtonService) {
+        ButtonCallbackDataService buttonCallbackDataService) {
         ChatIo = chatIo;
         _userInfo = userInfo;
         _settings = settings;
@@ -28,7 +28,7 @@ public class MainFlow {
         _userService = userService;
         _localDictionaryService = localDictionaryService;
         _learningSetService = learningSetService;
-        _callbackDataForButtonService = callbackDataForButtonService;
+        _buttonCallbackDataService = buttonCallbackDataService;
 
     }
 
@@ -36,7 +36,7 @@ public class MainFlow {
     private readonly UsersWordsService _usersWordsService;
     private readonly UserService _userService;
     private readonly LocalDictionaryService _localDictionaryService;
-    private readonly CallbackDataForButtonService _callbackDataForButtonService;
+    private readonly ButtonCallbackDataService _buttonCallbackDataService;
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
     private readonly BotSettings _settings;
@@ -100,14 +100,14 @@ public class MainFlow {
 
         Chat = new ChatRoom(ChatIo, user);
         // Initialize update hooks
-        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(_addWordsService, Chat, _callbackDataForButtonService);
+        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(Chat, _addWordsService, _buttonCallbackDataService);
         _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
 
         ChatIo.AddUpdateHook(_translationSelectedUpdateHook);
         ChatIo.AddUpdateHook(_wellKnownWordsUpdateHook);
 
         // Initialize  command handlers
-        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _callbackDataForButtonService, _translationSelectedUpdateHook);
+        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook);
 
         ChatIo.CommandHandlers = new[] {
             HelpBotCommandHandler.Instance,

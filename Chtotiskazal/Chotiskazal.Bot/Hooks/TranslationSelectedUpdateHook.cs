@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Chotiskazal.Bot.ChatFlows;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
@@ -14,16 +13,16 @@ namespace Chotiskazal.Bot.Hooks
     {
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
-        private readonly CallbackDataForButtonService _callbackDataForButtonService;
+        private readonly ButtonCallbackDataService _buttonCallbackDataService;
         
         public TranslationSelectedUpdateHook(
-            AddWordService addWordService, 
             ChatRoom chat,
-            CallbackDataForButtonService callbackDataForButtonService)
+            AddWordService addWordService,
+            ButtonCallbackDataService buttonCallbackDataService)
         {
             Chat = chat;
             _addWordService = addWordService;
-            _callbackDataForButtonService = callbackDataForButtonService;
+            _buttonCallbackDataService = buttonCallbackDataService;
         }
 
         public void SetLastTranslationHandler(LastTranslationHandler handler) => _cachedHandlerTranslationOrNull = handler;
@@ -32,13 +31,13 @@ namespace Chotiskazal.Bot.Hooks
         
         public bool CanBeHandled(Update update) => 
             update.CallbackQuery?.Data!=null 
-            && (update.CallbackQuery.Data.StartsWith(_callbackDataForButtonService.TranslationDataPrefix)
+            && (update.CallbackQuery.Data.StartsWith(_buttonCallbackDataService.TranslationDataPrefix)
                 ||
-                update.CallbackQuery.Data.StartsWith(_callbackDataForButtonService.TranslationDataPrefixForLargeSize));
+                update.CallbackQuery.Data.StartsWith(_buttonCallbackDataService.TranslationDataPrefixForLargeSize));
 
         public async Task Handle(Update update)
         {
-            var buttonData = await _callbackDataForButtonService.ParseQueryDataOrNull(update.CallbackQuery.Data);
+            var buttonData = await _buttonCallbackDataService.GetButtonDataOrNull(update.CallbackQuery.Data);
             if (buttonData == null)
             {
                 await Chat.ConfirmCallback(update.CallbackQuery.Id);
@@ -78,7 +77,7 @@ namespace Chotiskazal.Bot.Hooks
                 return;
             }
 
-            var selectionMarks = await GetSelectionMarks(_callbackDataForButtonService, allTranslations, originMessageButtons);
+            var selectionMarks = await GetSelectionMarks(_buttonCallbackDataService, allTranslations, originMessageButtons);
 
             var index = AddWordHelper.FindIndexOf(allTranslations, buttonData.Translation);
             if(index==-1)
@@ -108,7 +107,7 @@ namespace Chotiskazal.Bot.Hooks
             foreach (var translation in allTranslations) {
                 var translationIndex = AddWordHelper.FindIndexOf(allTranslations, translation.TranslatedText);
                 var button = await AddWordHelper.CreateButtonFor(
-                    _callbackDataForButtonService, translation, selectionMarks[translationIndex]);
+                    _buttonCallbackDataService, translation, selectionMarks[translationIndex]);
                 buttons.Add(new[]{button});
             }
             
@@ -117,13 +116,13 @@ namespace Chotiskazal.Bot.Hooks
                 buttons.ToArray());
         }
 
-        private static async Task<bool[]> GetSelectionMarks(CallbackDataForButtonService callbackDataForButtonService, IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
+        private static async Task<bool[]> GetSelectionMarks(ButtonCallbackDataService buttonCallbackDataService, IReadOnlyList<Translation> allTranslations, InlineKeyboardButton[] originMessageButtons)
         {
             bool[] selectionMarks = new bool[allTranslations.Count];
             int i = 0;
             foreach (var originMessageButton in originMessageButtons)
             {
-                var data = await callbackDataForButtonService.ParseQueryDataOrNull(originMessageButton.CallbackData);
+                var data = await buttonCallbackDataService.GetButtonDataOrNull(originMessageButton.CallbackData);
                 if (data != null)
                 {
                     if (allTranslations[i].TranslatedText.Equals(data.Translation) && data.IsSelected)

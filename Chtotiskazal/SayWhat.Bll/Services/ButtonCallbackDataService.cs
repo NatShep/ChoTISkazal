@@ -17,21 +17,26 @@ public class TranslationButtonData {
     public bool IsSelected { get; }
 }
 
-public class CallbackDataForButtonService {
+public class ButtonCallbackDataService {
     private readonly LongCallbackDataRepo _longCallbackDataRepository;
 
-    public readonly string Separator = "@";
+    private const string Separator = "@";
     public readonly string TranslationDataPrefix = "/trm";
     public readonly string TranslationDataPrefixForLargeSize = "/trl";
+    
+    public ButtonCallbackDataService(LongCallbackDataRepo repository) {
+        _longCallbackDataRepository = repository;
+    }
     
     public string CreateButtonDataForShortTranslation(Translation translation, bool isSelected)
         => TranslationDataPrefix
            + translation.OriginText
            + Separator
-           + translation.TranslatedText + Separator
+           + translation.TranslatedText 
+           + Separator
            + (isSelected ? "1" : "0");
 
-    public async Task<string> CreateButtonDataForLongTranslate(Translation translation, bool isSelected) {
+    public async Task<string> CreateDataForLongTranslation(Translation translation, bool isSelected) {
         var data = await GetLongButtonData(translation.TranslatedText);
         if (data is null) {
             data = new LongCallbackData(translation.OriginText, translation.TranslatedText);
@@ -44,9 +49,10 @@ public class CallbackDataForButtonService {
                + (isSelected ? "1" : "0");
     }
     
-    public async Task<TranslationButtonData> ParseQueryDataOrNull(string buttonQueryData) {
+    public async Task<TranslationButtonData> GetButtonDataOrNull(string buttonQueryData) {
         if (string.IsNullOrWhiteSpace(buttonQueryData))
             return null;
+        
         if (buttonQueryData.StartsWith(TranslationDataPrefix)) {
             var splitted = buttonQueryData.Substring(4).Split(Separator);
             return splitted.Length != 3
@@ -69,10 +75,6 @@ public class CallbackDataForButtonService {
         return null;
     }
 
-    public CallbackDataForButtonService(LongCallbackDataRepo repository) {
-        _longCallbackDataRepository = repository;
-    }
-    
     public async Task<LongCallbackData> GetLongButtonData(string translation) {
         return await _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
     }

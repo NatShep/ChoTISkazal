@@ -5,15 +5,15 @@ using MongoDB.Driver;
 
 namespace SayWhat.MongoDAL.LongDataForTranslationButton {
 public class LongCallbackDataRepo : IMongoRepo {
+    private readonly IMongoDatabase _db;
+    
     public const string LongDataForButtonCollectionName = "longTranslations";
     public const string WordFieldName = "w";
     public const string TranslateFieldName = "tr";
-    // А нужен ли тут вообще hash? Может искать по строке?
-
+    
     private IMongoCollection<LongCallbackData> Collection
         => _db.GetCollection<LongCallbackData>(LongDataForButtonCollectionName);
-
-    private readonly IMongoDatabase _db;
+    
     public LongCallbackDataRepo(IMongoDatabase db) => _db = db;
     public Task Add(LongCallbackData callbackData) => Collection.InsertOneAsync(callbackData);
     public List<LongCallbackData> GetAll() => Collection.AsQueryable().ToList();

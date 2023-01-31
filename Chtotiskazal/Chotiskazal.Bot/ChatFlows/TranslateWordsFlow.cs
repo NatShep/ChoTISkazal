@@ -14,18 +14,18 @@ namespace Chotiskazal.Bot.ChatFlows {
 internal class TranslateWordsFlow {
     private ChatRoom Chat { get; }
     private readonly AddWordService _addWordService;
-    private readonly CallbackDataForButtonService _callbackDataForButtonService;
+    private readonly ButtonCallbackDataService _buttonCallbackDataService;
     private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
     public TranslateWordsFlow(
         ChatRoom chat,
         AddWordService addWordService,
-        TranslationSelectedUpdateHook translationUpdateHookHandler,
-        CallbackDataForButtonService callbackDataForButtonService
+        ButtonCallbackDataService buttonCallbackDataService,
+        TranslationSelectedUpdateHook translationUpdateHookHandler
     ) {
         Chat = chat;
         _addWordService = addWordService;
-        _callbackDataForButtonService = callbackDataForButtonService;
+        _buttonCallbackDataService = buttonCallbackDataService;
         _translationSelectedUpdateHook = translationUpdateHookHandler;
     }
 
@@ -89,7 +89,7 @@ internal class TranslateWordsFlow {
             translations: translations,
             chat: Chat,
             addWordService: _addWordService,
-            callbackDataForButtonService: _callbackDataForButtonService);
+            buttonCallbackDataService: _buttonCallbackDataService);
 
         _translationSelectedUpdateHook.SetLastTranslationHandler(handler);
 

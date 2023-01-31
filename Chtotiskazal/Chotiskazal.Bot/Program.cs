@@ -28,7 +28,7 @@ namespace Chotiskazal.Bot
         private static TelegramBotClient _botClient;
         private static readonly ConcurrentDictionary<long, MainFlow> Chats = new ConcurrentDictionary<long,MainFlow>();
         private static AddWordService _addWordService;
-        private static CallbackDataForButtonService _callbackDataForButtonService;
+        private static ButtonCallbackDataService _buttonCallbackDataService;
         private static LocalDictionaryService _localDictionaryService;
         private static UsersWordsService _userWordService;
         private static BotSettings _settings;
@@ -71,7 +71,7 @@ namespace Chotiskazal.Bot
                 yandexDictionaryClient,
                 _localDictionaryService, 
                 _userService);
-            _callbackDataForButtonService = new CallbackDataForButtonService(longDataForButtonRepo);
+            _buttonCallbackDataService = new ButtonCallbackDataService(longDataForButtonRepo);
             
             QuestionSelector.Singletone = new QuestionSelector(_localDictionaryService);
     
@@ -259,7 +259,7 @@ namespace Chotiskazal.Bot
                 _userService,
                 _localDictionaryService,
                 _learningSetService,
-                _callbackDataForButtonService);
+                _buttonCallbackDataService);
             Chats.TryAdd(chat.Id, newChatRoom);
             return newChatRoom;
         }

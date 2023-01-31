@@ -14,7 +14,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         private readonly IReadOnlyList<Translation> _translations;
-        private readonly CallbackDataForButtonService _callbackDataForButtonService;
+        private readonly ButtonCallbackDataService _buttonCallbackDataService;
         private bool _isLastMessageInTheChat =true ;
 
         public string OriginWordText { get;  }
@@ -25,7 +25,7 @@ namespace Chotiskazal.Bot.ChatFlows
             IReadOnlyList<Translation> translations, 
             ChatRoom chat,
             AddWordService addWordService,
-            CallbackDataForButtonService callbackDataForButtonService)
+            ButtonCallbackDataService buttonCallbackDataService)
         {
             Chat = chat;
             OriginWordText = translations[0].OriginText;
@@ -34,7 +34,7 @@ namespace Chotiskazal.Bot.ChatFlows
             if(translations.Count>0)
                 _areSelected[0] = true;
             _addWordService = addWordService;
-            _callbackDataForButtonService = callbackDataForButtonService;
+            _buttonCallbackDataService = buttonCallbackDataService;
         }
 
         public async Task Handle(string translation, Update update)
@@ -78,7 +78,7 @@ namespace Chotiskazal.Bot.ChatFlows
             var buttons = new List<InlineKeyboardButton[]>();
             var i = 0;
             foreach (var translation in _translations) {
-                var button = await AddWordHelper.CreateButtonFor(_callbackDataForButtonService, translation, _areSelected[i]);
+                var button = await AddWordHelper.CreateButtonFor(_buttonCallbackDataService, translation, _areSelected[i]);
                 buttons.Add(new[]{button});
                 i++;
             }

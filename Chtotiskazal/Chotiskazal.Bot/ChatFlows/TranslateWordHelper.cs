@@ -10,23 +10,23 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Chotiskazal.Bot.ChatFlows {
 
 public static class AddWordHelper {
-    static async Task<string> CreateButtonDataFor(CallbackDataForButtonService callbackDataForButtonService, Translation translation,
+    static async Task<string> CreateButtonDataFor(ButtonCallbackDataService buttonCallbackDataService, Translation translation,
         bool isSelected) {
-        var buttonData = callbackDataForButtonService.CreateButtonDataForShortTranslation(translation, isSelected);
+        var buttonData = buttonCallbackDataService.CreateButtonDataForShortTranslation(translation, isSelected);
         Console.WriteLine(buttonData + " " + buttonData.Length);
         Console.WriteLine(System.Text.Encoding.UTF8.GetByteCount(buttonData));
         return System.Text.Encoding.UTF8.GetByteCount(buttonData) >= InlineButtons.MaxCallbackDataByteSizeUtf8
-            ? await callbackDataForButtonService.CreateButtonDataForLongTranslate(translation, isSelected)
+            ? await buttonCallbackDataService.CreateDataForLongTranslation(translation, isSelected)
             : buttonData;
     }
     
     public static async Task<InlineKeyboardButton> CreateButtonFor(
-        CallbackDataForButtonService callbackDataForButtonService,
+        ButtonCallbackDataService buttonCallbackDataService,
         Translation translation,
         bool selected)
         => new InlineKeyboardButton
         {
-            CallbackData = await CreateButtonDataFor(callbackDataForButtonService, translation, selected),
+            CallbackData = await CreateButtonDataFor(buttonCallbackDataService, translation, selected),
             Text = selected
                 ? $"{Emojis.Selected} {translation.TranslatedText}"
                 : translation.TranslatedText
