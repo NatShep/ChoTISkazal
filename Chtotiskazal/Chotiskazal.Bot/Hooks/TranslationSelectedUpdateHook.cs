@@ -31,9 +31,9 @@ namespace Chotiskazal.Bot.Hooks
         
         public bool CanBeHandled(Update update) => 
             update.CallbackQuery?.Data!=null 
-            && (update.CallbackQuery.Data.StartsWith(_buttonCallbackDataService.TranslationDataPrefix)
+            && (update.CallbackQuery.Data.StartsWith(ButtonCallbackDataService.TranslationDataPrefix)
                 ||
-                update.CallbackQuery.Data.StartsWith(_buttonCallbackDataService.TranslationDataPrefixForLargeSize));
+                update.CallbackQuery.Data.StartsWith(ButtonCallbackDataService.TranslationDataPrefixForLargeSize));
 
         public async Task Handle(Update update)
         {
