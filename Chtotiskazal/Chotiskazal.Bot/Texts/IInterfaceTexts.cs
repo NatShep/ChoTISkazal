@@ -53,6 +53,7 @@ public interface IInterfaceTexts {
     string DidYouWriteSomething { get; }
     string EnterWordOrStart { get; }
     string NoTranslationsFound { get; }
+    string PhraseBecomeSoon { get; }
     string StartButton { get; }
     string CancelButton { get; }
     string OneMoreLearnButton { get; }

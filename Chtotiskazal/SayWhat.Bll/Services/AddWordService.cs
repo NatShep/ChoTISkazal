@@ -20,6 +20,7 @@ public class AddWordService {
     private readonly YandexDictionaryApiClient _yaDicClient;
     private readonly LocalDictionaryService _localDictionaryService;
     private readonly UserService _userService;
+    private const int MaxWordsForTranslate = 3;
 
     public AddWordService(
         UsersWordsService usersWordsService,
@@ -35,7 +36,7 @@ public class AddWordService {
     public async Task<IReadOnlyList<Translation>> TranslateAndAddToDictionary(string originWord) {
         originWord = originWord.ToLower();
 
-        if (originWord.Count(e => e == ' ') >= 4) return null;
+        if (originWord.Count(e => e == ' ') >= MaxWordsForTranslate) return null;
         //todo go to translate api
         
         IReadOnlyList<Translation> res = null;

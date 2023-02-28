@@ -1,66 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MongoDB.Bson;
 using SayWhat.Bll.Dto;
+using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.LongDataForTranslationButton;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows
-{
-    public class TranslationButtonData
-    {
-        public TranslationButtonData(string origin, string translation, bool isSelected)
-        {
-            Origin = origin;
-            Translation = translation;
-            IsSelected = isSelected;
-        }
+namespace Chotiskazal.Bot.ChatFlows {
 
-        public string Origin { get; }
-        public string Translation { get; }
-        public bool IsSelected { get; }
+public static class AddWordHelper {
+    static async Task<string> CreateButtonDataFor(ButtonCallbackDataService buttonCallbackDataService, Translation translation,
+        bool isSelected) {
+        var buttonData = buttonCallbackDataService.CreateButtonDataForShortTranslation(translation, isSelected);
+        Console.WriteLine(buttonData + " " + buttonData.Length);
+        Console.WriteLine(System.Text.Encoding.UTF8.GetByteCount(buttonData));
+        return System.Text.Encoding.UTF8.GetByteCount(buttonData) >= InlineButtons.MaxCallbackDataByteSizeUtf8
+            ? await buttonCallbackDataService.CreateDataForLongTranslation(translation, isSelected)
+            : buttonData;
     }
-    public static class AddWordHelper
-    {
-        public const string Separator = "@";
-        public const string TranslationDataPrefix = "/tr";
-        
-        static string CreateButtonDataFor(Translation translation, bool isSelected)
-            => TranslationDataPrefix 
-               + translation.OriginText 
-               + Separator 
-               + translation.TranslatedText+Separator
-               + (isSelected?"1":"0");
+    
+    public static async Task<InlineKeyboardButton> CreateButtonFor(
+        ButtonCallbackDataService buttonCallbackDataService,
+        Translation translation,
+        bool selected)
+        => new InlineKeyboardButton
+        {
+            CallbackData = await CreateButtonDataFor(buttonCallbackDataService, translation, selected),
+            Text = selected
+                ? $"{Emojis.Selected} {translation.TranslatedText}"
+                : translation.TranslatedText
+        };
 
-        public static TranslationButtonData ParseQueryDataOrNull(string buttonQueryData)
-        {
-            if (string.IsNullOrWhiteSpace(buttonQueryData))
-                return null;
-            if (!buttonQueryData.StartsWith(TranslationDataPrefix))
-                return null;
-            var splitted = buttonQueryData.Substring(3).Split(Separator);
-            if (splitted.Length != 3)
-                return null;
-            return new TranslationButtonData(splitted[0],splitted[1], splitted[2]=="1");
-        }
-        
-        
-        public static InlineKeyboardButton CreateButtonFor(Translation translation, bool selected)
-            => new InlineKeyboardButton {
-                CallbackData = CreateButtonDataFor(translation,selected), 
-                Text = selected
-                    ? $"{Emojis.Selected} {translation.TranslatedText}"
-                    : translation.TranslatedText
-            };
-        public static  int  FindIndexOf(IReadOnlyList<Translation> translations, string translation)
-        {
-            for (int i = 0; i < translations.Count; i++)
-            {
-                if (translations[i].TranslatedText.Equals(translation))
-                {
-                    return i;
-                }
+    public static int FindIndexOf(IReadOnlyList<Translation> translations, string translation) {
+        for (int i = 0; i < translations.Count; i++) {
+            if (translations[i].TranslatedText.Equals(translation)) {
+                return i;
             }
-            return -1;
         }
 
-      
+        return -1;
     }
+}
 }

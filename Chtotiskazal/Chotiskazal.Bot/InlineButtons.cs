@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Chotiskazal.Bot {
 
 public static class InlineButtons {
-    public const int MaxDataStringLength = 32;
+    public const int MaxCallbackDataByteSizeUtf8 = 64;
     public static InlineKeyboardButton Translation(IInterfaceTexts texts) =>
         Translation(texts.TranslateButton);
 

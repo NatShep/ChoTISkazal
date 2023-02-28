@@ -18,7 +18,8 @@ public class MainFlow {
         UsersWordsService usersWordsService,
         UserService userService,
         LocalDictionaryService localDictionaryService,
-        LearningSetService learningSetService) {
+        LearningSetService learningSetService,
+        ButtonCallbackDataService buttonCallbackDataService) {
         ChatIo = chatIo;
         _userInfo = userInfo;
         _settings = settings;
@@ -27,12 +28,15 @@ public class MainFlow {
         _userService = userService;
         _localDictionaryService = localDictionaryService;
         _learningSetService = learningSetService;
+        _buttonCallbackDataService = buttonCallbackDataService;
+
     }
 
     private readonly AddWordService _addWordsService;
     private readonly UsersWordsService _usersWordsService;
     private readonly UserService _userService;
     private readonly LocalDictionaryService _localDictionaryService;
+    private readonly ButtonCallbackDataService _buttonCallbackDataService;
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
     private readonly BotSettings _settings;
@@ -96,14 +100,14 @@ public class MainFlow {
 
         Chat = new ChatRoom(ChatIo, user);
         // Initialize update hooks
-        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(_addWordsService, Chat);
+        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(Chat, _addWordsService, _buttonCallbackDataService);
         _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
 
         ChatIo.AddUpdateHook(_translationSelectedUpdateHook);
         ChatIo.AddUpdateHook(_wellKnownWordsUpdateHook);
 
         // Initialize  command handlers
-        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _translationSelectedUpdateHook);
+        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook);
 
         ChatIo.CommandHandlers = new[] {
             HelpBotCommandHandler.Instance,

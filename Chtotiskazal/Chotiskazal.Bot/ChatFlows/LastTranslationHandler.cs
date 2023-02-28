@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SayWhat.Bll;
@@ -13,6 +14,7 @@ namespace Chotiskazal.Bot.ChatFlows
         private ChatRoom Chat { get; }
         private readonly AddWordService _addWordService;
         private readonly IReadOnlyList<Translation> _translations;
+        private readonly ButtonCallbackDataService _buttonCallbackDataService;
         private bool _isLastMessageInTheChat =true ;
 
         public string OriginWordText { get;  }
@@ -22,7 +24,8 @@ namespace Chotiskazal.Bot.ChatFlows
         public LastTranslationHandler(
             IReadOnlyList<Translation> translations, 
             ChatRoom chat,
-            AddWordService addWordService)
+            AddWordService addWordService,
+            ButtonCallbackDataService buttonCallbackDataService)
         {
             Chat = chat;
             OriginWordText = translations[0].OriginText;
@@ -31,6 +34,7 @@ namespace Chotiskazal.Bot.ChatFlows
             if(translations.Count>0)
                 _areSelected[0] = true;
             _addWordService = addWordService;
+            _buttonCallbackDataService = buttonCallbackDataService;
         }
 
         public async Task Handle(string translation, Update update)
@@ -65,26 +69,20 @@ namespace Chotiskazal.Bot.ChatFlows
                 Reporter.ReportTranslationPairRemoved(Chat.User.TelegramId);
             }
 
-            var buttons = CreateButtons();
+            var buttons = await CreateButtons();
 
             await Chat.EditMessageButtons(messageId,buttons.ToArray());
         }
 
-        private IList<InlineKeyboardButton[]> CreateButtons() {
+        private async Task<IList<InlineKeyboardButton[]>> CreateButtons() {
             var buttons = new List<InlineKeyboardButton[]>();
             var i = 0;
             foreach (var translation in _translations) {
-                var button = AddWordHelper.CreateButtonFor(translation, _areSelected[i]);
-                if (button.CallbackData.Length >= InlineButtons.MaxDataStringLength) 
-                {
-                    Reporter.ReportError(Chat.ChatId.Identifier, $"Too long button data: '{button.Text}':'{button.CallbackData}'");
-                }
-                else 
-                {
-                    buttons.Add(new[]{button});
-                }
+                var button = await AddWordHelper.CreateButtonFor(_buttonCallbackDataService, translation, _areSelected[i]);
+                buttons.Add(new[]{button});
                 i++;
             }
+            if (i == 0) return buttons;
             if (_isLastMessageInTheChat)
                 buttons.Add(new[]
                 {
@@ -97,13 +95,13 @@ namespace Chotiskazal.Bot.ChatFlows
         /// <summary>
         /// User make next request
         /// </summary>
-        public void OnNextTranslationRequest()
+        public async Task OnNextTranslationRequest()
         {
             _isLastMessageInTheChat = false;
             if (_originMessageId!=null)
             {
                 //hide "menu" and "translation" buttons
-                var buttons = CreateButtons();
+                var buttons = await CreateButtons();
                 var _ = Chat.EditMessageButtons(_originMessageId.Value, buttons.ToArray());
             }
         }
@@ -114,9 +112,15 @@ namespace Chotiskazal.Bot.ChatFlows
         public async Task SendTranslationMessage(string markdownMessage, string transcription, bool[] selectionMarks)
         {
             _areSelected = selectionMarks;
+            var buttons = (await CreateButtons()).ToArray();
+            if (!buttons.Any()) {
+                await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
+                Reporter.ReportTranslationNotFound(Chat.User.TelegramId);
+                return;
+            }
+            
             _originMessageId = await Chat.SendMarkdownMessageAsync(
-                Chat.Texts.HereAreTheTranslation(markdownMessage, transcription), 
-                CreateButtons().ToArray());
+                Chat.Texts.HereAreTheTranslation(markdownMessage, transcription), buttons);
         }
     }
 }
