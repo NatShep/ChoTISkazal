@@ -24,8 +24,8 @@ public static class StatsRenderer {
                 .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
                 .ToArray(), chat.Texts)
             .ToPreFormattedMono()
-            .NewLine() +
-        RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+            .NewLine(); //+
+        //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
     private static Markdown Render7WeeksCalendarMarkdown(
         
@@ -97,7 +97,8 @@ public static class StatsRenderer {
         return statsTextMarkdown;
     }
 
-    private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
+    /*
+     private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
      
         if (user.Zen.Rate < -15)
             return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
@@ -114,5 +115,6 @@ public static class StatsRenderer {
         else
             return Markdown.Escaped(texts.Zen6YouNeedToLearn);
     }
+    */
 }
 }

@@ -94,7 +94,7 @@ public class UserModel {
     public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
     public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
     public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10);
-    public Zen Zen => new Zen(_countByCategoryScores, _outdatedWordsCount);
+    //public Zen Zen => new Zen(_countByCategoryScores, _outdatedWordsCount);
     public double GamingScore => _gamingScore;
 
     public int CountOf(int minScoreCategory, int maxScoreCategory) {
@@ -118,7 +118,7 @@ public class UserModel {
         today.WordsAdded++;
         month.WordsAdded++;
 
-        var gamingScore = WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.NewWordGamingScore; // * Zen.AddWordsBonusRate;
         today.OnGameScoreIncreased(gamingScore);
         month.OnGameScoreIncreased(gamingScore);
         _gamingScore += gamingScore;
@@ -219,7 +219,7 @@ public class UserModel {
         today.ExamplesAdded += examplesCount;
         month.PairsAdded += pairsCount;
         month.ExamplesAdded += examplesCount;
-        var gamingScore = pairsCount * WordLeaningGlobalSettings.NewPairGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = pairsCount * WordLeaningGlobalSettings.NewPairGamingScore;// * Zen.AddWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
         OnAnyActivity();
         return gamingScore;
@@ -235,7 +235,7 @@ public class UserModel {
         month.PairsAdded--;
         month.ExamplesAdded -= examplesCount;
 
-        var gamingScore = -WordLeaningGlobalSettings.NewPairGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = -WordLeaningGlobalSettings.NewPairGamingScore;// * Zen.AddWordsBonusRate;
         ApplyWordStatsChangings(wordScoreDelta, today, month, gamingScore);
         OnAnyActivity();
     }
@@ -249,7 +249,7 @@ public class UserModel {
         month.WordsAdded--;
 
         var scoreDelta = UserWordScore.Zero - alreadyExistsWord.Score;
-        var gamingScore = -WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = -WordLeaningGlobalSettings.NewWordGamingScore;// * Zen.AddWordsBonusRate;
 
         ApplyWordStatsChangings(scoreDelta, today, month, gamingScore);
     }
@@ -289,7 +289,7 @@ public class UserModel {
         OnAnyActivity();
     }
 
-    public double OnQuestionPassed(WordStatsChanging statsChanging) {
+    public void OnQuestionPassed(WordStatsChanging statsChanging) {
         _questionPassed++;
         var (today, month) = FixStatsAndGetCurrent();
 
@@ -298,9 +298,9 @@ public class UserModel {
 
         OnAnyActivity();
 
-        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore * Zen.LearnWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore;// * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
-        return gamingScore;
+ //       return gamingScore;
     }
 
     public double OnQuestionFailed(WordStatsChanging statsChanging) {
@@ -314,20 +314,22 @@ public class UserModel {
 
         ApplyWordStatsChangings(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
         return WordLeaningGlobalSettings.QuestionFailedGamingScore;
+        
+        //    return gamingScore;
     }
 
-    public double OnLearningDone() {
+    public void OnLearningDone() {
         _learningDone++;
         var (today, month) = FixStatsAndGetCurrent();
 
         today.LearningDone++;
         month.LearningDone++;
 
-        var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore * Zen.LearnWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore; // * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(WordStatsChanging.Zero, today, month, gamingScore);
         OnAnyActivity();
 
-        return gamingScore;
+    //    return gamingScore;
     }
 
     public IReadOnlyList<DailyStats> GetLastWeek() {

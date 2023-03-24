@@ -357,10 +357,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     .AddEscaped($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}")
                     .NewLine();
 
-            if (Chat.User.Zen.NeedToAddNewWords)
+         /*   if (Chat.User.Zen.NeedToAddNewWords)
                 doneMessageMarkdown = doneMessageMarkdown.NewLine()
                     .AddEscaped(Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords);
-
+        */
             return doneMessageMarkdown;
         }
 
