@@ -36,14 +36,14 @@ public class UserWordsRepo : IMongoRepo {
             .Limit(count)
             .ToListAsync();
 
-    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count, int minimumLearnRate)
+    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count, double learningRate)
         => Collection
            .Find(
                Builders<UserWordModel>.Filter.And(
                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                   Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, minimumLearnRate)
+                   Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, learningRate)
                ))
-           .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
+           .Sort($"{{{CurrentScoreFieldName}: 1}}")
            .Limit(count)
            .ToListAsync();
     

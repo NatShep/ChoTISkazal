@@ -50,7 +50,11 @@ namespace Chotiskazal.Bot.ChatFlows
            
             //TODO возможо надо делать рандомные худшие слова, пока что они выбираеются по принципу минимальных очков
             var newLearningWords 
-                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(Chat.User, count, 3); //TODO What is 3?!
+                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(
+                    Chat.User, 
+                    count, 
+                    _examSettings.MaxTranslationsInOneExam,
+                    WordLeaningGlobalSettings.LearnedWordMinScore); 
             Console.WriteLine($"Количество худших слов: {newLearningWords.Length}");
             Console.WriteLine(string.Join(" \r\n", newLearningWords.ToList()));
             

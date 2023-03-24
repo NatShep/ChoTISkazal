@@ -13,6 +13,7 @@
         public int ExamsCountGoalForDay { get; set; } = 10;
         public int MinBestLearnedWords { get; set; } = 2;
         public int MinimumQuestionAsked { get; set; } = 6;
+        public int MaxTranslationsInOneExam { get; } = 3;
 
     }
 }

@@ -25,9 +25,9 @@ namespace SayWhat.Bll.Services
         public Task AddUserWord(UserWordModel entity) =>
              _userWordsRepository.Add(entity);
 
-        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(UserModel user, int count)
+        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(UserModel user, int count, double worseRating)
         {
-            var words = await _userWordsRepository.GetWorstLearned(user, count);
+            var words = await _userWordsRepository.GetWorstLearned(user, count, worseRating);
             await IncludeExamples(words);
             return words;
         }
@@ -208,18 +208,19 @@ namespace SayWhat.Bll.Services
         public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(
             UserModel user, 
             int count,
-            int maxTranslationSize)
+            int maxTranslations,
+            double worseRating)
         {
-            var wordsForLearning = await GetWorstForUserWithPhrasesAsync(user, count);
+            var wordsForLearning = await GetWorstForUserWithPhrasesAsync(user, count, worseRating);
 
             foreach (var wordForLearning in wordsForLearning)
             {
                 
                 var translations = wordForLearning.TextTranslations.ToArray();
-                if (translations.Length <= maxTranslationSize)
-                    continue;
+                if (translations.Length <= maxTranslations)
+                    maxTranslations=translations.Length;
 
-                var usedTranslations = translations.Shuffle().Take(maxTranslationSize).ToArray();
+                var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
                 wordForLearning.RuTranslations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
 
                 // Remove Phrases added as learning word 
