@@ -11,9 +11,9 @@ namespace SayWhat.MongoDAL.Users
         [BsonElement("sd")] 
         [BsonIgnoreIfDefault]
         private double _absoluteScoreChanging;
-        [BsonElement("oc")] 
-        [BsonIgnoreIfDefault]
-        private int _outdatedChanging;
+     //   [BsonElement("oc")] 
+     //   [BsonIgnoreIfDefault]
+     //   private int _outdatedChanging;
         [BsonElement("gs")]
         [BsonIgnoreIfDefault]
         private double _gameScoreChanging;
@@ -30,8 +30,8 @@ namespace SayWhat.MongoDAL.Users
         public WordStatsChanging CummulativeStatsChanging 
             => new WordStatsChanging(
                 _scoreChangings,
-                _absoluteScoreChanging,
-                _outdatedChanging);
+                _absoluteScoreChanging);
+            //  _outdatedChanging);
         public void AppendStats(WordStatsChanging statsChanging)
         {
             if (_scoreChangings == null)
@@ -40,7 +40,7 @@ namespace SayWhat.MongoDAL.Users
                 _scoreChangings.AddValuesInplace(statsChanging.WordScoreChangings);
             
             _absoluteScoreChanging += statsChanging.AbsoluteScoreChanging;
-            _outdatedChanging      += statsChanging.OutdatedChanging;
+       //     _outdatedChanging      += statsChanging.OutdatedChanging;
         }
         
         [BsonElement("wa")]

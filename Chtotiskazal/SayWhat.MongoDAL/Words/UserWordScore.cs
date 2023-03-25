@@ -37,7 +37,8 @@ namespace SayWhat.MongoDAL.Words
             var scores = new int[8];
             scores[WordStatsChanging.CategorizedScore(earlierScore.AbsoluteScore)]--;
             scores[WordStatsChanging.CategorizedScore(laterScore.AbsoluteScore)]++;
-
+            
+            /*
             int outdatedChanging = 0;
             var agedScoreBefore = earlierScore.AgedScore;
             var agedScoreAfter  = laterScore.AgedScore;
@@ -45,11 +46,12 @@ namespace SayWhat.MongoDAL.Words
                 outdatedChanging--;
             if (agedScoreAfter < WordLeaningGlobalSettings.LearnedWordMinScore)
                 outdatedChanging++;
-
+            */
+            
             return new WordStatsChanging(
                 scores,
-                absoluteScoreChanging: laterScore.AbsoluteScore - earlierScore.AbsoluteScore,
-                outdatedChanging: outdatedChanging);
+                laterScore.AbsoluteScore - earlierScore.AbsoluteScore);
+            // laterScore.AbsoluteScore - earlierScore.AbsoluteScore);
         }
     }
 }

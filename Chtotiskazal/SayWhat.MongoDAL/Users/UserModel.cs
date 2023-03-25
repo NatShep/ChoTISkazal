@@ -75,14 +75,14 @@ public class UserModel {
     [BsonElement("qpc")] private int _questionPassed;
     [BsonElement("qfc")] private int _questionFailed;
 
-    [BsonElement("oc")] private int _outdatedWordsCount;
+ //   [BsonElement("oc")] private int _outdatedWordsCount;
     [BsonElement("gs")] private double _gamingScore;
 
     #endregion
 
     public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
-    public int OutdatedWordsCount => _outdatedWordsCount;
+//    public int OutdatedWordsCount => _outdatedWordsCount;
     public long? TelegramId => _telegramId;
     public string TelegramFirstName => _telegramFirstName;
     public string TelegramLastName => _telegramLastName;
@@ -274,9 +274,9 @@ public class UserModel {
             _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
         _countByCategoryScores.SetLowLimitInplace(0);
 
-        _outdatedWordsCount += statsChanging.OutdatedChanging;
+      //  _outdatedWordsCount += statsChanging.OutdatedChanging;
 
-        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
+//        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
     }
 
     public void OnEnglishWordTranslationRequest() {
@@ -354,7 +354,7 @@ public class UserModel {
         var days = new Dictionary<DateTime, DailyStats>();
         var months = new Dictionary<DateTime, MonthsStats>();
         _countByCategoryScores = new int[8];
-        _outdatedWordsCount = 0;
+     //   _outdatedWordsCount = 0;
         this._gamingScore = 0;
         foreach (var word in allUserWords)
         {
