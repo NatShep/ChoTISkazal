@@ -65,7 +65,7 @@ public class UserWordModel {
     /// Absolute words score.
     /// </summary>
     [BsonElement(UserWordsRepo.AbsoluteScoreFieldName)]
-    public double _absoluteScore;
+    private double _absoluteScore;
 
     /// <summary>
     /// Number of correctly answered questions 

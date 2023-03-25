@@ -12,7 +12,7 @@ namespace SayWhat.MongoDAL.Words
         public double AbsoluteScore { get; }
         public bool IsOutdated => IsLearned &&
                                   AgedScore < WordLeaningGlobalSettings.LearnedWordMinScore;
-        public bool IsLearned => AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore;
+        private bool IsLearned => AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore;
         
         //res reduces for 1 point per AgingFactor days
         public double AgedScore
@@ -21,8 +21,8 @@ namespace SayWhat.MongoDAL.Words
             {
                 //if there were no asked question yet - return 0, as lowest possible probability  
                 if (_lastAskTime == null) return 0;
-                return Math.Max(0, AbsoluteScore - (DateTime.Now - _lastAskTime.Value).TotalDays
-                    / WordLeaningGlobalSettings.AgingFactor);
+                return Math.Max(0, AbsoluteScore - 
+                                   (DateTime.Now - _lastAskTime.Value).TotalDays / WordLeaningGlobalSettings.AgingFactor);
             }
         }
 
