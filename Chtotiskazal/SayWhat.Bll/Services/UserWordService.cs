@@ -101,7 +101,7 @@ namespace SayWhat.Bll.Services
             foreach (var word in words)
             {
                 var scoreBefore = word.Score;
-                word.UpdateCurrentScore();
+                word.RefreshScoreUpdate();
                 await _userWordsRepository.UpdateMetrics(word);
                 user.OnStatsChangings(word.Score - scoreBefore);
             }

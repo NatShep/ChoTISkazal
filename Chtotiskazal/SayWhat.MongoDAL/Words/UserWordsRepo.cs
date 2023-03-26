@@ -131,7 +131,7 @@ public class UserWordsRepo : IMongoRepo {
 
 
     public Task Update(UserWordModel entity) {
-        entity.UpdateCurrentScore();
+        entity.RefreshScoreUpdate();
         return Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
     }
 

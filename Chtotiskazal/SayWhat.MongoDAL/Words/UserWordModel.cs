@@ -20,6 +20,7 @@ public class UserWordModel {
         _word = word;
         _currentOrderScore = rate;
         _absoluteScore = rate;
+        _scoreUpdatedTimestamp = DateTime.Now;
         RuTranslations = new[] { new UserWordTranslation(translation) };
     }
 
@@ -30,6 +31,7 @@ public class UserWordModel {
         _word = word;
         _translationDirection = direction;
         _absoluteScore = absScore;
+        _scoreUpdatedTimestamp = DateTime.Now;
         RuTranslations = new[] { translation };
     }
 
@@ -95,7 +97,7 @@ public class UserWordModel {
 
         
     public string Word => _word;
-    public double CurrentOrderScore => _currentOrderScore;
+    public double CurrentOrderScore => Score.AgedScore;
     public double AbsoluteScore => _absoluteScore;
     public int QuestionPassed => _questionPassed;
     public int QuestionAsked => _questionAsked;
@@ -125,7 +127,6 @@ public class UserWordModel {
         _questionAsked++;
         _questionPassed++;
         _scoreUpdatedTimestamp = DateTime.Now;
-        UpdateCurrentScore();
     }
 
     public void OnQuestionFailed() {
@@ -139,20 +140,10 @@ public class UserWordModel {
 
         _questionAsked++;
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
-
-        UpdateCurrentScore();
+        _scoreUpdatedTimestamp = DateTime.Now;
     }
 
-    public void UpdateCurrentScore() {
-        var probability = Math.Pow(
-            WordLeaningGlobalSettings.ReducingPerDayPowFactor,
-            Score.AgedScore);
-
-        //normal randomize the probability 
-        var rndFactor = Math.Pow(1.5, Rand.RandomNormal(0, 1));
-        probability *= rndFactor;
-
-        _currentOrderScore = probability;
+    public void RefreshScoreUpdate() {
         _scoreUpdatedTimestamp = DateTime.Now;
     }
 

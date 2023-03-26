@@ -112,7 +112,6 @@ public class AddWordService {
                                           .Select(p => new UserWordTranslationReferenceToExample(p.Id))
                                           .ToArray()
                 });
-            word.UpdateCurrentScore();
             await _usersWordsService.AddUserWord(word);
 
             user.OnNewWordAdded(
