@@ -95,6 +95,7 @@ namespace SayWhat.Bll.Services
             await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
         }
         
+        /*
         public async Task UpdateCurrentScoreForRandomWords(UserModel user, int count)
         {
             var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
@@ -106,6 +107,7 @@ namespace SayWhat.Bll.Services
                 user.OnStatsChangings(word.Score - scoreBefore);
             }
         }
+        */
 
         public async Task RegisterSuccess(UserWordModel model)
         {

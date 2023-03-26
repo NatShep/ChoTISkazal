@@ -40,12 +40,12 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
             }
            
-            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User, _examSettings.MaxLearningWordsCountInOneExam*2);
+      //      var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User, _examSettings.MaxLearningWordsCountInOneExam*2);
             var typing =  Chat.SendTyping();
             
             var count = Rand.RandomIn(_examSettings.MinNewLearningWordsCountInOneExam,
                 _examSettings.MaxNewLearningWordsCountInOneExam);
-            await startupScoreUpdate;
+      //      await startupScoreUpdate;
             await typing;
            
             //TODO возможо надо делать рандомные худшие слова, пока что они выбираеются по принципу минимальных очков
@@ -168,7 +168,7 @@ namespace Chotiskazal.Bot.ChatFlows
 
             Chat.User.OnLearningDone();
             var updateUserTask = _userService.Update(Chat.User);
-            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User,10);
+     //       var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User,10);
 
             //info after examination
             await SendExamResultToUser(
@@ -179,7 +179,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 gamingScoreBefore: gamingScoreBefore);
 
             await updateUserTask;
-            await finializeScoreUpdateTask;
+     //       await finializeScoreUpdateTask;
         }
 
         private async Task PrintNewWordsValues(UserWordModel[] newLearningWords) {
