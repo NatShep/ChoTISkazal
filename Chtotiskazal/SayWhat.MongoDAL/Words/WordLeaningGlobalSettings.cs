@@ -3,10 +3,6 @@
     public static class WordLeaningGlobalSettings{
         
         /// <summary>
-        /// If question failed - Absolute score reduced to {PenaltyScore} 
-        /// </summary>
-        public const double PenaltyScore = 6.0;
-        /// <summary>
         /// Absolute score reduced by {AgingFactor} per day in AgedScore calculation
         /// </summary>
         public const double AgingFactor = 0.33;

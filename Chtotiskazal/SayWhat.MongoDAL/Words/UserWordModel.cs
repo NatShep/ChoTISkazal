@@ -130,14 +130,11 @@ public class UserWordModel {
     }
 
     public void OnQuestionFailed() {
-         if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
-             _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
-
-        _absoluteScore = (int)Math.Round(_absoluteScore * WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed);
-        
+        _absoluteScore -= WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed;
+        if (_absoluteScore > WordLeaningGlobalSettings.LearnedWordMinScore)
+            _absoluteScore = WordLeaningGlobalSettings.WellDoneWordMinScore;
         if (_absoluteScore < 0)
             _absoluteScore = 0;
-
         _questionAsked++;
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
         _scoreUpdatedTimestamp = DateTime.Now;
