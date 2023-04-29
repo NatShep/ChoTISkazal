@@ -173,9 +173,6 @@ namespace Chotiskazal.Bot.InterfaceTexts
         public string AllWordsAreLearnedMessage(string setShortName) =>
             $"All words from learning set '{setShortName}' were added";
 
-        public string YouHaveLearnedWords(in int count)
-            => $"You have learned {count} words";
-
         public string YouForgotCountWords(in int forgottenWordsCount)
             =>$"You forgot {forgottenWordsCount} words";
 

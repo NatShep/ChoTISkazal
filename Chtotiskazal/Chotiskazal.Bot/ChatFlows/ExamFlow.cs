@@ -303,7 +303,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (newWellLearnedWords.Count > 1)
                     doneMessageMarkdown = doneMessageMarkdown.NewLine() +
                                           Markdown
-                                              .Escaped($"{Chat.Texts.YouHaveLearnedWords(newWellLearnedWords.Count)}:").ToSemiBold()
+                                              .Escaped($"{Chat.Texts.LearnMoreWords(newWellLearnedWords.Count)}:").ToSemiBold()
                                               .NewLine();
                 else
                     doneMessageMarkdown = doneMessageMarkdown.NewLine() +
