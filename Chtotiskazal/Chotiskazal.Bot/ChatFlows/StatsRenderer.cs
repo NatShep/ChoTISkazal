@@ -77,7 +77,7 @@ public static class StatsRenderer {
 
         var statsTextMarkdown = Markdown.Escaped(chat.Texts.StatsYourStats + ":\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
-                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}\r\n" +
                                                  $"  {chat.Texts.StatsScore}: {(int) chat.User.GamingScore}\r\n")
                                     .ToPreFormattedMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisMonth}:\r\n") +

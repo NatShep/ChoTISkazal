@@ -95,7 +95,7 @@ public class UserModel {
     public int ExamplesCount => _examplesCount;
     public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
     public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
-    public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10);
+    public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10);
     //public Zen Zen => new Zen(_countByCategoryScores, _outdatedWordsCount);
     public double GamingScore => _gamingScore;
 

@@ -280,14 +280,14 @@ namespace Chotiskazal.Bot.ChatFlows
 
             foreach (var word in wordsInExam)
             {
-                if (word.AbsoluteScore >= 4)
+                if (word.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
                 {
-                    if (originWordsScore[word.Word] < 4)
+                    if (originWordsScore[word.Word] < WordLeaningGlobalSettings.WellDoneWordMinScore)
                         newWellLearnedWords.Add(word);
                 }
                 else
                 {
-                    if (originWordsScore[word.Word] > 4)
+                    if (originWordsScore[word.Word] > WordLeaningGlobalSettings.WellDoneWordMinScore)
                         forgottenWords.Add(word);
                 }
             }

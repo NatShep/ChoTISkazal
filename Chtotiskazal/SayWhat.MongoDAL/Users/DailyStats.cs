@@ -26,7 +26,7 @@ namespace SayWhat.MongoDAL.Users
         {
             _gameScoreChanging += gameScoreChanging;
         }
-        public int WordsLearnt => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore,10);
+        public int WordsLearnt => CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2,10);
         public WordStatsChanging CummulativeStatsChanging 
             => new WordStatsChanging(
                 _scoreChangings,

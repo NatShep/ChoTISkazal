@@ -144,7 +144,7 @@ public class StatsBotCommandHandler : IBotCommandHandler {
                 new[] { InlineButtons.Translation($"{chat.Texts.TranslateButton} {Emojis.Translate}") },
                 new[] {
                     InlineButtons.WellLearnedWords(
-                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10)}) {Emojis.SoftMark}")
+                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}) {Emojis.SoftMark}")
                 }
             });
 }
