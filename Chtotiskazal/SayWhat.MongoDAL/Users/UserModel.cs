@@ -41,6 +41,7 @@ public class UserModel {
     private long? _telegramId = null;
     [BsonElement("sc")] private int[] _countByCategoryScores;
     [BsonElement("a")] private DateTime _lastActivity;
+    [BsonElement("last_ex")] private DateTime _lastExam;
     [BsonElement("tfn")] private string _telegramFirstName;
     [BsonElement("tln")] private string _telegramLastName;
     [BsonElement("tn")] private string _telegramNick;
@@ -83,6 +84,7 @@ public class UserModel {
     public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
 //    public int OutdatedWordsCount => _outdatedWordsCount;
+    public DateTime LastExam => _lastExam;
     public long? TelegramId => _telegramId;
     public string TelegramFirstName => _telegramFirstName;
     public string TelegramLastName => _telegramLastName;
@@ -110,6 +112,11 @@ public class UserModel {
     }
 
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
+
+    public void OnQuestionActivity() {
+        OnAnyActivity();
+        _lastExam = DateTime.Now;
+    }
 
     public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount) {
         _wordsCount++;
@@ -296,7 +303,7 @@ public class UserModel {
         today.QuestionsPassed++;
         month.QuestionsPassed++;
 
-        OnAnyActivity();
+        OnQuestionActivity();
 
         var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore;// * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
@@ -310,7 +317,7 @@ public class UserModel {
         today.QuestionsFailed++;
         month.QuestionsFailed++;
 
-        OnAnyActivity();
+        OnQuestionActivity();
 
         ApplyWordStatsChangings(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
         return WordLeaningGlobalSettings.QuestionFailedGamingScore;
