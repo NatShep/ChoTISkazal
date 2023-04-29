@@ -141,14 +141,14 @@ namespace Chotiskazal.Bot.ChatFlows
                         questionsCount++;
                         questionsPassed++;
                         questionMetric.OnExamFinished(word.Score, true);
-                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
                         await succTask;
                         Chat.User.OnQuestionPassed(word.Score - originRate);
                         break;
                     case ExamResult.Failed:
                         var failureTask = _usersWordsService.RegisterFailure(word);
                         questionMetric.OnExamFinished(word.Score, false);
-                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
                         questionsCount++;
                         await failureTask;
                         Chat.User.OnQuestionFailed(word.Score - originRate);
