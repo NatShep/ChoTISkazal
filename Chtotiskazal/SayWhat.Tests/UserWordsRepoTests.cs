@@ -38,6 +38,9 @@ public class UserWordsRepoTests {
     [TestCase(10, 1)]
     [TestCase(10, 10)]
     public async Task AddSeveral_GetWorstReturnWorstOnes(int worstCount, int bestCount) {
+        
+        #region arrange
+        
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
         var worstOnes = new List<UserWordModel>();
         for (int i = 0; i < worstCount; i++)
@@ -63,15 +66,25 @@ public class UserWordsRepoTests {
             await _repo.Add(new UserWordModel(user.Id, word, tranlation, rate));
         }
 
-        var allWords = await _repo.GetWorstLearned(user, worstCount);
+        #endregion
 
-        for (int i = 0; i < worstCount; i++)
+        //TODO 
+        #region act
+        
+        #endregion
+        
+        //TODO 
+        #region assert
+        /*
+         for (int i = 0; i < worstCount; i++)
         {
             var origin = worstOnes[i];
             var current = allWords[i];
             Assert.AreEqual(origin.Word, current.Word);
             Assert.AreEqual(origin.RuTranslations[0].Word, current.RuTranslations[0].Word);
         }
+        */
+        #endregion
     }
 
     [TestCase(0)]

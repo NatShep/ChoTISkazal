@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Transactions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SayWhat.MongoDAL.Users;
 
@@ -21,63 +23,28 @@ public class UserWordsRepo : IMongoRepo {
     public UserWordsRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
-
-    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count)
-        => Collection
-           .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-           .Sort($"{{{CurrentScoreFieldName}:1}}")
-           .Limit(count)
-           .ToListAsync();
     
-    public Task<List<UserWordModel>> GetWellLearnedOld(UserModel user, int count)
+    public Task<List<UserWordModel>> GetWordsForLearningBetweenLowAndHighScores(UserModel user, int count, double lowRate, double highRate)
         => Collection
-            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-            .Sort($"{{{CurrentScoreFieldName}:1}}")
+            .Find(
+                Builders<UserWordModel>.Filter.And(
+                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
+                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, lowRate),
+                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, highRate)
+                ))
+            .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
             .Limit(count)
             .ToListAsync();
-
-    public Task<List<UserWordModel>> GetWorstLearned(UserModel user, int count, double learningRate)
-        => Collection
-           .Find(
-               Builders<UserWordModel>.Filter.And(
-                   Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                   Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, learningRate)
-               ))
-           .Sort($"{{{CurrentScoreFieldName}: 1}}")
-           .Limit(count)
-           .ToListAsync();
     
-    public Task<List<UserWordModel>> GetWellLearned(UserModel user, int maxCount)
+    public Task<List<UserWordModel>> GetWordsForLearningAboveScore(UserModel user, int count, double lowRate)
         => Collection
             .Find(
                 Builders<UserWordModel>.Filter.And(
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.LearnedWordMinScore),
-                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
+                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, lowRate)
                 ))
-            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: 1}}")
-            .Limit(maxCount)
-            .ToListAsync();
-    
-    public Task<List<UserWordModel>> GetNotWellLearned(UserModel user, int maxCount)
-        => Collection
-            .Find(
-                Builders<UserWordModel>.Filter.And(
-                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.LearnedWordMinScore)
-                ))
-            .Sort($"{{{UserWordsRepo.CurrentScoreFieldName}: -1}}")
-            .Limit(maxCount)
-            .ToListAsync();
-
-    public Task<List<UserWordModel>> GetAllBestLearned(UserModel user)
-        => Collection
-            .Find(
-                Builders<UserWordModel>.Filter.And(
-                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName,
-                        WordLeaningGlobalSettings.WellDoneWordMinScore)
-                ))
+            .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
+            .Limit(count)
             .ToListAsync();
     
     public Task<List<UserWordModel>> GetLastAsked(UserModel user, int maxCount, int minimumQuestionAsked)
@@ -104,8 +71,7 @@ public class UserWordsRepo : IMongoRepo {
                                                .Set(CurrentScoreFieldName, word.CurrentOrderScore)
                                                .Set(QuestionPassedFieldName, word.QuestionPassed)
                                                .Set(QuestionAskedFieldName, word.QuestionAsked)
-                                               .Set(
-                                                   LastQuestionAskedTimestampFieldName,
+                                               .Set(LastQuestionAskedTimestampFieldName,
                                                    word.LastQuestionAskedTimestamp);
 
         return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
@@ -160,16 +126,6 @@ public class UserWordsRepo : IMongoRepo {
                     Builders<UserWordModel>.Filter.Eq(OriginWordFieldName, enWord)
                 ))
             .AnyAsync();
-
-    /// <summary>
-    /// Returns users words that was updated oldest
-    /// </summary>
-    public Task<List<UserWordModel>> GetOldestUpdatedWords(UserModel user, int count) =>
-        Collection
-            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-            .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:1}}")
-            .Limit(count)
-            .ToListAsync();
 
     public async Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) {
         var c = await Collection.FindAsync(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id));

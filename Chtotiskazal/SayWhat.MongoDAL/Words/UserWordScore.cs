@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SayWhat.MongoDAL.Words
 {
@@ -11,18 +12,21 @@ namespace SayWhat.MongoDAL.Words
         public static UserWordScore Zero => new UserWordScore(0, DateTime.Now);
         public double AbsoluteScore { get; }
         public bool IsOutdated => IsLearned &&
-                                  AgedScore < WordLeaningGlobalSettings.LearnedWordMinScore;
-        private bool IsLearned => AbsoluteScore >= WordLeaningGlobalSettings.LearnedWordMinScore;
+                                  AgedScore < WordLeaningGlobalSettings.LearningWordMinScore;
+        private bool IsLearned => AbsoluteScore > WordLeaningGlobalSettings.WellDoneWordMinScore;
         
         //res reduces for 1 point per AgingFactor days
         public double AgedScore
         {
             get
             {
-                //if there were no asked question yet - return 0, as lowest possible probability  
-                if (_lastAskTime == null) return 0;
-                return Math.Max(0, AbsoluteScore - 
-                                   (DateTime.Now - _lastAskTime.Value).TotalDays / WordLeaningGlobalSettings.AgingFactor);
+                //if there were no asked question yet - return AbsoluteScore, as lowest possible probability  
+                if (_lastAskTime == null || (DateTime.Now - _lastAskTime.Value).TotalDays == 0)
+                    return AbsoluteScore;
+
+                var newAgedScore = Math.Max(0, AbsoluteScore - 
+                                               (DateTime.Now - _lastAskTime.Value).TotalDays * WordLeaningGlobalSettings.AgingFactor);
+                return newAgedScore;
             }
         }
 

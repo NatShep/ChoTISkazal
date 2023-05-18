@@ -27,7 +27,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var translations = word.TextTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
+            if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.LearningWordMinScore)
                 return QuestionResult.Impossible;
 
 
