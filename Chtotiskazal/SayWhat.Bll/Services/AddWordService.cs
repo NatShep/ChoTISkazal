@@ -134,7 +134,7 @@ public class AddWordService {
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
                     });
 
-            alreadyExistsWord.OnQuestionFailed();
+            alreadyExistsWord.OnQuestionFailed(WordLeaningGlobalSettings.AverageScoresForFailedQuestion);
 
             if (newTranslations.Count == 0)
             {

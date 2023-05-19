@@ -14,8 +14,8 @@ namespace SayWhat.MongoDAL.Words
         /// Order index (probability of word appearing in exam) reduces
         /// for {ReducingPerPointFactor} times for each AgedScore
         /// </summary>
-        public const double ReduceRateWhenQuestionFailed = 0.4;
-        public const double ScoresForPassedQuestion = 0.4;
+        public const double AverageScoresForFailedQuestion = 0.4;
+        public const double AverageScoresForPassedQuestion = 0.4;
      
         //todo переделать подбор экзаменов и выбор слов по НОВЫМ статам
         public const double StartScoreForWord = 0;

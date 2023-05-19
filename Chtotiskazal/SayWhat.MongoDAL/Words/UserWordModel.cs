@@ -130,8 +130,8 @@ public class UserWordModel {
             .ToList()
             .GetRandomItemOrNull();
 
-    public void OnQuestionPassed() {
-        _absoluteScore += WordLeaningGlobalSettings.ScoresForPassedQuestion;
+    public void OnQuestionPassed(double scores) {
+        _absoluteScore += scores;
         if (_absoluteScore > WordLeaningGlobalSettings.MaxWordAbsScore)
             _absoluteScore = WordLeaningGlobalSettings.MaxWordAbsScore;
         _lastQuestionAskedTimestamp = DateTime.Now;
@@ -140,8 +140,8 @@ public class UserWordModel {
         _scoreUpdatedTimestamp = DateTime.Now;
     }
 
-    public void OnQuestionFailed() {
-        _absoluteScore -= WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed;
+    public void OnQuestionFailed(double scores) {
+        _absoluteScore -= scores;
         if (_absoluteScore > WordLeaningGlobalSettings.LearnedWordMinScore)
             _absoluteScore = WordLeaningGlobalSettings.WellDoneWordMinScore;
         if (_absoluteScore < 0)

@@ -7,6 +7,9 @@ namespace Chotiskazal.Bot.Questions
         public bool NeedClearScreen => true;
 
         private readonly IQuestion _origin;
+        public double PassScore => _origin.PassScore;
+        public double FailScore => _origin.FailScore;
+
 
         public ClearScreenQuestionDecorator(IQuestion origin)=> _origin = origin;
 

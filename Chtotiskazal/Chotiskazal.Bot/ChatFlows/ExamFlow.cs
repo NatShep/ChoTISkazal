@@ -181,7 +181,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 switch (result.Results)
                 {
                     case ExamResult.Passed:
-                        var succTask = _usersWordsService.RegisterSuccess(word);
+                        var succTask = _usersWordsService.RegisterSuccess(word, question.PassScore);
                         questionsCount++;
                         questionsPassed++;
                         questionMetric.OnExamFinished(word.Score, true);
@@ -190,7 +190,7 @@ namespace Chotiskazal.Bot.ChatFlows
                         Chat.User.OnQuestionPassed(word.Score - originRate);
                         break;
                     case ExamResult.Failed:
-                        var failureTask = _usersWordsService.RegisterFailure(word);
+                        var failureTask = _usersWordsService.RegisterFailure(word,question.FailScore);
                         questionMetric.OnExamFinished(word.Score, false);
                         Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
                         questionsCount++;

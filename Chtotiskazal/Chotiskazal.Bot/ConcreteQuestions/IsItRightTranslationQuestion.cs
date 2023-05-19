@@ -12,6 +12,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng is it right translation";
+        public double PassScore => 0.4;
+        public double FailScore => 0.4;
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
