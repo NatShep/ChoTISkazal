@@ -1,5 +1,5 @@
 ﻿using System;
-
+/*
 public class Zen
 {
 
@@ -53,4 +53,4 @@ public class Zen
     public double AddWordsBonusRate { get; } = 1;
     public double LearnWordsBonusRate { get; } = 1;
     
-}
+}*/

@@ -53,7 +53,7 @@ static class RuWriteQuestionHelper {
         LocalDictionaryService localDictionaryService) {
         var wordsInPhraseCount = word.Word.Count(c => c == ' ');
         if (wordsInPhraseCount > 0 &&
-            word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
+            word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.LearningWordMinScore)
             return QuestionResult.Impossible;
 
         await chat.SendMarkdownMessageAsync(

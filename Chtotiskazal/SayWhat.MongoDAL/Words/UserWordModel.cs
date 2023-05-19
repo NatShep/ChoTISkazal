@@ -18,8 +18,10 @@ public class UserWordModel {
     public UserWordModel(ObjectId userUserId, string word, string translation, double rate = 0) {
         _userUserId = userUserId;
         _word = word;
-        _currentOrderScore = rate;
+        _currentOrderScore = Math.Pow(
+            1.5, rate);
         _absoluteScore = rate;
+        _scoreUpdatedTimestamp = DateTime.Now;
         RuTranslations = new[] { new UserWordTranslation(translation) };
     }
 
@@ -29,7 +31,10 @@ public class UserWordModel {
         _userUserId = userId;
         _word = word;
         _translationDirection = direction;
+        _currentOrderScore = Math.Pow(
+            1.5, absScore);
         _absoluteScore = absScore;
+        _scoreUpdatedTimestamp = DateTime.Now;
         RuTranslations = new[] { translation };
     }
 
@@ -65,7 +70,7 @@ public class UserWordModel {
     /// Absolute words score.
     /// </summary>
     [BsonElement(UserWordsRepo.AbsoluteScoreFieldName)]
-    public double _absoluteScore;
+    private double _absoluteScore;
 
     /// <summary>
     /// Number of correctly answered questions 
@@ -95,7 +100,13 @@ public class UserWordModel {
 
         
     public string Word => _word;
-    public double CurrentOrderScore => _currentOrderScore;
+    
+    // current score is increased AgedScore
+    // for increase the distance between two values
+    public double CurrentOrderScore =>
+        Math.Pow(
+            1.5, Score.AgedScore);
+
     public double AbsoluteScore => _absoluteScore;
     public int QuestionPassed => _questionPassed;
     public int QuestionAsked => _questionAsked;
@@ -121,38 +132,29 @@ public class UserWordModel {
 
     public void OnQuestionPassed() {
         _absoluteScore += WordLeaningGlobalSettings.ScoresForPassedQuestion;
+        if (_absoluteScore > WordLeaningGlobalSettings.MaxWordAbsScore)
+            _absoluteScore = WordLeaningGlobalSettings.MaxWordAbsScore;
         _lastQuestionAskedTimestamp = DateTime.Now;
         _questionAsked++;
         _questionPassed++;
         _scoreUpdatedTimestamp = DateTime.Now;
-        UpdateCurrentScore();
     }
 
     public void OnQuestionFailed() {
-         if (_absoluteScore > WordLeaningGlobalSettings.PenaltyScore)
-             _absoluteScore = WordLeaningGlobalSettings.PenaltyScore;
-
-        _absoluteScore = (int)Math.Round(_absoluteScore * WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed);
-        
+        _absoluteScore -= WordLeaningGlobalSettings.ReduceRateWhenQuestionFailed;
+        if (_absoluteScore > WordLeaningGlobalSettings.LearnedWordMinScore)
+            _absoluteScore = WordLeaningGlobalSettings.WellDoneWordMinScore;
         if (_absoluteScore < 0)
-            _absoluteScore = 0;
-
+           _absoluteScore = 0;
         _questionAsked++;
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
-
-        UpdateCurrentScore();
+        _scoreUpdatedTimestamp = DateTime.Now;
     }
+    
 
-    public void UpdateCurrentScore() {
-        var probability = Math.Pow(
-            WordLeaningGlobalSettings.ReducingPerDayPowFactor,
-            Score.AgedScore);
-
-        //normal randomize the probability 
-        var rndFactor = Math.Pow(1.5, Rand.RandomNormal(0, 1));
-        probability *= rndFactor;
-
-        _currentOrderScore = probability;
+    public void RefreshScoreUpdate() {
+      //  _currentOrderScore = AbsoluteScore;
+        _currentOrderScore = CurrentOrderScore;
         _scoreUpdatedTimestamp = DateTime.Now;
     }
 
@@ -167,7 +169,7 @@ public class UserWordModel {
             RuTranslations = RuTranslations.Where(t => t != tr).ToArray();
         return tr;
     }
-    public override string ToString() => $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
+    public override string ToString() => $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} ages_score:{Score.AgedScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
     
 
     public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));

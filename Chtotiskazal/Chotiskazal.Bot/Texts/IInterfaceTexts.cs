@@ -100,7 +100,6 @@ public interface IInterfaceTexts {
     Markdown OutOfScopeWithCandidate(string otherMeaning);
     string FailedMistaken(string text);
     string MessageAfterTranslationIsSelected(Translation translation);
-    string YouHaveLearnedWords(in int count);
     string YouForgotCountWords(in int forgottenWordsCount);
     string MessageAfterTranslationIsDeselected(Translation allTranslation);
     string WordIsAddedForLearning(string word);

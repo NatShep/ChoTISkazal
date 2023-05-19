@@ -170,8 +170,6 @@ public class RussianTexts : IInterfaceTexts {
         = "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
           "\r\n" +
           "Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий:";
-    public string YouHaveLearnedWords(in int count)
-        => $"Выучено слов: {count}";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";

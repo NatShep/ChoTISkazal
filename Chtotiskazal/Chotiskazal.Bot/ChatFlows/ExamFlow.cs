@@ -39,35 +39,78 @@ namespace Chotiskazal.Bot.ChatFlows
                 await Chat.SendMessageAsync(Chat.Texts.NeedToAddMoreWordsBeforeLearning);
                 return;
             }
-           
-            var startupScoreUpdate =  _usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User, _examSettings.MaxLearningWordsCountInOneExam*2);
+            
             var typing =  Chat.SendTyping();
-            
-            var count = Rand.RandomIn(_examSettings.MinNewLearningWordsCountInOneExam,
-                _examSettings.MaxNewLearningWordsCountInOneExam);
-            await startupScoreUpdate;
-            await typing;
-           
-            //TODO возможо надо делать рандомные худшие слова, пока что они выбираеются по принципу минимальных очков
-            var newLearningWords 
-                = await _usersWordsService.GetWordsForLearningWithPhrasesAsync(Chat.User, count, 3); //TODO What is 3?!
-            Console.WriteLine($"Количество худших слов: {newLearningWords.Length}");
-            Console.WriteLine(string.Join(" \r\n", newLearningWords.ToList()));
-            
-            var examsWords = CreateExamListForNewWords(newLearningWords, _examSettings);
-            Console.WriteLine($"Количество экзаменов для новых слов {examsWords.Count}");
 
+            if ((DateTime.Now - Chat.User.LastExam).TotalDays >= 1) {
+                await Chat.SendMarkdownMessageAsync(Markdown.Escaped("Refresh words scores..."));
+                await _usersWordsService.RefreshWordsCurrentScoreAsync(Chat.User);
+            }
+
+            await typing;
+            
+            var lastAskedWords =
+                await _usersWordsService.GetLastAskedWordsWithPhrasesAsync(Chat.User, _examSettings.LastAskedWordsInOneExam, _examSettings);
+           
+            var wellDoneWords 
+                = await _usersWordsService.GetWordsWithPhrasesAsync(
+                    Chat.User, 
+                    _examSettings.WellDoneWordsInOneExam, 
+                    _examSettings.MaxTranslationsInOneExam,
+                    WordLeaningGlobalSettings.WellDoneWordMinScore,
+                    WordLeaningGlobalSettings.LearnedWordMinScore);
+
+            var freeSpaceForWords = 0;
+            if (wellDoneWords.Length < _examSettings.WellDoneWordsInOneExam) {
+                freeSpaceForWords = _examSettings .WellDoneWordsInOneExam - wellDoneWords.Length;
+            }
+            
+            var learningWords 
+                = await _usersWordsService.GetWordsWithPhrasesAsync(
+                    Chat.User, 
+                    _examSettings.LearningWordsInOneExam + freeSpaceForWords, 
+                    _examSettings.MaxTranslationsInOneExam,
+                    WordLeaningGlobalSettings.LearningWordMinScore,
+                    WordLeaningGlobalSettings.WellDoneWordMinScore);
+
+            if (learningWords.Length < _examSettings.WellDoneWordsInOneExam + freeSpaceForWords) 
+                freeSpaceForWords = _examSettings.WellDoneWordsInOneExam + _examSettings.NewWordInOneExam -
+                                    learningWords.Length;
+            else
+                freeSpaceForWords = 0;
+            
+            var newLearningWords 
+                = await _usersWordsService.GetRandomWordsWithPhrasesAsync(
+                    Chat.User, 
+                    _examSettings.NewWordInOneExam+freeSpaceForWords, 
+                    _examSettings.CountOfVariantsForChoose,
+                    _examSettings.MaxTranslationsInOneExam,
+                    WordLeaningGlobalSettings.StartScoreForWord,
+                    WordLeaningGlobalSettings.LearningWordMinScore);
+            
             await PrintNewWordsValues(newLearningWords);
             var needToContinue = await Chat.WaitInlineKeyboardInput();
             if (needToContinue != "/startExamination")
                 return;
-
-            var advancedWords = await _usersWordsService.AppendAdvancedWordsToExamList(
-                    Chat.User, _examSettings, _examSettings.MaxLearningWordsCountInOneExam-newLearningWords.Length);
             
-            Console.WriteLine($"{_examSettings.MaxLearningWordsCountInOneExam}-{newLearningWords.Length} = {_examSettings.MaxLearningWordsCountInOneExam-newLearningWords.Length}");
+            var learnedWords 
+                = await _usersWordsService.GetWordsWithPhrasesAsync(
+                    Chat.User, 
+                    _examSettings.LearnedWordsInOneExam, 
+                    _examSettings.MaxTranslationsInOneExam,
+                    WordLeaningGlobalSettings.LearnedWordMinScore);
+            
+            
+
             //TODO before this values used for count questions for advanced words. Maybe they are important. Maybe not
-            /*var minimumTimesThatWordHasToBeAsked =
+            /*
+             
+             var timesThatWordHasToBeAsked =
+                Rand.RandomIn(_examSettings.MinAdvancedExamMinQuestionAskedForOneWordCount,
+                    _examSettings.MaxAdvancedExamMinQuestionAskedForOneWordCount);
+            Console.WriteLine($":Непонятный подсчте: Желательное количество повтора экзаменов слов {timesThatWordHasToBeAsked}");
+             
+             var minimumTimesThatWordHasToBeAsked =
                 Rand.RandomIn(_examSettings.MinAdvancedExamMinQuestionAskedForOneWordCount,
                     _examSettings.MaxAdvancedExamMinQuestionAskedForOneWordCount);
 
@@ -77,16 +120,22 @@ namespace Chotiskazal.Bot.ChatFlows
             if (advancedlistMaxCountQuestions <= _examSettings.MinAdvancedQuestionsCount) 
                 advancedlistMaxCountQuestions = _examSettings.MinAdvancedQuestionsCount;
 
-            Console.WriteLine($" Максимальное Количество экзаменов для продвинутых  слов {advancedlistMaxCountQuestions}");
-
-            Console.WriteLine($"Минимальное кол во повтора продвинутых слов {minimumTimesThatWordHasToBeAsked}");*/
-
-            var examAdvancedWords = CreateExamListForNewWords(advancedWords, _examSettings);
-            Console.WriteLine($"Количество экзаменов для advanced слов: {examAdvancedWords.Count}");
-
-            examsWords.AddRange(examAdvancedWords);
+            */
             
-            var distinctLearningWords = newLearningWords.ToList().Union(advancedWords).ToArray();
+            var distinctLearningWords = newLearningWords.ToList()
+                .Union(lastAskedWords)
+                .Union(learningWords)
+                .Union(wellDoneWords)
+                .Union(learnedWords)
+                .ToArray();
+            
+            var examsLearnedWords = CreateExamListForNewWords(distinctLearningWords, _examSettings);
+            Console.WriteLine($"Количество экзаменов для всех слов {examsLearnedWords.Count}");
+            Console.WriteLine(string.Join(" \r\n", examsLearnedWords.ToList()));
+            
+            Console.WriteLine($"Количество всех слов: {distinctLearningWords.Count()}");
+            Console.WriteLine(string.Join(" \r\n", distinctLearningWords.ToList()));
+
             var learningWordsCount = distinctLearningWords.Length;
 
             var originWordsScore = new Dictionary<string,double>();
@@ -106,7 +155,7 @@ namespace Chotiskazal.Bot.ChatFlows
             QuestionResult lastExamResult = null;
 
             var previousWord = new UserWordModel();
-            foreach (var word in examsWords.Shuffle()) {
+            foreach (var word in examsLearnedWords.Shuffle()) {
                 //exclude the next same exam
                 if (previousWord == word)
                     continue;
@@ -125,7 +174,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (wordQuestionNumber > 1 && question.NeedClearScreen)
                     await WriteDontPeakMessage(lastExamResult?.ResultsBeforeHideousTextMarkdown.GetOrdinalString());
 
-                Chat.User.OnAnyActivity();
                 var originRate = word.Score;
 
                 var questionMetric = new QuestionMetric(word, question.Name);
@@ -137,14 +185,14 @@ namespace Chotiskazal.Bot.ChatFlows
                         questionsCount++;
                         questionsPassed++;
                         questionMetric.OnExamFinished(word.Score, true);
-                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
                         await succTask;
                         Chat.User.OnQuestionPassed(word.Score - originRate);
                         break;
                     case ExamResult.Failed:
                         var failureTask = _usersWordsService.RegisterFailure(word);
                         questionMetric.OnExamFinished(word.Score, false);
-                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId);
+                        Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
                         questionsCount++;
                         await failureTask;
                         Chat.User.OnQuestionFailed(word.Score - originRate);
@@ -164,7 +212,6 @@ namespace Chotiskazal.Bot.ChatFlows
 
             Chat.User.OnLearningDone();
             var updateUserTask = _userService.Update(Chat.User);
-            var finializeScoreUpdateTask =_usersWordsService.UpdateCurrentScoreForRandomWords(Chat.User,10);
 
             //info after examination
             await SendExamResultToUser(
@@ -175,7 +222,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 gamingScoreBefore: gamingScoreBefore);
 
             await updateUserTask;
-            await finializeScoreUpdateTask;
         }
 
         private async Task PrintNewWordsValues(UserWordModel[] newLearningWords) {
@@ -276,14 +322,14 @@ namespace Chotiskazal.Bot.ChatFlows
 
             foreach (var word in wordsInExam)
             {
-                if (word.AbsoluteScore >= 4)
+                if (word.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
                 {
-                    if (originWordsScore[word.Word] < 4)
+                    if (originWordsScore[word.Word] < WordLeaningGlobalSettings.WellDoneWordMinScore)
                         newWellLearnedWords.Add(word);
                 }
                 else
                 {
-                    if (originWordsScore[word.Word] > 4)
+                    if (originWordsScore[word.Word] > WordLeaningGlobalSettings.WellDoneWordMinScore)
                         forgottenWords.Add(word);
                 }
             }
@@ -299,7 +345,7 @@ namespace Chotiskazal.Bot.ChatFlows
                 if (newWellLearnedWords.Count > 1)
                     doneMessageMarkdown = doneMessageMarkdown.NewLine() +
                                           Markdown
-                                              .Escaped($"{Chat.Texts.YouHaveLearnedWords(newWellLearnedWords.Count)}:").ToSemiBold()
+                                              .Escaped($"{Chat.Texts.LearnMoreWords(newWellLearnedWords.Count)}:").ToSemiBold()
                                               .NewLine();
                 else
                     doneMessageMarkdown = doneMessageMarkdown.NewLine() +
@@ -353,10 +399,10 @@ namespace Chotiskazal.Bot.ChatFlows
                     .AddEscaped($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}")
                     .NewLine();
 
-            if (Chat.User.Zen.NeedToAddNewWords)
+         /*   if (Chat.User.Zen.NeedToAddNewWords)
                 doneMessageMarkdown = doneMessageMarkdown.NewLine()
                     .AddEscaped(Chat.Texts.ZenRecomendationAfterExamWeNeedMoreNewWords);
-
+        */
             return doneMessageMarkdown;
         }
 
@@ -376,9 +422,9 @@ namespace Chotiskazal.Bot.ChatFlows
             var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
 
             //Every learning word appears in exam from MIN to MAX times
-            for (int i = 0; i < examSettings.MinNewLearningWordsCountInOneExam; i++) 
+            for (int i = 0; i < examSettings.MinWordsQuestionsInOneExam; i++) 
                 examsList.AddRange(learningWords);
-            for (int i = 0; i < examSettings.MaxNewLearningWordsCountInOneExam - examSettings.MinNewLearningWordsCountInOneExam; i++) 
+            for (int i = 0; i < examSettings.MaxWordsQuestionsInOneExam - examSettings.MinWordsQuestionsInOneExam; i++) 
                 examsList.AddRange(learningWords.Where(w => Rand.Next() % 2 == 0));
             while (examsList.Count > examSettings.MaxExamSize) 
                 examsList.RemoveAt(examsList.Count - 1);

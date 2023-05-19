@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
-using SayWhat.MongoDAL.LongDataForTranslationButton;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows {

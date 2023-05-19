@@ -25,13 +25,6 @@ namespace SayWhat.Bll.Services
         public Task AddUserWord(UserWordModel entity) =>
              _userWordsRepository.Add(entity);
 
-        private async Task<IEnumerable<UserWordModel>> GetWorstForUserWithPhrasesAsync(UserModel user, int count)
-        {
-            var words = await _userWordsRepository.GetWorstLearned(user, count);
-            await IncludeExamples(words);
-            return words;
-        }
-
         private async Task IncludeExamples(IReadOnlyCollection<UserWordModel> words)
         {
             var ids = new List<ObjectId>();
@@ -58,35 +51,11 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public async Task<IReadOnlyList<UserWordModel>> GetWordsWithExamples(UserModel user, int maxCount, int minimumQuestionAsked, int  minBestLearnedWords)
-        {
-            if (maxCount <= 0)
-                return new UserWordModel[0];
-            
-            var words = await _userWordsRepository.GetLastAsked(user, maxCount/2, minimumQuestionAsked);
-            
-            //Console.WriteLine($"Количество lasted слов: {words.Count}");
-            //Console.WriteLine(string.Join(" \r\n", words.ToList()));
-            
-            var wellKnownWords = await _userWordsRepository.GetWellLearned(user, maxCount/2);
-            
-            //Console.WriteLine($"Количество wellKnownWords слов: {wellKnownWords.Count}");
-            //Console.WriteLine(string.Join(" \r\n", wellKnownWords.ToList()));
-            
-            words.AddRange(wellKnownWords);
-            if (wellKnownWords.Count < maxCount / 2) {
-                words.AddRange(await _userWordsRepository.GetNotWellLearned(user, maxCount/2 - wellKnownWords.Count));
+        public async Task RefreshWordsCurrentScoreAsync(UserModel user) {
+            var words = await _userWordsRepository.GetAllWords(user);
+            foreach (var word in words) {
+                await _userWordsRepository.Update(word);
             }
-
-            var bestKnownWords = (await _userWordsRepository.GetAllBestLearned(user)).Shuffle().Take(maxCount).ToList();
-            
-            //Console.WriteLine($"Количество bestKnownWords слов: {bestKnownWords.Count}");
-            //Console.WriteLine(string.Join(" \r\n", bestKnownWords.ToList()));
-
-            words.AddRange(bestKnownWords);
-            
-            await IncludeExamples(words);
-            return words;
         }
 
         public async Task RegisterFailure(UserWordModel userWordModelForLearning)
@@ -95,18 +64,6 @@ namespace SayWhat.Bll.Services
             await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
         }
         
-        public async Task UpdateCurrentScoreForRandomWords(UserModel user, int count)
-        {
-            var words = await _userWordsRepository.GetOldestUpdatedWords(user, count);
-            foreach (var word in words)
-            {
-                var scoreBefore = word.Score;
-                word.UpdateCurrentScore();
-                await _userWordsRepository.UpdateMetrics(word);
-                user.OnStatsChangings(word.Score - scoreBefore);
-            }
-        }
-
         public async Task RegisterSuccess(UserWordModel model)
         {
             model.OnQuestionPassed();
@@ -204,55 +161,109 @@ namespace SayWhat.Bll.Services
             Console.WriteLine($"Found: {searchedPhrases.Count}+{endings}");*/
         }
 
-        
-        public async Task<UserWordModel[]> GetWordsForLearningWithPhrasesAsync(
+        public async Task<UserWordModel[]> GetWordsWithPhrasesAsync(
             UserModel user, 
             int count,
-            int maxTranslationSize)
+            int maxTranslations,
+            double lowRating,
+            double? highRating = null) 
         {
-            var wordsForLearning = await GetWorstForUserWithPhrasesAsync(user, count);
+            Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
+            Console.WriteLine($"Количество мест для слов: {count}");
 
-            foreach (var wordForLearning in wordsForLearning)
-            {
-                
+            var wordsForLearning = highRating is null
+                ? (await _userWordsRepository.GetWordsForLearningAboveScore(user, count, lowRating)).ToList()
+                : (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user, count, lowRating, highRating.Value)).ToList();
+            
+            foreach (var wordForLearning in wordsForLearning) {
                 var translations = wordForLearning.TextTranslations.ToArray();
-                if (translations.Length <= maxTranslationSize)
-                    continue;
+                if (translations.Length <= maxTranslations)
+                    maxTranslations = translations.Length;
 
-                var usedTranslations = translations.Shuffle().Take(maxTranslationSize).ToArray();
-                wordForLearning.RuTranslations = usedTranslations.Select(t=>new UserWordTranslation(t)).ToArray();
+                var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
+                wordForLearning.RuTranslations = usedTranslations.Select(t => new UserWordTranslation(t)).ToArray();
 
-                // Remove Phrases added as learning word 
-                /*
-                 todo wtf?
-                 for (var i = 0; i < wordForLearning.RuPhrases.Count; i++)
-                {
-                    var phrase = wordForLearning.RuPhrases[i];
-                    if (!usedTranslations.Contains(phrase.PhraseRuTranslate))
-                        wordForLearning.RuPhrases.RemoveAt(i);
-                }*/
+                // TODO Remove Phrases added as learning words
             }
+            
+            Console.WriteLine($"Количество слов: {wordsForLearning.Count()}");
+            Console.WriteLine(string.Join(" \r\n", wordsForLearning.ToList()));
+            
+            await IncludeExamples(wordsForLearning);
             return wordsForLearning.ToArray();
         }
-
-        public async Task<UserWordModel[]> AppendAdvancedWordsToExamList(UserModel user, ExamSettings examSettings, int count)
+        
+        public async Task<UserWordModel[]> GetRandomWordsWithPhrasesAsync(
+            UserModel user, 
+            int count,
+            int fromNumber,
+            int maxTranslations,
+            double lowRating,
+            double highRating) 
         {
-            Console.WriteLine($"Количество мест для продвинутых слов: {count}");
+            Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
+            Console.WriteLine($"Количество мест для слов: {count}");
 
-            var advancedList = await GetWordsWithExamples(
-                user: user,
-                maxCount: count,
-                minimumQuestionAsked: examSettings.MinimumQuestionAsked,
-                minBestLearnedWords: examSettings.MinBestLearnedWords);
-          
-            //TODO Подобрать количество экзаменов для advanced слов
-            var minimumTimesThatWordHasToBeAsked =
-                Rand.RandomIn(examSettings.MinAdvancedExamMinQuestionAskedForOneWordCount,
-                    examSettings.MaxAdvancedExamMinQuestionAskedForOneWordCount);
+            var wordsForLearning = (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user, fromNumber, lowRating, highRating))
+                .Shuffle()
+                .Take(count)
+                .ToList();
 
-            Console.WriteLine($"Минимальное кол во повтора продвинутых слов {minimumTimesThatWordHasToBeAsked}");
+            foreach (var wordForLearning in wordsForLearning) {
+                var translations = wordForLearning.TextTranslations.ToArray();
+                if (translations.Length <= maxTranslations)
+                    maxTranslations = translations.Length;
 
-            return advancedList.ToArray();
+                var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
+                wordForLearning.RuTranslations = usedTranslations.Select(t => new UserWordTranslation(t)).ToArray();
+
+                // TODO Remove Phrases added as learning words
+            }
+            
+            Console.WriteLine($"Количество слов: {wordsForLearning.Count()}");
+            Console.WriteLine(string.Join(" \r\n", wordsForLearning.ToList()));
+            
+            await IncludeExamples(wordsForLearning);
+            return wordsForLearning.ToArray();
+        }
+        
+        public async Task<UserWordModel[]> GetLastAskedWordsWithPhrasesAsync(
+            UserModel user, 
+            int count,
+            ExamSettings examSettings) 
+        {
+            Console.WriteLine("Поиск недавно спрошенных слов");
+            Console.WriteLine($"Количество мест для слов: {count}");
+            
+            var newWordsForLearning = (
+                await _userWordsRepository.GetLastAsked(user, count, examSettings.MinimumQuestionAsked)
+                ).ToList();
+            
+            foreach (var wordForLearning in newWordsForLearning) {
+                var translations = wordForLearning.TextTranslations.ToArray();
+                var maxTranslations = translations.Length <= examSettings.MaxTranslationsInOneExam
+                    ? translations.Length
+                    : examSettings.MaxTranslationsInOneExam;
+                
+                var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
+                wordForLearning.RuTranslations = usedTranslations.Select(t => new UserWordTranslation(t)).ToArray();
+
+                // TODO Remove Phrases added as learning words
+                /*
+                     todo wtf?
+                     for (var i = 0; i < wordForLearning.RuPhrases.Count; i++)
+                    {
+                        var phrase = wordForLearning.RuPhrases[i];
+                        if (!usedTranslations.Contains(phrase.PhraseRuTranslate))
+                            wordForLearning.RuPhrases.RemoveAt(i);
+                    }*/
+            }
+            
+            Console.WriteLine($"Количество lasted слов: {newWordsForLearning.Count}");
+            Console.WriteLine(string.Join(" \r\n", newWordsForLearning));
+            
+            await IncludeExamples(newWordsForLearning);
+            return newWordsForLearning.ToArray();
         }
         
         public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
