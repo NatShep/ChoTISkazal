@@ -24,7 +24,11 @@ public class UserWordsRepo : IMongoRepo {
 
     public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
     
-    public Task<List<UserWordModel>> GetWordsForLearningBetweenLowAndHighScores(UserModel user, int count, double lowRate, double highRate)
+    public Task<List<UserWordModel>> GetWordsForLearningBetweenLowAndHighScores(UserModel user,
+        int count,
+        double lowRate,
+        double highRate,
+        Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sortType)
         => Collection
             .Find(
                 Builders<UserWordModel>.Filter.And(
@@ -32,7 +36,7 @@ public class UserWordsRepo : IMongoRepo {
                     Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, lowRate),
                     Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, highRate)
                 ))
-            .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
+            .Sort(sortType($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
             .Limit(count)
             .ToListAsync();
     

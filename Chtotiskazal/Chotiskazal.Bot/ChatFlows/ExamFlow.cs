@@ -57,6 +57,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     Chat.User, 
                     _examSettings.WellDoneWordsInOneExam, 
                     _examSettings.MaxTranslationsInOneExam,
+                    CurrentScoreSortingType.LongAsked,
                     WordLeaningGlobalSettings.WellDoneWordMinScore,
                     WordLeaningGlobalSettings.LearnedWordMinScore);
 
@@ -70,6 +71,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     Chat.User, 
                     _examSettings.LearningWordsInOneExam + freeSpaceForWords, 
                     _examSettings.MaxTranslationsInOneExam,
+                    CurrentScoreSortingType.LongAsked,
                     WordLeaningGlobalSettings.LearningWordMinScore,
                     WordLeaningGlobalSettings.WellDoneWordMinScore);
 
@@ -85,6 +87,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     _examSettings.NewWordInOneExam+freeSpaceForWords, 
                     _examSettings.CountOfVariantsForChoose,
                     _examSettings.MaxTranslationsInOneExam,
+                    CurrentScoreSortingType.JustAsked,
                     WordLeaningGlobalSettings.StartScoreForWord,
                     WordLeaningGlobalSettings.LearningWordMinScore);
             
@@ -98,6 +101,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     Chat.User, 
                     _examSettings.LearnedWordsInOneExam, 
                     _examSettings.MaxTranslationsInOneExam,
+                    CurrentScoreSortingType.LongAsked,
                     WordLeaningGlobalSettings.LearnedWordMinScore);
             
             

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
@@ -11,6 +11,11 @@ using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.Bll.Services
 {
+    public enum CurrentScoreSortingType {
+        JustAsked = 1,
+        LongAsked = 2
+    }
+
     public class UsersWordsService
     {
         private readonly UserWordsRepo _userWordsRepository;
@@ -165,15 +170,27 @@ namespace SayWhat.Bll.Services
             UserModel user, 
             int count,
             int maxTranslations,
+            CurrentScoreSortingType sortType,
             double lowRating,
             double? highRating = null) 
         {
             Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
             Console.WriteLine($"Количество мест для слов: {count}");
 
+            Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting 
+                = Builders<UserWordModel>.Sort.Ascending;
+            if (sortType == CurrentScoreSortingType.JustAsked) {
+                sorting = Builders<UserWordModel>.Sort.Descending;
+            }
+
             var wordsForLearning = highRating is null
                 ? (await _userWordsRepository.GetWordsForLearningAboveScore(user, count, lowRating)).ToList()
-                : (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user, count, lowRating, highRating.Value)).ToList();
+                : (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user,
+                    count,
+                    lowRating,
+                    highRating.Value,
+                    sorting))
+                .ToList();
             
             foreach (var wordForLearning in wordsForLearning) {
                 var translations = wordForLearning.TextTranslations.ToArray();
@@ -198,13 +215,24 @@ namespace SayWhat.Bll.Services
             int count,
             int fromNumber,
             int maxTranslations,
+            CurrentScoreSortingType sortType,
             double lowRating,
             double highRating) 
         {
             Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
             Console.WriteLine($"Количество мест для слов: {count}");
+            
+            Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting 
+                = Builders<UserWordModel>.Sort.Ascending;
+            if (sortType == CurrentScoreSortingType.JustAsked) {
+                sorting = Builders<UserWordModel>.Sort.Descending;
+            }
 
-            var wordsForLearning = (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user, fromNumber, lowRating, highRating))
+            var wordsForLearning = (await _userWordsRepository.GetWordsForLearningBetweenLowAndHighScores(user,
+                    fromNumber,
+                    lowRating,
+                    highRating,
+                    sorting))
                 .Shuffle()
                 .Take(count)
                 .ToList();
