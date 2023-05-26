@@ -100,9 +100,9 @@ public class UserWordsRepo : IMongoRepo {
     }
 
 
-    public Task Update(UserWordModel entity) {
+    public async Task Update(UserWordModel entity) {
         entity.RefreshScoreUpdate();
-        return Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
+        await Collection.FindOneAndReplaceAsync(f => f.Id == entity.Id, entity);
     }
 
     public async Task<bool> HasAnyFor(UserModel user) {

@@ -40,15 +40,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
             }
             
-            var typing =  Chat.SendTyping();
-
-            if ((DateTime.Now - Chat.User.LastExam).TotalDays >= 1) {
-                await Chat.SendMarkdownMessageAsync(Markdown.Escaped("Refresh words scores..."));
-                await _usersWordsService.RefreshWordsCurrentScoreAsync(Chat.User);
-            }
-
-            await typing;
-            
             var lastAskedWords =
                 await _usersWordsService.GetLastAskedWordsWithPhrasesAsync(Chat.User, _examSettings.LastAskedWordsInOneExam, _examSettings);
            

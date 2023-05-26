@@ -10,6 +10,7 @@ public static class ReportSenderJob {
     
     public static void Launch(TimeSpan timeSpan, ILogger logger) {
         _launchTime = DateTime.Now;
+        logger.Information($"Launch time for {nameof(ReportSenderJob)}: {_launchTime}");
         _timer = new Timer(timeSpan.TotalMilliseconds);
         if(logger==null)
             return;
@@ -18,6 +19,7 @@ public static class ReportSenderJob {
             logger.Error(message);
         };
         _timer.Enabled = true;
+        logger.Information($"Launched {nameof(ReportSenderJob)}");
     }
 
     private static  string GetStatisticMessage() {
