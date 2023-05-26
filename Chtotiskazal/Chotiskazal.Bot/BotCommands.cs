@@ -11,6 +11,7 @@ public class BotCommands {
     public const string Words = "/mywords";
     public const string LearningSetPrefix = "/set";
     public const string Report = "/report";
+    public const string Settings = "/settings";
 
 }
 

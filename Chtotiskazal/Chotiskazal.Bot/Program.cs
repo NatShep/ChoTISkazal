@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.InterfaceTexts;
+using Chotiskazal.Bot.Jobs;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -35,7 +36,7 @@ namespace Chotiskazal.Bot
         private static UserService _userService;
         private static LearningSetService _learningSetService;
 
-        private static void Main()
+        private static async Task Main()
         {
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
@@ -113,6 +114,7 @@ namespace Chotiskazal.Bot
             _botClient.StartReceiving();
             
             ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
+            await RemindSenderJob.Launch(_botClient, _userService);
             
             Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting
@@ -185,7 +187,7 @@ namespace Chotiskazal.Bot
                 Reporter.ReportError(chat?.Id, "WokeUp failed", e);
             }
         }
-        private static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
+        public static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;

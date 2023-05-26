@@ -121,6 +121,8 @@ public class MainFlow {
             new StartBotCommandHandler(ShowMainMenu),
             new ChlangBotCommandHandler(_userService),
             ReportBotCommandHandler.Instance,
+            new SettingsBotCommandHelper(_userService)
+            
         };
     }
 
@@ -146,6 +148,7 @@ public class MainFlow {
 
     private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Chat.Texts.ActionIsNotAllowed);
 
+    
     private async Task ShowMainMenu() {
         while (true)
         {
@@ -154,13 +157,15 @@ public class MainFlow {
             var statsBtn = InlineButtons.Stats(Chat.Texts);
             var helpBtn = InlineButtons.HowToUse(Chat.Texts);
             var learningSetsBtn = InlineButtons.LearningSets($"{Chat.Texts.LearningSetsButton} {Emojis.LearningSets}");
-
+            var settingsBtn = InlineButtons.Settings(Chat.Texts.SettingsButton);
+                
             await ChatIo.SendMessageAsync(Markdown.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuText,
                 new[] {
                     new[] { translationBtn },
                     new[] { examBtn },
                     new[] { learningSetsBtn },
-                    new[] { statsBtn, helpBtn }
+                    new[] { statsBtn, helpBtn },
+                    new[] { settingsBtn }
                 });
 
             while (true)

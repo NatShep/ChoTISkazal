@@ -113,6 +113,23 @@ public class LearnBotCommandHandler : IBotCommandHandler {
             chat, _userService, _usersWordsService, _examSettings)
         .EnterAsync();
 }
+
+public class SettingsBotCommandHelper : IBotCommandHandler {
+    private readonly UserService _userService;
+
+    public SettingsBotCommandHelper(
+        UserService userService) {
+        _userService = userService; 
+    }
+
+    public bool Acceptable(string text) => text == BotCommands.Settings;
+    public string ParseArgument(string text) => null;
+
+    public Task Execute(string argument, ChatRoom chat) => new SettingsFlow(
+            chat, _userService)
+        .EnterAsync();
+}
+
 public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
     private UsersWordsService _userWordsService;
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
