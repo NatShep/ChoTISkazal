@@ -11,7 +11,7 @@ public static class UpdateCurrentScoresJob {
     private static Timer _timer;
 
     public static async Task  Launch(ILogger logger, UserService userService, UsersWordsService usersWordsService) {
-        _launchTime = DateTime.Today.AddHours(14).AddMinutes(53);
+        _launchTime = DateTime.Today.AddHours(4);
         
         var now = DateTime.Now;
         var delay = now <= _launchTime
@@ -20,16 +20,16 @@ public static class UpdateCurrentScoresJob {
         logger.Information($"Launch time for {nameof(UpdateCurrentScores)}: {DateTime.Now.AddMilliseconds(delay)}");
        
         await Task.Delay((int)delay);
-        await UpdateCurrentScores(userService, usersWordsService);
+        await UpdateCurrentScores(userService, usersWordsService, logger);
 
         _timer = new Timer(TimeSpan.FromDays(1).TotalMilliseconds);
 
-        _timer.Elapsed += async (_, _) => await UpdateCurrentScores(userService, usersWordsService);
+        _timer.Elapsed += async (_, _) => await UpdateCurrentScores(userService, usersWordsService, logger);
         _timer.Enabled = true;
         logger.Information($"Launched {nameof(UpdateCurrentScores)}");
     }
 
-    private static async Task UpdateCurrentScores(UserService userService, UsersWordsService usersWordsService) {
+    private static async Task UpdateCurrentScores(UserService userService, UsersWordsService usersWordsService, ILogger logger) {
         var users = userService.GetAllUsers();
 
         foreach (var user in users) {
@@ -37,6 +37,7 @@ public static class UpdateCurrentScoresJob {
                 await usersWordsService.RefreshWordsCurrentScoreAsync(user);
             }
         }
+        logger.Information("Refresh current score for users complete");
     }
 }
 }
