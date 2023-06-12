@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
+using Serilog;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -15,13 +16,15 @@ public static class RemindSenderJob {
     private static DateTime _launchTime;
     private static Timer _timer;
 
-    public static async Task  Launch(TelegramBotClient botClient, UserService userService) {
-        _launchTime = DateTime.Today.AddHours(12).AddMinutes(15);
+    public static async Task Launch(TelegramBotClient botClient, UserService userService, ILogger logger) {
+        _launchTime = DateTime.Today.AddHours(20);
     
         var now = DateTime.Now;
         var delay = now <= _launchTime
             ? (_launchTime - now).TotalMilliseconds
             : TimeSpan.FromDays(1).TotalMilliseconds - (now - _launchTime).TotalMilliseconds;
+        logger.Information($"Launch time for {nameof(RemindSenderJob)}: {DateTime.Now.AddMilliseconds(delay)}");
+        
         await Task.Delay((int)delay);
         await RemindForAllUsers(botClient, userService);
 
@@ -29,13 +32,16 @@ public static class RemindSenderJob {
 
         _timer.Elapsed += async (_, _) => await RemindForAllUsers(botClient, userService);
         _timer.Enabled = true;
+        
+        logger.Information($"Launched {nameof(RemindSenderJob)}");
+
     }
 
     private static async Task RemindForAllUsers(TelegramBotClient botClient, UserService userService) {
         var users = userService.GetAllUsers();
         
         foreach (var user in users) {
-            if (user.TelegramId.ToString() == "326823645") {
+            if (user.TelegramId.ToString() == "326823645" || user.TelegramId.ToString() == "62634148") {
                 var remindFrequency = user.RemindFrequency ?? 1;
                 if (remindFrequency < 0)
                     continue;
