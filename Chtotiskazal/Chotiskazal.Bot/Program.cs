@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.InterfaceTexts;
+using Chotiskazal.Bot.Jobs;
 using Chotiskazal.Bot.Questions;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -35,7 +36,7 @@ namespace Chotiskazal.Bot
         private static UserService _userService;
         private static LearningSetService _learningSetService;
 
-        private static void Main()
+        private static async Task Main()
         {
             TaskScheduler.UnobservedTaskException +=
                 (sender, args) => Console.WriteLine($"Unobserved ex {args.Exception}");
@@ -53,12 +54,12 @@ namespace Chotiskazal.Bot
             var learningSetsRepo = new LearningSetsRepo(db);
             var longDataForButtonRepo = new LongCallbackDataRepo(db);
             
-            userWordRepo.UpdateDb();
-            dictionaryRepo.UpdateDb();
-            userRepo.UpdateDb();
-            examplesRepo.UpdateDb();
-            questionMetricsRepo.UpdateDb();
-            learningSetsRepo.UpdateDb();
+            await userWordRepo.UpdateDb();
+            await dictionaryRepo.UpdateDb();
+            await userRepo.UpdateDb();
+            await examplesRepo.UpdateDb();
+            await questionMetricsRepo.UpdateDb();
+            await learningSetsRepo.UpdateDb();
             
             Reporter.QuestionMetricRepo = questionMetricsRepo;
             
@@ -113,6 +114,7 @@ namespace Chotiskazal.Bot
             _botClient.StartReceiving();
             
             ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
+            await UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
             
             Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting

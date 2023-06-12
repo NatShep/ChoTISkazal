@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SayWhat.MongoDAL.Users;
 
@@ -18,6 +19,8 @@ namespace SayWhat.Bll.Services
         public async Task<UserModel> GetUserOrNull(TelegramUserInfo telegramUserInfo) 
             => await _repository.GetOrDefaultByTelegramIdOrNull(telegramUserInfo.TelegramId);
 
+        public List<UserModel> GetAllUsers()
+            =>  _repository.GetAll();
         public async Task<UserModel> AddUserFromTelegram(TelegramUserInfo info)
         {
             try
