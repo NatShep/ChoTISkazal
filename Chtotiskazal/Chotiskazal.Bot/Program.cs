@@ -114,12 +114,14 @@ namespace Chotiskazal.Bot
             _botClient.StartReceiving();
             
             ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
-            await RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
-            await UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
+            var remindJobTask = RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
+            var updateCurrentScoreJobTask = UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
             
             Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting
              new TaskCompletionSource<bool>().Task.Wait();
+             await remindJobTask;
+             await updateCurrentScoreJobTask;
              // it will never happens
              _botClient.StopReceiving();
         }
