@@ -16,6 +16,8 @@ public static class InlineButtons {
     public static InlineKeyboardButton LearningSets(string text)=> new InlineKeyboardButton
         { CallbackData = BotCommands.New, Text = text };
 
+    public static InlineKeyboardButton Settings(string text)=> new InlineKeyboardButton
+        { CallbackData = BotCommands.Settings, Text = text };
     public static InlineKeyboardButton Exam(IInterfaceTexts texts) =>
         Exam(texts.LearnButton);
 

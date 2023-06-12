@@ -54,12 +54,12 @@ namespace Chotiskazal.Bot
             var learningSetsRepo = new LearningSetsRepo(db);
             var longDataForButtonRepo = new LongCallbackDataRepo(db);
             
-            await userWordRepo.UpdateDb();
-            await dictionaryRepo.UpdateDb();
-            await userRepo.UpdateDb();
-            await examplesRepo.UpdateDb();
-            await questionMetricsRepo.UpdateDb();
-            await learningSetsRepo.UpdateDb();
+            userWordRepo.UpdateDb();
+            dictionaryRepo.UpdateDb();
+            userRepo.UpdateDb();
+            examplesRepo.UpdateDb();
+            questionMetricsRepo.UpdateDb();
+            learningSetsRepo.UpdateDb();
             
             Reporter.QuestionMetricRepo = questionMetricsRepo;
             
@@ -114,6 +114,7 @@ namespace Chotiskazal.Bot
             _botClient.StartReceiving();
             
             ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
+            await RemindSenderJob.Launch(_botClient, _userService);
             await UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
             
             Reporter.WriteInfo($"... and here i go!");
@@ -187,7 +188,7 @@ namespace Chotiskazal.Bot
                 Reporter.ReportError(chat?.Id, "WokeUp failed", e);
             }
         }
-        private static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
+        public static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
                 return existedChatRoom;

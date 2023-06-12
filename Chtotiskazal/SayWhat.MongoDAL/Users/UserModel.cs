@@ -51,7 +51,9 @@ public class UserModel {
     [BsonElement("pc")] private int _pairsCount;
     [BsonElement("en_wtc")] private int _englishWordTranslationRequestsCount;
     [BsonElement("ru_wtc")] private int _russianWordTranslationRequestsCount;
-    
+    [BsonElement("remindFr")] private int? _remindFrequency;
+    [BsonElement("remindLast")] private DateTime? _lastReminder;
+
     [BsonDefaultValue(false)]
     [BsonIgnoreIfDefault]
     [BsonElement("engInterface")] public bool IsEnglishInterface { get; set; }
@@ -85,6 +87,9 @@ public class UserModel {
     public DateTime LastActivity => _lastActivity;
 //    public int OutdatedWordsCount => _outdatedWordsCount;
     public DateTime LastExam => _lastExam;
+
+    public int? RemindFrequency => _remindFrequency;
+    public DateTime? LastReminder => _lastReminder;
     public long? TelegramId => _telegramId;
     public string TelegramFirstName => _telegramFirstName;
     public string TelegramLastName => _telegramLastName;
@@ -117,6 +122,8 @@ public class UserModel {
         OnAnyActivity();
         _lastExam = DateTime.Now;
     }
+    
+    public void SetRemindFrequency(int frequency) => _remindFrequency = frequency;
 
     public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount) {
         _wordsCount++;

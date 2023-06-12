@@ -21,6 +21,7 @@ namespace SayWhat.Bll.Services
 
         public List<UserModel> GetAllUsers()
             =>  _repository.GetAll();
+
         public async Task<UserModel> AddUserFromTelegram(TelegramUserInfo info)
         {
             try
