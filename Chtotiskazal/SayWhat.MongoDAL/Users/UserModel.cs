@@ -401,7 +401,7 @@ public class UserModel {
 
             var score = WordLeaningGlobalSettings.NewWordGamingScore +
                         WordLeaningGlobalSettings.NewPairGamingScore * word.RuTranslations.Length +
-                        WordLeaningGlobalSettings.ScoresForPassedQuestion * word.QuestionPassed +
+                        WordLeaningGlobalSettings.AverageScoresForPassedQuestion * word.QuestionPassed +
                         WordLeaningGlobalSettings.QuestionFailedGamingScore *
                         (word.QuestionAsked - word.QuestionPassed);
             ApplyWordStatsChangings(wc, dailyStats, monthsStats, (int)score);

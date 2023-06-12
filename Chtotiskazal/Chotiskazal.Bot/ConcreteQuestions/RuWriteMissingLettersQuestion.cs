@@ -14,9 +14,10 @@ public class RuWriteMissingLettersQuestion : IQuestion {
 
     }
     public bool NeedClearScreen => false;
-
     public string Name => "Ru write mising";
-
+    public double PassScore => 0.8;
+    public double FailScore => 0.8;
+    
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var engWord = word.Word;
 

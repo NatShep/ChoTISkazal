@@ -10,8 +10,10 @@ namespace Chotiskazal.Bot.ConcreteQuestions
     public class TranscriptionChooseQuestion : IQuestion
     {
         public bool NeedClearScreen => false;
-
         public string Name => "Trans Choose";
+        public double PassScore => 0.3;
+        public double FailScore => 0.3;
+
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
         {

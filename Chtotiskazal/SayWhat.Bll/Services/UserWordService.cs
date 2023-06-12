@@ -63,15 +63,15 @@ namespace SayWhat.Bll.Services
             }
         }
 
-        public async Task RegisterFailure(UserWordModel userWordModelForLearning)
+        public async Task RegisterFailure(UserWordModel userWordModelForLearning, double failScores)
         {
-            userWordModelForLearning.OnQuestionFailed();
+            userWordModelForLearning.OnQuestionFailed(failScores);
             await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
         }
         
-        public async Task RegisterSuccess(UserWordModel model)
+        public async Task RegisterSuccess(UserWordModel model, double passScores)
         {
-            model.OnQuestionPassed();
+            model.OnQuestionPassed(passScores);
             await _userWordsRepository.UpdateMetrics(model);
         }
 

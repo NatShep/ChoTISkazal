@@ -15,6 +15,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions
     {
         public bool NeedClearScreen => false;
         public string Name => "Eng phrase substitute";
+        public double PassScore => 0.6;
+        public double FailScore => 0.6;
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
             var (phrase, translation) = word.GetExamplesThatLoadedAndFits().GetRandomItemOrNull();
