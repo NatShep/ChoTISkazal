@@ -114,7 +114,7 @@ namespace Chotiskazal.Bot
             _botClient.StartReceiving();
             
             ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
-            await RemindSenderJob.Launch(_botClient, _userService);
+            await RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
             
             Reporter.WriteInfo($"... and here i go!");
             // workaround for infinity awaiting
