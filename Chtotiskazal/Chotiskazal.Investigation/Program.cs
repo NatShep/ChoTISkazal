@@ -12,7 +12,7 @@ namespace Chotiskazal.Investigation {
 
 class Program {
     static void Main() {
-        var client = new MongoClient("key");
+        var client = new MongoClient("mongodb+srv://4tsbot:hi-i-am-4ts-bot@cluster0.vam3q.mongodb.net/saywhatdb?retryWrites=true&w=majority");
         var db = client.GetDatabase("SayWhatDb");
         var collection = db.GetCollection<Qmodel>("questionMetrics");
         var allMetrics = collection.Find(Builders<Qmodel>.Filter.Empty).ToList();
@@ -23,7 +23,10 @@ class Program {
 
         Console.WriteLine("\r\n# Time metrics");
         Console.WriteLine(GetTimeMetricsReport(allMetrics));
-
+        
+        Console.WriteLine("\r\n# Detailed time metrics");
+        Console.WriteLine(GetDetailedTimeMetricsReport(allMetrics));
+        
         Console.WriteLine("\r\n# Score metrics");
         Console.WriteLine(GetScoreMetricsReport(allMetrics));
 
@@ -32,7 +35,10 @@ class Program {
 
         Console.WriteLine("\r\n# Question metrics without clean questions.");
         Console.WriteLine(QuestionMetricsReports.GetQuestionMetricsReport(allMetrics, true));
-
+    
+        Console.WriteLine("\r\n# Question metrics to Time and Score TABLE" );
+        Console.WriteLine(QuestionMetricsReports.GetQuestionMetricsToTSReport(allMetrics));
+        
         Console.WriteLine("\r\n# Weighted Question metrics without clean questions.");
         Console.WriteLine(QuestionMetricsReports.GetWeightedQuestionMetricsReport(allMetrics));
 
@@ -63,7 +69,7 @@ class Program {
 
         return sb + "\r\n";
     }
-
+    
     private static string GetScoreMetricsReport(List<Qmodel> allMetrics) {
         var sb = new StringBuilder();
 
@@ -76,7 +82,7 @@ class Program {
                             .Select(
                                 a => new {
                                     score = a.Key,
-                                    percent = a.Passed(),
+                                    percent = a.PassedDouble(),
                                     count = a.Count(),
                                 })
                             .OrderBy(c => c.score)
@@ -86,58 +92,63 @@ class Program {
         for (int i = 0; i < 20; i++) {
             var a = res.FirstOrDefault(s => s.score == i);
             if (a == null)
-                sb.Append("| --- ");
+                sb.Append($"|{i} --- ");
             else
-                sb.Append("| " + a.percent.ToString().PadLeft(3) + " ");
+                sb.Append($"|{i}: {a.percent:00.0} ");
         }
 
         var s = sb.ToString();
         return s;
     }
 
-
+    private static string GetDetailedTimeMetricsReport(List<Qmodel> allMetrics) {
+        var min = 60;
+        var hour = 3600;
+        var day = hour * 24;
+        var mon = day * 30;
+        var buckets = new[]
+        {
+            new TimeBucket(0, 10),
+            new TimeBucket(10, 30),
+            new TimeBucket(10, min),
+            new TimeBucket(min, 3 * min),
+            new TimeBucket(3 * min, 9 * min),
+            new TimeBucket(9 * min, 30 * min),
+            new TimeBucket(30 * min, 90 * min),
+            new TimeBucket(90 * min, 4 * hour + 30 * min),
+            new TimeBucket(4 * hour + 30 * min, 12 * hour),
+            new TimeBucket(12 * hour, 36 * hour),
+            new TimeBucket(36 * hour, 4 * day),
+            new TimeBucket(4 * day, 12 * day),
+            new TimeBucket(12 * day, 1 * mon),
+            new TimeBucket(1 * mon, 3 * mon),
+            new TimeBucket(3 * mon, 6 * mon),
+        };
+        return CalcTimeMetricsReport(allMetrics, buckets, true);
+    }
+    
     private static string GetTimeMetricsReport(List<Qmodel> allMetrics) {
+        var min = 60;
+        var hour = 3600;
+        var day = hour * 24;
+        var mon = day * 30;
         var buckets = new[] {
-            /*
-             *  0   - 20
-                10  - 40 *
-                20  - 120
-                40 - 2*6*20 *
-                6*20 - 720
-                2*6*20 - 2*720 *
-                6*6*20 - 6*720
-                2*720 - 12*720  *
-                6*720 - 36*720 
-                12*720  - 2 * 36 * 720 *
-                36*720 - 6 * 36 * 720
-                2* 36 * 720 - 12*36*720 *
-                6 * 36 * 720 - 36*36*720
-             */
-
-            new TimeBucket(0, 10), //
-            new TimeBucket(0, 20),
-            new TimeBucket(10, 40), //
-            new TimeBucket(20, 120),
-            new TimeBucket(40, 240), //
-            new TimeBucket(120, 720),
-            new TimeBucket(240, 1440), //
-            new TimeBucket(720, 3 * 1440),
-            new TimeBucket(1440, 6 * 1440), //
-            new TimeBucket(3 * 1440, 18 * 1440),
-            new TimeBucket(6 * 1440, 2 * 18 * 1440), //
-            new TimeBucket(18 * 1440, 6 * 18 * 1440),
-            new TimeBucket(2 * 18 * 1440, 12 * 18 * 1440), //
-            new TimeBucket(4 * 18 * 1440, 6 * 18 * 1440), //
-            new TimeBucket(6 * 18 * 1440, 36 * 18 * 1440),
-            new TimeBucket(12 * 18 * 1440, 3 * 36 * 18 * 1440), //
-            new TimeBucket(36 * 18 * 1440, 6 * 36 * 18 * 1440),
-            new TimeBucket(2 * 36 * 18 * 1440, 12 * 36 * 18 * 1440), //
-
-            new TimeBucket(6 * 36 * 18 * 1440, int.MaxValue),
-
-            //new TimeBucket(12*18*1440, int.MaxValue),
+            new TimeBucket(0, 10),
+            new TimeBucket(10, min),
+            new TimeBucket(min, 6*min),
+            new TimeBucket(6*min, 36*min),
+            new TimeBucket(36*min, 3*hour + 36*min),
+            new TimeBucket(3*hour + 36*min, day),
+            new TimeBucket(day, 5*day),
+            new TimeBucket(5*day, mon),
+            new TimeBucket(mon, 6*mon),
+            new TimeBucket(6*mon, 100*mon),
         };
 
+        return CalcTimeMetricsReport(allMetrics, buckets, false);
+    }
+
+    private static string CalcTimeMetricsReport(List<Qmodel> allMetrics, TimeBucket[] buckets, bool detailed) {
         foreach (var metric in allMetrics) {
             var bucks = buckets.Where(
                 b =>
@@ -147,7 +158,8 @@ class Program {
             }
         }
 
-        var s = string.Join("\r\n", buckets.Select(s => s.ToString()));
+        var s = string.Join("\r\n", buckets.Select(s => s.ToString(detailed)));
+        
         return s;
     }
 

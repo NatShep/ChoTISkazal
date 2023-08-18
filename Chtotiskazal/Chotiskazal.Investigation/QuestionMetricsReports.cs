@@ -97,24 +97,26 @@ public static class QuestionMetricsReports {
             : allMetrics.GroupBy(a => Helper.MapExamName(a.ExamName));
 
         var res = group.Select(
-                           a => new {
-                               exam = a.Key,
-                               percent = a.Passed(),
-                               count = a.Count(),
-                               simpleCount = a.Count(c=>c.ScoreBefore<=6),
-                               simplePassed = a.Count(c=>c.Result && c.ScoreBefore <=6),
-                               scores = a.GroupBy(b => (int)(b.ScoreBefore / 2) * 2)
-                                         .Select(
-                                             a => new {
-                                                 score = a.Key,
-                                                 percent = a.Passed(),
-                                                 count = a.Count(),
-                                             })
-                                         .OrderBy(c => c.score)
-                                         .ToList()
-                           })
-                       .OrderBy(r => r.percent)
-                       .ToList();
+                a => new
+                {
+                    exam = a.Key,
+                    percent = a.Passed(),
+                    count = a.Count(),
+                    simpleCount = a.Count(c => c.ScoreBefore <= 6),
+                    simplePassed = a.Count(c => c.Result && c.ScoreBefore <= 6),
+                    scores = a.GroupBy(b => (int)(b.ScoreBefore / 2) * 2)
+                        .Select(
+                            a => new
+                            {
+                                score = a.Key,
+                                percent = a.Passed(),
+                                count = a.Count(),
+                            })
+                        .OrderBy(c => c.score)
+                        .ToList()
+                })
+            .OrderBy(r => r.percent)
+            .ToList();
         var maxNameLen = allExamNames.Max(a => a.Length) + 2;
 
         var sb = new StringBuilder(
@@ -129,14 +131,77 @@ public static class QuestionMetricsReports {
                 sb.AppendTableItem(a?.percent);
             }
         }
+
         sb.Append("\r\nsimple questions:\r\n");
-        foreach (var type in res.OrderBy(c=>100*c.simplePassed/(double)c.simpleCount)) {
-            sb.Append("\r\n" + type.exam.PadRight(maxNameLen) + $" ({100*type.simplePassed/(double)type.simpleCount:000}% in {type.count:000}) :");
+        foreach (var type in res.OrderBy(c => 100 * c.simplePassed / (double)c.simpleCount)) {
+            sb.Append("\r\n" + type.exam.PadRight(maxNameLen) +
+                      $" ({100 * type.simplePassed / (double)type.simpleCount:000}% in {type.count:000}) :");
         }
 
         var s = sb.ToString();
         return s;
     }
+
+
+    public static string GetQuestionMetricsToTSReport(List<Qmodel> allMetrics) {
+        var allExamNames = allMetrics.Select(a => Helper.GetNonCleanName(a.ExamName)).ToHashSet();
+
+        var group = allMetrics.GroupBy(a => Helper.GetNonCleanName(a.ExamName));
+
+        var res = group.Select(
+                a => new
+                {
+                    exam = a.Key,
+                    percent = a.Passed(),
+                    count = a.Count(),
+                    simpleCount = a.Count(c => c.ScoreBefore <= 6),
+                    simplePassed = a.Count(c => c.Result && c.ScoreBefore <= 6),
+                    hardness = a
+                        .GroupBy(x => {
+                            var hardness = (int)GetHardness(x);
+                            return hardness == int.MaxValue ? 0 : hardness > 100 ? 100 : (hardness / 2) * 2;
+                        })
+                        .Select(m => new
+                        {
+                            score = m.Key,
+                            count = m.Count(),
+                            percent = m.PassedDouble()
+                        })
+                        .OrderBy(c => c.score)
+                        .ToList(),
+                })
+            .OrderBy(r => r.percent)
+            .ToList();
+        var maxNameLen = allExamNames.Max(a => a.Length) + 2;
+
+        var sb = new StringBuilder(
+            " NAME                              " +
+            "passed in count | 80-81 | 82-83 | 84-85 | 86-87 | 88-89  ..... 99-100 | Оценка" +
+            "\r\n----------------------------------------------------------" +
+            "-------------------------------");
+        foreach (var ts in res) {
+            sb.Append("\r\n" + ts.exam.PadRight(maxNameLen) + $" ({ts.percent:000}% in {ts.count:000}) :");
+            for (int i = 80; i <= 100; i += 2) {
+                var a = ts.hardness.FirstOrDefault(s => s.score == i && s.count > 10);
+                if (a == null)
+                    sb.AppendTableItem($"----");
+                else
+                    sb.AppendTableItem($"{a?.percent:00.0}");
+            }
+        }
+
+        sb.Append("\r\nsimple questions:\r\n");
+        foreach (var type in res.OrderBy(c => 100 * c.simplePassed / (double)c.simpleCount)) {
+            sb.Append("\r\n" + type.exam.PadRight(maxNameLen) +
+                      $" ({100 * type.simplePassed / (double)type.simpleCount:000}% in {type.count:000}) :");
+        }
+
+        var s = sb.ToString();
+        return s;
+    }
+
+    public static double GetHardness(Qmodel qmodel) =>
+        95 - 0.8 * Math.Log(qmodel.PreviousExamDeltaInSecs) + 0.5 * qmodel.ScoreBefore;
 
     public static string GetWeightedQuestionMetricsReport(List<Qmodel> allMetrics) {
         double GetScoreWeight(double i) =>
@@ -163,8 +228,8 @@ public static class QuestionMetricsReports {
                 var scoreW = GetScoreWeight(question.ScoreBefore);
                 //маленький вес если только что задан с высоким скором.
                 //1 если давно задан с низким скором
-                var wMissed = 0.2 + 0.8*timeW*scoreW;
-                var wPassed = 1- wMissed;
+                var wMissed = 0.2 + 0.8 * timeW * scoreW;
+                var wPassed = 1 - wMissed;
 
                 if (question.Result)
                     passed += wPassed;
@@ -175,51 +240,52 @@ public static class QuestionMetricsReports {
                 countMissed += wMissed;
 
 
-                if(question.ScoreBefore<= 5 && question.QuestionsAsked < 20)
-                {
-                    var wMissedSimple = 0.2 + 0.8*timeW;
-                    var wPassedSimple = 1- wMissedSimple;
+                if (question.ScoreBefore <= 5 && question.QuestionsAsked < 20) {
+                    var wMissedSimple = 0.2 + 0.8 * timeW;
+                    var wPassedSimple = 1 - wMissedSimple;
                     if (question.Result)
                         simplePassed += wPassedSimple;
                     simpleCount += wPassedSimple;
                 }
-                if(question.ScoreBefore >= 6)
-                {
-                    var wMissedHard = 0.2 + 0.8*timeW;
-                    var wPassedHard = 1- wMissedHard;
+
+                if (question.ScoreBefore >= 6) {
+                    var wMissedHard = 0.2 + 0.8 * timeW;
+                    var wPassedHard = 1 - wMissedHard;
                     if (question.Result)
                         hardPassed += wPassedHard;
                     hardCount += wPassedHard;
                 }
             }
-            results.Add(new wBucket(examGroup.Key.PadRight(30), passed, missed, countPassed, countMissed, count, simplePassed, simpleCount, hardPassed, hardCount));
-        }
 
+            results.Add(new wBucket(examGroup.Key.PadRight(30), passed, missed, countPassed, countMissed, count,
+                simplePassed, simpleCount, hardPassed, hardCount));
+        }
 
 
         sb.Append("\r\nRELATIVES-------------\r\n");
 
-        foreach (var r in results.Where(c=>c.CountMissed>300).OrderBy(r => r.RelativePassed)) {
+        foreach (var r in results.Where(c => c.CountMissed > 300).OrderBy(r => r.RelativePassed)) {
             sb.Append($"{r.Name}{r.TotalCount:0000}:   {(r.RelativePassed * 1000):000}\r\n");
         }
 
         sb.Append("\r\nRELATIVES MISSED-------------\r\n");
 
-        foreach (var r in results.Where(c=>c.CountMissed>300).OrderByDescending(r => r.RelativeMissed)) {
+        foreach (var r in results.Where(c => c.CountMissed > 300).OrderByDescending(r => r.RelativeMissed)) {
             sb.Append($"{r.Name}{r.TotalCount:0000}:   {(r.RelativeMissed * 1000):000}\r\n");
         }
 
         sb.Append("\r\nSIMPLE RELATIVES-------------\r\n");
 
-        foreach (var r in results.Where(c=>c.CountMissed>300).OrderBy(r => r.RelativeSimplePassed)) {
+        foreach (var r in results.Where(c => c.CountMissed > 300).OrderBy(r => r.RelativeSimplePassed)) {
             sb.Append($"{r.Name}{r.TotalCount:0000}:   {(r.RelativeSimplePassed * 1000):000}\r\n");
         }
 
         sb.Append("\r\nHARD RELATIVES-------------\r\n");
 
-        foreach (var r in results.Where(c=>c.CountMissed>300).OrderBy(r => r.RelativeHardPassed)) {
+        foreach (var r in results.Where(c => c.CountMissed > 300).OrderBy(r => r.RelativeHardPassed)) {
             sb.Append($"{r.Name}{r.TotalCount:0000}:   {(r.RelativeHardPassed * 1000):000}\r\n");
         }
+
         return sb.ToString();
     }
 
@@ -227,18 +293,17 @@ public static class QuestionMetricsReports {
     private static double GetTimeWeight(long seconds) => Math.Min(100, Math.Max(0, 100.0 - 1.5 * Math.Log(seconds)));
 
 
-    class wBucket{
+    class wBucket {
         public double HardPassed { get; }
         public double HardWeightedCount { get; }
 
         public wBucket(
-                string name, double passed,
-                double missed,
-                double countPassed, double countMissed,
-                int count,
-                double simplePassed, double simpleCount,
-                double hardPassed, double hardCount)
-        {
+            string name, double passed,
+            double missed,
+            double countPassed, double countMissed,
+            int count,
+            double simplePassed, double simpleCount,
+            double hardPassed, double hardCount) {
             HardPassed = hardPassed;
             HardWeightedCount = hardCount;
             Name = name;
@@ -251,13 +316,13 @@ public static class QuestionMetricsReports {
             SimpleWeightedCount = simpleCount;
         }
 
-        public int TotalCount {get;}
+        public int TotalCount { get; }
         public double SimplePassed { get; }
         public double SimpleWeightedCount { get; }
         public double CountMissed { get; }
         public double CountPassed { get; }
         public double Passed { get; }
-        public double Missed { get;}
+        public double Missed { get; }
         public string Name { get; }
 
         public double RelativeHardPassed => HardPassed / HardWeightedCount;
@@ -265,9 +330,11 @@ public static class QuestionMetricsReports {
         public double RelativePassed => Passed / CountPassed;
         public double RelativeMissed => Missed / CountMissed;
     }
-    
+
     class QuestionToTimeBucket {
-        public QuestionToTimeBucket(string questionName) { QuestionName = questionName; }
+        public QuestionToTimeBucket(string questionName) {
+            QuestionName = questionName;
+        }
 
         public string QuestionName { get; }
         public int Count { get; private set; }
@@ -296,20 +363,19 @@ public static class QuestionMetricsReports {
                 item = CountByScore.Length - 1;
 
             CountByScore[item]++;
-            if (result)
-            {
+            if (result) {
                 Passed++;
                 PassedByScore[item]++;
             }
         }
 
         public QuestionToTimeBucket Sum(QuestionToTimeBucket other, string name) {
-            var result = new QuestionToTimeBucket(name) {
+            var result = new QuestionToTimeBucket(name)
+            {
                 Count = Count + other.Count,
                 Passed = Passed + other.Passed,
             };
-            for (int i = 0; i < CountByScore.Length; i++)
-            {
+            for (int i = 0; i < CountByScore.Length; i++) {
                 result.CountByScore[i] = CountByScore[i] + other.CountByScore[i];
                 result.PassedByScore[i] = PassedByScore[i] + other.PassedByScore[i];
             }
@@ -318,6 +384,4 @@ public static class QuestionMetricsReports {
         }
     }
 }
-
-
 }

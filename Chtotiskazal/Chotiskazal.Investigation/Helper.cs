@@ -17,7 +17,9 @@ namespace Chotiskazal.Investigation {
         };
 
         public static int Passed(this IEnumerable<Qmodel> a) => (100 * a.Count(a => a.Result)) / a.Count();
-
+        
+        public static double PassedDouble(this IEnumerable<Qmodel> a) => (100.0 * a.Count(a => a.Result)) / a.Count();
+        
         public static void AppendTableItem(this StringBuilder sb, object a) {
             if (a == null)
                 sb.Append("| --- ");

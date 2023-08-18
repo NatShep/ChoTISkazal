@@ -12,7 +12,6 @@ class TimeBucket {
     public int[] CountByScore = new int[15];
     public int[] PassedByScore = new int[15];
     
-    
 
     public void Put(double score, bool result) {
         Count++;
@@ -33,31 +32,37 @@ class TimeBucket {
         SecLow = secLow;
         SecHi = secHi;
     }
-
-    public override string ToString() {
+    
+    public string ToString(bool detailed) {
         if (Count == 0)
             return TimeSpan.FromSeconds(SecLow) + " - " + TimeSpan.FromSeconds(SecHi) + ":   NA";
 
-        var sb = new StringBuilder(
-            $"{(SecHi-SecLow)/2:0000}) " +
-             TimeSpan.FromSeconds(SecLow) +
-            " - " +
-            TimeSpan.FromSeconds(SecHi) +
-            ":   " +
-            Passed * 100 / Count +
-            $"   {GetWeightedScore():00.0}" +
-            "   ");
-            
+        var sb = new StringBuilder();
+        if (detailed)
+            sb.Append($"{SecLow + (SecHi - SecLow) / 2:000000})\t");
+
+        sb.Append($"{TimeSpan.FromSeconds(SecLow)} - {TimeSpan.FromSeconds(SecHi)}:[{Count}]\t");
+        
+        if (detailed)
+            sb.Append($"{Passed * 100.0 / Count:00.0}\t{GetWeightedScore():00.0}");
+        else
+            sb.Append($"{Passed * 100 / Count}");
+        
         for (int i = 0; i < CountByScore.Length - 1; i += 2) {
-            var relative = Percentage(i, 3);
+            var relative = Percentage(i, 20);
             if (relative == null)
-                sb.Append("| --- ");
+                sb.Append("\t---");
+            else if (detailed)
+                sb.Append($"\t{relative:00.0}");
             else
-                sb.Append($"| {relative:000} ");
+                sb.Append($"\t{relative:000}");
         }
 
         return sb.ToString();
     }
+
+    public override string ToString() => ToString(false);
+    
     private double? GetWeightedScore() {
         /*
          * 
@@ -115,7 +120,7 @@ sum(c[i] * w[i]) //кол-во
         if (count < threshold)
             return null;
         else
-            return score * 100 / count;
+            return score * 100.0 / count;
     }
 }
 }
