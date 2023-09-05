@@ -7,6 +7,9 @@ namespace Chotiskazal.Bot.Questions
     {
         bool NeedClearScreen { get; }
         string Name { get; }
+        double PassScore { get; }
+        
+        double FailScore { get; }
         Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList);
     }
 

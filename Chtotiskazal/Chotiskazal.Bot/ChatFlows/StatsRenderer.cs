@@ -24,8 +24,8 @@ public static class StatsRenderer {
                 .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
                 .ToArray(), chat.Texts)
             .ToPreFormattedMono()
-            .NewLine() +
-        RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+            .NewLine(); //+
+        //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
     private static Markdown Render7WeeksCalendarMarkdown(
         
@@ -77,7 +77,7 @@ public static class StatsRenderer {
 
         var statsTextMarkdown = Markdown.Escaped(chat.Texts.StatsYourStats + ":\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
-                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.LearnedWordMinScore, 10)}\r\n" +
+                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}\r\n" +
                                                  $"  {chat.Texts.StatsScore}: {(int) chat.User.GamingScore}\r\n")
                                     .ToPreFormattedMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisMonth}:\r\n") +
@@ -97,7 +97,8 @@ public static class StatsRenderer {
         return statsTextMarkdown;
     }
 
-    private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
+    /*
+     private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
      
         if (user.Zen.Rate < -15)
             return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
@@ -114,5 +115,6 @@ public static class StatsRenderer {
         else
             return Markdown.Escaped(texts.Zen6YouNeedToLearn);
     }
+    */
 }
 }

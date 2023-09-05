@@ -54,6 +54,13 @@ public class RussianTexts : IInterfaceTexts {
     public string CorrectTranslationButQuestionWasAbout => "Перевод то верный, но вопрос был о слове";
     public string LetsTryAgain => "Давайте еще разок";
     public string ChooseTheTranscription => "Выберите транскрипцию";
+    public string SettingsButton => "Настройки";
+    public string RemindSettingsButton => "Частота напоминаний";
+    public string RemindSettingsMessage => "Как часто напоминать тебе учить слова?";
+    public string RemindEveryDay => "Каждый день";
+    public string RemindEveryThreeDays => "Раз в три дня";
+    public string RemindEveryWeek => "Раз в неделю";
+    public string NoRemind => "Не напоминать";
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
@@ -170,8 +177,6 @@ public class RussianTexts : IInterfaceTexts {
         = "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
           "\r\n" +
           "Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий:";
-    public string YouHaveLearnedWords(in int count)
-        => $"Выучено слов: {count}";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";

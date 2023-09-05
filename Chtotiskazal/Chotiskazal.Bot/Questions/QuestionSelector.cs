@@ -317,15 +317,15 @@ namespace Chotiskazal.Bot.Questions
             _simpleExamsList.Concat(_intermidiateExamsList).Concat(_advancedExamsList).ToHashSet();
         public IQuestion GetNextQuestionFor(bool isFirstExam, UserWordModel model)
         {
-            if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.IncompleteWordMinScore)
+            if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.LearningWordMinScore)
                 return _simpleExamsList.GetRandomItemOrNull().Question;
 
-            var score = model.AbsoluteScore - (isFirstExam ? (WordLeaningGlobalSettings.LearnedWordMinScore/2) : 0);
+            //что это?Как выбираются экзамены. Покапоменяла похожим оразом, но надо разобраться, что за score
+            var score = model.AbsoluteScore - (isFirstExam ? WordLeaningGlobalSettings.LearningWordMinScore/2 : 0);
 
-            if (model.AbsoluteScore < WordLeaningGlobalSettings.FamiliarWordMinScore)
-                return ChooseExam(score, _intermidiateExamsList);
-            else
-                return ChooseExam(score, _advancedExamsList);
+            return ChooseExam(score, model.AbsoluteScore < WordLeaningGlobalSettings.WellDoneWordMinScore 
+                ? _intermidiateExamsList 
+                : _advancedExamsList);
         }
 
         private static IQuestion ChooseExam(double score, ExamAndPreferredScore[] exams)

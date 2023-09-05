@@ -54,6 +54,13 @@ namespace Chotiskazal.Bot.InterfaceTexts
         public string CorrectTranslationButQuestionWasAbout => "Your translation was correct, but the question was about the word";
         public string LetsTryAgain => "Let's try again";
         public string ChooseTheTranscription => "Choose the transcription";
+        public string SettingsButton => "Settings";
+        public string RemindSettingsButton => "Remind frequency";
+        public string RemindSettingsMessage => "How often do you want I remind you about myself?";
+        public string RemindEveryDay => "Every day";
+        public string RemindEveryThreeDays => "One per thee days";
+        public string RemindEveryWeek => "One per week";
+        public string NoRemind => "No remind";
         
         public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
            Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
@@ -172,9 +179,6 @@ namespace Chotiskazal.Bot.InterfaceTexts
 
         public string AllWordsAreLearnedMessage(string setShortName) =>
             $"All words from learning set '{setShortName}' were added";
-
-        public string YouHaveLearnedWords(in int count)
-            => $"You have learned {count} words";
 
         public string YouForgotCountWords(in int forgottenWordsCount)
             =>$"You forgot {forgottenWordsCount} words";

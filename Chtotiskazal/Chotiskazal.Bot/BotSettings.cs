@@ -27,15 +27,19 @@ namespace Chotiskazal.Bot
         private ExamSettings ReadExamSettings(IConfigurationSection secton) =>
             new ExamSettings
             {
-                MinAdvancedExamMinQuestionAskedForOneWordCount = ReadInt(secton, "MinAdvancedExamMinQuestionAskedForOneWordCount"),
-                MaxAdvancedExamMinQuestionAskedForOneWordCount = ReadInt(secton,"MaxAdvancedExamMinQuestionAskedForOneWordCount"),
-                MinAdvancedQuestionsCount = ReadInt(secton,"MinAdvancedQuestionsCount"),
-                MaxAdvancedQuestionsCount = ReadInt(secton,"MaxAdvancedQuestionsCount"),
-                MaxLearningWordsCountInOneExam = ReadInt(secton,"MaxLearningWordsCountInOneExam"),
-                MaxExamSize = ReadInt(secton,"MaxExamSize"), 
-                MinNewLearningWordsCountInOneExam = ReadInt(secton,"MinNewLearningWordsCountInOneExam"), 
-                MaxNewLearningWordsCountInOneExam = ReadInt(secton,"MaxNewLearningWordsCountInOneExam"), 
-                ExamsCountGoalForDay = ReadInt(secton,"ExamsCountGoalForDay"), 
+                MinWordsQuestionsInOneExam = ReadInt(secton, nameof(ExamSettings.MinWordsQuestionsInOneExam)),
+                MaxWordsQuestionsInOneExam = ReadInt(secton, nameof(ExamSettings.MaxWordsQuestionsInOneExam)),
+                MaxExamSize = ReadInt(secton,nameof(ExamSettings.MaxExamSize)), 
+                
+                ExamsCountGoalForDay = ReadInt(secton, nameof(ExamSettings.ExamsCountGoalForDay)), 
+                MinimumQuestionAsked = ReadInt(secton, nameof(ExamSettings.MinimumQuestionAsked)), 
+                MaxTranslationsInOneExam = ReadInt(secton, nameof(ExamSettings.MaxTranslationsInOneExam)), 
+                
+                NewWordInOneExam = ReadInt(secton, nameof(ExamSettings.NewWordInOneExam)), 
+                LearningWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LearningWordsInOneExam)), 
+                WellDoneWordsInOneExam = ReadInt(secton, nameof(ExamSettings.WellDoneWordsInOneExam)), 
+                LearnedWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LearnedWordsInOneExam)), 
+                LastAskedWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LastAskedWordsInOneExam)),
             };
 
         private int ReadInt(IConfigurationSection section, string key) {

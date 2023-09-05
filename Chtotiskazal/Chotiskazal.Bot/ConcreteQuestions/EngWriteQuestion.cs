@@ -18,8 +18,9 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             _localDictionaryService = localDictionaryService;
         }
         public bool NeedClearScreen => false;
-
         public string Name => "Eng Write";
+        public double PassScore => 1.2;
+        public double FailScore => 1;
 
         public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
             UserWordModel[] examList)
@@ -27,7 +28,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             var translations = word.TextTranslations.ToArray();
             
             var minCount = translations.Min(t => t.Count(c => c == ' '));
-            if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.FamiliarWordMinScore)
+            if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.LearningWordMinScore)
                 return QuestionResult.Impossible;
 
 

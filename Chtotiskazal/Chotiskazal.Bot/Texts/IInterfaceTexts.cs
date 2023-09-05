@@ -100,7 +100,6 @@ public interface IInterfaceTexts {
     Markdown OutOfScopeWithCandidate(string otherMeaning);
     string FailedMistaken(string text);
     string MessageAfterTranslationIsSelected(Translation translation);
-    string YouHaveLearnedWords(in int count);
     string YouForgotCountWords(in int forgottenWordsCount);
     string MessageAfterTranslationIsDeselected(Translation allTranslation);
     string WordIsAddedForLearning(string word);
@@ -109,6 +108,14 @@ public interface IInterfaceTexts {
     string AllWordsAreLearnedMessage(string setShortName);
     string ReportWasSentEnterAdditionalInformationAboutTheReport { get; }
     string ThankYouForYourCommentInReport { get; }
+    string SettingsButton { get; }
+    string RemindSettingsButton { get; }
+    string RemindSettingsMessage { get; }
+    string RemindEveryDay { get; }
+    string RemindEveryWeek { get; }
+    string RemindEveryThreeDays { get; }
+    string NoRemind { get; }
+    
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
     Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }
@@ -124,6 +131,7 @@ public interface IInterfaceTexts {
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);
     Markdown XofY(in int x, in int y);
+    
 }
 
 }

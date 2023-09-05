@@ -18,16 +18,20 @@
   "welcome-msg": "Hi. i am ChtoTiSkazal bot. And I will help you learn English, my Russian-speaking friend",
   "examSettings":
   {
-    "MinAdvancedQuestionsCount":"8",
-    "MaxAdvancedQuestionsCount": "20",
-    "MinNewLearningWordsCountInOneExam": "3",
-    "MaxNewLearningWordsCountInOneExam": "5",
+    "MinWordsQuestionsInOneExam": "1",
+    "MaxWordsQuestionsInOneExam": "3",
     "MaxExamSize": "25",
+
     "ExamsCountGoalForDay": "10",
-    "MaxLearningWordsCountInOneExam": "13",
-    "MinAdvancedExamMinQuestionAskedForOneWordCount": "2",
-    "MaxAdvancedExamMinQuestionAskedForOneWordCount": "4",
-	"MinBestLearnedWords":"2",
-	"MinimumQuestionAsked":"6"
+    "MinimumQuestionAsked": "6",
+    "MaxTranslationsInOneExam": "3",
+
+    "NewWordInOneExam" : "3",
+    "LearningWordsInOneExam":"3",
+    "WellDoneWordsInOneExam":"3",
+    "LearnedWordsInOneExam":"1",
+    "LastAskedWordsInOneExam": "2",
+
+    "CountOfVariantsForChoose": "10",
   }
 }

@@ -41,6 +41,7 @@ public class UserModel {
     private long? _telegramId = null;
     [BsonElement("sc")] private int[] _countByCategoryScores;
     [BsonElement("a")] private DateTime _lastActivity;
+    [BsonElement("last_ex")] private DateTime _lastExam;
     [BsonElement("tfn")] private string _telegramFirstName;
     [BsonElement("tln")] private string _telegramLastName;
     [BsonElement("tn")] private string _telegramNick;
@@ -50,7 +51,9 @@ public class UserModel {
     [BsonElement("pc")] private int _pairsCount;
     [BsonElement("en_wtc")] private int _englishWordTranslationRequestsCount;
     [BsonElement("ru_wtc")] private int _russianWordTranslationRequestsCount;
-    
+    [BsonElement("remindFr")] private int? _remindFrequency;
+    [BsonElement("remindLast")] private DateTime? _lastReminder;
+
     [BsonDefaultValue(false)]
     [BsonIgnoreIfDefault]
     [BsonElement("engInterface")] public bool IsEnglishInterface { get; set; }
@@ -75,14 +78,18 @@ public class UserModel {
     [BsonElement("qpc")] private int _questionPassed;
     [BsonElement("qfc")] private int _questionFailed;
 
-    [BsonElement("oc")] private int _outdatedWordsCount;
+ //   [BsonElement("oc")] private int _outdatedWordsCount;
     [BsonElement("gs")] private double _gamingScore;
 
     #endregion
 
     public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
-    public int OutdatedWordsCount => _outdatedWordsCount;
+//    public int OutdatedWordsCount => _outdatedWordsCount;
+    public DateTime LastExam => _lastExam;
+
+    public int? RemindFrequency => _remindFrequency;
+    public DateTime? LastReminder => _lastReminder;
     public long? TelegramId => _telegramId;
     public string TelegramFirstName => _telegramFirstName;
     public string TelegramLastName => _telegramLastName;
@@ -93,8 +100,8 @@ public class UserModel {
     public int ExamplesCount => _examplesCount;
     public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
     public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
-    public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.LearnedWordMinScore, 10);
-    public Zen Zen => new Zen(_countByCategoryScores, _outdatedWordsCount);
+    public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10);
+    //public Zen Zen => new Zen(_countByCategoryScores, _outdatedWordsCount);
     public double GamingScore => _gamingScore;
 
     public int CountOf(int minScoreCategory, int maxScoreCategory) {
@@ -111,6 +118,13 @@ public class UserModel {
 
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
 
+    public void OnQuestionActivity() {
+        OnAnyActivity();
+        _lastExam = DateTime.Now;
+    }
+    
+    public void SetRemindFrequency(int frequency) => _remindFrequency = frequency;
+
     public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount) {
         _wordsCount++;
         var (today, month) = FixStatsAndGetCurrent();
@@ -118,7 +132,7 @@ public class UserModel {
         today.WordsAdded++;
         month.WordsAdded++;
 
-        var gamingScore = WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.NewWordGamingScore; // * Zen.AddWordsBonusRate;
         today.OnGameScoreIncreased(gamingScore);
         month.OnGameScoreIncreased(gamingScore);
         _gamingScore += gamingScore;
@@ -219,7 +233,7 @@ public class UserModel {
         today.ExamplesAdded += examplesCount;
         month.PairsAdded += pairsCount;
         month.ExamplesAdded += examplesCount;
-        var gamingScore = pairsCount * WordLeaningGlobalSettings.NewPairGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = pairsCount * WordLeaningGlobalSettings.NewPairGamingScore;// * Zen.AddWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
         OnAnyActivity();
         return gamingScore;
@@ -235,7 +249,7 @@ public class UserModel {
         month.PairsAdded--;
         month.ExamplesAdded -= examplesCount;
 
-        var gamingScore = -WordLeaningGlobalSettings.NewPairGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = -WordLeaningGlobalSettings.NewPairGamingScore;// * Zen.AddWordsBonusRate;
         ApplyWordStatsChangings(wordScoreDelta, today, month, gamingScore);
         OnAnyActivity();
     }
@@ -249,7 +263,7 @@ public class UserModel {
         month.WordsAdded--;
 
         var scoreDelta = UserWordScore.Zero - alreadyExistsWord.Score;
-        var gamingScore = -WordLeaningGlobalSettings.NewWordGamingScore * Zen.AddWordsBonusRate;
+        var gamingScore = -WordLeaningGlobalSettings.NewWordGamingScore;// * Zen.AddWordsBonusRate;
 
         ApplyWordStatsChangings(scoreDelta, today, month, gamingScore);
     }
@@ -274,9 +288,9 @@ public class UserModel {
             _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
         _countByCategoryScores.SetLowLimitInplace(0);
 
-        _outdatedWordsCount += statsChanging.OutdatedChanging;
+      //  _outdatedWordsCount += statsChanging.OutdatedChanging;
 
-        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
+//        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
     }
 
     public void OnEnglishWordTranslationRequest() {
@@ -289,18 +303,18 @@ public class UserModel {
         OnAnyActivity();
     }
 
-    public double OnQuestionPassed(WordStatsChanging statsChanging) {
+    public void OnQuestionPassed(WordStatsChanging statsChanging) {
         _questionPassed++;
         var (today, month) = FixStatsAndGetCurrent();
 
         today.QuestionsPassed++;
         month.QuestionsPassed++;
 
-        OnAnyActivity();
+        OnQuestionActivity();
 
-        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore * Zen.LearnWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore;// * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
-        return gamingScore;
+ //       return gamingScore;
     }
 
     public double OnQuestionFailed(WordStatsChanging statsChanging) {
@@ -310,24 +324,26 @@ public class UserModel {
         today.QuestionsFailed++;
         month.QuestionsFailed++;
 
-        OnAnyActivity();
+        OnQuestionActivity();
 
         ApplyWordStatsChangings(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
         return WordLeaningGlobalSettings.QuestionFailedGamingScore;
+        
+        //    return gamingScore;
     }
 
-    public double OnLearningDone() {
+    public void OnLearningDone() {
         _learningDone++;
         var (today, month) = FixStatsAndGetCurrent();
 
         today.LearningDone++;
         month.LearningDone++;
 
-        var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore * Zen.LearnWordsBonusRate;
+        var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore; // * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(WordStatsChanging.Zero, today, month, gamingScore);
         OnAnyActivity();
 
-        return gamingScore;
+    //    return gamingScore;
     }
 
     public IReadOnlyList<DailyStats> GetLastWeek() {
@@ -352,7 +368,7 @@ public class UserModel {
         var days = new Dictionary<DateTime, DailyStats>();
         var months = new Dictionary<DateTime, MonthsStats>();
         _countByCategoryScores = new int[8];
-        _outdatedWordsCount = 0;
+     //   _outdatedWordsCount = 0;
         this._gamingScore = 0;
         foreach (var word in allUserWords)
         {
@@ -392,7 +408,7 @@ public class UserModel {
 
             var score = WordLeaningGlobalSettings.NewWordGamingScore +
                         WordLeaningGlobalSettings.NewPairGamingScore * word.RuTranslations.Length +
-                        WordLeaningGlobalSettings.ScoresForPassedQuestion * word.QuestionPassed +
+                        WordLeaningGlobalSettings.AverageScoresForPassedQuestion * word.QuestionPassed +
                         WordLeaningGlobalSettings.QuestionFailedGamingScore *
                         (word.QuestionAsked - word.QuestionPassed);
             ApplyWordStatsChangings(wc, dailyStats, monthsStats, (int)score);

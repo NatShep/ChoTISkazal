@@ -17,7 +17,7 @@
         {
             var changings = new int[MaxObservingScore+1];
             changings[CategorizedScore(absoluteScore)]++;
-            return new WordStatsChanging(changings,absoluteScore,0);
+            return new WordStatsChanging(changings,absoluteScore); //,0);
         }
 
         public static WordStatsChanging operator +(WordStatsChanging lstats, WordStatsChanging rstats)
@@ -28,8 +28,8 @@
                 return lstats;
             return new WordStatsChanging(
                 lstats.WordScoreChangings.Sum(rstats.WordScoreChangings),
-                lstats.AbsoluteScoreChanging + rstats.AbsoluteScoreChanging,
-                lstats.OutdatedChanging + rstats.OutdatedChanging);
+                lstats.AbsoluteScoreChanging + rstats.AbsoluteScoreChanging);
+            //    lstats.OutdatedChanging + rstats.OutdatedChanging);
         }
 
         private WordStatsChanging()
@@ -38,12 +38,12 @@
 
         public WordStatsChanging(
             int[] wordScoreChangings,
-            double absoluteScoreChanging, 
-            int outdatedChanging)
+            double absoluteScoreChanging)
+         //   int outdatedChanging)
         {
             WordScoreChangings = wordScoreChangings;
             AbsoluteScoreChanging = absoluteScoreChanging;
-            OutdatedChanging = outdatedChanging;
+         //   OutdatedChanging = outdatedChanging;
         }
         public int[] WordScoreChangings { get; }
         public double AbsoluteScoreChanging { get; }
@@ -66,6 +66,6 @@
         /// Positive: Means that {OutdatedChanging}  become outdated (Score > A2 scores, but Score-time become less than A2)
         /// Negative: Means that {-OutdatedChanging} become fresh(Score > A2 scores, and Score-time become more than A2)
         /// </summary>
-        public int OutdatedChanging { get; }
+//        public int OutdatedChanging { get; }
     }
 }

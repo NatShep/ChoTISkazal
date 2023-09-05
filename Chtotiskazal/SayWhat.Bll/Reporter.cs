@@ -57,8 +57,8 @@ public static class Reporter {
                 e?.ToString()??"none");
     }
 
-    public static void ReportQuestionDone(QuestionMetric questionMetric, string chatId) {
-        _log.Information("Save question metric {@ChatInfo} {@questionMetric}", new { ChatInfo = chatId }, questionMetric);
+    public static void ReportQuestionDone(QuestionMetric questionMetric, string chatId, string questionName) {
+        _log.Information("Save question metric {@ChatInfo} {@questionMetric} {@questionName}", new { ChatInfo = chatId }, questionMetric, questionName);
         QuestionMetricRepo?.Add(questionMetric);
     }
     public static void ReportTranslationRequsted(long? userTelegramId, bool isRussian)
