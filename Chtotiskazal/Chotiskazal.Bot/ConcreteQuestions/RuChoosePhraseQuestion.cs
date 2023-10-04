@@ -41,7 +41,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions
             if(choice==null)
                 return QuestionResult.RetryThisQuestion;
 
-            return choice.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase)
+            return choice.AreEqualIgnoreCase(targetPhrase.OriginPhrase)
                 ? QuestionResult.Passed(chat.Texts)
                 : QuestionResult.Failed(chat.Texts);
         }
