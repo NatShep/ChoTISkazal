@@ -238,12 +238,12 @@ namespace SayWhat.Bll.Services
                 .ToList();
 
             foreach (var wordForLearning in wordsForLearning) {
-                var translations = wordForLearning.TextTranslations.ToArray();
+                var translations = wordForLearning.RuTranslations.ToArray();
                 if (translations.Length <= maxTranslations)
                     maxTranslations = translations.Length;
 
                 var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
-                wordForLearning.RuTranslations = usedTranslations.Select(t => new UserWordTranslation(t)).ToArray();
+                wordForLearning.RuTranslations = usedTranslations;
 
                 // TODO Remove Phrases added as learning words
             }
@@ -268,13 +268,13 @@ namespace SayWhat.Bll.Services
                 ).ToList();
             
             foreach (var wordForLearning in newWordsForLearning) {
-                var translations = wordForLearning.TextTranslations.ToArray();
+                var translations = wordForLearning.RuTranslations.ToArray();
                 var maxTranslations = translations.Length <= examSettings.MaxTranslationsInOneExam
                     ? translations.Length
                     : examSettings.MaxTranslationsInOneExam;
                 
                 var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
-                wordForLearning.RuTranslations = usedTranslations.Select(t => new UserWordTranslation(t)).ToArray();
+                wordForLearning.RuTranslations = usedTranslations;
 
                 // TODO Remove Phrases added as learning words
                 /*
