@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Chotiskazal.Bot.ConcreteQuestions;
-using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
@@ -41,12 +40,12 @@ namespace Chotiskazal.Bot.Questions
 
         private readonly ExamAndPreferredScore _engPhraseChoose = new ExamAndPreferredScore(
             question: new EngChoosePhraseQuestion(),
-            expectedScore: 1.3,
+            expectedScore: 6,
             frequency: 4);
 
         private readonly ExamAndPreferredScore _ruPhraseChoose = new ExamAndPreferredScore(
             question: new RuChoosePhraseQuestion(),
-            expectedScore: 1.3,
+            expectedScore: 6,
             frequency: 4);
 
         
@@ -73,19 +72,19 @@ namespace Chotiskazal.Bot.Questions
                 frequency: 7);
 
         private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
-            new EngChooseWordInPhraseQuestion(), 2, 20);
+            new EngChooseWordInPhraseQuestion(), 4, 20);
 
         private readonly ExamAndPreferredScore _clearEngChooseWordInPhrase = new ExamAndPreferredScore(
             new ClearScreenQuestionDecorator(new EngChooseWordInPhraseQuestion()), 2.3, 20);
 
         private readonly ExamAndPreferredScore _engPhraseSubstitute = new ExamAndPreferredScore(
             question: new EngPhraseSubstituteQuestion(),
-            expectedScore: 2,
+            expectedScore: 4,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _ruPhraseSubstitute = new ExamAndPreferredScore(
             question: new RuPhraseSubstituteQuestion(),
-            expectedScore: 2,
+            expectedScore: 4,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _assemblePhraseExam = new ExamAndPreferredScore(
@@ -93,12 +92,12 @@ namespace Chotiskazal.Bot.Questions
 
         private readonly ExamAndPreferredScore _clearEngPhraseSubstitute = new ExamAndPreferredScore(
             question: new ClearScreenQuestionDecorator(new EngPhraseSubstituteQuestion()),
-            expectedScore: 2.6,
+            expectedScore: 6,
             frequency: 12);
 
         private readonly ExamAndPreferredScore _clearRuPhraseSubstitute = new ExamAndPreferredScore(
             question: new ClearScreenQuestionDecorator(new RuPhraseSubstituteQuestion()),
-            expectedScore: 2.6,
+            expectedScore: 6,
             frequency: 12);
 
         
