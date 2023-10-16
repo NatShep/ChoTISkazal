@@ -33,10 +33,10 @@ public class UserWordsRepo : IMongoRepo {
             .Find(
                 Builders<UserWordModel>.Filter.And(
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, lowRate),
+                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName, lowRate),
                     Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, highRate)
                 ))
-            .Sort(sortType($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
+            .Sort(sortType($"{CurrentScoreFieldName}")) 
             .Limit(count)
             .ToListAsync();
     
@@ -45,9 +45,9 @@ public class UserWordsRepo : IMongoRepo {
             .Find(
                 Builders<UserWordModel>.Filter.And(
                     Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                    Builders<UserWordModel>.Filter.Gt(AbsoluteScoreFieldName, lowRate)
+                    Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName, lowRate)
                 ))
-            .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}")) //$"{{{CurrentScoreFieldName}: -1}}")
+            .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}"))
             .Limit(count)
             .ToListAsync();
     
@@ -56,7 +56,7 @@ public class UserWordsRepo : IMongoRepo {
            .Find(
                Builders<UserWordModel>.Filter.And(
                    Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                   Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked),
+                   Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked), //todo can't understand
                    Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
     ))
            .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:-1}}")
