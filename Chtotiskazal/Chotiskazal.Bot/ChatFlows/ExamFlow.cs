@@ -40,9 +40,6 @@ namespace Chotiskazal.Bot.ChatFlows
                 return;
             }
             
-            var lastAskedWords =
-                await _usersWordsService.GetLastAskedWordsWithPhrasesAsync(Chat.User, _examSettings.LastAskedWordsInOneExam, _examSettings);
-           
             var wellDoneWords 
                 = await _usersWordsService.GetWordsWithPhrasesAsync(
                     Chat.User, 
@@ -118,7 +115,6 @@ namespace Chotiskazal.Bot.ChatFlows
             */
             
             var distinctLearningWords = newLearningWords.ToList()
-                .Union(lastAskedWords)
                 .Union(learningWords)
                 .Union(wellDoneWords)
                 .Union(learnedWords)

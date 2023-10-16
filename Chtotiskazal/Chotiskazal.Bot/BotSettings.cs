@@ -32,14 +32,12 @@ namespace Chotiskazal.Bot
                 MaxExamSize = ReadInt(secton,nameof(ExamSettings.MaxExamSize)), 
                 
                 ExamsCountGoalForDay = ReadInt(secton, nameof(ExamSettings.ExamsCountGoalForDay)), 
-                MinimumQuestionAsked = ReadInt(secton, nameof(ExamSettings.MinimumQuestionAsked)), 
                 MaxTranslationsInOneExam = ReadInt(secton, nameof(ExamSettings.MaxTranslationsInOneExam)), 
                 
                 NewWordInOneExam = ReadInt(secton, nameof(ExamSettings.NewWordInOneExam)), 
                 LearningWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LearningWordsInOneExam)), 
                 WellDoneWordsInOneExam = ReadInt(secton, nameof(ExamSettings.WellDoneWordsInOneExam)), 
                 LearnedWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LearnedWordsInOneExam)), 
-                LastAskedWordsInOneExam = ReadInt(secton, nameof(ExamSettings.LastAskedWordsInOneExam)),
             };
 
         private int ReadInt(IConfigurationSection section, string key) {

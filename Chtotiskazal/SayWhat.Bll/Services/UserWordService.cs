@@ -255,45 +255,6 @@ namespace SayWhat.Bll.Services
             return wordsForLearning.ToArray();
         }
         
-        public async Task<UserWordModel[]> GetLastAskedWordsWithPhrasesAsync(
-            UserModel user, 
-            int count,
-            ExamSettings examSettings) 
-        {
-            Console.WriteLine("Поиск недавно спрошенных слов");
-            Console.WriteLine($"Количество мест для слов: {count}");
-            
-            var newWordsForLearning = (
-                await _userWordsRepository.GetLastAsked(user, count, examSettings.MinimumQuestionAsked)
-                ).ToList();
-            
-            foreach (var wordForLearning in newWordsForLearning) {
-                var translations = wordForLearning.RuTranslations.ToArray();
-                var maxTranslations = translations.Length <= examSettings.MaxTranslationsInOneExam
-                    ? translations.Length
-                    : examSettings.MaxTranslationsInOneExam;
-                
-                var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
-                wordForLearning.RuTranslations = usedTranslations;
-
-                // TODO Remove Phrases added as learning words
-                /*
-                     todo wtf?
-                     for (var i = 0; i < wordForLearning.RuPhrases.Count; i++)
-                    {
-                        var phrase = wordForLearning.RuPhrases[i];
-                        if (!usedTranslations.Contains(phrase.PhraseRuTranslate))
-                            wordForLearning.RuPhrases.RemoveAt(i);
-                    }*/
-            }
-            
-            Console.WriteLine($"Количество lasted слов: {newWordsForLearning.Count}");
-            Console.WriteLine(string.Join(" \r\n", newWordsForLearning));
-            
-            await IncludeExamples(newWordsForLearning);
-            return newWordsForLearning.ToArray();
-        }
-        
         public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
             => _userWordsRepository.GetAllWords(user);
 

@@ -51,18 +51,6 @@ public class UserWordsRepo : IMongoRepo {
             .Limit(count)
             .ToListAsync();
     
-    public Task<List<UserWordModel>> GetLastAsked(UserModel user, int maxCount, int minimumQuestionAsked)
-        => Collection
-           .Find(
-               Builders<UserWordModel>.Filter.And(
-                   Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id),
-                   Builders<UserWordModel>.Filter.Gt(QuestionAskedFieldName, minimumQuestionAsked), //todo can't understand
-                   Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, WordLeaningGlobalSettings.WellDoneWordMinScore)
-    ))
-           .Sort($"{{{UserWordsRepo.LastUpdateScoreTime}:-1}}")
-           .Limit(maxCount)
-           .ToListAsync();
-
     public Task<List<UserWordModel>> GetAllUserWordsAsync(UserModel user)
         => Collection
            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
