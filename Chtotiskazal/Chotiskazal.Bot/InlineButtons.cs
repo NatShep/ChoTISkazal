@@ -49,6 +49,8 @@ public static class InlineButtons {
                        })
                    .ToArray();
 
+    public static InlineKeyboardButton Chlang(IInterfaceTexts texts) =>
+        new InlineKeyboardButton { CallbackData = BotCommands.Chlang, Text = texts.ChangeLanguageButton };
 }
 
 }

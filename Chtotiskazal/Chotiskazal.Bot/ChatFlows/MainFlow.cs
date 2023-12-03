@@ -151,21 +151,16 @@ public class MainFlow {
     private async Task ShowMainMenu() {
         while (true)
         {
-            var translationBtn = InlineButtons.Translation(Chat.Texts);
-            var examBtn = InlineButtons.Exam(Chat.Texts);
-            var statsBtn = InlineButtons.Stats(Chat.Texts);
-            var helpBtn = InlineButtons.HowToUse(Chat.Texts);
-            var learningSetsBtn = InlineButtons.LearningSets(Chat.Texts);
-            var settingsBtn = InlineButtons.Settings(Chat.Texts);
-            
+            var commands =  new[] {
+                new[] { InlineButtons.Translation(Chat.Texts) },
+                new[] { InlineButtons.Exam(Chat.Texts) },
+                new[] { InlineButtons.LearningSets(Chat.Texts) },
+                Chat.User.WasInterfaceLanguageChanged ? null : new [] { InlineButtons.Chlang(Chat.Texts)},
+                new[] { InlineButtons.Stats(Chat.Texts), InlineButtons.HowToUse(Chat.Texts) },
+                new[] { InlineButtons.Settings(Chat.Texts) }
+            };
             await ChatIo.SendMessageAsync(Markdown.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuText,
-                new[] {
-                    new[] { translationBtn },
-                    new[] { examBtn },
-                    new[] { learningSetsBtn },
-                    new[] { statsBtn, helpBtn },
-                    new[] { settingsBtn }
-                });
+                commands.Where(c=>c!=null).ToArray());
 
             while (true)
             {

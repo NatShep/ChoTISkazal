@@ -24,14 +24,8 @@ public class SettingsFlow {
             {
                 CallbackData = RemindInlineData,  Text = Chat.Texts.RemindSettingsButton
             },
-            new InlineKeyboardButton
-            {
-                CallbackData = BotCommands.Chlang, Text = Chat.Texts.ChangeLanguageSettingsButton
-            },
-            new InlineKeyboardButton
-            {
-                CallbackData = BotCommands.Start, Text = Chat.Texts.CancelButton
-            }
+            InlineButtons.Chlang(Chat.Texts),
+            InlineButtons.MainMenu(Chat.Texts)
         );
 
         var chosenSetting = await Chat.WaitInlineKeyboardInput();

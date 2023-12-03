@@ -54,9 +54,15 @@ public class UserModel {
     [BsonElement("remindFr")] private int? _remindFrequency;
     [BsonElement("remindLast")] private DateTime? _lastReminder;
 
+
     [BsonDefaultValue(false)]
     [BsonIgnoreIfDefault]
-    [BsonElement("engInterface")] public bool IsEnglishInterface { get; set; }
+    [BsonElement("engInterface")] private bool _isEnglishInterface;
+
+    [BsonDefaultValue(false)]
+    [BsonIgnoreIfDefault]
+    [BsonElement("interfaceLangChanged")]
+    private bool _wasInterfaceLangChanged;
 
     [BsonDefaultValue(null)]
     [BsonIgnoreIfDefault]
@@ -83,9 +89,20 @@ public class UserModel {
 
     #endregion
 
+    public bool IsEnglishInterface
+    {
+        get => _isEnglishInterface;
+        set
+        {
+            _isEnglishInterface = value;
+            _wasInterfaceLangChanged = true;
+        }
+    }
+
+    public bool WasInterfaceLanguageChanged => _wasInterfaceLangChanged;
+
     public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
-//    public int OutdatedWordsCount => _outdatedWordsCount;
     public DateTime LastExam => _lastExam;
 
     public int? RemindFrequency => _remindFrequency;

@@ -109,7 +109,7 @@ public interface IInterfaceTexts {
     string ThankYouForYourCommentInReport { get; }
     string SettingsButton { get; }
     string RemindSettingsButton { get; }
-    string ChangeLanguageSettingsButton { get; }
+    string ChangeLanguageButton { get; }
 
     string AllowedSettings { get; }
     string SettingsApplied { get; }

@@ -57,7 +57,7 @@ public class RussianTexts : IInterfaceTexts {
     public string ChooseTheTranscription => "Выберите транскрипцию";
     public string SettingsButton => "Настройки";
     public string RemindSettingsButton => "Частота напоминаний";
-    public string ChangeLanguageSettingsButton => $"{Emojis.EnFlag} Switch interface to english";
+    public string ChangeLanguageButton => $"{Emojis.EnFlag} Switch interface to english";
     public string AllowedSettings => "Доступные настройки";
     public string SettingsApplied => "Настройки применены";
     public string RemindSettingsMessage => "Как часто напоминать тебе учить слова?";

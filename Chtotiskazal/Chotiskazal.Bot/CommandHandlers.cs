@@ -27,12 +27,8 @@ public class HelpBotCommandHandler : IBotCommandHandler {
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) => chat.SendMarkdownMessageAsync(
-        chat.Texts.Help,
-        new[] {
-            new[] {
-                InlineButtons.MainMenu(chat.Texts)
-            }
-        });
+        chat.Texts.Help, InlineButtons.MainMenu(chat.Texts)
+    );
 }
 
 public class ChlangBotCommandHandler : IBotCommandHandler {

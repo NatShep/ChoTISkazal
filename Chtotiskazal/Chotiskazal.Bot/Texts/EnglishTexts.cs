@@ -55,7 +55,7 @@ namespace Chotiskazal.Bot.Texts
         public string ChooseTheTranscription => "Choose the transcription";
         public string SettingsButton => "Settings";
         public string RemindSettingsButton => "Remind frequency";
-        public string ChangeLanguageSettingsButton => $"{Emojis.RuFlag} Переключить язык интерфейса на русский ";
+        public string ChangeLanguageButton => $"{Emojis.RuFlag} Переключить язык интерфейса на русский ";
 
         public string AllowedSettings => "Available settings";
         public string SettingsApplied => "Settings applied";
