@@ -53,14 +53,14 @@ namespace Chotiskazal.Bot
             var questionMetricsRepo = new QuestionMetricRepo(db);
             var learningSetsRepo = new LearningSetsRepo(db);
             var longDataForButtonRepo = new LongCallbackDataRepo(db);
-            
-            userWordRepo.UpdateDb();
-            dictionaryRepo.UpdateDb();
-            userRepo.UpdateDb();
-            examplesRepo.UpdateDb();
-            questionMetricsRepo.UpdateDb();
-            learningSetsRepo.UpdateDb();
-            
+
+            await userWordRepo.UpdateDb();
+            await dictionaryRepo.UpdateDb();
+            await userRepo.UpdateDb();
+            await examplesRepo.UpdateDb();
+            await questionMetricsRepo.UpdateDb();
+            await learningSetsRepo.UpdateDb();
+
             Reporter.QuestionMetricRepo = questionMetricsRepo;
             
             _userWordService      = new UsersWordsService(userWordRepo, examplesRepo);
@@ -86,17 +86,7 @@ namespace Chotiskazal.Bot
 
             Reporter.ReportBotWokeup(me.Id, me.Username);
 
-            _botClient.SetMyCommandsAsync(new[] {
-                new BotCommand{Command = BotCommands.Help, Description  = "Help and instructions (Помощь и инстркции)"},
-                new BotCommand{Command = BotCommands.Start, Description = "Main menu (Главное меню)"},
-                new BotCommand{Command = BotCommands.Translate, Description   = "Translator (Переводчик)"},
-                new BotCommand{Command = BotCommands.Learn, Description = "Learning translated words (Учить слова)"},
-                new BotCommand{Command = BotCommands.New, Description   = "Show learning sets (Показать наборы для изучения)"},
-                new BotCommand{Command = BotCommands.Stats, Description = "Your stats (Твоя статистика)"},
-                new BotCommand{Command = BotCommands.Words, Description = "Your learned words (Твои выученные слова)"},
-                new BotCommand{Command = BotCommands.Chlang, Description = "Change interface language (Сменить язык интерфейса)"},
-                new BotCommand{Command = BotCommands.Report, Description = "Report an bug or inaccuracy  (Сообщить об ошибке или неточности)"},
-            }).Wait();
+            _botClient.SetMyCommandsAsync(BotCommands.Descriptions).Wait();
             
             var allUpdates =_botClient.GetUpdatesAsync().Result;
             Reporter.WriteInfo($"{allUpdates.Length} messages were missed");
@@ -190,6 +180,7 @@ namespace Chotiskazal.Bot
                 Reporter.ReportError(chat?.Id, "WokeUp failed", e);
             }
         }
+
         public static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat)
         {
             if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
@@ -205,6 +196,7 @@ namespace Chotiskazal.Bot
             RunChatRoom(chat, newChatRoom);
             return newChatRoom;
         }
+
         private static void RunChatRoom(Chat chat, MainFlow newMain)
         {
             var task = newMain.Run();

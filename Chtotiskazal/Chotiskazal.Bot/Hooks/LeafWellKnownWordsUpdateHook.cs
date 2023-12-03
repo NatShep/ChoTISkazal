@@ -50,11 +50,10 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
         await Chat.EditMessageTextMarkdown(
             update.CallbackQuery.Message.MessageId,
             msg,
-            new[] {
+            new[]
+            {
                 WellKnownWordsHelper.GetPagingKeys(),
-                new[] {
-                    InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
-                }
+                new[] { InlineButtons.MainMenu(Chat.Texts) }
             });
 
         await Chat.ConfirmCallback(update.CallbackQuery.Id);

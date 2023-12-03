@@ -9,17 +9,19 @@ namespace Chotiskazal.Bot {
 public static class InlineButtons {
     public const int MaxCallbackDataByteSizeUtf8 = 64;
     public static InlineKeyboardButton Translation(IInterfaceTexts texts) =>
-        Translation(texts.TranslateButton);
+        Translation($"{texts.TranslateButton} {Emojis.Translate}");
 
     public static InlineKeyboardButton Translation(string text) => new InlineKeyboardButton
         { CallbackData = BotCommands.Translate, Text = text };
-    public static InlineKeyboardButton LearningSets(string text)=> new InlineKeyboardButton
-        { CallbackData = BotCommands.New, Text = text };
 
-    public static InlineKeyboardButton Settings(string text)=> new InlineKeyboardButton
-        { CallbackData = BotCommands.Settings, Text = text };
+    public static InlineKeyboardButton LearningSets(IInterfaceTexts texts) => new InlineKeyboardButton
+        { CallbackData = BotCommands.New, Text = $"{texts.LearningSetsButton} {Emojis.LearningSets}" };
+
+    public static InlineKeyboardButton Settings(IInterfaceTexts texts) => new InlineKeyboardButton
+        { CallbackData = BotCommands.Settings, Text = $"{texts.SettingsButton} {Emojis.Gear}" };
+
     public static InlineKeyboardButton Exam(IInterfaceTexts texts) =>
-        Exam(texts.LearnButton);
+        Exam($"{texts.LearnButton} {Emojis.Learning}");
 
     public static InlineKeyboardButton Exam(string text) => new InlineKeyboardButton
         { CallbackData = BotCommands.Learn, Text = text };
@@ -31,7 +33,7 @@ public static class InlineButtons {
         { CallbackData = BotCommands.Help, Text = texts.HelpButton };
 
     public static InlineKeyboardButton MainMenu(IInterfaceTexts texts) =>
-        MainMenu(texts.MainMenuButton);
+        MainMenu($"{Emojis.MainMenu} {texts.MainMenuButton}");
 
     public static InlineKeyboardButton MainMenu(string text) => new InlineKeyboardButton
         { CallbackData = BotCommands.Start, Text = text };

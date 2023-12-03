@@ -181,7 +181,7 @@ public class AddFromLearningSetFlow {
                 },
             },
             new[] {
-                InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
+                InlineButtons.MainMenu(Chat.Texts),
             }
         };
     

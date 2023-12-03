@@ -55,12 +55,17 @@ namespace Chotiskazal.Bot.Texts
         public string ChooseTheTranscription => "Choose the transcription";
         public string SettingsButton => "Settings";
         public string RemindSettingsButton => "Remind frequency";
+        public string ChangeLanguageSettingsButton => $"{Emojis.RuFlag} Переключить язык интерфейса на русский ";
+
+        public string AllowedSettings => "Available settings";
+        public string SettingsApplied => "Settings applied";
         public string RemindSettingsMessage => "How often do you want I remind you about myself?";
         public string RemindEveryDay => "Every day";
         public string RemindEveryThreeDays => "Once per thee days";
         public string RemindEveryWeek => "Once per week";
         public string DoNotRemind => "Do not remind";
-        
+        public string ReminderLearn => "Hey! Do you remember about me! Let's repeat words!\r\n";
+
         public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
            Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
         public Markdown YouHaveATypoLetsTryAgain(string text)

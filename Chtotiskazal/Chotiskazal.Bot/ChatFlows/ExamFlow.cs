@@ -263,7 +263,7 @@ namespace Chotiskazal.Bot.ChatFlows
                     new[] { InlineButtons.Exam($"🔁 {Chat.Texts.OneMoreLearnButton}") },
                     new[] {
                         InlineButtons.Stats(Chat.Texts),
-                        InlineButtons.Translation(Chat.Texts.TranslateButton + " " + Emojis.Translate)
+                        InlineButtons.Translation(Chat.Texts)
                     }
                 });
         }

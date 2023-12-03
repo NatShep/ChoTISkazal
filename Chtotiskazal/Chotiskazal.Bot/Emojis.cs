@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Chotiskazal.Bot
+﻿namespace Chotiskazal.Bot
 {
     public static class Emojis
     {
@@ -23,9 +20,8 @@ namespace Chotiskazal.Bot
         public const string GreenSquare = "🟩";
         public static string NextButton  = "⏭️";
         public static string LearningSets = "§";
-
-        public static List<string> Elements = new List<string>()
-            {"🟢",  "☰", "☆", "㊍", "✅", "❌", "☑️", "✓", "➖",  "➕", ">>", "<<", "«", "»", "🔥", "🟩", 
-                "⏭️", "§"};
+        public static string Gear = "⚙️";
+        public static string RuFlag = "🇷🇺";
+        public static string EnFlag = "🇬🇧";
     }
 }

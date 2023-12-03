@@ -30,7 +30,7 @@ public class HelpBotCommandHandler : IBotCommandHandler {
         chat.Texts.Help,
         new[] {
             new[] {
-                InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}")
+                InlineButtons.MainMenu(chat.Texts)
             }
         });
 }
@@ -125,14 +125,12 @@ public class SettingsBotCommandHelper : IBotCommandHandler {
     public bool Acceptable(string text) => text == BotCommands.Settings;
     public string ParseArgument(string text) => null;
 
-    public Task Execute(string argument, ChatRoom chat) => new SettingsFlow(
-            chat, _userService)
-        .EnterAsync();
+    public Task Execute(string argument, ChatRoom chat) => new SettingsFlow(chat, _userService).EnterAsync();
 }
 
 public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
-    private UsersWordsService _userWordsService;
-    private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
+    private readonly UsersWordsService _userWordsService;
+    private readonly LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
     public ShowWellLearnedWordsCommandHandler(UsersWordsService userWordsService, LeafWellKnownWordsUpdateHook wellKnownWordsUpdateHook) {
         _userWordsService = userWordsService;
         _wellKnownWordsUpdateHook = wellKnownWordsUpdateHook;
@@ -155,10 +153,10 @@ public class StatsBotCommandHandler : IBotCommandHandler {
             StatsRenderer.GetStatsTextMarkdown(_settings,chat),
             new[] {
                 new[] {
-                    InlineButtons.MainMenu($"{Emojis.MainMenu} {chat.Texts.MainMenuButton}"),
-                    InlineButtons.Exam($"{chat.Texts.LearnButton} {Emojis.Learning}"),
+                    InlineButtons.MainMenu(chat.Texts),
+                    InlineButtons.Exam(chat.Texts),
                 },
-                new[] { InlineButtons.Translation($"{chat.Texts.TranslateButton} {Emojis.Translate}") },
+                new[] { InlineButtons.Translation(chat.Texts) },
                 new[] {
                     InlineButtons.WellLearnedWords(
                         $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}) {Emojis.SoftMark}")

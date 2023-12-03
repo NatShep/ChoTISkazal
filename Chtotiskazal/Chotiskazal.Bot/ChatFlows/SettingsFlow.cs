@@ -1,28 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Hooks;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
-using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows {
-
-public class SettingsHelper {
-    public const string PrevData = "/wk<<";
-    public const string NextData = "/wk>>";
-
-    public static InlineKeyboardButton[] GetPagingKeys() => new[] {
-        new InlineKeyboardButton { CallbackData = PrevData, Text = "<<" },
-        new InlineKeyboardButton { CallbackData = NextData, Text = ">>" },
-    };
-}
-
 public class SettingsFlow {
+    private const string RemindInlineData = "remind";
+
     private readonly UserService _userService;
 
     public SettingsFlow(
@@ -35,36 +19,26 @@ public class SettingsFlow {
     private ChatRoom Chat { get; }
 
     public async Task EnterAsync() {
-        var user = Chat.User;
-
-        var settingMessage = Markdown.Escaped("Доступные настройки:");
-        
-        await Chat.SendMarkdownMessageAsync(settingMessage, new[]
-        {
-            
-            new[]
+        await Chat.SendMessageAsync(Chat.Texts.AllowedSettings,
+            new InlineKeyboardButton
             {
-                new InlineKeyboardButton
-                {
-                    CallbackData = "remind",
-                    Text = Chat.Texts.RemindSettingsButton
-                },
+                CallbackData = RemindInlineData,  Text = Chat.Texts.RemindSettingsButton
             },
-            new[]
+            new InlineKeyboardButton
             {
-                new InlineKeyboardButton
-                {
-                    CallbackData = BotCommands.Start,
-                    Text = Chat.Texts.CancelButton,
-                }
+                CallbackData = BotCommands.Chlang, Text = Chat.Texts.ChangeLanguageSettingsButton
+            },
+            new InlineKeyboardButton
+            {
+                CallbackData = BotCommands.Start, Text = Chat.Texts.CancelButton
             }
-        });
-        
+        );
+
         var chosenSetting = await Chat.WaitInlineKeyboardInput();
 
         switch (chosenSetting) {
-            case "remind":
-                await SetRemindFrequency(user);
+            case RemindInlineData:
+                await SetRemindFrequency(Chat.User);
                 break;
             default:
                 return;
@@ -72,62 +46,33 @@ public class SettingsFlow {
     }
 
     private async Task SetRemindFrequency(UserModel user) {
-        await Chat.SendMarkdownMessageAsync(
-            Markdown.Escaped(Chat.Texts.RemindSettingsMessage),
-            new[]
+        await Chat.SendMessageAsync(
+            Chat.Texts.RemindSettingsMessage,
+            new InlineKeyboardButton
             {
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "1",
-                        Text = Chat.Texts.RemindEveryDay
-                    }
-                },
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "3",
-                        Text = Chat.Texts.RemindEveryThreeDays
-                    }
-                },
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "7",
-                        Text = Chat.Texts.RemindEveryWeek
-                    }
-                },
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "-1",
-                        Text = Chat.Texts.DoNotRemind
-                    }
-                },
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = BotCommands.Start,
-                        Text = Chat.Texts.CancelButton,
-                    }
-                }
-            });
+                CallbackData = "1", Text = Chat.Texts.RemindEveryDay
+            },
+            new InlineKeyboardButton
+            {
+                CallbackData = "3", Text = Chat.Texts.RemindEveryThreeDays
+            },
+            new InlineKeyboardButton
+            {
+                CallbackData = "7", Text = Chat.Texts.RemindEveryWeek
+            },
+            new InlineKeyboardButton
+            {
+                CallbackData = "-1", Text = Chat.Texts.DoNotRemind
+            },
+            new InlineKeyboardButton
+            {
+                CallbackData = BotCommands.Start, Text = Chat.Texts.CancelButton
+            }
+        );
 
         user.SetRemindFrequency(int.Parse(await Chat.WaitInlineKeyboardInput()));
         await _userService.Update(user);
-
-        await Chat.SendMarkdownMessageAsync(
-            Markdown.Escaped("Настройки установлены!"));
-        
-        Chat.ChatIo.OnUpdate(new Update {Message = new Message {Text = "/start"}});
-   //?     throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
-        
-
+        await Chat.SendMessageAsync(Chat.Texts.SettingsApplied, InlineButtons.MainMenu(Chat.Texts));
     }
 }
 }

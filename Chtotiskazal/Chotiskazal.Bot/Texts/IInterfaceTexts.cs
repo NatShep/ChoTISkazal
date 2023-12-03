@@ -4,7 +4,6 @@ using SayWhat.Bll.Dto;
 // ReSharper disable InconsistentNaming
 
 namespace Chotiskazal.Bot.Texts {
-
 public interface IInterfaceTexts {
     string more { get; }
     string[] ShortDayNames { get; }
@@ -89,12 +88,12 @@ public interface IInterfaceTexts {
     string NoWellKnownWords { get; }
     string JustOneLearnedWord { get; }
     string SelectWordInLearningSet { get; }
-    string Skip { get;  }
-    string ChooseLearningSet { get;  }
+    string Skip { get; }
+    string ChooseLearningSet { get; }
     string LearningSetsButton { get; }
     string RussianInputExpected { get; }
     string EnglishInputExpected { get; }
-    string TodaysGoal { get;  }
+    string TodaysGoal { get; }
     string Exams { get; }
     string TodayGoalReached { get; }
     Markdown OutOfScopeWithCandidate(string otherMeaning);
@@ -110,11 +109,17 @@ public interface IInterfaceTexts {
     string ThankYouForYourCommentInReport { get; }
     string SettingsButton { get; }
     string RemindSettingsButton { get; }
+    string ChangeLanguageSettingsButton { get; }
+
+    string AllowedSettings { get; }
+    string SettingsApplied { get; }
+
     string RemindSettingsMessage { get; }
     string RemindEveryDay { get; }
     string RemindEveryWeek { get; }
     string RemindEveryThreeDays { get; }
     string DoNotRemind { get; }
+    string ReminderLearn { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
@@ -131,7 +136,5 @@ public interface IInterfaceTexts {
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);
     Markdown XofY(in int x, in int y);
-    
 }
-
 }

@@ -86,7 +86,7 @@ public class ShowWellKnownWordsFlow {
             buttons = new[] {
                 WellKnownWordsHelper.GetPagingKeys(),
                 new[] {
-                    InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}")
+                    InlineButtons.MainMenu(Chat.Texts)
                 }
             };
         }

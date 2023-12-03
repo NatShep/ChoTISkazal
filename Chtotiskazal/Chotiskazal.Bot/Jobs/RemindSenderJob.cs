@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Interface;
+using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using Serilog;
@@ -53,33 +53,22 @@ public static class RemindSenderJob {
     }
 
     private static async Task Remind(TelegramBotClient botClient, UserModel user) {
-        if (user.LastActivity.AddDays(1) <= DateTime.Today) {
+        if (user.LastActivity.AddDays(1) <= DateTime.Today)
             return;
-        }
         
-        var sb = Markdown.Escaped("Hey! Do you remember about me! Let's repeat words!\r\n");
         var chat = await botClient.GetChatAsync(user.TelegramId, CancellationToken.None);
-        var chatRoom = Program.GetOrCreate(chat);
-        
-        var examBtn = InlineButtons.Exam($"Учи слова {Emojis.Learning}");
-        var cnlBtn = InlineButtons.MainMenu("Нееее...");
-        var settingsBtn = InlineButtons.Settings("Настройки");
+        Program.GetOrCreate(chat);
 
+        var texts = user.GetText();
         await botClient.SendTextMessageAsync(
-            user.TelegramId, sb.GetMarkdownString(),
+            user.TelegramId,
+            texts.ReminderLearn,
             replyMarkup: new InlineKeyboardMarkup(
                 new[]
                 {
-                    new[]
-                    {
-                        examBtn, cnlBtn
-                    },
-                    new[]
-                    {
-                        settingsBtn
-                    }
+                    InlineButtons.Exam(texts),
+                    InlineButtons.Settings(texts)
                 }),
-
             parseMode: ParseMode.MarkdownV2);
     }
 }
