@@ -65,6 +65,7 @@ namespace Chotiskazal.Bot.Texts
         public string RemindEveryWeek => "Once per week";
         public string DoNotRemind => "Do not remind";
         public string ReminderLearn => "Hey! Do you remember about me! Let's repeat words!\r\n";
+        public string PressTranslateToMoveStartTranslation => $"Press {BotCommands.Translate} to tranlate word";
 
         public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
            Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");

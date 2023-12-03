@@ -66,6 +66,7 @@ public class RussianTexts : IInterfaceTexts {
     public string RemindEveryWeek => "Раз в неделю";
     public string DoNotRemind => "Не напоминать";
     public string ReminderLearn => "Вы не забыли про меня? Предлагаю повторить слова!\r\n";
+    public string PressTranslateToMoveStartTranslation => $"Нажмите {BotCommands.Translate} для перевода слова";
 
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>

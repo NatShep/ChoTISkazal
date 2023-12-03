@@ -120,6 +120,7 @@ public interface IInterfaceTexts {
     string RemindEveryThreeDays { get; }
     string DoNotRemind { get; }
     string ReminderLearn { get; }
+    string PressTranslateToMoveStartTranslation { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }

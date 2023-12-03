@@ -24,9 +24,9 @@ public class AddFromLearningSetFlow {
     private readonly UserService _userService;
     private readonly UsersWordsService _usersWordsService;
     private readonly AddWordService _addWordService;
-    private string selectLearningSetData = "/lsselect";
-    private string moveNextData => "/ls>>";
-    private string movePrevData => "/ls<<";
+    private const string SelectLearningSetData = "/lsselect";
+    private const string MoveNextData = "/ls>>";
+    private const string MovePrevData = "/ls<<";
 
     public AddFromLearningSetFlow(
         ChatRoom chat,
@@ -64,8 +64,12 @@ public class AddFromLearningSetFlow {
         while (continueAddWords)
         {
             var userInput = await Chat.WaitUserInputAsync();
-            continueAddWords = await HandleWordButton(userInput, selector);
-            var _ = SaveTrainingSetOffset(selector.Page);
+            if(userInput.CallbackQuery!=null)
+            {
+                continueAddWords = await HandleWordButton(userInput, selector);
+                var _ = SaveTrainingSetOffset(selector.Page);
+            } //todo - Это должно сразу переводиться. Значит нужно выносить обработчики страниц в обработчики ???
+            else await Chat.SendMessageAsync(Chat.Texts.PressTranslateToMoveStartTranslation);
         }
     }
 
@@ -94,7 +98,7 @@ public class AddFromLearningSetFlow {
         }
 
         var moveResult = false;
-        if (update.CallbackQuery.Data == selectLearningSetData)
+        if (update.CallbackQuery.Data == SelectLearningSetData)
         {
             await AddWordToUser(selector.Current);
             //Todo почему то не работает
@@ -102,7 +106,7 @@ public class AddFromLearningSetFlow {
                 update.CallbackQuery.Id, Chat.Texts.WordIsAddedForLearning(selector.Current.Word));
             moveResult = await MoveOnNextWord(selector, true);
         }
-        else if (update.CallbackQuery.Data == moveNextData)
+        else if (update.CallbackQuery.Data == MoveNextData)
         {
             await Chat.AnswerCallbackQueryWithTooltip(
                 update.CallbackQuery.Id, Chat.Texts.WordIsSkippedForLearning(selector.Current.Word));
@@ -170,13 +174,13 @@ public class AddFromLearningSetFlow {
         new[] {
             new[] {
                 new InlineKeyboardButton {
-                    CallbackData = selectLearningSetData,
+                    CallbackData = SelectLearningSetData,
                     Text = $"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}"
                 }
             },
             new[] {
                 new InlineKeyboardButton {
-                    CallbackData = moveNextData,
+                    CallbackData = MoveNextData,
                     Text = $"{Emojis.SoftNext}  {Chat.Texts.Skip}"
                 },
             },
