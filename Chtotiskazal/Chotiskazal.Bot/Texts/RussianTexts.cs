@@ -1,12 +1,10 @@
 ﻿using Chotiskazal.Bot.Interface;
-using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Strings;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceTexts {
-
+namespace Chotiskazal.Bot.Texts {
 public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
     public string less => "меньше";
@@ -29,14 +27,17 @@ public class RussianTexts : IInterfaceTexts {
     public string TodaysGoal => "Цель на день";
     public string Exams => "экзаменов";
     public string TodayGoalReached => "Цель на день - достигнута!";
+
     public Markdown OutOfScopeWithCandidate(string otherMeaning) {
         return Markdown.Escaped("Перевод-то правильный, но учим мы не его (имелось ввиду ")
-                       .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
-                       .AddEscaped("?).\r\nОжидаемые переводы");
+            .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
+            .AddEscaped("?).\r\nОжидаемые переводы");
     }
-    public string OutOfScopeTranslation { get; }
-        = "Перевод то правильный, но учим мы не его. " +
+
+    public string OutOfScopeTranslation =>
+          "Перевод то правильный, но учим мы не его. " +
           "\r\nОжидаемые переводы";
+
     public string FailedTranslationWas => "Правильный перевод";
     public string ItIsNotRightTryAgain => "Неа. Давай попробуем еще раз";
     public string SeeTheTranslation => "Посмотреть перевод";
@@ -60,18 +61,19 @@ public class RussianTexts : IInterfaceTexts {
     public string RemindEveryDay => "Каждый день";
     public string RemindEveryThreeDays => "Раз в три дня";
     public string RemindEveryWeek => "Раз в неделю";
-    public string NoRemind => "Не напоминать";
+    public string DoNotRemind => "Не напоминать";
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
+
     public Markdown YouHaveATypoLetsTryAgain(string text)
         => Markdown.Escaped("Ошибочка\\. Правильно будет ")
-                   .AddMarkdown(text.ToSemiBoldMarkdown())
-                   .AddEscaped(". Давайте еще разок.");
+            .AddMarkdown(text.ToSemiBoldMarkdown())
+            .AddEscaped(". Давайте еще разок.");
 
     #region questionResult
 
-    public string Passed1 => "Дыа!";
+    public string Passed1 => "О да!";
     public string PassedOpenIHopeYouWereHonest => "Надеюсь вы были честны с собой";
     public string PassedHideousWell => "Неплохо";
     public string PassedHideousWell2 => "Отлично";
@@ -96,13 +98,13 @@ public class RussianTexts : IInterfaceTexts {
         "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
-    
+
     public string PhraseBecomeSoon => "Сейчас я не умею переводить фразы. Но скоро это станет возможным!";
 
     public Markdown LearningCarefullyStudyTheList =>
         Markdown.Escaped("Ботаем").ToSemiBold()
-                .NewLine()
-                .AddEscaped("Внимательно посмотрите слова из списка:");
+            .NewLine()
+            .AddEscaped("Внимательно посмотрите слова из списка:");
 
     public string LearningDone => "Ботанье завершено";
     public string WordsInTestCount => "Слов в тренировке";
@@ -115,17 +117,17 @@ public class RussianTexts : IInterfaceTexts {
     public string NeedToAddMoreWordsBeforeLearning => "Нужно перевести больше слов дабы начать ботать";
 
     public Markdown Help => Markdown
-                            .Escaped("Привет! Я переводчик и учитель.*\r\n\r\n").ToSemiBold()
-                            .AddEscaped(
-                                "1⃣ Можешь использовать меня как русско-английский переводчик. " +
-                                $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода.\r\n\r\n" +
-                                "2⃣ Затем, когда будет времечко нажми на кнопку ")
-                            .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
-                            .AddEscaped($" или набери команду {BotCommands.Learn}, что бы начать учить переведенные ранее слова.\r\n\r\n" +
-                                        $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
-                                        $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
-                                        "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
-                                        "Надеюсь это порадует вас и вы выучите миллион слов. Мои создатели проверили - это работает!");
+        .Escaped("Привет! Я переводчик и учитель.*\r\n\r\n").ToSemiBold()
+        .AddEscaped(
+            "1⃣ Можешь использовать меня как русско-английский переводчик. " +
+            $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода.\r\n\r\n" +
+            "2⃣ Затем, когда будет времечко нажми на кнопку ")
+        .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
+        .AddEscaped($" или набери команду {BotCommands.Learn}, что бы начать учить переведенные ранее слова.\r\n\r\n" +
+                    $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
+                    $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
+                    "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
+                    "Надеюсь это порадует вас и вы выучите миллион слов. Мои создатели проверили - это работает!");
 
     public Markdown MainMenuText =>
         Markdown.Escaped("Я переводчик и учитель.\r\n" +
@@ -134,22 +136,23 @@ public class RussianTexts : IInterfaceTexts {
                          $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова");
 
     public string ActionIsNotAllowed => "Действие не разрешено";
+
     public string OopsSomethingGoesWrong =>
         "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
 
     public Markdown HereAreTheTranslation(string word, string tr)
         => Markdown.Escaped("Вот что я перевел.\r\n" +
                             "Выберите один или несколько переводов, дабы заботать их в будущем").ToItalic()
-                   .NewLine()
-                   .NewLine()
-                   .AddMarkdown($"{word.Capitalize()}".ToSemiBoldMarkdown())
-                   .AddMarkdown($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}".ToPreFormattedMonoMarkdown());
+            .NewLine()
+            .NewLine()
+            .AddMarkdown($"{word.Capitalize()}".ToSemiBoldMarkdown())
+            .AddMarkdown($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}".ToPreFormattedMonoMarkdown());
 
     public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Перевод  '{translation.TranslatedText} - {translation.OriginText}' сохранен для вас";
 
     public string MessageAfterTranslationIsDeselected(Translation translation)
-        => $"Будто ничего и не было";
+        => "Будто ничего и не было";
 
     public Markdown LearnMoreWords(in int length)
         => Markdown.Escaped($"Молодец! Ты выучил {length} слов! Давай еще!");
@@ -173,8 +176,9 @@ public class RussianTexts : IInterfaceTexts {
 
     public string AllWordsAreLearnedMessage(string setShortName) =>
         $"Все слова из набора '{setShortName}' были добавлены";
-    public string ReportWasSentEnterAdditionalInformationAboutTheReport { get; }
-        = "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
+
+    public string ReportWasSentEnterAdditionalInformationAboutTheReport =>
+          "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
           "\r\n" +
           "Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий:";
 
@@ -202,7 +206,8 @@ public class RussianTexts : IInterfaceTexts {
 
     #region stats
 
-    public string[] ShortDayNames { get; } = {
+    public string[] ShortDayNames { get; } =
+    {
         "пон",
         "вт ",
         "срд",

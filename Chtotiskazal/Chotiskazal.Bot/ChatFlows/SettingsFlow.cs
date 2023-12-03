@@ -105,7 +105,7 @@ public class SettingsFlow {
                     new InlineKeyboardButton
                     {
                         CallbackData = "-1",
-                        Text = Chat.Texts.NoRemind
+                        Text = Chat.Texts.DoNotRemind
                     }
                 },
                 new[]

@@ -1,11 +1,10 @@
 ﻿using Chotiskazal.Bot.Interface;
-using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Strings;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceTexts
+namespace Chotiskazal.Bot.Texts
 {
     public class EnglishTexts : IInterfaceTexts {
         public string more => "more";
@@ -58,9 +57,9 @@ namespace Chotiskazal.Bot.InterfaceTexts
         public string RemindSettingsButton => "Remind frequency";
         public string RemindSettingsMessage => "How often do you want I remind you about myself?";
         public string RemindEveryDay => "Every day";
-        public string RemindEveryThreeDays => "One per thee days";
-        public string RemindEveryWeek => "One per week";
-        public string NoRemind => "No remind";
+        public string RemindEveryThreeDays => "Once per thee days";
+        public string RemindEveryWeek => "Once per week";
+        public string DoNotRemind => "Do not remind";
         
         public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
            Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
@@ -218,8 +217,8 @@ namespace Chotiskazal.Bot.InterfaceTexts
         public string Zen2TranslateNewWords => "Add new words";
         public string Zen3TranslateNewWordsAndPassExams => "Add new words and pass exams.";
 
-        public string Zen3EverythingIsGood { get; } = $"Everything is perfect! " +
-                                                      $"\r\nTranslate new words and pass exams.";
+        public string Zen3EverythingIsGood => "Everything is perfect! " +
+                                              "\r\nTranslate new words and pass exams.";
 
         public string Zen4PassExamsAndTranslateNewWords => "Pass exams and translate new words.";
         public string Zen5PassExams => "I recommend you to pass exams";

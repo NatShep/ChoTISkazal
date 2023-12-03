@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Interface;
-using Chotiskazal.Bot.InterfaceTexts;
+using Chotiskazal.Bot.Texts;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -14,10 +14,9 @@ namespace Chotiskazal.Bot
         private readonly ChatIO _origin;
 
         public IInterfaceTexts Texts => User.IsEnglishInterface
-            //todo cr: ??? -)
-            //todo answer: temporally hide RussianTexts
-            ? (IInterfaceTexts) new EnglishTexts()  
-            : (IInterfaceTexts) new EnglishTexts();//RussianTexts();
+            ? new EnglishTexts()
+            : new RussianTexts();
+
         public  ChatId ChatId => _origin.ChatId;
         public  ChatIO ChatIo => _origin;
 

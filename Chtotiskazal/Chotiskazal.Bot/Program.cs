@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
-using Chotiskazal.Bot.InterfaceTexts;
 using Chotiskazal.Bot.Jobs;
 using Chotiskazal.Bot.Questions;
+using Chotiskazal.Bot.Texts;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SayWhat.Bll;

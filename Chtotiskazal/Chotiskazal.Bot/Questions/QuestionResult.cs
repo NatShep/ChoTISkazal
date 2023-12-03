@@ -1,5 +1,5 @@
-﻿using Chotiskazal.Bot.Interface;
-using Chotiskazal.Bot.InterfaceTexts;
+using Chotiskazal.Bot.Interface;
+using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Strings;
 
 namespace Chotiskazal.Bot.Questions

@@ -3,7 +3,7 @@ using SayWhat.Bll.Dto;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.InterfaceTexts {
+namespace Chotiskazal.Bot.Texts {
 
 public interface IInterfaceTexts {
     string more { get; }
@@ -114,7 +114,7 @@ public interface IInterfaceTexts {
     string RemindEveryDay { get; }
     string RemindEveryWeek { get; }
     string RemindEveryThreeDays { get; }
-    string NoRemind { get; }
+    string DoNotRemind { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
