@@ -11,8 +11,8 @@ public class RuTrustSingleTranslationQuestion : IQuestion
 {
     public bool NeedClearScreen => false;
     public string Name => "Ru trust single translation";
-    public double PassScore => 0.4;
-    public double FailScore => 0.4;
+    public double PassScore => 1.3;
+    public double FailScore => 0.68;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
             

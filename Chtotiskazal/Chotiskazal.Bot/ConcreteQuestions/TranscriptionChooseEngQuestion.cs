@@ -9,8 +9,8 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 public class TranscriptionChooseEngQuestion : IQuestion {
     public bool NeedClearScreen => false;
     public string Name => "Choose Eng By Transcription";
-    public double PassScore => 0.3;
-    public double FailScore => 0.3;
+    public double PassScore => 0.9;
+    public double FailScore => 0.6;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var originTranslation = word.RuTranslations.Where(r => r.HasTranscription).GetRandomItemOrNull();

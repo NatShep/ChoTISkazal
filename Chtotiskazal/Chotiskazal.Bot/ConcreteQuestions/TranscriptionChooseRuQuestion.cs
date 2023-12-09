@@ -10,8 +10,8 @@ public class TranscriptionChooseRuQuestion:IQuestion
 {
     public bool NeedClearScreen => false;
     public string Name => "Choose Ru By Transcription";
-    public double PassScore => 0.3;
-    public double FailScore => 0.3;
+    public double PassScore => 1.0;
+    public double FailScore => 0.6;
 
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)

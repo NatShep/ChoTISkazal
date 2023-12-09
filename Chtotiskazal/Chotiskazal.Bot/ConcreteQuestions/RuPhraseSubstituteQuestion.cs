@@ -12,8 +12,8 @@ public class RuPhraseSubstituteQuestion : IQuestion
 {
     public bool NeedClearScreen => false;
     public string Name => "Ru phrase substitute";
-    public double PassScore => 0.6;
-    public double FailScore => 0.6;
+    public double PassScore => 0.73;
+    public double FailScore => 0.4;
 
     public async Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,

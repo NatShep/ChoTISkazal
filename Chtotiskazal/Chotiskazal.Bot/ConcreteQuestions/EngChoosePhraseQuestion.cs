@@ -11,7 +11,7 @@ public class EngChoosePhraseQuestion : IQuestion
 {
     public bool NeedClearScreen => false;
     public string Name => "Eng Choose Phrase";
-    public double PassScore => 0.6;
+    public double PassScore => 0.4;
     public double FailScore => 0.6;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)

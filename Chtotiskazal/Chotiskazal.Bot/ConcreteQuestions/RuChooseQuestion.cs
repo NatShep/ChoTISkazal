@@ -10,7 +10,7 @@ public class RuChooseQuestion: IQuestion
 {
     public bool NeedClearScreen => false;
     public string Name => "RuChoose";
-    public double PassScore => 0.6;
+    public double PassScore => 0.4;
     public double FailScore => 1;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)

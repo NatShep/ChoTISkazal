@@ -15,8 +15,8 @@ public class EngWriteMissingLettersQuestion : IQuestion {
     }
     public bool NeedClearScreen => false;
     public string Name => "Eng write mising";
-    public double PassScore => 0.8;
-    public double FailScore => 0.8;
+    public double PassScore => 1.3;
+    public double FailScore => 0.52;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var engWord = word.Word;

@@ -11,8 +11,8 @@ public class AssemblePhraseQuestion :IQuestion
     public bool NeedClearScreen => false;
 
     public string Name => "Assemble phrase";
-    public double PassScore => 1;
-    public double FailScore => 0.5;
+    public double PassScore => 1.47;
+    public double FailScore => 0.6;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 
     {

@@ -17,8 +17,8 @@ public class RuWriteQuestion : IQuestion {
 
     public bool NeedClearScreen => false;
     public string Name => "Ru Write";
-    public double PassScore => 1.5;
-    public double FailScore => 1;
+    public double PassScore => 1.8;
+    public double FailScore => 0.7;
 
     public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
         RuWriteQuestionHelper.PassRuWriteQuestion(
@@ -37,8 +37,8 @@ public class RuWriteSingleTarnslationQuestion : IQuestion {
 
     public bool NeedClearScreen => false;
     public string Name => "Ru Write Single Translation";
-    public double PassScore => 1.5;
-    public double FailScore => 1;
+    public double PassScore => 2;
+    public double FailScore => 0.7;
 
     public Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,

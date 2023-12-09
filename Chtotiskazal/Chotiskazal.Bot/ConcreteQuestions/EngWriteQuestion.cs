@@ -18,8 +18,8 @@ public class EngWriteQuestion : IQuestion
     }
     public bool NeedClearScreen => false;
     public string Name => "Eng Write";
-    public double PassScore => 1.2;
-    public double FailScore => 1;
+    public double PassScore => 1.8;
+    public double FailScore => 0.7;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
         UserWordModel[] examList)
