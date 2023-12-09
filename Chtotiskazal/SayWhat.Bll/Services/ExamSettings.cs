@@ -1,11 +1,10 @@
 ﻿namespace SayWhat.Bll.Services;
 
-public class ExamSettings
-{
+public class ExamSettings {
     public int MinWordsQuestionsInOneExam { get; set; } = 1;
     public int MaxWordsQuestionsInOneExam { get; set; } = 3;
     public int MaxExamSize { get; set; } = 25;
-        
+
     public int ExamsCountGoalForDay { get; set; } = 10;
     public int MaxTranslationsInOneExam { get; set; } = 3;
 

@@ -1,27 +1,23 @@
 ﻿namespace SayWhat.MongoDAL.Words;
 
-public class WordStatsChanging
-{
-    public static readonly WordStatsChanging Zero = new WordStatsChanging(); 
+public class WordStatsChanging {
+    public static readonly WordStatsChanging Zero = new WordStatsChanging();
     private const int MaxObservingScore = 7;
 
-    public static int CategorizedScore(double absoluteScore)
-    {
-        int normalizedAbsScore = (int) absoluteScore;
-        return normalizedAbsScore >= MaxObservingScore 
-            ? MaxObservingScore 
+    public static int CategorizedScore(double absoluteScore) {
+        int normalizedAbsScore = (int)absoluteScore;
+        return normalizedAbsScore >= MaxObservingScore
+            ? MaxObservingScore
             : normalizedAbsScore;
     }
 
-    public static WordStatsChanging CreateForNewWord(double absoluteScore)
-    {
-        var changings = new int[MaxObservingScore+1];
+    public static WordStatsChanging CreateForNewWord(double absoluteScore) {
+        var changings = new int[MaxObservingScore + 1];
         changings[CategorizedScore(absoluteScore)]++;
-        return new WordStatsChanging(changings,absoluteScore); //,0);
+        return new WordStatsChanging(changings, absoluteScore); //,0);
     }
 
-    public static WordStatsChanging operator +(WordStatsChanging lstats, WordStatsChanging rstats)
-    {
+    public static WordStatsChanging operator +(WordStatsChanging lstats, WordStatsChanging rstats) {
         if (lstats == null)
             return rstats;
         if (rstats == null)
@@ -32,9 +28,7 @@ public class WordStatsChanging
         //    lstats.OutdatedChanging + rstats.OutdatedChanging);
     }
 
-    private WordStatsChanging()
-    {
-    }
+    private WordStatsChanging() { }
 
     public WordStatsChanging(
             int[] wordScoreChangings,
@@ -45,19 +39,19 @@ public class WordStatsChanging
         AbsoluteScoreChanging = absoluteScoreChanging;
         //   OutdatedChanging = outdatedChanging;
     }
+
     public int[] WordScoreChangings { get; }
     public double AbsoluteScoreChanging { get; }
 
-    public int CountOf(int minimumScoreCategory, int maximumScoreCategory)
-    {
+    public int CountOf(int minimumScoreCategory, int maximumScoreCategory) {
         if (WordScoreChangings == null)
             return 0;
-            
+
         var acc = 0;
-        for (int i = minimumScoreCategory; i < WordScoreChangings.Length && i< maximumScoreCategory; i++)
-        {
-            acc+=WordScoreChangings[i];
+        for (int i = minimumScoreCategory; i < WordScoreChangings.Length && i < maximumScoreCategory; i++) {
+            acc += WordScoreChangings[i];
         }
+
         return acc;
     }
     /// <summary>

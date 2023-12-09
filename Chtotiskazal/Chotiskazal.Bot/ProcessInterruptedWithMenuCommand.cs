@@ -2,8 +2,7 @@
 
 namespace Chotiskazal.Bot;
 
-internal class ProcessInterruptedWithMenuCommand : Exception
-{
+internal class ProcessInterruptedWithMenuCommand : Exception {
     public ProcessInterruptedWithMenuCommand(string command, IBotCommandHandler commandHandler) {
         Command = command;
         CommandHandler = commandHandler;

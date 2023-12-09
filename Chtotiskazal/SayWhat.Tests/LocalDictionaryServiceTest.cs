@@ -43,7 +43,8 @@ public class LocalDictionaryServiceTest {
      */
     [Test]
     public async Task AddWordToDictionary_GetWithExampleReturnsSame() {
-        var example = new Example {
+        var example = new Example
+        {
             Direction = TranslationDirection.EnRu,
             Id = ObjectId.GenerateNewId(),
             OriginWord = "table",
@@ -51,7 +52,7 @@ public class LocalDictionaryServiceTest {
             OriginPhrase = "What the table?",
             TranslatedPhrase = "Какого стола?"
         };
-        
+
         var word = CreateWord("table", "qweqwe", ("Стол", new[] { example }));
         await _service.AddNewWord(word);
         var translations = await _service.GetTranslationsWithExamplesByEnWord("table");
@@ -68,17 +69,20 @@ public class LocalDictionaryServiceTest {
         Assert.AreEqual(example.TranslatedPhrase, translation.Examples[0].TranslatedPhrase);
     }
 
-    public static DictionaryWord CreateWord(string en, string transcription, params (string, Example[])[] translations) {
-        return  new DictionaryWord {
+    public static DictionaryWord
+        CreateWord(string en, string transcription, params (string, Example[])[] translations) {
+        return new DictionaryWord
+        {
             Id = ObjectId.GenerateNewId(),
             Word = en,
             Language = Language.En,
             Source = TranslationSource.Yadic,
             Transcription = transcription,
-            Translations = translations.SelectToArray(t=> new DictionaryTranslationDbEntity {
+            Translations = translations.SelectToArray(t => new DictionaryTranslationDbEntity
+            {
                 Word = t.Item1,
                 Language = Language.Ru,
-                Examples = t.Item2.SelectToArray(i=>new DictionaryReferenceToExample(i))
+                Examples = t.Item2.SelectToArray(i => new DictionaryReferenceToExample(i))
             })
         };
     }

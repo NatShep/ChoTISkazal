@@ -23,7 +23,7 @@ public class UserWordsRepo : IMongoRepo {
     public UserWordsRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
-    
+
     public Task<List<UserWordModel>> GetWordsForLearningBetweenLowAndHighScores(UserModel user,
         int count,
         double lowRate,
@@ -36,10 +36,10 @@ public class UserWordsRepo : IMongoRepo {
                     Builders<UserWordModel>.Filter.Gte(AbsoluteScoreFieldName, lowRate),
                     Builders<UserWordModel>.Filter.Lt(AbsoluteScoreFieldName, highRate)
                 ))
-            .Sort(sortType($"{CurrentScoreFieldName}")) 
+            .Sort(sortType($"{CurrentScoreFieldName}"))
             .Limit(count)
             .ToListAsync();
-    
+
     public Task<List<UserWordModel>> GetWordsForLearningAboveScore(UserModel user, int count, double lowRate)
         => Collection
             .Find(
@@ -50,7 +50,7 @@ public class UserWordsRepo : IMongoRepo {
             .Sort(Builders<UserWordModel>.Sort.Ascending($"{CurrentScoreFieldName}"))
             .Limit(count)
             .ToListAsync();
-    
+
     public Task<List<UserWordModel>> GetAllUserWordsAsync(UserModel user)
         => Collection
             .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
@@ -58,13 +58,13 @@ public class UserWordsRepo : IMongoRepo {
 
     public Task UpdateMetrics(UserWordModel word) {
         var updateDef = Builders<UserWordModel>.Update
-                                               .Set(LastUpdateScoreTime, DateTime.Now)
-                                               .Set(AbsoluteScoreFieldName, word.AbsoluteScore)
-                                               .Set(CurrentScoreFieldName, word.CurrentOrderScore)
-                                               .Set(QuestionPassedFieldName, word.QuestionPassed)
-                                               .Set(QuestionAskedFieldName, word.QuestionAsked)
-                                               .Set(LastQuestionAskedTimestampFieldName,
-                                                   word.LastQuestionAskedTimestamp);
+            .Set(LastUpdateScoreTime, DateTime.Now)
+            .Set(AbsoluteScoreFieldName, word.AbsoluteScore)
+            .Set(CurrentScoreFieldName, word.CurrentOrderScore)
+            .Set(QuestionPassedFieldName, word.QuestionPassed)
+            .Set(QuestionAskedFieldName, word.QuestionAsked)
+            .Set(LastQuestionAskedTimestampFieldName,
+                word.LastQuestionAskedTimestamp);
 
         return Collection.UpdateOneAsync(o => o.Id == word.Id, updateDef);
     }
@@ -75,7 +75,8 @@ public class UserWordsRepo : IMongoRepo {
     public async Task UpdateDb() {
         await Collection.Indexes.DropAllAsync();
         var csKeys = Builders<UserWordModel>.IndexKeys.Ascending(CurrentScoreFieldName);
-        var csIndexOptions = new CreateIndexOptions<UserWordModel> {
+        var csIndexOptions = new CreateIndexOptions<UserWordModel>
+        {
             Unique = false
         };
         var currentScoreIndex = new CreateIndexModel<UserWordModel>(csKeys, csIndexOptions);
@@ -95,8 +96,8 @@ public class UserWordsRepo : IMongoRepo {
 
     public async Task<bool> HasAnyFor(UserModel user) {
         var docsCount = await Collection
-                              .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-                              .CountDocumentsAsync();
+            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
+            .CountDocumentsAsync();
         return docsCount > 0;
     }
 

@@ -23,16 +23,16 @@ public class ButtonCallbackDataService {
     private const string Separator = "@";
     public const string TranslationDataPrefix = "/trm";
     public const string TranslationDataPrefixForLargeSize = "/trl";
-    
+
     public ButtonCallbackDataService(LongCallbackDataRepo repository) {
         _longCallbackDataRepository = repository;
     }
-    
+
     public string CreateButtonDataForShortTranslation(Translation translation, bool isSelected)
         => TranslationDataPrefix
            + translation.OriginText
            + Separator
-           + translation.TranslatedText 
+           + translation.TranslatedText
            + Separator
            + (isSelected ? "1" : "0");
 
@@ -48,11 +48,11 @@ public class ButtonCallbackDataService {
                + Separator
                + (isSelected ? "1" : "0");
     }
-    
+
     public async Task<TranslationButtonData> GetButtonDataOrNull(string buttonQueryData) {
         if (string.IsNullOrWhiteSpace(buttonQueryData))
             return null;
-        
+
         // if text in callbackData is less then max size we save translate  to Callbackdata
         if (buttonQueryData.StartsWith(TranslationDataPrefix)) {
             var splitted = buttonQueryData.Substring(4).Split(Separator);
@@ -80,11 +80,11 @@ public class ButtonCallbackDataService {
     public async Task<LongCallbackData> GetLongButtonData(string translation) {
         return await _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
     }
-    
+
     public async Task<LongCallbackData?> GetLongButtonData(ObjectId translation) {
         return await _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
     }
-    
+
     public async Task AddLongButtonData(LongCallbackData callbackData) {
         await _longCallbackDataRepository.Add(callbackData);
     }

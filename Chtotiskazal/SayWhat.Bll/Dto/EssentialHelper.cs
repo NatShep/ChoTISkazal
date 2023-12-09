@@ -4,15 +4,15 @@ using SayWhat.MongoDAL.Examples;
 
 namespace SayWhat.Bll.Dto;
 
-public static class EssentialHelper{
-    
+public static class EssentialHelper {
     public static EssentialPhrase ToEssentialPhrase(this Example example) {
         var (en, ru) = example.Deconstruct();
         return new(en, ru);
     }
 
     public static Example ToExample(this EssentialPhrase phrase, EssentialWord word, EssentialTranslation translation) =>
-        new() {
+        new()
+        {
             Direction = TranslationDirection.EnRu,
             Id = ObjectId.GenerateNewId(),
             OriginPhrase = phrase.En,
@@ -20,5 +20,4 @@ public static class EssentialHelper{
             TranslatedWord = translation.Ru,
             TranslatedPhrase = phrase.Ru
         };
-
 }

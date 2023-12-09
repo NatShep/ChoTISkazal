@@ -15,15 +15,17 @@ public class EssentialService {
     private readonly ExamplesRepo _examplesRepo;
     private readonly LocalDictionaryRepo _localDictionaryRepo;
     private readonly AddWordService _addWordService;
-    public readonly LearningSetsRepo _learningSetsRepo;
+    private readonly LearningSetsRepo _learningSetsRepo;
+
     public EssentialService(
-        ExamplesRepo examplesRepo, LocalDictionaryRepo localDictionaryRepo, AddWordService addWordService, LearningSetsRepo learningSetsRepo) {
+        ExamplesRepo examplesRepo, LocalDictionaryRepo localDictionaryRepo, AddWordService addWordService,
+        LearningSetsRepo learningSetsRepo) {
         _examplesRepo = examplesRepo;
         _localDictionaryRepo = localDictionaryRepo;
         _addWordService = addWordService;
         _learningSetsRepo = learningSetsRepo;
     }
-    
+
     public async Task<List<WordInLearningSet>> MergeEssentials(IList<EssentialWord> esWords) {
         // для каждого слова - смотрим есть ли это слово в  бд
         // если нет - то создаем и добавляем фразы с ним связанные, сверху докатываем Yandex перевод из словаря
@@ -46,22 +48,18 @@ public class EssentialService {
         Console.WriteLine(
             $"Essentials: {esWords.Count}, Dictionaries: {dictionariesCountBefore}, Examples: {examplesCOuntBefore}");
 
-        foreach (var essentialWord in esWords)
-        {
+        foreach (var essentialWord in esWords) {
             i++;
             Console.Write($"[{i} of {esWords.Count}] Word: '{essentialWord.En}'");
-            try
-            {
+            try {
                 var dicword = await _localDictionaryRepo.GetOrDefault(essentialWord.En);
-                if (dicword == null)
-                {
+                if (dicword == null) {
                     Console.Write($" [add] ...\r\n");
                     var tsword = await CreateWordInLocalDictionary(essentialWord);
                     results.Add(tsword);
                     added++;
                 }
-                else
-                {
+                else {
                     dicword.LoadExamples(allExamples);
                     Console.Write($" [merge] ...\r\n");
                     var tsword = await MergeEssentialAndLocalDictionaryWords(essentialWord, dicword);
@@ -69,8 +67,7 @@ public class EssentialService {
                     merged++;
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Console.WriteLine(e);
                 throw;
             }
@@ -96,7 +93,8 @@ public class EssentialService {
             throw new InvalidOperationException(learningSetDescription.ShortName + " already existing in db");
 
         var words = await MergeEssentials(learningSetDescription.Words);
-        var learningSet = new LearningSet {
+        var learningSet = new LearningSet
+        {
             Enabled = true,
             EnDescription = learningSetDescription.EnDescription,
             EnName = learningSetDescription.EnName,
@@ -107,7 +105,6 @@ public class EssentialService {
             Words = words
         };
         await _learningSetsRepo.Add(learningSet);
-        
     }
 
     private async Task<WordInLearningSet> MergeEssentialAndLocalDictionaryWords(
@@ -116,8 +113,7 @@ public class EssentialService {
         //      для каждого перевод смотрим есть ли такой перевод в словаре 
         //      если нет то добавляем (на соотв позицию) и добавляем фразы
         //      если есть то проверяем позицию и проверяем наличие фраз
-        if (!string.IsNullOrWhiteSpace(esWord.Transcription))
-        {
+        if (!string.IsNullOrWhiteSpace(esWord.Transcription)) {
             if (dicword.Transcription != esWord.Transcription)
                 dicword.Transcription = esWord.Transcription;
         }
@@ -125,18 +121,15 @@ public class EssentialService {
         var resultTranlsations = new List<DictionaryTranslationDbEntity>();
         var examplesToAdd = new List<Example>();
         var essentialsObjectIds = new List<ObjectId>();
-        foreach (var translation in esWord.Translations)
-        {
+        foreach (var translation in esWord.Translations) {
             var existingTranslation = dicword.GetTranslationOrNull(translation.Ru);
-            if (existingTranslation == null)
-            {
+            if (existingTranslation == null) {
                 var (newExamplesForTranslation, newTranslation) = CreateNewTranslationModels(esWord, translation);
                 examplesToAdd.AddRange(newExamplesForTranslation);
                 resultTranlsations.Add(newTranslation);
                 essentialsObjectIds.AddRange(newExamplesForTranslation.Select(e => e.Id));
             }
-            else
-            {
+            else {
                 //уже есть перевод. 
                 resultTranlsations.Add(existingTranslation);
                 //Подгружаем Examples
@@ -148,10 +141,8 @@ public class EssentialService {
                         .ToArray();
 
                 var newEssentialPhrases = translation.Phrases.Except(alreadyPhrases).ToArray();
-                if (newEssentialPhrases.Any())
-                {
-                    if (alreadyPhrases.Any())
-                    { }
+                if (newEssentialPhrases.Any()) {
+                    if (alreadyPhrases.Any()) { }
 
                     var newExamplesForTranslation =
                         newEssentialPhrases.SelectToArray(b => b.ToExample(esWord, translation));
@@ -182,7 +173,8 @@ public class EssentialService {
             await _examplesRepo.Add(examplesToAdd);
         await _localDictionaryRepo.Update(dicword);
         Console.Write("\r\n");
-        return new WordInLearningSet {
+        return new WordInLearningSet
+        {
             Word = esWord.En,
             AllowedTranslations = esWord.Translations.SelectToArray(t => t.Ru),
             AllowedExamples = essentialsObjectIds.ToArray()
@@ -194,7 +186,8 @@ public class EssentialService {
         var newExamplesForTranslation = translation
             .Phrases
             .SelectToArray(p => p.ToExample(esWord, translation));
-        var newTranslation = new DictionaryTranslationDbEntity {
+        var newTranslation = new DictionaryTranslationDbEntity
+        {
             Language = Language.Ru,
             Word = translation.Ru,
             Examples = newExamplesForTranslation.SelectToArray(
@@ -208,10 +201,10 @@ public class EssentialService {
         //load translations from yandex translate
         await _addWordService.TranslateAndAddToDictionary(essentialWord.En);
         var dicword = await _localDictionaryRepo.GetOrDefault(essentialWord.En);
-        if (dicword == null)
-        {
+        if (dicword == null) {
             throw new InvalidOperationException();
         }
+
         return await MergeEssentialAndLocalDictionaryWords(essentialWord, dicword);
     }
 }

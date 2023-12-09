@@ -8,16 +8,13 @@ using SayWhat.MongoDAL.Words;
 namespace SayWhat.MongoDAL.QuestionMetrics;
 
 [BsonIgnoreExtraElements]
-public class QuestionMetric
-{
-    [BsonIgnore]
-    private readonly Stopwatch _startTime;
+public class QuestionMetric {
+    [BsonIgnore] private readonly Stopwatch _startTime;
 
     public QuestionMetric(
         UserWordModel pairModel,
         string examName
-    )
-    {
+    ) {
         _startTime = Stopwatch.StartNew();
         Word = pairModel.Word;
         WordCreated = pairModel.Id.CreationTime;
@@ -34,42 +31,27 @@ public class QuestionMetric
     }
 
 
-
-    public void OnExamFinished(UserWordScore scoreAfter, bool result)
-    {
+    public void OnExamFinished(UserWordScore scoreAfter, bool result) {
         _startTime.Stop();
-        ScoreChanging = scoreAfter.AbsoluteScore-ScoreBefore;
+        ScoreChanging = scoreAfter.AbsoluteScore - ScoreBefore;
         SpendTimeMs = (int)_startTime.ElapsedMilliseconds;
         Result = result;
     }
-        
-    [BsonElement("e")]
-    public string ExamName { get;  }
-    [BsonElement("r")]
-    public bool Result { get; private  set; }
-        
-    [BsonElement("pts")]
-    public int PreviousExamDeltaInSecs { get;  }
-    [BsonElement("sb")]
-    public double ScoreBefore { get; }
-    [BsonElement("asb")]
-    public double AgedScoreBefore { get;  }
+
+    [BsonElement("e")] public string ExamName { get; }
+    [BsonElement("r")] public bool Result { get; private set; }
+
+    [BsonElement("pts")] public int PreviousExamDeltaInSecs { get; }
+    [BsonElement("sb")] public double ScoreBefore { get; }
+    [BsonElement("asb")] public double AgedScoreBefore { get; }
 
 
-    [BsonElement("w")]
-    public string Word { get;  }
-    [BsonElement("ct")]
-    public DateTime WordCreated { get;  }
-        
-    [BsonElement("dt")]
-    public int SpendTimeMs { get; private  set; }
-    [BsonElement("ds")]
-    public double ScoreChanging { get; private set; }
-      
-    [BsonElement("qa")]
-    public int QuestionsAsked { get; }
-    [BsonElement("qp")]
-    public int QuestionsPassed { get; }
+    [BsonElement("w")] public string Word { get; }
+    [BsonElement("ct")] public DateTime WordCreated { get; }
 
-        
+    [BsonElement("dt")] public int SpendTimeMs { get; private set; }
+    [BsonElement("ds")] public double ScoreChanging { get; private set; }
+
+    [BsonElement("qa")] public int QuestionsAsked { get; }
+    [BsonElement("qp")] public int QuestionsPassed { get; }
 }

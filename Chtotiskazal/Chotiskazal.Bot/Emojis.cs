@@ -1,7 +1,6 @@
 ﻿namespace Chotiskazal.Bot;
 
-public static class Emojis
-{
+public static class Emojis {
     public const string GreenCircle = "🟢";
     public const string MainMenu = "☰";
     public const string Learning = "☆";
@@ -18,7 +17,7 @@ public static class Emojis
     public const string CloseQuote = "»";
     public const string Fire = "🔥";
     public const string GreenSquare = "🟩";
-    public static string NextButton  = "⏭️";
+    public static string NextButton = "⏭️";
     public static string LearningSets = "§";
     public static string Gear = "⚙️";
     public static string RuFlag = "🇷🇺";

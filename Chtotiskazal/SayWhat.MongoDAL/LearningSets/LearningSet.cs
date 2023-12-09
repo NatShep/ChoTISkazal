@@ -23,8 +23,7 @@ public class LearningSet {
     public void RegisterUsage(UserModel user, int offset) {
         user.TrainingSets ??= new List<UserTrainSet>();
         var alreadyContains = user.TrainingSets.FirstOrDefault(t => t.SetId == Id);
-        if (alreadyContains == null)
-        {
+        if (alreadyContains == null) {
             alreadyContains = new UserTrainSet { SetId = Id };
             user.TrainingSets.Add(alreadyContains);
         }

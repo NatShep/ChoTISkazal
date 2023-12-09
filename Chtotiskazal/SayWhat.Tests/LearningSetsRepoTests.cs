@@ -81,13 +81,16 @@ public class LearningSetsRepoTests {
 
 
     private static LearningSet CreateLearningSetModel() {
-        var model = new LearningSet {
+        var model = new LearningSet
+        {
             Enabled = true,
             EnName = "qwe",
             Used = 12,
             Passed = 3,
-            Words = new List<WordInLearningSet> {
-                new WordInLearningSet {
+            Words = new List<WordInLearningSet>
+            {
+                new WordInLearningSet
+                {
                     AllowedExamples = Array.Empty<ObjectId>(),
                     AllowedTranslations = new[] { "коу", "муу" },
                     Word = "korova",

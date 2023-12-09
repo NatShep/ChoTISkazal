@@ -16,13 +16,11 @@ public enum CurrentScoreSortingType {
     LongAsked = 2
 }
 
-public class UsersWordsService
-{
+public class UsersWordsService {
     private readonly UserWordsRepo _userWordsRepository;
-    private readonly  ExamplesRepo _examplesRepo;
+    private readonly ExamplesRepo _examplesRepo;
 
-    public UsersWordsService(UserWordsRepo repository, ExamplesRepo examplesRepo)
-    {
+    public UsersWordsService(UserWordsRepo repository, ExamplesRepo examplesRepo) {
         _userWordsRepository = repository;
         _examplesRepo = examplesRepo;
     }
@@ -30,26 +28,20 @@ public class UsersWordsService
     public Task AddUserWord(UserWordModel entity) =>
         _userWordsRepository.Add(entity);
 
-    private async Task IncludeExamples(IReadOnlyCollection<UserWordModel> words)
-    {
+    private async Task IncludeExamples(IReadOnlyCollection<UserWordModel> words) {
         var ids = new List<ObjectId>();
 
-        foreach (var word in words)
-        {
-            foreach (var translation in word.RuTranslations)
-            {
+        foreach (var word in words) {
+            foreach (var translation in word.RuTranslations) {
                 ids.AddRange(translation.Examples.Select(e => e.ExampleId));
             }
         }
 
         var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e.Id);
 
-        foreach (var word in words)
-        {
-            foreach (var translation in word.RuTranslations)
-            {
-                foreach (var example in translation.Examples)
-                {
+        foreach (var word in words) {
+            foreach (var translation in word.RuTranslations) {
+                foreach (var example in translation.Examples) {
                     example.ExampleOrNull = examples[example.ExampleId];
                 }
             }
@@ -63,32 +55,31 @@ public class UsersWordsService
         }
     }
 
-    public async Task RegisterFailure(UserWordModel userWordModelForLearning, double failScores)
-    {
+    public async Task RegisterFailure(UserWordModel userWordModelForLearning, double failScores) {
         userWordModelForLearning.OnQuestionFailed(failScores);
         await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
     }
-        
-    public async Task RegisterSuccess(UserWordModel model, double passScores)
-    {
+
+    public async Task RegisterSuccess(UserWordModel model, double passScores) {
         model.OnQuestionPassed(passScores);
         await _userWordsRepository.UpdateMetrics(model);
     }
 
     public Task<bool> HasWordsFor(UserModel user) => _userWordsRepository.HasAnyFor(user);
+
     public Task UpdateWord(UserWordModel model) =>
         _userWordsRepository.Update(model);
+
     public Task RemoveWord(UserWordModel model) =>
         _userWordsRepository.Remove(model);
 
     public Task UpdateWordMetrics(UserWordModel model) =>
         _userWordsRepository.UpdateMetrics(model);
-        
-    public async Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord) 
+
+    public async Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord)
         => await _userWordsRepository.GetWordOrDefault(user, enWord);
 
-    public  Task AddMutualPhrasesToVocabAsync(UserModel user, int maxCount)
-    {
+    public Task AddMutualPhrasesToVocabAsync(UserModel user, int maxCount) {
         return Task.CompletedTask;
         /*
         //var allWords = (await _usersWordsService.GetAllEnWordsForUserAsync(user)).Select(s => s.ToLower().Trim())
@@ -167,17 +158,16 @@ public class UsersWordsService
     }
 
     public async Task<UserWordModel[]> GetWordsWithPhrasesAsync(
-        UserModel user, 
+        UserModel user,
         int count,
         int maxTranslations,
         CurrentScoreSortingType sortType,
         double lowRating,
-        double? highRating = null) 
-    {
+        double? highRating = null) {
         Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
         Console.WriteLine($"Количество мест для слов: {count}");
 
-        Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting 
+        Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting
             = Builders<UserWordModel>.Sort.Ascending;
         if (sortType == CurrentScoreSortingType.JustAsked) {
             sorting = Builders<UserWordModel>.Sort.Descending;
@@ -191,7 +181,7 @@ public class UsersWordsService
                 highRating.Value,
                 sorting))
             .ToList();
-            
+
         foreach (var wordForLearning in wordsForLearning) {
             var translations = wordForLearning.TextTranslations.ToArray();
             if (translations.Length <= maxTranslations)
@@ -202,27 +192,26 @@ public class UsersWordsService
 
             // TODO Remove Phrases added as learning words
         }
-            
+
         Console.WriteLine($"Количество слов: {wordsForLearning.Count()}");
         Console.WriteLine(string.Join(" \r\n", wordsForLearning.ToList()));
-            
+
         await IncludeExamples(wordsForLearning);
         return wordsForLearning.ToArray();
     }
-        
+
     public async Task<UserWordModel[]> GetRandomWordsWithPhrasesAsync(
-        UserModel user, 
+        UserModel user,
         int count,
         int fromNumber,
         int maxTranslations,
         CurrentScoreSortingType sortType,
         double lowRating,
-        double highRating) 
-    {
+        double highRating) {
         Console.WriteLine($"Рейтинг искомых слов: {lowRating} - {highRating}");
         Console.WriteLine($"Количество мест для слов: {count}");
-            
-        Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting 
+
+        Func<FieldDefinition<UserWordModel>, SortDefinition<UserWordModel>> sorting
             = Builders<UserWordModel>.Sort.Ascending;
         if (sortType == CurrentScoreSortingType.JustAsked) {
             sorting = Builders<UserWordModel>.Sort.Descending;
@@ -247,16 +236,16 @@ public class UsersWordsService
 
             // TODO Remove Phrases added as learning words
         }
-            
+
         Console.WriteLine($"Количество слов: {wordsForLearning.Count()}");
         Console.WriteLine(string.Join(" \r\n", wordsForLearning.ToList()));
-            
+
         await IncludeExamples(wordsForLearning);
         return wordsForLearning.ToArray();
     }
-        
-    public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user) 
+
+    public Task<IReadOnlyCollection<UserWordModel>> GetAllWords(UserModel user)
         => _userWordsRepository.GetAllWords(user);
 
-    public Task<bool> Contains(UserModel user, string word) =>  _userWordsRepository.Contains(user, word);
+    public Task<bool> Contains(UserModel user, string word) => _userWordsRepository.Contains(user, word);
 }

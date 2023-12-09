@@ -84,8 +84,7 @@ public class UserWordModel {
     [BsonElement(UserWordsRepo.QuestionAskedFieldName)]
     private int _questionAsked;
 
-    [BsonElement("tr")] 
-    public UserWordTranslation[] RuTranslations {get;set;}
+    [BsonElement("tr")] public UserWordTranslation[] RuTranslations { get; set; }
 
     [BsonElement("t")] [BsonDefaultValue(UserWordType.UsualWord)] [BsonIgnoreIfDefault]
     private UserWordType _type = UserWordType.UsualWord;
@@ -98,9 +97,9 @@ public class UserWordModel {
 
     #endregion
 
-        
+
     public string Word => _word;
-    
+
     // current score is increased AgedScore
     // for increase the distance between two values
     public double CurrentOrderScore =>
@@ -112,13 +111,16 @@ public class UserWordModel {
     public int QuestionAsked => _questionAsked;
     public DateTime? LastQuestionAskedTimestamp => _lastQuestionAskedTimestamp;
     public DateTime ScoreUpdatedTimestamp => _scoreUpdatedTimestamp;
-    
+
     public UserWordScore Score => new UserWordScore(_absoluteScore, LastQuestionAskedTimestamp ?? DateTime.Now);
     public bool HasAnyExamples => RuTranslations.Any(t => t.Examples?.Any() == true);
     public DateTime? LastExam => LastQuestionAskedTimestamp;
     public string AllTranslationsAsSingleString => string.Join(", ", TextTranslations);
     public IEnumerable<string> TextTranslations => RuTranslations.Select(t => t.Word);
-    public bool ContainsTranscription(string transcription) => RuTranslations.Any(r => r.Transcription == transcription);
+
+    public bool ContainsTranscription(string transcription) =>
+        RuTranslations.Any(r => r.Transcription == transcription);
+
     public IEnumerable<Example> Examples =>
         RuTranslations
             .SelectMany(t => t.Examples)
@@ -150,7 +152,7 @@ public class UserWordModel {
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
         _scoreUpdatedTimestamp = DateTime.Now;
     }
-    
+
 
     public void RefreshScoreUpdate() {
         //  _currentOrderScore = AbsoluteScore;
@@ -169,8 +171,10 @@ public class UserWordModel {
             RuTranslations = RuTranslations.Where(t => t != tr).ToArray();
         return tr;
     }
-    public override string ToString() => $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} ages_score:{Score.AgedScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
-    
+
+    public override string ToString() =>
+        $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} ages_score:{Score.AgedScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
+
 
     public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));
 }

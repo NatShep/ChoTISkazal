@@ -5,7 +5,7 @@ public static class MarkdownExtension {
         return m.AddBypassed("\r\n");
     }
 
-    
+
     public static Markdown ToSemiBold(this Markdown m) {
         if (m.IsEmpty())
             return m;

@@ -38,7 +38,7 @@ public class AddWordService {
 
         if (originWord.Count(e => e == ' ') >= MaxWordsForTranslate) return null;
         //todo go to translate api
-        
+
         IReadOnlyList<Translation> res = null;
         return originWord.IsRussian()
             ? await TranslateRuEnWordAndAddItToDictionary(originWord)
@@ -65,15 +65,14 @@ public class AddWordService {
         if (yaResponse?.Any() != true)
             return Array.Empty<Translation>();
         var word = ChaosBllHelper.ConvertToDictionaryWord(englishWord, yaResponse, Language.En, Language.Ru);
-        try
-        {
+        try {
             await _localDictionaryService.AddNewWord(word);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             Console.WriteLine(e);
             throw;
         }
+
         return word.ToDictionaryTranslations();
     }
 
@@ -86,7 +85,7 @@ public class AddWordService {
         await _localDictionaryService.AddNewWord(word);
         return word.ToDictionaryTranslations();
     }
-    
+
     public async Task<IReadOnlyList<Translation>> FindInLocalDictionaryWithExamples(string word)
         => await _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.ToLower());
 
@@ -97,15 +96,15 @@ public class AddWordService {
 
         var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
 
-        if (alreadyExistsWord == null)
-        {
+        if (alreadyExistsWord == null) {
             //the Word is new for the user
             var word = new UserWordModel(
                 userId: user.Id,
                 word: translation.OriginText,
                 direction: TranslationDirection.EnRu,
                 absScore: 0,
-                translation: new UserWordTranslation {
+                translation: new UserWordTranslation
+                {
                     Transcription = translation.EnTranscription,
                     Word = translation.TranslatedText,
                     Examples = translation.Examples
@@ -119,8 +118,7 @@ public class AddWordService {
                 pairsCount: word.RuTranslations.Length,
                 examplesCount: word.RuTranslations.Sum(t => t.Examples?.Length ?? 0));
         }
-        else
-        {
+        else {
             // User already have the word.
             var originRate = alreadyExistsWord.Score;
             var translates = alreadyExistsWord.TextTranslations.ToList();
@@ -128,7 +126,8 @@ public class AddWordService {
             var r = translation;
             if (!translates.Contains(r.TranslatedText))
                 newTranslations.Add(
-                    new UserWordTranslation {
+                    new UserWordTranslation
+                    {
                         Transcription = r.EnTranscription,
                         Word = r.TranslatedText,
                         Examples = r.Examples.Select(p => new UserWordTranslationReferenceToExample(p.Id)).ToArray()
@@ -136,8 +135,7 @@ public class AddWordService {
 
             alreadyExistsWord.OnQuestionFailed(WordLeaningGlobalSettings.AverageScoresForFailedQuestion);
 
-            if (newTranslations.Count == 0)
-            {
+            if (newTranslations.Count == 0) {
                 await _usersWordsService.UpdateWordMetrics(alreadyExistsWord);
                 return;
             }
@@ -167,8 +165,7 @@ public class AddWordService {
             return;
 
         user.OnPairRemoved(tr, alreadyExistsWord.Score - scoreBefore);
-        if (alreadyExistsWord.RuTranslations.Length == 0)
-        {
+        if (alreadyExistsWord.RuTranslations.Length == 0) {
             await _usersWordsService.RemoveWord(alreadyExistsWord);
             user.OnWordRemoved(alreadyExistsWord);
         }

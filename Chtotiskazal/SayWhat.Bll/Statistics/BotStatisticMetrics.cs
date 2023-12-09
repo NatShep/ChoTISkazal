@@ -7,10 +7,11 @@ public class BotStatisticMetrics {
     public BotStatisticMetrics() {
         Since = DateTime.Now;
     }
-    private HashSet<long> _usersThatTranslatedSomething = new(100);
-    private HashSet<long> _usersThatChoosSomeTranslation = new(100);
-    private HashSet<long> _usersThatPassedExams = new(100);
-    private HashSet<long> _userActivity = new(100);
+
+    private readonly HashSet<long> _usersThatTranslatedSomething = new(100);
+    private readonly HashSet<long> _usersThatChoosSomeTranslation = new(100);
+    private readonly HashSet<long> _usersThatPassedExams = new(100);
+    private readonly HashSet<long> _userActivity = new(100);
     private int _questionsAsked;
     private int _questionsPassed;
     private int _examsFinished;
@@ -54,6 +55,7 @@ public class BotStatisticMetrics {
         OnUserInput(userTelegramId);
         _translationChoosen++;
     }
+
     public void OnExam(
         long? userTelegramId,
         int questionsCount,
@@ -70,21 +72,26 @@ public class BotStatisticMetrics {
         OnUserInput(userTelegramId);
         _translationRemoved++;
     }
+
     public void OnTranslationNotFound(long? userTelegramId) {
         OnUserInput(userTelegramId);
         _tranlationNotFound++;
     }
+
     public void OnNewWordFromLearningSet(long? userTelegramId) {
         OnUserInput(userTelegramId);
         _wordsFromLearningSetAdded++;
     }
+
     public void OnNewUser() {
         _newUsers++;
     }
+
     public void OnUserInput(long? userTelegramId) {
-        if(userTelegramId!=null)
+        if (userTelegramId != null)
             _userActivity.Add(userTelegramId.Value);
     }
-    public void OnCommand(long chatIdIdentifier, string eCommand) 
+
+    public void OnCommand(long chatIdIdentifier, string eCommand)
         => OnUserInput(chatIdIdentifier);
 }

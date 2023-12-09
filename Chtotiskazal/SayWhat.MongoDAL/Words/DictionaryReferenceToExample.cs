@@ -5,23 +5,17 @@ using SayWhat.MongoDAL.Examples;
 namespace SayWhat.MongoDAL.Words;
 
 public class UserWordTranslationReferenceToExample {
-    public UserWordTranslationReferenceToExample()
-    {
-            
-    }
+    public UserWordTranslationReferenceToExample() { }
 
-    public UserWordTranslationReferenceToExample(ObjectId exampleId)
-    {
+    public UserWordTranslationReferenceToExample(ObjectId exampleId) {
         ExampleId = exampleId;
     }
 
-    public UserWordTranslationReferenceToExample(Example example)
-    {
+    public UserWordTranslationReferenceToExample(Example example) {
         ExampleId = example.Id;
         ExampleOrNull = example;
     }
-    [BsonElement("eid")]
-    public ObjectId ExampleId { get; set; }
-    [BsonIgnore] 
-    public Example ExampleOrNull { get; set; }
+
+    [BsonElement("eid")] public ObjectId ExampleId { get; set; }
+    [BsonIgnore] public Example ExampleOrNull { get; set; }
 }

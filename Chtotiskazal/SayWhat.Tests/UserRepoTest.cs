@@ -33,8 +33,7 @@ public class UserRepoTests {
     [TestCase(2)]
     [TestCase(42)]
     public void Add_GetCountReturnsSize(int count) {
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             _repo.AddFromTelegram(i, "vasa", "", "").Wait();
         }
 
@@ -51,8 +50,7 @@ public class UserRepoTests {
     [TestCase(2)]
     [TestCase(42)]
     public void AddSeveralUsersWithoutTelegramId_DoesNotThrows(int count) {
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             _repo.Add(
                     new UserModel(
                         telegramId: null,
@@ -142,12 +140,15 @@ public class UserRepoTests {
         model.OnEnglishWordTranslationRequest();
         model.OnEnglishWordTranslationRequest();
         model.OnRussianWordTranslationRequest();
-        model.TrainingSets = new List<UserTrainSet> {
-            new UserTrainSet {
+        model.TrainingSets = new List<UserTrainSet>
+        {
+            new UserTrainSet
+            {
                 SetId = ObjectId.GenerateNewId(),
                 LastSeenWordOffset = 1,
             },
-            new UserTrainSet {
+            new UserTrainSet
+            {
                 SetId = ObjectId.GenerateNewId(),
                 LastSeenWordOffset = 2,
             }

@@ -7,17 +7,17 @@ namespace SayWhat.Bll.Strings;
 
 public static class StringExtensions {
     public static Markdown ToSemiBoldMarkdown(this string s) {
-        return  Markdown.Escaped(s).ToSemiBold();
+        return Markdown.Escaped(s).ToSemiBold();
     }
-    
+
     public static Markdown ToItalicMarkdown(this string s) {
-        return  Markdown.Escaped(s).ToItalic();
+        return Markdown.Escaped(s).ToItalic();
     }
 
     public static Markdown ToPreFormattedMonoMarkdown(this string s) {
         return Markdown.Escaped(s).ToPreFormattedMono();
     }
-    
+
     public static Markdown ToMonoMarkdown(this string s) {
         return Markdown.Escaped(s).ToMono();
     }
@@ -25,25 +25,28 @@ public static class StringExtensions {
     public static Markdown ToBypassedMarkdown(this string s) {
         return Markdown.Bypassed(s);
     }
-    
-    public static  Markdown ToEscapedMarkdown(this string s) {
+
+    public static Markdown ToEscapedMarkdown(this string s) {
         return Markdown.Escaped(s);
     }
-    
+
     private static string GetWithStarredBody(this string origin, int start, int finish, out string replacedBody) {
         var size = origin.Length - start - finish;
         replacedBody = origin.Substring(start, size);
         return origin.Substring(0, start) + '*'.Repeat(size) + origin.Tail(finish);
     }
+
     public static string GetWithStarredBody(this string origin, StarredHardness hardness, out string replacedBody) {
         return hardness == StarredHardness.Easy
-            ? origin.Length switch {
+            ? origin.Length switch
+            {
                 <= 3 => GetWithStarredBody(origin, 1, 0, out replacedBody),
                 <= 5 => GetWithStarredBody(origin, 1, 1, out replacedBody),
                 <= 9 => GetWithStarredBody(origin, 2, 2, out replacedBody),
                 _ => GetWithStarredBody(origin, 2, 2, out replacedBody)
             }
-            : origin.Length switch {
+            : origin.Length switch
+            {
                 <= 7 => GetWithStarredBody(origin, 1, 0, out replacedBody),
                 <= 11 => GetWithStarredBody(origin, 2, 0, out replacedBody),
                 _ => GetWithStarredBody(origin, 2, 1, out replacedBody)
@@ -55,36 +58,37 @@ public static class StringExtensions {
         for (int i = 0; i < count; i++) {
             sb.Append(targetString);
         }
+
         return sb.ToString();
     }
-        
-    public static char FirstSymbol(this string targetString) => targetString[0];     
+
+    public static char FirstSymbol(this string targetString) => targetString[0];
 
     public static char LastSymbol(this string targetString) => targetString[^1];
 
-    public static string Tail(this string targetString, int count) => count==0? string.Empty: targetString.Substring(targetString.Length-count);
+    public static string Tail(this string targetString, int count) =>
+        count == 0 ? string.Empty : targetString.Substring(targetString.Length - count);
 
-    public static string Repeat(this char targetChar, int count) => new(targetChar, count);     
-    
-    public static (string, StringsCompareResult) GetClosestTo(this IReadOnlyList<string> translations, string translation)
-    {
-        if(translations==null || translations.Count==0)
+    public static string Repeat(this char targetChar, int count) => new(targetChar, count);
+
+    public static (string, StringsCompareResult) GetClosestTo(this IReadOnlyList<string> translations,
+        string translation) {
+        if (translations == null || translations.Count == 0)
             return (null, StringsCompareResult.NotEqual);
-            
-        var bestOne  = translations[0];
-        var bestOneResult =  bestOne.CheckCloseness(translation);
-        for (int i = 1; i < translations.Count; i++)
-        {
+
+        var bestOne = translations[0];
+        var bestOneResult = bestOne.CheckCloseness(translation);
+        for (int i = 1; i < translations.Count; i++) {
             var res = translations[i].CheckCloseness(translation);
-            if (res > bestOneResult)
-            {
+            if (res > bestOneResult) {
                 bestOne = translations[i];
                 bestOneResult = res;
-            }                
+            }
         }
+
         return (bestOne, bestOneResult);
     }
-    
+
     public static StringsCompareResult CheckCloseness(this string wordA, string wordB) {
         if (wordA == null || wordB == null)
             return wordA == wordB ? StringsCompareResult.Equal : StringsCompareResult.NotEqual;
@@ -105,8 +109,7 @@ public static class StringExtensions {
         return StringsCompareResult.NotEqual;
     }
 
-    public static string Capitalize(this string word)
-    {
+    public static string Capitalize(this string word) {
         if (string.IsNullOrWhiteSpace(word))
             return word;
         word = word.ToLower();
@@ -116,24 +119,26 @@ public static class StringExtensions {
             return word;
         return capitalLetter + word.Substring(1);
     }
+
     public static bool IsRussian(this string englishWord) => englishWord.Count(e => e >= 'А' && e <= 'я') > 1;
-    
-    public static bool AreEqualIgnoreCase(this string wordA, string wordB) => wordA.Equals(wordB, StringComparison.OrdinalIgnoreCase);
-   
-    public static bool AreEqualIgnoreSmallMistakes(this string wordA, string wordB)
-    {
-        var m =CheckCloseness(wordA, wordB);
+
+    public static bool AreEqualIgnoreCase(this string wordA, string wordB) =>
+        wordA.Equals(wordB, StringComparison.OrdinalIgnoreCase);
+
+    public static bool AreEqualIgnoreSmallMistakes(this string wordA, string wordB) {
+        var m = CheckCloseness(wordA, wordB);
         return m == StringsCompareResult.Equal || m == StringsCompareResult.SmallMistakes;
     }
-
 }
-public enum StringsCompareResult
-{
+
+public enum StringsCompareResult {
     Equal = 3,
     SmallMistakes = 2,
-    BigMistakes  = 1,
+    BigMistakes = 1,
     NotEqual = 0,
 }
+
 public enum StarredHardness {
-    Hard, Easy
+    Hard,
+    Easy
 }

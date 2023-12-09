@@ -2,4 +2,6 @@
 
 namespace SayWhat.MongoDAL;
 
-public interface IMongoRepo { Task UpdateDb(); }
+public interface IMongoRepo {
+    Task UpdateDb();
+}

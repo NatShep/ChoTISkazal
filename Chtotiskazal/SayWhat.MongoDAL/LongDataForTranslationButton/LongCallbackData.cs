@@ -11,17 +11,18 @@ public class LongCallbackData {
         _word = word;
         _translation = translation;
     }
-    
+
     #region mongo fields
 
     public ObjectId Id { get; set; }
+
     [BsonElement(UserWordsRepo.OriginWordFieldName)]
     private string _word;
-    [BsonElement("tr")]
-    private string _translation;
+
+    [BsonElement("tr")] private string _translation;
 
     #endregion
-    
+
     public string Word => _word;
     public string Translation => _translation;
 }

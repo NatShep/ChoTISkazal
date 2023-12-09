@@ -38,13 +38,11 @@ public class UserWordsRepoTests {
     [TestCase(10, 1)]
     [TestCase(10, 10)]
     public async Task AddSeveral_GetWorstReturnWorstOnes(int worstCount, int bestCount) {
-        
         #region arrange
-        
+
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
         var worstOnes = new List<UserWordModel>();
-        for (int i = 0; i < worstCount; i++)
-        {
+        for (int i = 0; i < worstCount; i++) {
             string word1 = $"table{i}";
             string tranlation = $"стол{i}";
             var word = new UserWordModel(user.Id, word1, tranlation, i);
@@ -53,13 +51,11 @@ public class UserWordsRepoTests {
 
         var randomList = worstOnes.OrderBy(x => Rand.Next()).ToList();
 
-        foreach (var word in randomList)
-        {
+        foreach (var word in randomList) {
             await _repo.Add(word);
         }
 
-        for (int i = 0; i < bestCount; i++)
-        {
+        for (int i = 0; i < bestCount; i++) {
             string word = $"table{i}";
             string tranlation = $"стол{i}";
             double rate = i + worstCount;
@@ -69,12 +65,15 @@ public class UserWordsRepoTests {
         #endregion
 
         //TODO 
+
         #region act
-        
+
         #endregion
-        
+
         //TODO 
+
         #region assert
+
         /*
          for (int i = 0; i < worstCount; i++)
         {
@@ -84,6 +83,7 @@ public class UserWordsRepoTests {
             Assert.AreEqual(origin.RuTranslations[0].Word, current.RuTranslations[0].Word);
         }
         */
+
         #endregion
     }
 
@@ -93,8 +93,7 @@ public class UserWordsRepoTests {
     [TestCase(42)]
     public async Task AddSeveral_GetAllForUserReturnsThem(int count) {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             string word = $"table{i}";
             await _repo.Add(new UserWordModel(user.Id, word, "стол{i}", 0));
         }
@@ -143,11 +142,15 @@ public class UserWordsRepoTests {
         var word = new UserWordModel(user.Id, "table", "стол");
         await _repo.Add(word);
         word.AddTranslations(
-            new List<UserWordTranslation> {
-                new UserWordTranslation {
+            new List<UserWordTranslation>
+            {
+                new UserWordTranslation
+                {
                     Word = "таблица",
-                    Examples = new[] {
-                        new UserWordTranslationReferenceToExample() {
+                    Examples = new[]
+                    {
+                        new UserWordTranslationReferenceToExample()
+                        {
                             ExampleId = ObjectId.GenerateNewId()
                         }
                     }

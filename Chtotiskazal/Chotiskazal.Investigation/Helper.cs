@@ -10,16 +10,17 @@ static class Helper {
     public static string GetNonCleanName(string examName) => MapExamName(examName.Replace("Clean ", ""));
 
     public static string MapExamName(string examName) =>
-        examName switch {
+        examName switch
+        {
             "Eng is it right transltion" => "Eng is it right translation",
             "Ru Choose By Transcription" => "Choose Ru By Transcription",
             _ => examName
         };
 
     public static int Passed(this IEnumerable<Qmodel> a) => (100 * a.Count(a => a.Result)) / a.Count();
-        
+
     public static double PassedDouble(this IEnumerable<Qmodel> a) => (100.0 * a.Count(a => a.Result)) / a.Count();
-        
+
     public static void AppendTableItem(this StringBuilder sb, object a) {
         if (a == null)
             sb.Append("| --- ");
@@ -60,8 +61,7 @@ static class Helper {
         double sCo = 0;
         double count = exclusiveEnd - inclusiveStart;
 
-        for (int ctr = inclusiveStart; ctr < exclusiveEnd; ctr++)
-        {
+        for (int ctr = inclusiveStart; ctr < exclusiveEnd; ctr++) {
             double x = xVals[ctr];
             double y = yVals[ctr];
             sumCodeviates += x * y;
@@ -83,6 +83,5 @@ static class Helper {
         rsquared = dblR * dblR;
         yintercept = meanY - ((sCo / ssX) * meanX);
         slope = sCo / ssX;
-
     }
 }

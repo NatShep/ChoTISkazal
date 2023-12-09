@@ -7,7 +7,10 @@ namespace SayWhat.Bll;
 public class PaginationCollection<T> {
     public PaginationCollection() { }
 
-    public PaginationCollection(IReadOnlyList<T> origin) { _items = origin; }
+    public PaginationCollection(IReadOnlyList<T> origin) {
+        _items = origin;
+    }
+
     public int Count => _items.Count;
 
     public void Set(IReadOnlyList<T> items) {
@@ -19,6 +22,7 @@ public class PaginationCollection<T> {
 
     private IReadOnlyList<T> _items = Array.Empty<T>();
     private int _numberOfPaginate;
+
     public int Page
     {
         get
@@ -38,6 +42,7 @@ public class PaginationCollection<T> {
                 _numberOfPaginate = value;
         }
     }
+
     public void MoveNext() => Page++;
     public void MovePrev() => Page--;
     public T Current => _items.Any() ? _items[Page] : default;

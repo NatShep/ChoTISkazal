@@ -17,15 +17,13 @@ class AllExamplesDictionary {
     }
 
     public void AddExample(string en, string ru) {
-        if (en.StartsWith("<"))
-        {
+        if (en.StartsWith("<")) {
             en = en.Replace("<", "").Replace(">", "");
         }
 
         var words = en.ToLower().Split(new[] { " ", "-", "'s" }, StringSplitOptions.RemoveEmptyEntries);
 
-        foreach (string word in words)
-        {
+        foreach (string word in words) {
             var resultWord = word;
             //
             // if (word.EndsWith("'s"))
@@ -43,8 +41,8 @@ class AllExamplesDictionary {
     public List<EssentialPhrase> GetPhrases(string en, string ru) {
         var phrases = GetFor(en);
         var result = phrases
-                     .Where(p => p.Fits(en, ru))
-                     .ToList();
+            .Where(p => p.Fits(en, ru))
+            .ToList();
         return result;
     }
 
@@ -58,8 +56,7 @@ class AllExamplesDictionary {
 
         if (!_dictionary.ContainsKey(key))
             _dictionary.Add(key, new List<EssentialPhrase>());
-        else
-        {
+        else {
             if (_dictionary[key].Any(i => i.En == example.En))
                 return;
         }

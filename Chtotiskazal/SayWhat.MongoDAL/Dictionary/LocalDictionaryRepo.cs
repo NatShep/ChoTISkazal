@@ -32,7 +32,8 @@ public class LocalDictionaryRepo : IMongoRepo {
     public async Task UpdateDb() {
         await Collection.Indexes.DropAllAsync();
         var keys = Builders<DictionaryWord>.IndexKeys.Ascending(WordFieldBsonName);
-        var indexOptions = new CreateIndexOptions<DictionaryWord> {
+        var indexOptions = new CreateIndexOptions<DictionaryWord>
+        {
             Unique = true,
         };
         var model = new CreateIndexModel<DictionaryWord>(keys, indexOptions);

@@ -11,7 +11,7 @@ using SayWhat.MongoDAL.Examples;
 
 namespace PureVocabBuilder;
 
-public  class Operations {
+public class Operations {
     private UsersWordsService _userWordService;
     private LocalDictionaryService _localDictionaryService;
     private UserService _userService;
@@ -20,7 +20,11 @@ public  class Operations {
     private ExamplesRepo _examplesRepo;
     private LocalDictionaryRepo _localDictionaryRepo;
     private YandexDictionaryApiClient _yandexDictionaryClient;
-    public Operations(UsersWordsService userWordService, LocalDictionaryService localDictionaryService, UserService userService, LearningSetService learningSetService, AddWordService addWordService, ExamplesRepo examplesRepo, LocalDictionaryRepo localDictionaryRepo, YandexDictionaryApiClient yandexDictionaryClient) {
+
+    public Operations(UsersWordsService userWordService, LocalDictionaryService localDictionaryService,
+        UserService userService, LearningSetService learningSetService, AddWordService addWordService,
+        ExamplesRepo examplesRepo, LocalDictionaryRepo localDictionaryRepo,
+        YandexDictionaryApiClient yandexDictionaryClient) {
         _userWordService = userWordService;
         _localDictionaryService = localDictionaryService;
         _userService = userService;
@@ -43,39 +47,31 @@ public  class Operations {
         int saved = 0;
         int failures = 0;
         int number = 1;
-        foreach (var word in loaded)
-        {
+        foreach (var word in loaded) {
             var yaTranlations = await _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.En);
-            foreach (var translation in word.Translations)
-            {
+            foreach (var translation in word.Translations) {
                 var yaTrans = yaTranlations.FirstOrDefault(
                     t => t.TranslatedText.Equals(translation.Ru, StringComparison.InvariantCultureIgnoreCase));
                 var phrases = examplesDictionary.GetPhrases(word.En, translation.Ru);
-                
-                if (yaTrans?.Examples.Any()==true)
-                {
+
+                if (yaTrans?.Examples.Any() == true) {
                     translation.Phrases.AddRange(yaTrans.Examples.Select(EssentialHelper.ToEssentialPhrase));
-                    if (translation.Phrases.All(p => !p.Fits(word.En, translation.Ru)))
-                    {
+                    if (translation.Phrases.All(p => !p.Fits(word.En, translation.Ru))) {
                         //if all origins does not fit - add single clean example
-                        if (phrases.Any())
-                        {
+                        if (phrases.Any()) {
                             var e = phrases.OrderBy(e => e.En.Length).First();
                             translation.Phrases.Add(e);
                             optimized++;
                         }
                     }
-                    else
-                    {
+                    else {
                         good++;
                     }
 
                     continue;
                 }
-                else
-                {
-                    if (phrases.Any())
-                    {
+                else {
+                    if (phrases.Any()) {
                         translation.Phrases.AddRange(phrases.OrderBy(e => e.En.Length).Take(3));
                         saved++;
                     }
@@ -86,6 +82,7 @@ public  class Operations {
             word.Index = number;
             number++;
         }
+
         ChaosBllHelper.SaveJson(loaded, essentialPathWithExamplesResult);
     }
 
@@ -97,26 +94,21 @@ public  class Operations {
         int succ = 0;
         int fail = 0;
         int noCandidates = 0;
-        foreach (var word in loaded)
-        {
+        foreach (var word in loaded) {
             var fittedPhrases = word.Translations.SelectMany(t => examplesDictionary.GetPhrases(word.En, t.Ru))
                 .ToList();
-            if (fittedPhrases.Any())
-            {
+            if (fittedPhrases.Any()) {
                 succ++;
             }
-            else
-            {
+            else {
                 var candidates = examplesDictionary.GetFor(word.En);
-                if (candidates.Count == 0)
-                {
+                if (candidates.Count == 0) {
                     noCandidates++;
                     var res = await _yandexDictionaryClient.EnRuTranslateAsync(word.En);
                     var examples = res.SelectMany(r => r.Tr).SelectMany(t => t.GetPhrases(word.En)).ToList();
                     //await _examplesRepo.Add(examples);
                 }
-                else
-                {
+                else {
                     fail++;
                 }
             }
@@ -124,7 +116,8 @@ public  class Operations {
     }
 
     private async Task FilterEssentials() {
-        var blackList = new HashSet<string> {
+        var blackList = new HashSet<string>
+        {
             "en", "harry", "jackson", "indiana", "maryland", "con", "ss", "santa", "diego", "hong", "intel", "maine",
             "sql", "perl", "costa", "navy", "adam", "psp", "caribbean", "nebraska", "delaware", "toshiba",
             "institutional", "attempted", "sue", "communist", "stressed", "shocked", "ego", "aide", "spokesperson",
@@ -132,7 +125,8 @@ public  class Operations {
         };
 
 
-        var insertList = new Dictionary<string, string> {
+        var insertList = new Dictionary<string, string>
+        {
             { "secure", "безопасный" },
             { "venture", "отважиться" },
             { "easier", "полегче" }, { "char", "символ" }, { "tight", "тугой" }, { "heating", "обогрев" },
@@ -148,7 +142,8 @@ public  class Operations {
             { "trait ", "особенность" }, { "soak ", "замочить" }, { "unwilling ", "несклонный" },
             { "overlook ", "проглядеть" }, { "discourage ", "обескураживать" }, { "enact ", "вводить в действие" }
         };
-        var replaceList = new Dictionary<string, string>() {
+        var replaceList = new Dictionary<string, string>()
+        {
             { "shrug", "пожимать плечами" }, { "premises", "помещение" }, { "incur", "навлечь на себя" },
             { "dispose", "избавляться" }
         };
@@ -158,16 +153,14 @@ public  class Operations {
             "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/FilteredOnlyTranslations.essential";
 
         var loaded = ChaosBllHelper.LoadJson<List<EssentialWord>>(essentialPath);
-        foreach (string item in blackList)
-        {
+        foreach (string item in blackList) {
             var toRemove = loaded.FirstOrDefault(l => l.En == item);
             if (toRemove == null)
                 throw new InvalidOperationException();
             loaded.Remove(toRemove);
         }
 
-        foreach (var replacement in replaceList)
-        {
+        foreach (var replacement in replaceList) {
             var toReplace = loaded.FirstOrDefault(l => l.En == replacement.Key);
             if (toReplace == null)
                 throw new InvalidOperationException();
@@ -175,8 +168,7 @@ public  class Operations {
             toReplace.Translations.Add(new EssentialTranslation(replacement.Value, new List<EssentialPhrase>()));
         }
 
-        foreach (var replacement in insertList)
-        {
+        foreach (var replacement in insertList) {
             var toReplace = loaded.FirstOrDefault(l => l.En == replacement.Key.Trim());
             if (toReplace == null)
                 throw new InvalidOperationException();
@@ -190,25 +182,20 @@ public  class Operations {
 
         int i = 1;
         var missed = new List<string>();
-        foreach (var word in loaded)
-        {
-            try
-            {
+        foreach (var word in loaded) {
+            try {
                 if (word.Translations == null || word.Translations.Count == 0)
                     throw new InvalidOperationException();
                 word.Index = i;
                 var info = await _localDictionaryRepo.GetOrDefault(word.En.ToLower());
-                if (info == null)
-                {
+                if (info == null) {
                     missed.Add(word.En);
                 }
-                else
-                {
+                else {
                     word.Transcription = info.Transcription;
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Console.WriteLine(e);
             }
 
@@ -232,23 +219,19 @@ public  class Operations {
         int match = 0;
         int fail = 0;
         var words = new List<EssentialWord>();
-        for (int i = 0; i < manualEngRu.Length; i++)
-        {
+        for (int i = 0; i < manualEngRu.Length; i++) {
             var manual = manualEngRu[i];
             var yapi = yapiEnRu[i];
             string[] result = null;
-            if (manual.Item2.Length == 1 && manual.Item2[0] == yapi.Item2)
-            {
+            if (manual.Item2.Length == 1 && manual.Item2[0] == yapi.Item2) {
                 result = manual.Item2;
                 succ++;
             }
-            else if (manual.Item2.Contains(yapi.Item2))
-            {
+            else if (manual.Item2.Contains(yapi.Item2)) {
                 result = GetNotFullMatchEnter(i, manual.Item1, yapi.Item2, manual.Item2);
                 match++;
             }
-            else
-            {
+            else {
                 result = GetUnmatchedEnter(i, manual.Item1, yapi.Item2, manual.Item2);
                 fail++;
             }
@@ -278,15 +261,12 @@ public  class Operations {
     }
 
     private static string[] ChooseFromInput(string[] inputOptions) {
-        while (true)
-        {
+        while (true) {
             var input = Console.ReadLine();
             var items = input.Split(" ");
             List<string> result = new List<string>();
-            foreach (var item in items)
-            {
-                if (!int.TryParse(item, out var i) || i <= 0 || i > inputOptions.Length)
-                {
+            foreach (var item in items) {
+                if (!int.TryParse(item, out var i) || i <= 0 || i > inputOptions.Length) {
                     Console.WriteLine("invalid input");
                     continue;
                 }
@@ -310,5 +290,4 @@ public  class Operations {
 
         return ChooseFromInput(options);
     }
-
 }

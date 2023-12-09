@@ -18,8 +18,6 @@ public interface IBotCommandHandler {
     Task Execute(string argument, ChatRoom chat);
 }
 
-
-
 public class HelpBotCommandHandler : IBotCommandHandler {
     public static IBotCommandHandler Instance { get; } = new HelpBotCommandHandler();
     private HelpBotCommandHandler() { }
@@ -50,18 +48,20 @@ public class AddBotCommandHandler : IBotCommandHandler {
     private readonly TranslationSelectedUpdateHook _translationSelectedUpdateHook;
 
     public AddBotCommandHandler(
-        AddWordService addWordsService, ButtonCallbackDataService buttonCallbackDataService, TranslationSelectedUpdateHook translationSelectedUpdateHook) {
+        AddWordService addWordsService, ButtonCallbackDataService buttonCallbackDataService,
+        TranslationSelectedUpdateHook translationSelectedUpdateHook) {
         _addWordsService = addWordsService;
         _buttonCallbackDataService = buttonCallbackDataService;
         _translationSelectedUpdateHook = translationSelectedUpdateHook;
     }
 
-    
+
     public bool Acceptable(string text) => text == BotCommands.Translate;
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>
-        new TranslateWordsFlow(chat, _addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook).Enter(argument);
+        new TranslateWordsFlow(chat, _addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook)
+            .Enter(argument);
 }
 
 public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
@@ -77,13 +77,13 @@ public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
     public async Task Execute(string argument, ChatRoom chat) {
         var allSets = await _learningSetService.GetAllSets();
         var msg = new StringBuilder($"{chat.Texts.ChooseLearningSet}:\r\n");
-        foreach (var learningSet in allSets)
-        {
+        foreach (var learningSet in allSets) {
             msg.AppendLine(
                 chat.User.IsEnglishInterface
                     ? $"{BotCommands.LearningSetPrefix}_{learningSet.ShortName}   {learningSet.EnName}\r\n{learningSet.EnDescription}\r\n"
                     : $"{BotCommands.LearningSetPrefix}_{learningSet.ShortName}   {learningSet.RuName}\r\n{learningSet.RuDescription}\r\n");
         }
+
         await chat.SendMessageAsync(msg.ToString());
     }
 }
@@ -115,7 +115,7 @@ public class SettingsBotCommandHelper : IBotCommandHandler {
 
     public SettingsBotCommandHelper(
         UserService userService) {
-        _userService = userService; 
+        _userService = userService;
     }
 
     public bool Acceptable(string text) => text == BotCommands.Settings;
@@ -127,12 +127,16 @@ public class SettingsBotCommandHelper : IBotCommandHandler {
 public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
     private readonly UsersWordsService _userWordsService;
     private readonly LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
-    public ShowWellLearnedWordsCommandHandler(UsersWordsService userWordsService, LeafWellKnownWordsUpdateHook wellKnownWordsUpdateHook) {
+
+    public ShowWellLearnedWordsCommandHandler(UsersWordsService userWordsService,
+        LeafWellKnownWordsUpdateHook wellKnownWordsUpdateHook) {
         _userWordsService = userWordsService;
         _wellKnownWordsUpdateHook = wellKnownWordsUpdateHook;
     }
+
     public bool Acceptable(string text) => text == BotCommands.Words;
     public string ParseArgument(string text) => null;
+
     public Task Execute(string argument, ChatRoom chat) => new ShowWellKnownWordsFlow(
             chat, _userWordsService, _wellKnownWordsUpdateHook)
         .EnterAsync();
@@ -140,29 +144,39 @@ public class ShowWellLearnedWordsCommandHandler : IBotCommandHandler {
 
 public class StatsBotCommandHandler : IBotCommandHandler {
     private readonly ExamSettings _settings;
-    public StatsBotCommandHandler(ExamSettings settings) { _settings = settings; }
+
+    public StatsBotCommandHandler(ExamSettings settings) {
+        _settings = settings;
+    }
+
     public bool Acceptable(string text) => text == BotCommands.Stats;
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>
         chat.SendMarkdownMessageAsync(
-            StatsRenderer.GetStatsTextMarkdown(_settings,chat),
-            new[] {
-                new[] {
+            StatsRenderer.GetStatsTextMarkdown(_settings, chat),
+            new[]
+            {
+                new[]
+                {
                     InlineButtons.MainMenu(chat.Texts),
                     InlineButtons.Exam(chat.Texts),
                 },
                 new[] { InlineButtons.Translation(chat.Texts) },
-                new[] {
+                new[]
+                {
                     InlineButtons.WellLearnedWords(
-                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}) {Emojis.SoftMark}")
+                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore / 2, 10)}) {Emojis.SoftMark}")
                 }
             });
 }
 
 public class StartBotCommandHandler : IBotCommandHandler {
     private readonly Func<Task> _showMainMenu;
-    public StartBotCommandHandler(Func<Task> showMainMenu) { _showMainMenu = showMainMenu; }
+
+    public StartBotCommandHandler(Func<Task> showMainMenu) {
+        _showMainMenu = showMainMenu;
+    }
 
     public bool Acceptable(string text) => text == BotCommands.Start;
     public string ParseArgument(string text) => null;
@@ -178,7 +192,8 @@ public class SelectLearningSet : IBotCommandHandler {
     private readonly UsersWordsService _usersWordsService;
     private readonly AddWordService _addWordService;
 
-    public SelectLearningSet(LearningSetService learningSetService, LocalDictionaryService localDictionaryService, UserService userService, UsersWordsService usersWordsService, AddWordService addWordService) {
+    public SelectLearningSet(LearningSetService learningSetService, LocalDictionaryService localDictionaryService,
+        UserService userService, UsersWordsService usersWordsService, AddWordService addWordService) {
         _learningSetService = learningSetService;
         _localDictionaryService = localDictionaryService;
         _userService = userService;
@@ -192,26 +207,26 @@ public class SelectLearningSet : IBotCommandHandler {
 
     public async Task Execute(string argument, ChatRoom chat) {
         var allSets = await _learningSetService.GetAllSets();
-        var set = allSets.FirstOrDefault(s => s.ShortName.Equals(argument, StringComparison.InvariantCultureIgnoreCase));
-        if (set == null)
-        {
+        var set = allSets.FirstOrDefault(s =>
+            s.ShortName.Equals(argument, StringComparison.InvariantCultureIgnoreCase));
+        if (set == null) {
             await chat.SendMessageAsync(chat.Texts.LearningSetNotFound(argument));
             return;
         }
-        
+
         await new AddFromLearningSetFlow(
-            chat: chat, 
-            localDictionaryService: _localDictionaryService, 
-            set: set, 
+            chat: chat,
+            localDictionaryService: _localDictionaryService,
+            set: set,
             userService: _userService,
-            usersWordsService: _usersWordsService, 
+            usersWordsService: _usersWordsService,
             addWordService: _addWordService).EnterAsync();
     }
 }
 
 public class ReportBotCommandHandler : IBotCommandHandler {
     public static readonly ReportBotCommandHandler Instance = new ReportBotCommandHandler();
-    private ReportBotCommandHandler() {}
+    private ReportBotCommandHandler() { }
     public bool Acceptable(string text) => text == BotCommands.Report;
     public string ParseArgument(string text) => null;
 
@@ -224,10 +239,9 @@ public class ReportBotCommandHandler : IBotCommandHandler {
             .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToPreFormattedMono());
         Reporter.ReportUserIssue(message.GetMarkdownString());
         await chat.SendMessageAsync(chat.Texts.ReportWasSentEnterAdditionalInformationAboutTheReport);
-        
+
         var userComments = await chat.WaitUserTextInputAsync();
         Reporter.ReportUserIssue($"Comment: {header}\r\n '\r\n{userComments}\r\n'");
         await chat.SendMessageAsync(chat.Texts.ThankYouForYourCommentInReport);
-
     }
 }

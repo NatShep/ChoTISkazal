@@ -17,16 +17,14 @@ using SayWhat.MongoDAL.Words;
 namespace SayWhat.Bll;
 
 public static class ChaosBllHelper {
-    public static IEnumerable<(Example, UserWordTranslation)> GetExamplesThatLoadedAndFits(this UserWordModel wordModel) {
-        foreach (var translation in wordModel.RuTranslations)
-        {
-            foreach (var example in translation.GetDownloadedExamples())
-            {
+    public static IEnumerable<(Example, UserWordTranslation)>
+        GetExamplesThatLoadedAndFits(this UserWordModel wordModel) {
+        foreach (var translation in wordModel.RuTranslations) {
+            foreach (var example in translation.GetDownloadedExamples()) {
                 if (example.Fits(wordModel.Word, translation.Word))
                     yield return (example, translation);
             }
         }
-        yield break;
     }
 
     public static bool Fits(string enWord, string ruWord, string enPhrase, string ruPhrase) {
@@ -36,6 +34,7 @@ public static class ChaosBllHelper {
         return ruPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries)
             .Any(w => w.CheckCloseness(ruWord) != StringsCompareResult.NotEqual);
     }
+
     public static bool Fits(this Example example, string en, string ru) {
         var (ourEn, ourRu) = example.Deconstruct();
         return Fits(en, ru, ourEn, ourRu);
@@ -65,25 +64,29 @@ public static class ChaosBllHelper {
 
         var variants = definitions.SelectMany(
             r => r.Tr.Select(
-                tr => new {
+                tr => new
+                {
                     defenition = r,
                     translation = tr,
                 }));
 
-        var word = new DictionaryWord {
+        var word = new DictionaryWord
+        {
             Id = ObjectId.GenerateNewId(),
             Language = langFrom,
             Word = originText,
             Source = TranslationSource.Yadic,
             Transcription = definitions.FirstOrDefault()?.Ts,
             Translations = variants.Select(
-                    v => new DictionaryTranslationDbEntity() {
+                    v => new DictionaryTranslationDbEntity()
+                    {
                         Word = v.translation.Text,
                         Language = langTo,
                         Examples = v.translation.Ex?.Select(
                                            e =>
                                                new DictionaryReferenceToExample(
-                                                   new Example {
+                                                   new Example
+                                                   {
                                                        Id = ObjectId.GenerateNewId(),
                                                        OriginWord = originText,
                                                        TranslatedWord = v.translation.Text,
@@ -103,7 +106,8 @@ public static class ChaosBllHelper {
 
 
     public static string ToJson(this object v) {
-        var options = new JsonSerializerOptions {
+        var options = new JsonSerializerOptions
+        {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             WriteIndented = true,
@@ -111,7 +115,9 @@ public static class ChaosBllHelper {
         return JsonSerializer.Serialize(v, options);
     }
 
-    public static void SaveJson(object value, string path) { File.WriteAllText(path, value.ToJson()); }
+    public static void SaveJson(object value, string path) {
+        File.WriteAllText(path, value.ToJson());
+    }
 
     public static T LoadJson<T>(string path) {
         var text = File.ReadAllText(path);

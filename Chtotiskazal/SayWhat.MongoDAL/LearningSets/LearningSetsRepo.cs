@@ -7,8 +7,10 @@ namespace SayWhat.MongoDAL.LearningSets;
 
 public class LearningSetsRepo : IMongoRepo {
     private readonly IMongoDatabase _db;
+
     private IMongoCollection<LearningSet> Collection
         => _db.GetCollection<LearningSet>("learningSets");
+
     public LearningSetsRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(LearningSet model) => Collection.InsertOneAsync(model);

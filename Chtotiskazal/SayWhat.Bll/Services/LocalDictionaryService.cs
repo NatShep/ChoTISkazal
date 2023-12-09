@@ -84,13 +84,12 @@ public class LocalDictionaryService {
                     l => l.Word.Equals(
                         t.ru, StringComparison.InvariantCultureIgnoreCase)))
             .ToList();
-        if (newTranslations.Any())
-        {
+        if (newTranslations.Any()) {
             var localTranslations = localWord.Translations.ToList();
-            foreach (var newTranslation in newTranslations)
-            {
+            foreach (var newTranslation in newTranslations) {
                 localTranslations.Add(
-                    new DictionaryTranslationDbEntity {
+                    new DictionaryTranslationDbEntity
+                    {
                         Language = Language.Ru,
                         Word = newTranslation.ru,
                         Examples = Array.Empty<DictionaryReferenceToExample>()
@@ -103,21 +102,20 @@ public class LocalDictionaryService {
     }
 
     public async Task<List<DictionaryWord>> GetAll() {
-        var allWords  = await _dicRepository.GetAll();
+        var allWords = await _dicRepository.GetAll();
         var allExamples = await _exampleRepository.GetAll();
         var examples = allExamples.ToDictionary(k => k.Id, v => v);
-        foreach (var word in allWords)
-        {
-            foreach (var trans in word.Translations)
-            {
-                foreach (var example in trans.Examples)
-                {
+        foreach (var word in allWords) {
+            foreach (var trans in word.Translations) {
+                foreach (var example in trans.Examples) {
                     example.TryLoadExample(examples);
                 }
             }
         }
+
         return allWords;
     }
+
     public async Task<string[]> GetAllTranslationWords(string enword) {
         var results = await _dicRepository.GetOrDefault(enword);
         if (results == null)
@@ -129,8 +127,8 @@ public class LocalDictionaryService {
         var (_, translations) = await GetTranslationWithExamplesByEnWord(enword);
         return translations;
     }
-    
-    public async Task<(DictionaryWord,  IReadOnlyList<Translation>)> GetTranslationWithExamplesByEnWord(string enword) {
+
+    public async Task<(DictionaryWord, IReadOnlyList<Translation>)> GetTranslationWithExamplesByEnWord(string enword) {
         var word = await _dicRepository.GetOrDefault(enword);
         var translations = await GetTranslationsWithExamples(word);
         return (word, translations);
@@ -141,8 +139,7 @@ public class LocalDictionaryService {
             return Array.Empty<Translation>();
 
         var result = new List<Translation>();
-        foreach (var translation in word.Translations)
-        {
+        foreach (var translation in word.Translations) {
             var examples = await GetExamples(translation.Examples.Select(e => e.ExampleId));
             result.Add(
                 new Translation(
@@ -156,9 +153,9 @@ public class LocalDictionaryService {
         return result;
     }
 
-    private async Task<List<Example>> GetExamples(IEnumerable<ObjectId> examplesId) => 
-        examplesId.Any() 
-            ? await _exampleRepository.GetAll(examplesId) 
+    private async Task<List<Example>> GetExamples(IEnumerable<ObjectId> examplesId) =>
+        examplesId.Any()
+            ? await _exampleRepository.GetAll(examplesId)
             : new List<Example>();
 
     public async Task<IReadOnlyList<Translation>> GetTranslationsWithoutExamples(string enword) {
@@ -181,6 +178,7 @@ public class LocalDictionaryService {
                         .ToList()))
             .ToList();
     }
+
     /// <summary>
     /// Adds word, its translation and examples to database
     /// </summary>

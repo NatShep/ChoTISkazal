@@ -11,13 +11,14 @@ public class QuestionMetricRepo : IMongoRepo {
     public QuestionMetricRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(QuestionMetric metric) => Collection.InsertOneAsync(metric);
-    
+
     public Task<List<QuestionMetric>> GetFrom(DateTime from)
         => Collection
             .Find(Builders<QuestionMetric>.Filter.Gt("_id", ObjectId.GenerateNewId(from)))
             .ToListAsync();
-    
+
     public Task UpdateDb() => Task.CompletedTask;
+
     private IMongoCollection<QuestionMetric> Collection
         => _db.GetCollection<QuestionMetric>("questionMetrics");
 }

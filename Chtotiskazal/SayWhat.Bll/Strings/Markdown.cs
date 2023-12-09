@@ -1,22 +1,20 @@
-
-
 namespace SayWhat.Bll.Strings;
 
 public class Markdown {
     private readonly string _rawStr;
     private readonly string _markdownString;
     public static readonly Markdown Empty = new Markdown("", "");
-        
+
     private Markdown(string rawStr, string markdownString) {
         _rawStr = rawStr;
         _markdownString = markdownString;
     }
-        
+
     public static Markdown Escaped(string str) {
         var escapedStr = ConvertToMarkdownString(str);
-        return new Markdown(str, escapedStr);        
+        return new Markdown(str, escapedStr);
     }
-     
+
     public static Markdown Bypassed(string str) {
         return new Markdown(str, str);
     }

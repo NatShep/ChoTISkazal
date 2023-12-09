@@ -7,18 +7,19 @@ namespace SayWhat.MongoDAL.LongDataForTranslationButton;
 
 public class LongCallbackDataRepo : IMongoRepo {
     private readonly IMongoDatabase _db;
-    
+
     public const string LongDataForButtonCollectionName = "longTranslations";
     public const string WordFieldName = "w";
     public const string TranslateFieldName = "tr";
-    
+
     private IMongoCollection<LongCallbackData> Collection
         => _db.GetCollection<LongCallbackData>(LongDataForButtonCollectionName);
-    
+
     public LongCallbackDataRepo(IMongoDatabase db) => _db = db;
     public Task Add(LongCallbackData callbackData) => Collection.InsertOneAsync(callbackData);
     public List<LongCallbackData> GetAll() => Collection.AsQueryable().ToList();
     public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
+
     public Task<LongCallbackData> GetCallbackDataOrDefault(string translation) =>
         Collection
             .Find(Builders<LongCallbackData>.Filter.Eq(TranslateFieldName, translation))

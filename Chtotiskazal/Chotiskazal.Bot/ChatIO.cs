@@ -23,6 +23,7 @@ public class ChatIO {
     private readonly SmallChatHistory _chatHistory = new SmallChatHistory(5);
 
     private IChatUpdateHook[] _updateHooks = Array.Empty<IChatUpdateHook>();
+
     public ChatIO(TelegramBotClient client, Chat chat) {
         _client = client;
         ChatId = chat.Id;
@@ -36,7 +37,7 @@ public class ChatIO {
             return _chatHistory.GetHistory();
         }
         catch (Exception e) {
-            Reporter.ReportError(ChatId.Identifier,"Cannot get chat history", e);
+            Reporter.ReportError(ChatId.Identifier, "Cannot get chat history", e);
             return Array.Empty<string>();
         }
     }
@@ -47,14 +48,13 @@ public class ChatIO {
     internal void OnUpdate(Update update) {
         _chatHistory.OnInput(update);
         Reporter.OnUserInput(ChatId.Identifier);
-        foreach (var hook in _updateHooks)
-        {
-            if (hook.CanBeHandled(update))
-            {
+        foreach (var hook in _updateHooks) {
+            if (hook.CanBeHandled(update)) {
                 var _ = hook.Handle(update);
                 return;
             }
         }
+
         _senderChannel.Writer.TryWrite(update);
     }
 
@@ -70,7 +70,7 @@ public class ChatIO {
     }
 
     public Task SendMessageAsync(string message, params InlineKeyboardButton[] buttons) {
-        _chatHistory.OnOutputMessage(message,buttons);
+        _chatHistory.OnOutputMessage(message, buttons);
         AssertTooLongButtonData(buttons);
         return _client.SendTextMessageAsync(
             ChatId, message,
@@ -78,8 +78,8 @@ public class ChatIO {
     }
 
     public Task SendMessageAsync(string message, InlineKeyboardButton[][] buttons) {
-        _chatHistory.OnOutputMessage(message,buttons);
-        AssertTooLongButtonData(buttons.SelectMany(b=>b));
+        _chatHistory.OnOutputMessage(message, buttons);
+        AssertTooLongButtonData(buttons.SelectMany(b => b));
         return _client.SendTextMessageAsync(ChatId, message, replyMarkup: new InlineKeyboardMarkup(buttons));
     }
 
@@ -94,17 +94,19 @@ public class ChatIO {
     }
 
     public async Task<int> SendMessageAsync(Markdown message, InlineKeyboardButton[][] buttons) {
-        _chatHistory.OnOutputMarkdownMessage(message,buttons);
-        AssertTooLongButtonData(buttons.SelectMany(b=>b));
+        _chatHistory.OnOutputMarkdownMessage(message, buttons);
+        AssertTooLongButtonData(buttons.SelectMany(b => b));
         return (await _client.SendTextMessageAsync(
             ChatId, message.GetMarkdownString(),
             replyMarkup: new InlineKeyboardMarkup(buttons),
             parseMode: ParseMode.MarkdownV2)).MessageId;
     }
+
     private void AssertTooLongButtonData(IEnumerable<InlineKeyboardButton> selectMany) {
         foreach (var button in selectMany) {
-            if(button.CallbackData?.Length>=InlineButtons.MaxCallbackDataByteSizeUtf8)
-                Reporter.ReportError(ChatId.Identifier, $"Too long button data: Text:'{button.Text}'  Data:'{button.CallbackData}'");
+            if (button.CallbackData?.Length >= InlineButtons.MaxCallbackDataByteSizeUtf8)
+                Reporter.ReportError(ChatId.Identifier,
+                    $"Too long button data: Text:'{button.Text}'  Data:'{button.CallbackData}'");
         }
     }
 
@@ -113,22 +115,17 @@ public class ChatIO {
         var upd = await _senderChannel.Reader.ReadAsync();
         _chatHistory.OnInput(upd);
         string text = null;
-        if (upd.CallbackQuery != null)
-        {
+        if (upd.CallbackQuery != null) {
             await _client.AnswerCallbackQueryAsync(upd.CallbackQuery.Id);
             text = upd.CallbackQuery.Data;
         }
-        else
-        {
+        else {
             text = upd.Message?.Text;
         }
-        
-        if(text!=null)
-        {
-            foreach (var botCommandHandler in CommandHandlers)
-            {
-                if (botCommandHandler.Acceptable(text))
-                {
+
+        if (text != null) {
+            foreach (var botCommandHandler in CommandHandlers) {
+                if (botCommandHandler.Acceptable(text)) {
                     var argument = botCommandHandler.ParseArgument(text);
                     throw new ProcessInterruptedWithMenuCommand(argument, botCommandHandler);
                 }
@@ -140,8 +137,7 @@ public class ChatIO {
     }
 
     public async Task<string> WaitInlineKeyboardInput() {
-        while (true)
-        {
+        while (true) {
             var res = await WaitUserInputAsync();
             var data = res.CallbackQuery?.Data;
             if (data != null) {
@@ -159,8 +155,7 @@ public class ChatIO {
     }
 
     public async Task<int> WaitInlineIntKeyboardInput() {
-        while (true)
-        {
+        while (true) {
             var res = await WaitUserInputAsync();
             if (res.CallbackQuery != null && int.TryParse(res.CallbackQuery.Data, out var i))
                 return i;
@@ -168,8 +163,7 @@ public class ChatIO {
     }
 
     public async Task<string> WaitUserTextInputAsync() {
-        while (true)
-        {
+        while (true) {
             var res = await WaitUserInputAsync();
             var txt = res.Message?.Text;
             if (!string.IsNullOrWhiteSpace(txt))
@@ -183,8 +177,7 @@ public class ChatIO {
     }
 
     public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[] buttons) {
-        try
-        {
+        try {
             _chatHistory.OnEditMessageButtons(buttons);
             AssertTooLongButtonData(buttons);
             await _client.EditMessageReplyMarkupAsync(
@@ -192,76 +185,67 @@ public class ChatIO {
                 new InlineKeyboardMarkup(buttons.Select(b => new[] { b })));
             return true;
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return false;
         }
     }
 
     public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[][] buttons) {
-        try
-        {
+        try {
             _chatHistory.OnEditMessageButtons(buttons);
-            AssertTooLongButtonData(buttons.SelectMany(b=>b));
+            AssertTooLongButtonData(buttons.SelectMany(b => b));
             await _client.EditMessageReplyMarkupAsync(
                 ChatId, messageId,
                 new InlineKeyboardMarkup(buttons));
             return true;
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return false;
         }
     }
 
     public async Task<bool> EditMessageText(int messageId, string newText) {
-        try
-        {
+        try {
             _chatHistory.OnEditMessageText(newText);
             await _client.EditMessageTextAsync(ChatId, messageId, newText);
             return true;
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return false;
         }
     }
 
-    public async Task<bool> EditMessageAsync(int messageId, Markdown newText, InlineKeyboardMarkup inlineKeyboard = null) {
-        try
-        {
+    public async Task<bool> EditMessageAsync(int messageId, Markdown newText,
+        InlineKeyboardMarkup inlineKeyboard = null) {
+        try {
             _chatHistory.OnEditMarkdownMessageText(newText);
             await _client.EditMessageTextAsync(
-                ChatId, messageId, newText.GetMarkdownString(), parseMode: ParseMode.MarkdownV2, replyMarkup: inlineKeyboard);
+                ChatId, messageId, newText.GetMarkdownString(), parseMode: ParseMode.MarkdownV2,
+                replyMarkup: inlineKeyboard);
             return true;
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return false;
         }
     }
 
     public async Task<bool> AnswerCallbackQueryWithTooltip(string callbackQueryId, string s) {
-        try
-        {
+        try {
             _chatHistory.OnAnswerWithTooltip(s);
             await _client.AnswerCallbackQueryAsync(callbackQueryId, s, false);
             return true;
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return false;
         }
     }
 
     public async Task ConfirmCallback(string callbackQueryId) {
-        try
-        {
+        try {
             _chatHistory.InputConfirmCallback();
             await _client.AnswerCallbackQueryAsync(callbackQueryId);
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             // ignored
         }
     }
