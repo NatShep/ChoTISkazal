@@ -55,13 +55,13 @@ public class UsersWordsService {
         }
     }
 
-    public async Task RegisterFailure(UserWordModel userWordModelForLearning, double failScores) {
-        userWordModelForLearning.OnQuestionFailed(failScores);
+    public async Task RegisterFailure(UserWordModel userWordModelForLearning, double questionFailScore) {
+        userWordModelForLearning.OnQuestionFailed(questionFailScore);
         await _userWordsRepository.UpdateMetrics(userWordModelForLearning);
     }
 
-    public async Task RegisterSuccess(UserWordModel model, double passScores) {
-        model.OnQuestionPassed(passScores);
+    public async Task RegisterSuccess(UserWordModel model, double questionPassScore) {
+        model.OnQuestionPassed(questionPassScore);
         await _userWordsRepository.UpdateMetrics(model);
     }
 

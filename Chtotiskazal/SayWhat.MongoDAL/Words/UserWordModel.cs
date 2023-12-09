@@ -132,27 +132,20 @@ public class UserWordModel {
             .ToList()
             .GetRandomItemOrNull();
 
-    public void OnQuestionPassed(double scores) {
-        _absoluteScore += scores;
-        if (_absoluteScore > WordLeaningGlobalSettings.MaxWordAbsScore)
-            _absoluteScore = WordLeaningGlobalSettings.MaxWordAbsScore;
+    public void OnQuestionPassed(double questionPassScore) {
+        _absoluteScore = LearnMechanics.CalculateAbsoluteScoreOnSuccessAnswer(questionPassScore, this);
         _lastQuestionAskedTimestamp = DateTime.Now;
         _questionAsked++;
         _questionPassed++;
         _scoreUpdatedTimestamp = DateTime.Now;
     }
 
-    public void OnQuestionFailed(double scores) {
-        _absoluteScore -= scores;
-        if (_absoluteScore > WordLeaningGlobalSettings.LearnedWordMinScore)
-            _absoluteScore = WordLeaningGlobalSettings.WellDoneWordMinScore;
-        if (_absoluteScore < 0)
-            _absoluteScore = 0;
+    public void OnQuestionFailed(double questionFailScore) {
+        _absoluteScore = LearnMechanics.CalculateAbsoluteScoreOnFailedAnswer(questionFailScore, this);
         _questionAsked++;
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
         _scoreUpdatedTimestamp = DateTime.Now;
     }
-
 
     public void RefreshScoreUpdate() {
         //  _currentOrderScore = AbsoluteScore;
