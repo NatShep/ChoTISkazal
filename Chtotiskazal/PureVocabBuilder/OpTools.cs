@@ -2,13 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using SayWhat.Bll.Dto;
-using SayWhat.MongoDAL;
-using SayWhat.MongoDAL.Examples;
 
 namespace PureVocabBuilder;
 

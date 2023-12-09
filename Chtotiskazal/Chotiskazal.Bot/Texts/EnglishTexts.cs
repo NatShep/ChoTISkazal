@@ -152,7 +152,7 @@ public class EnglishTexts : IInterfaceTexts {
                .NewLine()
                .NewLine() +
            Markdown.Escaped(word.Capitalize()).ToSemiBold() +
-           Markdown.Escaped($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}").ToPreFormattedMono();
+           Markdown.Escaped($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}").ToQuotationMono();
 
     public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
@@ -161,7 +161,7 @@ public class EnglishTexts : IInterfaceTexts {
         => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
     public Markdown LearnMoreWords(in int length)
-        => Markdown.Escaped($"Good job! You have learned {length} words!");
+        => Markdown.Escaped($"Good job! You have learned {length} words");
 
     public Markdown LearnSomeWords(in int length)
         => Markdown.Escaped($"You have learned {length} words. Let's do more!");

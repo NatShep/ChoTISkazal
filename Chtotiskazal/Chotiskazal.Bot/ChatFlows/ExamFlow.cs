@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
@@ -225,7 +224,7 @@ public class ExamFlow
             .Aggregate(Markdown.Empty, (current, pairModel) =>
                 current + Markdown.Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}\r\n"));
 
-        markdown += messageWithListOfWords.ToPreFormattedMono()
+        markdown += messageWithListOfWords.ToQuotationMono()
             .NewLine()
             .AddEscaped($"... {Chat.Texts.thenClickStart}");
 

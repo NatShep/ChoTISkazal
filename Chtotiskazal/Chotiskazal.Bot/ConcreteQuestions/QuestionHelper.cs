@@ -18,11 +18,12 @@ public static class QuestionHelper {
             .Append(englishWord)
             .Shuffle()
             .ToArray();
-    
-    public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation, int count)
+
+    public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation,
+        int count)
         => list
             .SelectMany(e => e.TextTranslations)
-            .Where(e=>e != translation.Word)
+            .Where(e => e != translation.Word)
             .Distinct()
             .Shuffle()
             .Take(count)
@@ -30,29 +31,25 @@ public static class QuestionHelper {
             .Shuffle()
             .ToArray();
 
-    public static async Task<string> ChooseVariantsFlow(ChatRoom chat, string target, string[] variants)
-    {
-        if(variants.Any(c=>c.Length < 38))
+    public static async Task<string> ChooseVariantsFlow(ChatRoom chat, string target, string[] variants) {
+        if (variants.Any(c => c.Length < 38))
             await PassForShortVariants(chat, target, variants);
         else
             await PassForLongVariants(chat, target, variants);
 
         var choice = await chat.TryWaitInlineIntKeyboardInput();
-        if(choice==null)
+        if (choice == null)
             return null;
 
         return variants[choice.Value];
     }
 
-    private static Task PassForShortVariants(ChatRoom chat, string target, string[] variants)
-    {
+    private static Task PassForShortVariants(ChatRoom chat, string target, string[] variants) {
         var msg = QuestionMarkups.TranslateTemplate(target, chat.Texts.ChooseTheTranslation);
         return chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
     }
 
-    private static Task PassForLongVariants(ChatRoom chat, string target, string[] variants)
-    {
-
+    private static Task PassForLongVariants(ChatRoom chat, string target, string[] variants) {
         var msg = target
             .ToSemiBoldMarkdown()
             .NewLine()
@@ -61,16 +58,15 @@ public static class QuestionHelper {
             .NewLine();
 
         int num = 0;
-        foreach (var variant in variants)
-        {
+        foreach (var variant in variants) {
             num++;
             msg = msg.NewLine()
-                .AddMarkdown((num+". ").ToSemiBoldMarkdown())
+                .AddMarkdown((num + ". ").ToSemiBoldMarkdown())
                 .AddEscaped(variant);
         }
 
         var markup = QuestionMarkups.FreeTemplateMarkdown(msg);
         return chat.SendMarkdownMessageAsync(markup, InlineButtons.CreateVariants(
-            variants.Select((_,i)=>(i+1).ToString())));
+            variants.Select((_, i) => (i + 1).ToString())));
     }
 }

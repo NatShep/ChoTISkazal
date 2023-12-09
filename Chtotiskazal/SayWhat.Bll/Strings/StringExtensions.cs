@@ -15,7 +15,7 @@ public static class StringExtensions {
     }
 
     public static Markdown ToPreFormattedMonoMarkdown(this string s) {
-        return Markdown.Escaped(s).ToPreFormattedMono();
+        return Markdown.Escaped(s).ToQuotationMono();
     }
 
     public static Markdown ToMonoMarkdown(this string s) {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll.Services;
@@ -80,9 +79,6 @@ public class ShowWellKnownWordsFlow {
             _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
             _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
             
-            //TODO зачем это? Выше формируется строка с маркдаун форматированием, но где она применяется? 
-            //_wellKnownWordsUpdateHook.SetBeginningMessage(message.GetMarkdownString());
-
             buttons = new[] {
                 WellKnownWordsHelper.GetPagingKeys(),
                 new[] {

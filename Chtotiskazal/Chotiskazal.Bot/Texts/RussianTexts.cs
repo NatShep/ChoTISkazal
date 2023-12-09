@@ -161,7 +161,7 @@ public class RussianTexts : IInterfaceTexts {
         => "Будто ничего и не было";
 
     public Markdown LearnMoreWords(in int length)
-        => Markdown.Escaped($"Молодец! Ты выучил {length} слов! Давай еще!");
+        => Markdown.Escaped($"Молодец! Ты выучил {length} слов");
 
     public Markdown LearnSomeWords(in int length)
         => Markdown.Escaped($"Выучено слов: {length}. Давай еще!");

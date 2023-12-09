@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
-using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;

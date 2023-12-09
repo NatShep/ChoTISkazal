@@ -4,7 +4,6 @@ using System.Text;
 using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
-using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows;
@@ -24,7 +23,7 @@ public static class StatsRenderer {
         Render7WeeksCalendarMarkdown(settings, chat.User.LastDaysStats
                 .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
                 .ToArray(), chat.Texts)
-            .ToPreFormattedMono()
+            .ToQuotationMono()
             .NewLine(); //+
     //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
@@ -80,19 +79,19 @@ public static class StatsRenderer {
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
                                                  $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}\r\n" +
                                                  $"  {chat.Texts.StatsScore}: {(int) chat.User.GamingScore}\r\n")
-                                    .ToPreFormattedMono() +
+                                    .ToQuotationMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisMonth}:\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
                                                  $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
                                                  $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
                                                  $"  {chat.Texts.StatsScore}: {(int) lastMonth.GameScoreChanging}\r\n")
-                                    .ToPreFormattedMono() +
+                                    .ToQuotationMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisDay}:\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +
                                                  $"  {chat.Texts.StatsLearnedWell}: {lastDay.WordsLearnt}\r\n" +
                                                  $"  {chat.Texts.StatsExamsPassed}: {lastDay.LearningDone}/{settings.ExamsCountGoalForDay}\r\n" +
                                                  $"  {chat.Texts.StatsScore}: {(int)lastDay.GameScoreChanging}\r\n")
-                                    .ToPreFormattedMono() +
+                                    .ToQuotationMono() +
                                 Markdown.Escaped($" {chat.Texts.StatsActivityForLast7Weeks}:\r\n");
 
         return statsTextMarkdown;

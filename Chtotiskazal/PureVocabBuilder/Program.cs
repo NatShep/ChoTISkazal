@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using SayWhat.Bll;
-using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
-using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.LearningSets;

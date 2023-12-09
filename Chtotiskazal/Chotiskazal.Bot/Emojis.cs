@@ -22,4 +22,5 @@ public static class Emojis {
     public static string Gear = "⚙️";
     public static string RuFlag = "🇷🇺";
     public static string EnFlag = "🇬🇧";
+    public static string Question = "❔";
 }

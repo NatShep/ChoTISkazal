@@ -3,7 +3,8 @@ using SayWhat.Bll.Strings;
 namespace Chotiskazal.Bot.Questions;
 
 public static class QuestionMarkups {
-    private static readonly Markdown QuestionHeader = Markdown.Escaped("---❔---").ToPreFormattedMono();
+    private static readonly Markdown QuestionHeader = Markdown.Escaped($"---{Emojis.Question}---").ToMonoWord();
+    
     public static Markdown FreeTemplateMarkdown(Markdown s) => QuestionHeader + Markdown.Escaped("\r\n") + s;
 
     public static Markdown TranslateTemplate(string word, string instruction)

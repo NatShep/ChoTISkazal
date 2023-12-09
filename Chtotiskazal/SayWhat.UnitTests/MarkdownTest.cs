@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System.Text;
 using Chotiskazal.Bot;
+using Chotiskazal.Bot.Texts;
+using MongoDB.Bson;
 using NUnit.Framework;
 using SayWhat.Bll.Strings;
+using SayWhat.MongoDAL;
+using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.UnitTests;
 
@@ -147,9 +151,9 @@ public class MarkdownTest {
     public void ToPreFormattedMonoTextTest(string s1, string s2, string expected) {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
-        Assert.AreEqual(expected, m1.AddMarkdown(m2).ToPreFormattedMono().GetMarkdownString());
-        Assert.AreEqual(expected, m1.AddEscaped(s2).ToPreFormattedMono().GetMarkdownString());
-        Assert.AreEqual(expected, (m1 + m2).ToPreFormattedMono().GetMarkdownString());
+        Assert.AreEqual(expected, m1.AddMarkdown(m2).ToQuotationMono().GetMarkdownString());
+        Assert.AreEqual(expected, m1.AddEscaped(s2).ToQuotationMono().GetMarkdownString());
+        Assert.AreEqual(expected, (m1 + m2).ToQuotationMono().GetMarkdownString());
     }
 
     [TestCase("markdown1", "markdown2", "markdown1```\r\nmarkdown2\r\n```")]
@@ -160,7 +164,7 @@ public class MarkdownTest {
         var m1 = Markdown.Escaped(s1);
         var m2 = Markdown.Escaped(s2);
         Assert.AreEqual(expected, m1.AddMarkdown(s2.ToPreFormattedMonoMarkdown()).GetMarkdownString());
-        Assert.AreEqual(expected, (m1 + m2.ToPreFormattedMono()).GetMarkdownString());
+        Assert.AreEqual(expected, (m1 + m2.ToQuotationMono()).GetMarkdownString());
     }
 
     [TestCase("markdown1", "```\r\nmarkdown1\r\n```")]
@@ -168,6 +172,37 @@ public class MarkdownTest {
         var sb = new StringBuilder();
         sb.Append($"```\r\n{Markdown.Escaped(s).GetMarkdownString()}\r\n```");
         Assert.AreEqual(expected, sb.ToString().ToBypassedMarkdown().GetMarkdownString());
+    }
+
+    [Test]
+    public void MarkdownIntegrationTest() {
+        var texts = new EnglishTexts();
+        var doneMessageMarkdown = Markdown.Escaped($"{texts.LearningDone}:").ToSemiBold()
+            .AddEscaped($" {1}/{2}")
+            .NewLine();
+
+        doneMessageMarkdown = doneMessageMarkdown.NewLine() +
+                              new EnglishTexts().LearnMoreWords(42).ToSemiBold().AddEscaped(":")
+                                  .NewLine();
+        var newWellLearnedWords = new List<UserWordModel>()
+        {
+            new(ObjectId.GenerateNewId(), "Foo", TranslationDirection.EnRu, 0, new UserWordTranslation("Фуу")),
+            new(ObjectId.GenerateNewId(), "Bar", TranslationDirection.EnRu, 0, new UserWordTranslation("Бар")),
+        };
+
+
+        foreach (var word in newWellLearnedWords) {
+            doneMessageMarkdown = doneMessageMarkdown
+                .AddEscaped($"{Emojis.HeavyPlus} ")
+                .AddEscaped(word.Word)
+                .NewLine();
+        }
+
+        Assert.AreEqual($"*Learning done:* 1/2\r\n\r\n" +
+                        $"*Good job\\! You have learned 42 words\\!*:\r\n" +
+                        $"{Emojis.HeavyPlus} Foo\r\n" +
+                        $"{Emojis.HeavyPlus} Bar\r\n"
+            , doneMessageMarkdown.GetMarkdownString());
     }
 
     [Test]

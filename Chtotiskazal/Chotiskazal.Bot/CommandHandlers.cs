@@ -236,7 +236,7 @@ public class ReportBotCommandHandler : IBotCommandHandler {
                      $"{chat.User.TelegramId}:{chat.User.TelegramFirstName}-{chat.User.TelegramLastName}\r\n";
         var message = Markdown.Escaped($"Report {header}")
             .NewLine()
-            .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToPreFormattedMono());
+            .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToQuotationMono());
         Reporter.ReportUserIssue(message.GetMarkdownString());
         await chat.SendMessageAsync(chat.Texts.ReportWasSentEnterAdditionalInformationAboutTheReport);
 
