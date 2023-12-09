@@ -3,7 +3,8 @@ using System.Text;
 using System.Timers;
 using Serilog;
 
-namespace SayWhat.Bll.Statistics {
+namespace SayWhat.Bll.Statistics;
+
 public static class ReportSenderJob {
     private static DateTime _launchTime;
     private static Timer _timer;
@@ -57,6 +58,4 @@ public static class ReportSenderJob {
 
         return sb.ToString();
     }
-}
-
 }

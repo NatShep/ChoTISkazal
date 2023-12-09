@@ -1,8 +1,7 @@
 ﻿using NUnit.Framework;
-using SayWhat.Bll;
 using SayWhat.Bll.Strings;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.UnitTests;
 
 public class StringHelperTest {
     [TestCase("Something",0, "")]
@@ -84,6 +83,4 @@ public class StringHelperTest {
     [TestCase("вася", "петя")]
     public void CheckMistakes_returnsNotEqual(string wordA, string wordB)
         => Assert.AreEqual(StringsCompareResult.NotEqual, wordA.CheckCloseness(wordB));
-}
-
 }

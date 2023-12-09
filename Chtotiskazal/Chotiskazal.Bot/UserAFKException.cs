@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Chotiskazal.Bot
+namespace Chotiskazal.Bot;
+
+// ReSharper disable once InconsistentNaming
+internal class UserAFKException : Exception
 {
-    // ReSharper disable once InconsistentNaming
-    internal class UserAFKException : Exception
-    {
-    }
 }

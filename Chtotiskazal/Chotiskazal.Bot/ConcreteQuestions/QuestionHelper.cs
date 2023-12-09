@@ -1,34 +1,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ConcreteQuestions {
+namespace Chotiskazal.Bot.ConcreteQuestions;
+
 public static class QuestionHelper {
     public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
         => list
-           .Where(p => p.Word != englishWord)
-           .Select(e => e.Word)
-           .Shuffle()
-           .Take(count)
-           .Append(englishWord)
-           .Shuffle()
-           .ToArray();
+            .Where(p => p.Word != englishWord)
+            .Select(e => e.Word)
+            .Shuffle()
+            .Take(count)
+            .Append(englishWord)
+            .Shuffle()
+            .ToArray();
     
     public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation, int count)
         => list
-           .SelectMany(e => e.TextTranslations)
-           .Where(e=>e != translation.Word)
-           .Distinct()
-           .Shuffle()
-           .Take(count)
-           .Append(translation.Word)
-           .Shuffle()
-           .ToArray();
+            .SelectMany(e => e.TextTranslations)
+            .Where(e=>e != translation.Word)
+            .Distinct()
+            .Shuffle()
+            .Take(count)
+            .Append(translation.Word)
+            .Shuffle()
+            .ToArray();
 
     public static async Task<string> ChooseVariantsFlow(ChatRoom chat, string target, string[] variants)
     {
@@ -71,7 +71,6 @@ public static class QuestionHelper {
 
         var markup = QuestionMarkups.FreeTemplateMarkdown(msg);
         return chat.SendMarkdownMessageAsync(markup, InlineButtons.CreateVariants(
-                    variants.Select((_,i)=>(i+1).ToString())));
+            variants.Select((_,i)=>(i+1).ToString())));
     }
 }
-}   

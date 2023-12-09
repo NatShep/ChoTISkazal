@@ -1,7 +1,7 @@
 using System;
 using Chotiskazal.Bot;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 public static class InputConfigurationReader{
 
@@ -23,6 +23,4 @@ public static class InputConfigurationReader{
             throw;
         }
     }
-}
-
 }

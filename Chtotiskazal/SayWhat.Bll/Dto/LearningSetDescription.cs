@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using SayWhat.Bll.Dto;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Dto;
 
 public class LearningSetDescription {
     public LearningSetDescription(string shortName, string enName, string ruName, string ruDescription, string enDescription, List<EssentialWord> words) {
@@ -18,6 +17,4 @@ public class LearningSetDescription {
     public string RuName { get;  }
     public string EnDescription { get;  }
     public string RuDescription { get;  }
-}
-
 }

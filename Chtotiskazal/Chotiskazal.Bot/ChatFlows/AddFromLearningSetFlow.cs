@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.LearningSets;
 using SayWhat.MongoDAL.Users;
-using SayWhat.MongoDAL.WordKits;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
 
 public class AddFromLearningSetFlow {
     private ChatRoom Chat { get; }
@@ -220,12 +219,12 @@ public class AddFromLearningSetFlow {
     private static Example GetExampleOrNull(
         WordInLearningSet wordInLearningSet, Translation[] allowedTranslations) {
         var allowed = allowedTranslations.SelectMany(t => t.Examples)
-                                         .Where(e => wordInLearningSet.AllowedExamples.Contains(e.Id));
+            .Where(e => wordInLearningSet.AllowedExamples.Contains(e.Id));
         var bestFit = allowed.Where(
-                                 a => a.TranslatedPhrase.Contains(
-                                     a.TranslatedWord, StringComparison.InvariantCultureIgnoreCase))
-                             .OrderBy(e => e.TranslatedPhrase.Length)
-                             .FirstOrDefault();
+                a => a.TranslatedPhrase.Contains(
+                    a.TranslatedWord, StringComparison.InvariantCultureIgnoreCase))
+            .OrderBy(e => e.TranslatedPhrase.Length)
+            .FirstOrDefault();
         return bestFit ??
                allowed
                    .OrderBy(e => e.TranslatedPhrase.Length)
@@ -235,19 +234,17 @@ public class AddFromLearningSetFlow {
     private static Translation[] SearchForAllowedTranslations(
         IReadOnlyList<Translation> translations, WordInLearningSet wordInLearningSet) {
         var allowedTranslations = translations.Where(
-                                                  t =>
-                                                      wordInLearningSet.AllowedTranslations.Any(
-                                                          a => a.Equals(
-                                                              t.TranslatedText,
-                                                              StringComparison.InvariantCultureIgnoreCase))
-                                              )
-                                              .Take(3)
-                                              .ToArray();
+                t =>
+                    wordInLearningSet.AllowedTranslations.Any(
+                        a => a.Equals(
+                            t.TranslatedText,
+                            StringComparison.InvariantCultureIgnoreCase))
+            )
+            .Take(3)
+            .ToArray();
 
         if (!allowedTranslations.Any())
             allowedTranslations = new[] { translations.First() };
         return allowedTranslations;
     }
-}
-
 }

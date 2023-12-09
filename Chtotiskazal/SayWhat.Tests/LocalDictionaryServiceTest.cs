@@ -5,7 +5,7 @@ using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.MongoDAL.Tests;
 
 public class LocalDictionaryServiceTest {
     private LocalDictionaryRepo _dictionaryRepo;
@@ -32,8 +32,8 @@ public class LocalDictionaryServiceTest {
 
     /**
      * // ## Other translation case ##
-            
-            // example: 
+
+            // example:
             //     Coefficient - коэффициент
             //     Rate        - коэффициент
             // Question is about 'коэффициент' (Coefficient)
@@ -82,7 +82,4 @@ public class LocalDictionaryServiceTest {
             })
         };
     }
-}
-
-
 }

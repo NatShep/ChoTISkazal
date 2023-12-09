@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SayWhat.Bll {
+namespace SayWhat.Bll;
 
 public class PaginationCollection<T> {
     public PaginationCollection() { }
@@ -41,6 +41,4 @@ public class PaginationCollection<T> {
     public void MoveNext() => Page++;
     public void MovePrev() => Page--;
     public T Current => _items.Any() ? _items[Page] : default;
-}
-
 }

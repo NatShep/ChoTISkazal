@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using SayWhat.Bll.Yapi;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 public class YandexTranslateApiClient
 {
@@ -59,6 +59,4 @@ public class YandexTranslateApiClient
             return null;
         }
     }
-}
-
 }

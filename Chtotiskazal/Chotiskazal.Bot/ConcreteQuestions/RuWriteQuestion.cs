@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -8,7 +7,7 @@ using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ConcreteQuestions {
+namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuWriteQuestion : IQuestion {
     private readonly LocalDictionaryService _localDictionaryService;
@@ -124,6 +123,4 @@ static class RuWriteQuestionHelper {
             failedMessage,
             chat.Texts);
     }
-}
-
 }

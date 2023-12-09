@@ -1,6 +1,6 @@
 using Telegram.Bot.Types;
 
-namespace Chotiskazal.Bot {
+namespace Chotiskazal.Bot;
 
 public class BotCommands {
     public const string Help = "/help";
@@ -22,11 +22,11 @@ public class BotCommands {
         new BotCommand { Command = Translate, Description = "Translator (Переводчик)" },
         new BotCommand { Command = Learn, Description = "Learning translated words (Учить слова)" },
         new BotCommand
-        { Command = New, Description = "Show learning sets (Показать наборы для изучения)" },
+            { Command = New, Description = "Show learning sets (Показать наборы для изучения)" },
         new BotCommand { Command = Stats, Description = "Your stats (Твоя статистика)" },
         new BotCommand { Command = Words, Description = "Your learned words (Твои выученные слова)" },
         new BotCommand
-        { Command = Chlang, Description = "Change interface language (Сменить язык интерфейса)" },
+            { Command = Chlang, Description = "Change interface language (Сменить язык интерфейса)" },
         new BotCommand
         {
             Command = Report,
@@ -34,6 +34,4 @@ public class BotCommands {
         },
         new BotCommand { Command = Settings, Description = "Bot settings  (Настройки бота)" },
     };
-}
-
 }

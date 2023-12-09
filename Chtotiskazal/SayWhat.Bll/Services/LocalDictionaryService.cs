@@ -8,7 +8,7 @@ using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Services;
 
 public class LocalDictionaryService {
     private readonly LocalDictionaryRepo _dicRepository;
@@ -20,9 +20,9 @@ public class LocalDictionaryService {
     }
 
     /*public Task AddNewWordPairToDictionaryAsync(
-        string enword, 
-        string ruword, 
-        string transcription, 
+        string enword,
+        string ruword,
+        string transcription,
         TranslationSource sourse)
     {
         var word = new MongoDAL.Dictionary.DictionaryWord
@@ -80,10 +80,10 @@ public class LocalDictionaryService {
         if (localWord == null)
             throw new InvalidOperationException($"Word {en} not found in local dictionary");
         var newTranslations = translations.Where(
-                                              t => !localWord.Translations.Any(
-                                                  l => l.Word.Equals(
-                                                      t.ru, StringComparison.InvariantCultureIgnoreCase)))
-                                          .ToList();
+                t => !localWord.Translations.Any(
+                    l => l.Word.Equals(
+                        t.ru, StringComparison.InvariantCultureIgnoreCase)))
+            .ToList();
         if (newTranslations.Any())
         {
             var localTranslations = localWord.Translations.ToList();
@@ -167,19 +167,19 @@ public class LocalDictionaryService {
             return new Translation[0];
 
         return word.Translations
-                   .Select(
-                       translation => new Translation(
-                           originText: word.Word,
-                           translatedText: translation.Word,
-                           originTranscription: word.Transcription,
-                           translationDirection: word.Language == Language.En
-                               ? TranslationDirection.EnRu
-                               : TranslationDirection.RuEn,
-                           source: word.Source,
-                           translation.Examples
-                                      .Select(e => new Example { Id = e.ExampleId })
-                                      .ToList()))
-                   .ToList();
+            .Select(
+                translation => new Translation(
+                    originText: word.Word,
+                    translatedText: translation.Word,
+                    originTranscription: word.Transcription,
+                    translationDirection: word.Language == Language.En
+                        ? TranslationDirection.EnRu
+                        : TranslationDirection.RuEn,
+                    source: word.Source,
+                    translation.Examples
+                        .Select(e => new Example { Id = e.ExampleId })
+                        .ToList()))
+            .ToList();
     }
     /// <summary>
     /// Adds word, its translation and examples to database
@@ -187,12 +187,10 @@ public class LocalDictionaryService {
     /// <param name="word"></param>
     public async Task AddNewWord(DictionaryWord word) {
         var allExamples = word.Translations
-                              .SelectMany(t => t.Examples)
-                              .Select(e => e.ExampleOrNull)
-                              .Where(e => e != null);
+            .SelectMany(t => t.Examples)
+            .Select(e => e.ExampleOrNull)
+            .Where(e => e != null);
         await _exampleRepository.Add(allExamples);
         await _dicRepository.Add(word);
     }
-}
-
 }

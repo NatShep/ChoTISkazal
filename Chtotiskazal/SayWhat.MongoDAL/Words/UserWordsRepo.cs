@@ -6,7 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SayWhat.MongoDAL.Users;
 
-namespace SayWhat.MongoDAL.Words {
+namespace SayWhat.MongoDAL.Words;
 
 public class UserWordsRepo : IMongoRepo {
     public const string UserCollectionName = "words";
@@ -53,8 +53,8 @@ public class UserWordsRepo : IMongoRepo {
     
     public Task<List<UserWordModel>> GetAllUserWordsAsync(UserModel user)
         => Collection
-           .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
-           .ToListAsync();
+            .Find(Builders<UserWordModel>.Filter.Eq(UserIdFieldName, user.Id))
+            .ToListAsync();
 
     public Task UpdateMetrics(UserWordModel word) {
         var updateDef = Builders<UserWordModel>.Update
@@ -126,6 +126,4 @@ public class UserWordsRepo : IMongoRepo {
 
     public Task Remove(UserWordModel model)
         => Collection.DeleteOneAsync(Builders<UserWordModel>.Filter.Eq("Id", model.Id));
-}
-
 }

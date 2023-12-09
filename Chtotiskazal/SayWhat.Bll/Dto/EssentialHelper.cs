@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Examples;
 
-namespace SayWhat.Bll.Dto {
+namespace SayWhat.Bll.Dto;
 
 public static class EssentialHelper{
     
@@ -20,7 +20,5 @@ public static class EssentialHelper{
             TranslatedWord = translation.Ru,
             TranslatedPhrase = phrase.Ru
         };
-
-}
 
 }

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Chotiskazal.Bot.Interface;
 
-namespace SayWhat.Bll.Strings {
+namespace SayWhat.Bll.Strings;
+
 public static class StringExtensions {
     public static Markdown ToSemiBoldMarkdown(this string s) {
         return  Markdown.Escaped(s).ToSemiBold();
@@ -136,5 +136,4 @@ public enum StringsCompareResult
 }
 public enum StarredHardness {
     Hard, Easy
-}
 }

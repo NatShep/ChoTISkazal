@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace SayWhat.Bll.Statistics {
+namespace SayWhat.Bll.Statistics;
+
 public class BotStatisticMetrics {
     public BotStatisticMetrics() {
         Since = DateTime.Now;
@@ -86,5 +87,4 @@ public class BotStatisticMetrics {
     }
     public void OnCommand(long chatIdIdentifier, string eCommand) 
         => OnUserInput(chatIdIdentifier);
-}
 }

@@ -5,7 +5,7 @@ using NUnit.Framework;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.MongoDAL.Tests;
 
 public class UserRepoTests {
     private UsersRepo _repo;
@@ -54,13 +54,13 @@ public class UserRepoTests {
         for (int i = 0; i < count; i++)
         {
             _repo.Add(
-                     new UserModel(
-                         telegramId: null,
-                         lastName: "",
-                         firstName: "",
-                         telegramNick: $"petr{count}",
-                         source: UserSource.Telegram))
-                 .Wait();
+                    new UserModel(
+                        telegramId: null,
+                        lastName: "",
+                        firstName: "",
+                        telegramNick: $"petr{count}",
+                        source: UserSource.Telegram))
+                .Wait();
         }
 
         Assert.AreEqual(count, _repo.GetCount().Result);
@@ -170,6 +170,4 @@ public class UserRepoTests {
         Assert.AreEqual(2, user.TrainingSets[1].LastSeenWordOffset);
         Assert.AreEqual(model.TrainingSets[1].SetId, user.TrainingSets[1].SetId);
     }
-}
-
 }

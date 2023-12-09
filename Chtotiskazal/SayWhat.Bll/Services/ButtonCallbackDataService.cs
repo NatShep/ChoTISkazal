@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL.LongDataForTranslationButton;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Services;
 
 public class TranslationButtonData {
     public TranslationButtonData(string origin, string translation, bool isSelected) {
@@ -88,5 +88,4 @@ public class ButtonCallbackDataService {
     public async Task AddLongButtonData(LongCallbackData callbackData) {
         await _longCallbackDataRepository.Add(callbackData);
     }
-}
 }

@@ -9,7 +9,7 @@ using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.MongoDAL.Tests;
 
 public class AddWordServicetest {
     private AddWordService _service;
@@ -55,6 +55,4 @@ public class AddWordServicetest {
             user, new Translation("piss", "моча", "", TranslationDirection.EnRu, TranslationSource.Manual));
         Assert.IsNull(await _userWordsRepo.GetWordOrDefault(user, "piss"));
     }
-}
-
 }

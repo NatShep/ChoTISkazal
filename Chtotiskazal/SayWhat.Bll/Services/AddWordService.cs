@@ -13,7 +13,7 @@ using SayWhat.MongoDAL.Words;
 using Language = SayWhat.MongoDAL.Language;
 using Translation = SayWhat.Bll.Dto.Translation;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Services;
 
 public class AddWordService {
     private readonly UsersWordsService _usersWordsService;
@@ -109,8 +109,8 @@ public class AddWordService {
                     Transcription = translation.EnTranscription,
                     Word = translation.TranslatedText,
                     Examples = translation.Examples
-                                          .Select(p => new UserWordTranslationReferenceToExample(p.Id))
-                                          .ToArray()
+                        .Select(p => new UserWordTranslationReferenceToExample(p.Id))
+                        .ToArray()
                 });
             await _usersWordsService.AddUserWord(word);
 
@@ -178,6 +178,4 @@ public class AddWordService {
 
     public Task<UserWordModel> GetWordNullByEngWord(UserModel chatUser, string word)
         => _usersWordsService.GetWordNullByEngWord(chatUser, word);
-}
-
 }

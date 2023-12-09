@@ -3,7 +3,8 @@ using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
+
 public class SettingsFlow {
     private const string RemindInlineData = "remind";
 
@@ -68,5 +69,4 @@ public class SettingsFlow {
         await _userService.Update(user);
         await Chat.SendMessageAsync(Chat.Texts.SettingsApplied, InlineButtons.MainMenu(Chat.Texts));
     }
-}
 }

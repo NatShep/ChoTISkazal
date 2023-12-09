@@ -1,4 +1,5 @@
-namespace SayWhat.Bll.Statistics {
+namespace SayWhat.Bll.Statistics;
+
 public class BotStatisticCollector {
     private BotStatisticMetrics _current = new();
     public BotStatisticMetrics Flush() {
@@ -20,5 +21,3 @@ public class BotStatisticCollector {
     public void OnUserInput(long? userTelegramId) => _current.OnUserInput(userTelegramId);
     public void OnCommand(long chatIdIdentifier, string eCommand) => _current.OnCommand(chatIdIdentifier, eCommand);
 }
-}
-

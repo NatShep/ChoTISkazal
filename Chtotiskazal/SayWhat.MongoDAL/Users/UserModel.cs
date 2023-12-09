@@ -11,7 +11,7 @@ using SayWhat.MongoDAL.Words;
 // ReSharper disable ConvertToAutoProperty
 #pragma warning disable 649
 
-namespace SayWhat.MongoDAL.Users {
+namespace SayWhat.MongoDAL.Users;
 
 [BsonIgnoreExtraElements]
 public class UserModel {
@@ -84,7 +84,7 @@ public class UserModel {
     [BsonElement("qpc")] private int _questionPassed;
     [BsonElement("qfc")] private int _questionFailed;
 
- //   [BsonElement("oc")] private int _outdatedWordsCount;
+    //   [BsonElement("oc")] private int _outdatedWordsCount;
     [BsonElement("gs")] private double _gamingScore;
 
     #endregion
@@ -305,7 +305,7 @@ public class UserModel {
             _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
         _countByCategoryScores.SetLowLimitInplace(0);
 
-      //  _outdatedWordsCount += statsChanging.OutdatedChanging;
+        //  _outdatedWordsCount += statsChanging.OutdatedChanging;
 
 //        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
     }
@@ -331,7 +331,7 @@ public class UserModel {
 
         var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore;// * Zen.LearnWordsBonusRate;
         ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
- //       return gamingScore;
+        //       return gamingScore;
     }
 
     public double OnQuestionFailed(WordStatsChanging statsChanging) {
@@ -360,7 +360,7 @@ public class UserModel {
         ApplyWordStatsChangings(WordStatsChanging.Zero, today, month, gamingScore);
         OnAnyActivity();
 
-    //    return gamingScore;
+        //    return gamingScore;
     }
 
     public IReadOnlyList<DailyStats> GetLastWeek() {
@@ -385,7 +385,7 @@ public class UserModel {
         var days = new Dictionary<DateTime, DailyStats>();
         var months = new Dictionary<DateTime, MonthsStats>();
         _countByCategoryScores = new int[8];
-     //   _outdatedWordsCount = 0;
+        //   _outdatedWordsCount = 0;
         this._gamingScore = 0;
         foreach (var word in allUserWords)
         {
@@ -456,6 +456,4 @@ public class UserModel {
         LastMonthStats.Sort((d1, d2) => d1.Months.CompareTo(d2.Months));
         _wordsCount = allUserWords.Count();
     }
-}
-
 }

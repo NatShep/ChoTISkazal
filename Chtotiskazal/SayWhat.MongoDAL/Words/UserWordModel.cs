@@ -11,7 +11,7 @@ using SayWhat.MongoDAL.Examples;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 #pragma warning disable 414
 
-namespace SayWhat.MongoDAL.Words {
+namespace SayWhat.MongoDAL.Words;
 
 [BsonIgnoreExtraElements]
 public class UserWordModel {
@@ -145,7 +145,7 @@ public class UserWordModel {
         if (_absoluteScore > WordLeaningGlobalSettings.LearnedWordMinScore)
             _absoluteScore = WordLeaningGlobalSettings.WellDoneWordMinScore;
         if (_absoluteScore < 0)
-           _absoluteScore = 0;
+            _absoluteScore = 0;
         _questionAsked++;
         _lastQuestionAskedTimestamp = _scoreUpdatedTimestamp = DateTime.Now;
         _scoreUpdatedTimestamp = DateTime.Now;
@@ -153,7 +153,7 @@ public class UserWordModel {
     
 
     public void RefreshScoreUpdate() {
-      //  _currentOrderScore = AbsoluteScore;
+        //  _currentOrderScore = AbsoluteScore;
         _currentOrderScore = CurrentOrderScore;
         _scoreUpdatedTimestamp = DateTime.Now;
     }
@@ -173,6 +173,4 @@ public class UserWordModel {
     
 
     public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));
-}
-
 }

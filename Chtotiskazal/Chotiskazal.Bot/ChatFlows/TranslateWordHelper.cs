@@ -5,7 +5,7 @@ using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
 
 public static class AddWordHelper {
     static async Task<string> CreateButtonDataFor(ButtonCallbackDataService buttonCallbackDataService, Translation translation,
@@ -39,5 +39,4 @@ public static class AddWordHelper {
 
         return -1;
     }
-}
 }

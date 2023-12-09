@@ -3,12 +3,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
 
 public class WellKnownWordsHelper {
     public const string PrevData = "/wk<<";
@@ -37,8 +37,8 @@ public class ShowWellKnownWordsFlow {
 
     public async Task EnterAsync() {
         var wellKnownWords = (await _usersWordsService.GetAllWords(Chat.User))
-                             .Where(u => u.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
-                             .ToArray();
+            .Where(u => u.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
+            .ToArray();
         var paginationForWords = new List<List<UserWordModel>>();
         var i = 0;
         while (i < wellKnownWords.Length)
@@ -66,9 +66,9 @@ public class ShowWellKnownWordsFlow {
         var msgWithWords = Markdown.Empty;
         foreach (var word in paginationForWords[0]) {
             msgWithWords += Markdown.Escaped($"{Emojis.SoftMark} ") +
-                              Markdown.Escaped($"{word.Word}: ").ToSemiBold() +
-                              Markdown.Escaped(word.AllTranslationsAsSingleString)
-                                  .NewLine();
+                            Markdown.Escaped($"{word.Word}: ").ToSemiBold() +
+                            Markdown.Escaped(word.AllTranslationsAsSingleString)
+                                .NewLine();
         }
 
         if (paginationForWords.Count > 1)
@@ -97,6 +97,4 @@ public class ShowWellKnownWordsFlow {
 
         await Chat.ChatIo.SendMessageAsync(msgWithWords, buttons);
     }
-}
-
 }

@@ -5,14 +5,14 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
+using SayWhat.Bll.Strings;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot {
+namespace Chotiskazal.Bot;
 
 // ReSharper disable once InconsistentNaming
 public class ChatIO {
@@ -265,6 +265,4 @@ public class ChatIO {
             // ignored
         }
     }
-}
-
 }

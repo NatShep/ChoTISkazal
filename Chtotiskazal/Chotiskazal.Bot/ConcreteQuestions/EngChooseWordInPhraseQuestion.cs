@@ -1,65 +1,63 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ConcreteQuestions
+namespace Chotiskazal.Bot.ConcreteQuestions;
+
+public class EngChooseWordInPhraseQuestion : IQuestion
 {
-    public class EngChooseWordInPhraseQuestion : IQuestion
+    public bool NeedClearScreen => false;
+    public string Name => "Eng Choose word in phrase";
+    public double PassScore => 0.6;
+    public double FailScore => 0.6;
+
+    public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
+        UserWordModel[] examList)
     {
-        public bool NeedClearScreen => false;
-        public string Name => "Eng Choose word in phrase";
-        public double PassScore => 0.6;
-        public double FailScore => 0.6;
+        if (!word.Examples.Any())
+            return QuestionResult.Impossible;
 
-        public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
-            UserWordModel[] examList)
-        {
-            if (!word.Examples.Any())
-                return QuestionResult.Impossible;
+        var phrase = word.GetRandomExample();
 
-            var phrase = word.GetRandomExample();
+        var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
 
-            var replaced = phrase.OriginPhrase.Replace(phrase.OriginWord, "...");
-
-            if (replaced == phrase.OriginPhrase)
-                return QuestionResult.Impossible;
+        if (replaced == phrase.OriginPhrase)
+            return QuestionResult.Impossible;
             
-            var variants = examList
-                .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
-                    .Any(t=>t.AreEqualIgnoreCase(phrase.TranslatedPhrase)))
-                .Select(e => e.Word)
-                .Shuffle()
-                .Take(5)
-                .Append(phrase.OriginWord)
-                .Shuffle()
-                .ToArray();
+        var variants = examList
+            .Where(p => !p.Examples.Select(e=>e.TranslatedPhrase)
+                .Any(t=>t.AreEqualIgnoreCase(phrase.TranslatedPhrase)))
+            .Select(e => e.Word)
+            .Shuffle()
+            .Take(5)
+            .Append(phrase.OriginWord)
+            .Shuffle()
+            .ToArray();
 
-            var _ = await chat.SendMarkdownMessageAsync(
-                QuestionMarkups.TranslatesAsTemplate(
-                    phrase.TranslatedPhrase, 
-                    chat.Texts.translatesAs, 
-                    replaced, 
-                    chat.Texts.ChooseMissingWord+":")
-                , InlineButtons.CreateVariants(variants));
+        var _ = await chat.SendMarkdownMessageAsync(
+            QuestionMarkups.TranslatesAsTemplate(
+                phrase.TranslatedPhrase, 
+                chat.Texts.translatesAs, 
+                replaced, 
+                chat.Texts.ChooseMissingWord+":")
+            , InlineButtons.CreateVariants(variants));
 
-            var choice = await chat.TryWaitInlineIntKeyboardInput();
-            if (choice == null)
-                return QuestionResult.RetryThisQuestion;
+        var choice = await chat.TryWaitInlineIntKeyboardInput();
+        if (choice == null)
+            return QuestionResult.RetryThisQuestion;
 
-            if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
-                return QuestionResult.Passed(Markdown.Escaped(chat.Texts.Passed1), 
-                    chat.Texts);
-
-            return QuestionResult.Failed(
-                Markdown.Escaped($"{chat.Texts.OriginWas}:").NewLine() +
-                Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
+        if (variants[choice.Value].AreEqualIgnoreCase(word.Word))
+            return QuestionResult.Passed(Markdown.Escaped(chat.Texts.Passed1), 
                 chat.Texts);
-        }
+
+        return QuestionResult.Failed(
+            Markdown.Escaped($"{chat.Texts.OriginWas}:").NewLine() +
+            Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
+            chat.Texts);
     }
 }

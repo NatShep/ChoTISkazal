@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace SayWhat.MongoDAL.Dictionary {
+namespace SayWhat.MongoDAL.Dictionary;
 
 public class LocalDictionaryRepo : IMongoRepo {
     public const string DictionaryCollectionName = "dictionary";
@@ -40,11 +40,9 @@ public class LocalDictionaryRepo : IMongoRepo {
     }
 
     public Task<List<DictionaryWord>> GetAll() => Collection
-                                                  .Find(Builders<DictionaryWord>.Filter.Empty)
-                                                  .ToListAsync();
+        .Find(Builders<DictionaryWord>.Filter.Empty)
+        .ToListAsync();
 
     public Task Update(DictionaryWord dicword) => Collection
         .FindOneAndReplaceAsync(f => f.Id == dicword.Id, dicword);
-}
-
 }

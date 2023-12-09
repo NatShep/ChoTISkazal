@@ -10,7 +10,8 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Timer = System.Timers.Timer;
 
-namespace Chotiskazal.Bot.Jobs {
+namespace Chotiskazal.Bot.Jobs;
+
 public static class RemindSenderJob {
 
     private static DateTime _launchTime;
@@ -71,5 +72,4 @@ public static class RemindSenderJob {
                 }),
             parseMode: ParseMode.MarkdownV2);
     }
-}
 }

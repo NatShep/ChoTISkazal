@@ -2,7 +2,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.MongoDAL.LongDataForTranslationButton {
+namespace SayWhat.MongoDAL.LongDataForTranslationButton;
+
 [BsonIgnoreExtraElements]
 public class LongCallbackData {
     public LongCallbackData(string word, string translation) {
@@ -23,6 +24,4 @@ public class LongCallbackData {
     
     public string Word => _word;
     public string Translation => _translation;
-}
-
 }

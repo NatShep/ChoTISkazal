@@ -1,9 +1,10 @@
-﻿using Chotiskazal.Bot.Interface;
-using SayWhat.Bll.Dto;
+﻿using SayWhat.Bll.Dto;
+using SayWhat.Bll.Strings;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.Texts {
+namespace Chotiskazal.Bot.Texts;
+
 public interface IInterfaceTexts {
     string more { get; }
     string[] ShortDayNames { get; }
@@ -137,5 +138,4 @@ public interface IInterfaceTexts {
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);
     Markdown XofY(in int x, in int y);
-}
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using Chotiskazal.Bot.Texts;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot {
+namespace Chotiskazal.Bot;
 
 public static class InlineButtons {
     public const int MaxCallbackDataByteSizeUtf8 = 64;
@@ -43,14 +43,12 @@ public static class InlineButtons {
 
     public static InlineKeyboardButton[] CreateVariants(IEnumerable<string> variants)
         => variants.Select(
-                       (v, i) => new InlineKeyboardButton {
-                           CallbackData = i.ToString(),
-                           Text = v ?? throw new InvalidDataException("Keyboard text cannot be null")
-                       })
-                   .ToArray();
+                (v, i) => new InlineKeyboardButton {
+                    CallbackData = i.ToString(),
+                    Text = v ?? throw new InvalidDataException("Keyboard text cannot be null")
+                })
+            .ToArray();
 
     public static InlineKeyboardButton Chlang(IInterfaceTexts texts) =>
         new InlineKeyboardButton { CallbackData = BotCommands.Chlang, Text = texts.ChangeLanguageButton };
-}
-
 }

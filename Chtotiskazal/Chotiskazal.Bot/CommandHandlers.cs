@@ -4,13 +4,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Hooks;
-using Chotiskazal.Bot.Interface;
 using Microsoft.VisualBasic;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot {
+namespace Chotiskazal.Bot;
 
 public interface IBotCommandHandler {
     bool Acceptable(string text);
@@ -220,8 +220,8 @@ public class ReportBotCommandHandler : IBotCommandHandler {
         var header = $"sent by @{chat.User.TelegramNick}\r\n:" +
                      $"{chat.User.TelegramId}:{chat.User.TelegramFirstName}-{chat.User.TelegramLastName}\r\n";
         var message = Markdown.Escaped($"Report {header}")
-                              .NewLine()
-                              .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToPreFormattedMono());
+            .NewLine()
+            .AddMarkdown(Markdown.Escaped(Strings.Join(history, "\r\n")).ToPreFormattedMono());
         Reporter.ReportUserIssue(message.GetMarkdownString());
         await chat.SendMessageAsync(chat.Texts.ReportWasSentEnterAdditionalInformationAboutTheReport);
         
@@ -230,5 +230,4 @@ public class ReportBotCommandHandler : IBotCommandHandler {
         await chat.SendMessageAsync(chat.Texts.ThankYouForYourCommentInReport);
 
     }
-}
 }

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Chotiskazal.Bot;
-using Chotiskazal.Bot.Interface;
 using NUnit.Framework;
 using SayWhat.Bll.Strings;
 
-namespace SayWhat.UnitTests {
+namespace SayWhat.UnitTests;
+
 public class MarkdownTest {
     [TestCase("Word.", "Word\\.")]
     [TestCase(".Word.", "\\.Word\\.")]
@@ -201,5 +201,4 @@ public class MarkdownTest {
             Assert.AreEqual(element, element.ToBypassedMarkdown().GetMarkdownString());
         }
     }
-}
 }

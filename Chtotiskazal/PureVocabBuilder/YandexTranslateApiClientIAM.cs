@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 public class YandexTranslateApiClientIAM
 {
@@ -87,6 +87,4 @@ public class YaTransAnswer
 {
     [JsonPropertyName("translations")] 
     public Translation[] Translations { get; set; }
-}
-
 }

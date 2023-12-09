@@ -2,13 +2,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types;
 
-namespace Chotiskazal.Bot.Hooks {
-
+namespace Chotiskazal.Bot.Hooks;
 
 public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
     private PaginationCollection<List<UserWordModel>> _pages = new PaginationCollection<List<UserWordModel>>();
@@ -40,9 +39,9 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
         foreach (var word in _pages.Current) {
             msg = msg.AddEscaped(Emojis.SoftMark) +
-                Markdown.Escaped($"{word.Word}:").ToSemiBold()
-                    .AddEscaped(word.AllTranslationsAsSingleString)
-                    .NewLine();
+                  Markdown.Escaped($"{word.Word}:").ToSemiBold()
+                      .AddEscaped(word.AllTranslationsAsSingleString)
+                      .NewLine();
         }
 
         msg += (Chat.Texts.PageXofY(_pages.Page + 1, _pages.Count));
@@ -58,6 +57,4 @@ public class LeafWellKnownWordsUpdateHook : IChatUpdateHook {
 
         await Chat.ConfirmCallback(update.CallbackQuery.Id);
     }
-}
-
 }

@@ -10,7 +10,7 @@ using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Examples;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 public static class OpTools {
    
@@ -39,32 +39,30 @@ public static class OpTools {
     public static string[] ReadSortedEnglishWordsFromEnru(string path) {
         var lines = File.ReadAllLines(path);
         return lines.Select(l => l.Split("\t", StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim())
-                    .Where(c => c != null)
-                    .ToArray();
+            .Where(c => c != null)
+            .ToArray();
     }
     
     public static (string, string)[] ReadEnSingleRu(string path) {
         var lines = File.ReadAllLines(path);
         return lines.Where(c =>!string.IsNullOrWhiteSpace(c))
-                    .Select(l => {
-                        var split = l.Split("\t", StringSplitOptions.RemoveEmptyEntries);
-                        return (split[0], split[1]);
-                    })
-                    .ToArray();
+            .Select(l => {
+                var split = l.Split("\t", StringSplitOptions.RemoveEmptyEntries);
+                return (split[0], split[1]);
+            })
+            .ToArray();
     }
 
    
     public static (string, string[])[] ReadEnru(string path) {
         var lines = File.ReadAllLines(path);
         return lines.Where(c =>!string.IsNullOrWhiteSpace(c))
-                    .Select(l => {
-                        var split = l.Split("\t", StringSplitOptions.RemoveEmptyEntries);
-                        return (split[0], split[1].Split(",").Select(c => c.Trim()).ToArray());
-                    })
-                    .ToArray();
+            .Select(l => {
+                var split = l.Split("\t", StringSplitOptions.RemoveEmptyEntries);
+                return (split[0], split[1].Split(",").Select(c => c.Trim()).ToArray());
+            })
+            .ToArray();
     }
     
    
-}
-
 }

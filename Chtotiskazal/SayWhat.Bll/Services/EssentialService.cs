@@ -7,9 +7,9 @@ using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
-using SayWhat.MongoDAL.WordKits;
+using SayWhat.MongoDAL.LearningSets;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Services;
 
 public class EssentialService {
     private readonly ExamplesRepo _examplesRepo;
@@ -143,9 +143,9 @@ public class EssentialService {
                 //Нужно проверять какие фразы есть в нем, а каких нет
                 var alreadyPhrases =
                     existingTranslation.Examples
-                                       .Where(e => e.ExampleOrNull != null)
-                                       .Select(e => e.ExampleOrNull.ToEssentialPhrase())
-                                       .ToArray();
+                        .Where(e => e.ExampleOrNull != null)
+                        .Select(e => e.ExampleOrNull.ToEssentialPhrase())
+                        .ToArray();
 
                 var newEssentialPhrases = translation.Phrases.Except(alreadyPhrases).ToArray();
                 if (newEssentialPhrases.Any())
@@ -158,21 +158,21 @@ public class EssentialService {
                     examplesToAdd.AddRange(newExamplesForTranslation);
                     //Вставляем новые фразы в начало
                     existingTranslation.Examples = newExamplesForTranslation
-                                                   .Select(e => new DictionaryReferenceToExample(e))
-                                                   .Concat(
-                                                       existingTranslation
-                                                           .Examples //удаляем 'битые' примеры 
-                                                           .Where(e => e.ExampleOrNull != null))
-                                                   .ToArray();
+                        .Select(e => new DictionaryReferenceToExample(e))
+                        .Concat(
+                            existingTranslation
+                                .Examples //удаляем 'битые' примеры 
+                                .Where(e => e.ExampleOrNull != null))
+                        .ToArray();
                 }
 
                 var essentialIds = existingTranslation.Examples
-                                                      .Where(
-                                                          e => translation.Phrases.Any(
-                                                              p => p.En.Equals(
-                                                                  e.ExampleOrNull.OriginPhrase,
-                                                                  StringComparison.OrdinalIgnoreCase)))
-                                                      .Select(e => e.ExampleId);
+                    .Where(
+                        e => translation.Phrases.Any(
+                            p => p.En.Equals(
+                                e.ExampleOrNull.OriginPhrase,
+                                StringComparison.OrdinalIgnoreCase)))
+                    .Select(e => e.ExampleId);
                 essentialsObjectIds.AddRange(essentialIds);
             }
         }
@@ -192,8 +192,8 @@ public class EssentialService {
     private (Example[] newExamplesForTranslation, DictionaryTranslationDbEntity newTranslation)
         CreateNewTranslationModels(EssentialWord esWord, EssentialTranslation translation) {
         var newExamplesForTranslation = translation
-                                        .Phrases
-                                        .SelectToArray(p => p.ToExample(esWord, translation));
+            .Phrases
+            .SelectToArray(p => p.ToExample(esWord, translation));
         var newTranslation = new DictionaryTranslationDbEntity {
             Language = Language.Ru,
             Word = translation.Ru,
@@ -214,6 +214,4 @@ public class EssentialService {
         }
         return await MergeEssentialAndLocalDictionaryWords(essentialWord, dicword);
     }
-}
-
 }

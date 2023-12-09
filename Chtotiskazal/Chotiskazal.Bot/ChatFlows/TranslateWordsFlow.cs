@@ -9,7 +9,7 @@ using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
 
 internal class TranslateWordsFlow {
     private ChatRoom Chat { get; }
@@ -83,7 +83,7 @@ internal class TranslateWordsFlow {
 
         // getting first transcription
         var transcription = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))
-                                        ?.EnTranscription;
+            ?.EnTranscription;
 
         var handler = new LastTranslationHandler(
             translations: translations,
@@ -121,6 +121,4 @@ internal class TranslateWordsFlow {
             ans[i] = alreadyExistUserWord.HasTranslation(translations[i].TranslatedText);
         return ans;
     }
-}
-
 }

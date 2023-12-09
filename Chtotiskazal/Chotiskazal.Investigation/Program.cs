@@ -8,7 +8,7 @@ using SayWhat.Bll.Services;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 
-namespace Chotiskazal.Investigation {
+namespace Chotiskazal.Investigation;
 
 class Program {
     static void Main() {
@@ -186,8 +186,8 @@ class Program {
     private static string GetPauseData(List<Qmodel> allMetrics, int minScore, int maxScore, int countInBunch) =>
         GetPauseData(
             allMetrics.Where(a => a.ScoreBefore >= minScore && a.ScoreBefore <= maxScore)
-                      .Where(a => a.ExamName.EndsWith("Eng Choose"))
-                      .ToList(), countInBunch);
+                .Where(a => a.ExamName.EndsWith("Eng Choose"))
+                .ToList(), countInBunch);
 
     private static string GetPauseData(List<Qmodel> allMetrics, int countInBunch) {
         var intervals = GetTimeSeries(countInBunch, allMetrics);
@@ -318,7 +318,4 @@ class Program {
         var s = sb2.ToString();
         return s;
     }
-}
-
-
 }

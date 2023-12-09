@@ -1,10 +1,10 @@
-﻿using Chotiskazal.Bot.Interface;
-using SayWhat.Bll.Dto;
+﻿using SayWhat.Bll.Dto;
 using SayWhat.Bll.Strings;
 
 // ReSharper disable InconsistentNaming
 
-namespace Chotiskazal.Bot.Texts {
+namespace Chotiskazal.Bot.Texts;
+
 public class RussianTexts : IInterfaceTexts {
     public string more => "больше";
     public string less => "меньше";
@@ -35,8 +35,8 @@ public class RussianTexts : IInterfaceTexts {
     }
 
     public string OutOfScopeTranslation =>
-          "Перевод то правильный, но учим мы не его. " +
-          "\r\nОжидаемые переводы";
+        "Перевод то правильный, но учим мы не его. " +
+        "\r\nОжидаемые переводы";
 
     public string FailedTranslationWas => "Правильный перевод";
     public string ItIsNotRightTryAgain => "Неа. Давай попробуем еще раз";
@@ -184,9 +184,9 @@ public class RussianTexts : IInterfaceTexts {
         $"Все слова из набора '{setShortName}' были добавлены";
 
     public string ReportWasSentEnterAdditionalInformationAboutTheReport =>
-          "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
-          "\r\n" +
-          "Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий:";
+        "Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!\r\n" +
+        "\r\n" +
+        "Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий:";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
         => $"Позабыто слов: {forgottenWordsCount}";
@@ -246,5 +246,4 @@ public class RussianTexts : IInterfaceTexts {
     public string StatsActivityForLast7Weeks => "Активность за последние 7 недель";
 
     #endregion
-}
 }

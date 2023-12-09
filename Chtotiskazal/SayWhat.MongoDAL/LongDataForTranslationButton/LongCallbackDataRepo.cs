@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace SayWhat.MongoDAL.LongDataForTranslationButton {
+namespace SayWhat.MongoDAL.LongDataForTranslationButton;
+
 public class LongCallbackDataRepo : IMongoRepo {
     private readonly IMongoDatabase _db;
     
@@ -39,5 +40,4 @@ public class LongCallbackDataRepo : IMongoRepo {
         var model = new CreateIndexModel<LongCallbackData>(keys, indexOptions);
         await Collection.Indexes.CreateOneAsync(model);
     }
-}
 }

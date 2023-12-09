@@ -4,7 +4,8 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ConcreteQuestions {
+namespace Chotiskazal.Bot.ConcreteQuestions;
+
 public class TranscriptionChooseEngQuestion : IQuestion {
     public bool NeedClearScreen => false;
     public string Name => "Choose Eng By Transcription";
@@ -18,8 +19,8 @@ public class TranscriptionChooseEngQuestion : IQuestion {
             return QuestionResult.Impossible;
 
         string[] variants = examList
-                            .Where(e => !e.ContainsTranscription(originTranslation.Transcription))
-                            .GetEngVariants(word.Word, 5);
+            .Where(e => !e.ContainsTranscription(originTranslation.Transcription))
+            .GetEngVariants(word.Word, 5);
 
         var msg = QuestionMarkups.TranscriptionTemplate(originTranslation.Transcription, chat.Texts.ChooseWhichWordHasThisTranscription);
         await chat.SendMarkdownMessageAsync(msg, InlineButtons.CreateVariants(variants));
@@ -31,5 +32,4 @@ public class TranscriptionChooseEngQuestion : IQuestion {
             return QuestionResult.Passed(chat.Texts);
         return QuestionResult.Failed(chat.Texts);
     }
-}
 }

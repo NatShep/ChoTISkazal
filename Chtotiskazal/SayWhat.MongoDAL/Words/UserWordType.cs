@@ -1,10 +1,9 @@
-﻿namespace SayWhat.MongoDAL.Words
+﻿namespace SayWhat.MongoDAL.Words;
+
+public enum UserWordType
 {
-    public enum UserWordType
-    {
-        // word
-        UsualWord = 1,
-        // automaticly added phrase
-        AutoPhrase =2
-    }
+    // word
+    UsualWord = 1,
+    // automaticly added phrase
+    AutoPhrase =2
 }

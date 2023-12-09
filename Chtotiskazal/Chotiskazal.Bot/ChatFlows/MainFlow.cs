@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Hooks;
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Users;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
 
 public class MainFlow {
     public MainFlow(
@@ -188,6 +188,4 @@ public class MainFlow {
             }
         }
     }
-}
-
 }

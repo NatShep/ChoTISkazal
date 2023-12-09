@@ -9,7 +9,7 @@ using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 public  class Operations {
     private UsersWordsService _userWordService;
@@ -100,7 +100,7 @@ public  class Operations {
         foreach (var word in loaded)
         {
             var fittedPhrases = word.Translations.SelectMany(t => examplesDictionary.GetPhrases(word.En, t.Ru))
-                                    .ToList();
+                .ToList();
             if (fittedPhrases.Any())
             {
                 succ++;
@@ -310,7 +310,5 @@ public  class Operations {
 
         return ChooseFromInput(options);
     }
-
-}
 
 }

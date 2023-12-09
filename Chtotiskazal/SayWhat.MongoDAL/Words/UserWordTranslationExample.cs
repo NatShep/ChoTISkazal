@@ -1,9 +1,8 @@
 ﻿
-namespace SayWhat.MongoDAL.Words
+namespace SayWhat.MongoDAL.Words;
+
+public class UserWordTranslationExample
 {
-    public class UserWordTranslationExample
-    {
-        public string Origin { get;set; }
-        public string Translation { get;set; }
-    }
+    public string Origin { get;set; }
+    public string Translation { get;set; }
 }

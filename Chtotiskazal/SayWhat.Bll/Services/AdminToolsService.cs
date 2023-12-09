@@ -5,7 +5,7 @@ using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.Bll.Services {
+namespace SayWhat.Bll.Services;
 
 /// <summary>
 /// Операции для администрирования бота. Вызываются из вручную написанного кода
@@ -75,6 +75,4 @@ public class AdminToolsService {
             }
         }
     } 
-}
-
 }

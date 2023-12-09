@@ -1,7 +1,7 @@
-using Chotiskazal.Bot.Interface;
 using SayWhat.Bll.Strings;
 
-namespace Chotiskazal.Bot.Questions {
+namespace Chotiskazal.Bot.Questions;
+
 public static class QuestionMarkups {
     private static readonly Markdown QuestionHeader = Markdown.Escaped("---❔---").ToPreFormattedMono();
     public static Markdown FreeTemplateMarkdown(Markdown s) => QuestionHeader + Markdown.Escaped("\r\n") + s;
@@ -9,7 +9,7 @@ public static class QuestionMarkups {
     public static Markdown TranslateTemplate(string word, string instruction)
         => QuestionHeader
                .NewLine() +
-                word.ToSemiBoldMarkdown()
+           word.ToSemiBoldMarkdown()
                .NewLine()
                .NewLine()
                .NewLine()
@@ -49,4 +49,3 @@ public static class QuestionMarkups {
 // either add methods like 'AddEscaped(...)', 'AddEscapedItalic()', AddEscapedBold etc
 // but combination of these looks very confusing
 //TODO answer i need more time for this =) 
-}

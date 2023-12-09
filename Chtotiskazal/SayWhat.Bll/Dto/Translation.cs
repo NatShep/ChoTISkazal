@@ -4,7 +4,7 @@ using SayWhat.MongoDAL.Examples;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace SayWhat.Bll.Dto {
+namespace SayWhat.Bll.Dto;
 
 public class Translation {
     public Translation(
@@ -46,6 +46,4 @@ public class Translation {
             TranslationDirection == TranslationDirection.EnRu
                 ? TranslationDirection.RuEn
                 : TranslationDirection.EnRu, Source);
-}
-
 }

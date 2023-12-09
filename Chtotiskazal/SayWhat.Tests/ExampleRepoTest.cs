@@ -4,23 +4,23 @@ using MongoDB.Bson;
 using NUnit.Framework;
 using SayWhat.MongoDAL.Examples;
 
-namespace SayWhat.MongoDAL.Tests
+namespace SayWhat.MongoDAL.Tests;
+
+public class ExampleRepoTests
 {
-    public class ExampleRepoTests
+        
+    private ExamplesRepo _repo;
+        
+    [SetUp]
+    public void Intitalize()
     {
-        
-        private ExamplesRepo _repo;
-        
-        [SetUp]
-        public void Intitalize()
-        {
             MongoTestHelper.DropAllCollections();
             _repo =new ExamplesRepo(MongoTestHelper.Database);
             _repo.UpdateDb().Wait();
         }
-        [Test]
-        public async Task AddOne_GetReturnsIt()
-        {
+    [Test]
+    public async Task AddOne_GetReturnsIt()
+    {
             var example = CreateExample("table","стол");
             await _repo.Add(example);
             var read = await _repo.GetOrDefault(example.Id);
@@ -31,9 +31,9 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual(example.TranslatedWord, read.TranslatedWord);
         }
 
-        [Test]
-        public async Task AddOne_GetAllReturnsIt()
-        {
+    [Test]
+    public async Task AddOne_GetAllReturnsIt()
+    {
             var example = CreateExample("table","стол");
             await _repo.Add(example);
             var all = await _repo.GetAll(new[]{example.Id});
@@ -45,31 +45,30 @@ namespace SayWhat.MongoDAL.Tests
             Assert.AreEqual(example.TranslatedWord, read.TranslatedWord);
         }
         
-        [Test]
-        public async Task Empty_GetAllReturnsEmptyList()
-        {
+    [Test]
+    public async Task Empty_GetAllReturnsEmptyList()
+    {
             var all = await _repo.GetAll(new[]{ObjectId.GenerateNewId()});
             Assert.AreEqual(0,all.Count);
         }
         
-        [Test]
-        public async Task AddOne_GetDifferentReturnsNull()
-        {
+    [Test]
+    public async Task AddOne_GetDifferentReturnsNull()
+    {
             var example = CreateExample("table","стол");
             await _repo.Add(example);
             var read = await _repo.GetOrDefault(ObjectId.GenerateNewId());
             Assert.IsNull(read);
         }
 
-        private Example CreateExample(string originWord, string translatedWord)
-            =>
-                new Example
-                {
-                    Id = ObjectId.GenerateNewId(),
-                    OriginPhrase = "on the table", OriginWord = originWord, TranslatedPhrase = "на столе",
-                    TranslatedWord = translatedWord
-                };
+    private Example CreateExample(string originWord, string translatedWord)
+        =>
+            new Example
+            {
+                Id = ObjectId.GenerateNewId(),
+                OriginPhrase = "on the table", OriginWord = originWord, TranslatedPhrase = "на столе",
+                TranslatedWord = translatedWord
+            };
        
 
-    }
 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Chotiskazal.Investigation {
+namespace Chotiskazal.Investigation;
+
 public static class QuestionMetricsReports {
     public static string GetQuestionMetricsByTimeReport(List<Qmodel> allMetrics) {
         var allExamNames = allMetrics.Select(a => Helper.GetNonCleanName(a.ExamName)).ToHashSet();
@@ -383,5 +384,4 @@ public static class QuestionMetricsReports {
             return result;
         }
     }
-}
 }

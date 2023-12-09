@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SayWhat.Bll.Dto {
+namespace SayWhat.Bll.Dto;
 
 public class EssentialWord {
     public EssentialWord() {
@@ -55,6 +55,4 @@ public class EssentialPhrase {
         return true;
     }
     public bool Fits(string enWord, string ruWord) => ChaosBllHelper.Fits(enWord, ruWord, En, Ru);
-}
-
 }

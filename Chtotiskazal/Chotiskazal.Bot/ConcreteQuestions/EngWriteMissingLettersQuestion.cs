@@ -5,7 +5,8 @@ using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ConcreteQuestions {
+namespace Chotiskazal.Bot.ConcreteQuestions;
+
 public class EngWriteMissingLettersQuestion : IQuestion {
     private readonly StarredHardness _hardness;
     public EngWriteMissingLettersQuestion(StarredHardness hardness) {
@@ -58,5 +59,4 @@ public class EngWriteMissingLettersQuestion : IQuestion {
         return QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord),chat.Texts);
 
     }
-}
 }

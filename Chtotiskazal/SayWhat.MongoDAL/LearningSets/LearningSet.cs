@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SayWhat.MongoDAL.Users;
 
-namespace SayWhat.MongoDAL.WordKits {
+namespace SayWhat.MongoDAL.LearningSets;
 
 [BsonIgnoreExtraElements]
 public class LearningSet {
@@ -39,6 +39,4 @@ public class WordInLearningSet {
 
     [BsonElement("trs")] public string[] AllowedTranslations { get; set; }
     [BsonElement("es")] public ObjectId[] AllowedExamples { get; set; }
-}
-
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using NUnit.Framework;
-using SayWhat.MongoDAL.WordKits;
+using SayWhat.MongoDAL.LearningSets;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.MongoDAL.Tests;
 
 public class LearningSetsRepoTests {
     private LearningSetsRepo _repo;
@@ -110,6 +110,4 @@ public class LearningSetsRepoTests {
         Assert.AreEqual(expected.Words[0].AllowedTranslations[1], actual.Words[0].AllowedTranslations[1]);
         Assert.AreEqual(expected.Words[0].Word, actual.Words[0].Word);
     }
-}
-
 }

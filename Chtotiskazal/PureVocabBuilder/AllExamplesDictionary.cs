@@ -4,7 +4,7 @@ using System.Linq;
 using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL.Examples;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 class AllExamplesDictionary {
     private Dictionary<string, List<EssentialPhrase>> _dictionary = new();
@@ -66,6 +66,4 @@ class AllExamplesDictionary {
 
         _dictionary[key].Add(example);
     }
-}
-
 }

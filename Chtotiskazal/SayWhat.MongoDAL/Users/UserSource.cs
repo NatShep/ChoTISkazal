@@ -1,8 +1,7 @@
-﻿namespace SayWhat.MongoDAL.Users
+﻿namespace SayWhat.MongoDAL.Users;
+
+public enum UserSource
 {
-    public enum UserSource
-    {
-        Unknown = 0,
-        Telegram = 1,
-    }
+    Unknown = 0,
+    Telegram = 1,
 }

@@ -10,11 +10,12 @@ using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.LearningSets;
 using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace PureVocabBuilder {
+namespace PureVocabBuilder;
 
 class Program {
     private static UsersWordsService _userWordService;
@@ -99,6 +100,4 @@ class Program {
         _toolsService = new AdminToolsService(
             _userRepo, _userWordRepo, _localDictionaryService, _addWordService);
     }
-}
-
 }

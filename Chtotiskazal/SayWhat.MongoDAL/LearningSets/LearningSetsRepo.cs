@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SayWhat.MongoDAL;
-using SayWhat.MongoDAL.WordKits;
+
+namespace SayWhat.MongoDAL.LearningSets;
 
 public class LearningSetsRepo : IMongoRepo {
     private readonly IMongoDatabase _db;
@@ -23,8 +23,8 @@ public class LearningSetsRepo : IMongoRepo {
     public Task UpdateDb() => Task.CompletedTask;
 
     public Task<List<LearningSet>> GetAll() => Collection
-                                                    .Find(Builders<LearningSet>.Filter.Empty)
-                                                    .ToListAsync();
+        .Find(Builders<LearningSet>.Filter.Empty)
+        .ToListAsync();
 
     public Task<long> GetCount() => Collection.CountDocumentsAsync(new BsonDocument());
 }

@@ -2,7 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace Chotiskazal.Investigation {
+namespace Chotiskazal.Investigation;
+
 class TimeBucket {
     public readonly int SecLow;
     public readonly int SecHi;
@@ -65,7 +66,7 @@ class TimeBucket {
     
     private double? GetWeightedScore() {
         /*
-         * 
+         *
 у разных очков разный вес
 если в корзинке будут только высокие числа то это значит что мы будем переоценивать
 значит чем выше тем ниже вес
@@ -73,7 +74,7 @@ class TimeBucket {
 
 sum(p[i] * w[i]) //сдано
 /
-sum(c[i] * w[i]) //кол-во 
+sum(c[i] * w[i]) //кол-во
 
 k+b = 1
 15k+b = 0.5
@@ -101,10 +102,10 @@ b = 17/14
         var bottom = 0.0;
         for (int i = 3; i < 9; i += 1) {
             /*
-             * 
+             *
 sum(p[i] * w[i]) //сдано
 /
-sum(c[i] * w[i]) //кол-во 
+sum(c[i] * w[i]) //кол-во
 
              */
 
@@ -122,5 +123,4 @@ sum(c[i] * w[i]) //кол-во
         else
             return score * 100.0 / count;
     }
-}
 }

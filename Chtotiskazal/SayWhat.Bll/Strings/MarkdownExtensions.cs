@@ -1,4 +1,5 @@
-namespace Chotiskazal.Bot.Interface {
+namespace SayWhat.Bll.Strings;
+
 public static class MarkdownExtension {
     public static Markdown NewLine(this Markdown m) {
         return m.AddBypassed("\r\n");
@@ -44,5 +45,4 @@ public static class MarkdownExtension {
     public static bool IsNullOrEmpty(this Markdown s) {
         return s == null || s.IsEmpty();
     }
-}
 }

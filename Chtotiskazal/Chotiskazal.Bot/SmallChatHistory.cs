@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Concurrent;
-using Chotiskazal.Bot.Interface;
+using SayWhat.Bll.Strings;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot {
+namespace Chotiskazal.Bot;
+
 public class SmallChatHistory {
     private readonly int _size;
     private readonly ConcurrentQueue<string> _buffer;
@@ -46,5 +47,4 @@ public class SmallChatHistory {
         return $"Unknown: {update.Type}";
     }
 
-}
 }

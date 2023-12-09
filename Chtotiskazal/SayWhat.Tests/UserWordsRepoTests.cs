@@ -6,7 +6,7 @@ using NUnit.Framework;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.MongoDAL.Tests {
+namespace SayWhat.MongoDAL.Tests;
 
 public class UserWordsRepoTests {
     private UserWordsRepo _repo;
@@ -160,6 +160,4 @@ public class UserWordsRepoTests {
         Assert.AreEqual("стол", readWord.RuTranslations[1].Word);
         Assert.AreEqual("таблица", readWord.RuTranslations[0].Word);
     }
-}
-
 }

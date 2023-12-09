@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using System.Text;
-using Chotiskazal.Bot.Interface;
 using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Services;
+using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 
-namespace Chotiskazal.Bot.ChatFlows {
+namespace Chotiskazal.Bot.ChatFlows;
+
 public static class StatsRenderer {
     private const string Empty = "✖";
     private const string S0 = "➖";
@@ -25,7 +26,7 @@ public static class StatsRenderer {
                 .ToArray(), chat.Texts)
             .ToPreFormattedMono()
             .NewLine(); //+
-        //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+    //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
     private static Markdown Render7WeeksCalendarMarkdown(
         
@@ -99,7 +100,7 @@ public static class StatsRenderer {
 
     /*
      private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
-     
+
         if (user.Zen.Rate < -15)
             return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
         else if (user.Zen.Rate < -10)
@@ -116,5 +117,4 @@ public static class StatsRenderer {
             return Markdown.Escaped(texts.Zen6YouNeedToLearn);
     }
     */
-}
 }

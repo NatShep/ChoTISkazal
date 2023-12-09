@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Chotiskazal.Bot.Interface;
 using MongoDB.Bson;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Strings;
@@ -15,7 +14,7 @@ using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Words;
 
-namespace SayWhat.Bll {
+namespace SayWhat.Bll;
 
 public static class ChaosBllHelper {
     public static IEnumerable<(Example, UserWordTranslation)> GetExamplesThatLoadedAndFits(this UserWordModel wordModel) {
@@ -35,7 +34,7 @@ public static class ChaosBllHelper {
             return false;
 
         return ruPhrase.Split(" ", StringSplitOptions.RemoveEmptyEntries)
-                       .Any(w => w.CheckCloseness(ruWord) != StringsCompareResult.NotEqual);
+            .Any(w => w.CheckCloseness(ruWord) != StringsCompareResult.NotEqual);
     }
     public static bool Fits(this Example example, string en, string ru) {
         var (ourEn, ourRu) = example.Deconstruct();
@@ -78,26 +77,26 @@ public static class ChaosBllHelper {
             Source = TranslationSource.Yadic,
             Transcription = definitions.FirstOrDefault()?.Ts,
             Translations = variants.Select(
-                                       v => new DictionaryTranslationDbEntity() {
-                                           Word = v.translation.Text,
-                                           Language = langTo,
-                                           Examples = v.translation.Ex?.Select(
-                                                           e =>
-                                                               new DictionaryReferenceToExample(
-                                                                   new Example {
-                                                                       Id = ObjectId.GenerateNewId(),
-                                                                       OriginWord = originText,
-                                                                       TranslatedWord = v.translation.Text,
-                                                                       Direction = langFrom == Language.En
-                                                                           ? TranslationDirection.EnRu
-                                                                           : TranslationDirection.RuEn,
-                                                                       OriginPhrase = e.Text,
-                                                                       TranslatedPhrase = e.Tr.First().Text,
-                                                                   }))
-                                                       .ToArray() ??
-                                                      Array.Empty<DictionaryReferenceToExample>()
-                                       })
-                                   .ToArray()
+                    v => new DictionaryTranslationDbEntity() {
+                        Word = v.translation.Text,
+                        Language = langTo,
+                        Examples = v.translation.Ex?.Select(
+                                           e =>
+                                               new DictionaryReferenceToExample(
+                                                   new Example {
+                                                       Id = ObjectId.GenerateNewId(),
+                                                       OriginWord = originText,
+                                                       TranslatedWord = v.translation.Text,
+                                                       Direction = langFrom == Language.En
+                                                           ? TranslationDirection.EnRu
+                                                           : TranslationDirection.RuEn,
+                                                       OriginPhrase = e.Text,
+                                                       TranslatedPhrase = e.Tr.First().Text,
+                                                   }))
+                                       .ToArray() ??
+                                   Array.Empty<DictionaryReferenceToExample>()
+                    })
+                .ToArray()
         };
         return word;
     }
@@ -118,6 +117,4 @@ public static class ChaosBllHelper {
         var text = File.ReadAllText(path);
         return JsonSerializer.Deserialize<T>(text);
     }
-}
-
 }

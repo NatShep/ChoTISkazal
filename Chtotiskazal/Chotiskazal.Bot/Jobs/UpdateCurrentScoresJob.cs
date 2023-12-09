@@ -4,7 +4,8 @@ using SayWhat.Bll.Services;
 using Serilog;
 using Timer = System.Timers.Timer;
 
-namespace Chotiskazal.Bot.Jobs {
+namespace Chotiskazal.Bot.Jobs;
+
 public static class UpdateCurrentScoresJob {
 
     private static DateTime _launchTime;
@@ -39,5 +40,4 @@ public static class UpdateCurrentScoresJob {
         }
         logger.Information("Refresh current score for users complete");
     }
-}
 }

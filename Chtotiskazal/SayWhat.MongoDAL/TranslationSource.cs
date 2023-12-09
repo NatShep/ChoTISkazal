@@ -1,11 +1,10 @@
-﻿namespace SayWhat.MongoDAL
+﻿namespace SayWhat.MongoDAL;
+
+public enum TranslationSource
 {
-    public enum TranslationSource
-    {
-        Yadic   = 1,
-        Yatrans = 2,
-        Manual   = 3,
-        AutoPhrase = 4,
-        Restored = 5,
-    }
+    Yadic   = 1,
+    Yatrans = 2,
+    Manual   = 3,
+    AutoPhrase = 4,
+    Restored = 5,
 }
