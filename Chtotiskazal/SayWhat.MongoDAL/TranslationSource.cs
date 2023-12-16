@@ -2,8 +2,14 @@
 
 public enum TranslationSource {
     Yadic = 1,
-    Yatrans = 2,
     Manual = 3,
-    AutoPhrase = 4,
-    Restored = 5,
+    GoogleTranslate = 4,
+    Google2Translate = 5,
+    MicrosoftTranslate = 6,
+    YandexTranslate = 7,
+    BingTranslate = 8,
+    UnknownGTranslate = 9,
+    AutoPhrase = 100,
+    Restored = 200,
+    
 }

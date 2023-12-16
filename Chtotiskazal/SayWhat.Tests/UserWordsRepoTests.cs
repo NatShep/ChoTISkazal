@@ -21,7 +21,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task Add_GetAllForUserReturnsIt() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
+        await _repo.Add(new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, 0));
         var allWords = await _repo.GetAllUserWordsAsync(user);
         Assert.AreEqual(1, allWords.Count);
         Assert.AreEqual("table", allWords[0].Word);
@@ -45,7 +45,7 @@ public class UserWordsRepoTests {
         for (int i = 0; i < worstCount; i++) {
             string word1 = $"table{i}";
             string tranlation = $"стол{i}";
-            var word = new UserWordModel(user.Id, word1, tranlation, i);
+            var word = new UserWordModel(user.Id, word1, tranlation, UserWordType.UsualWord, i);
             worstOnes.Add(word);
         }
 
@@ -59,7 +59,7 @@ public class UserWordsRepoTests {
             string word = $"table{i}";
             string tranlation = $"стол{i}";
             double rate = i + worstCount;
-            await _repo.Add(new UserWordModel(user.Id, word, tranlation, rate));
+            await _repo.Add(new UserWordModel(user.Id, word, tranlation, UserWordType.UsualWord, rate));
         }
 
         #endregion
@@ -95,7 +95,7 @@ public class UserWordsRepoTests {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
         for (int i = 0; i < count; i++) {
             string word = $"table{i}";
-            await _repo.Add(new UserWordModel(user.Id, word, "стол{i}", 0));
+            await _repo.Add(new UserWordModel(user.Id, word, "стол{i}", UserWordType.UsualWord, 0));
         }
 
         var allWords = await _repo.GetAllUserWordsAsync(user);
@@ -105,7 +105,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task TableHasNoWordsForUser_HasAnyReturnsFalse() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
+        await _repo.Add(new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, 0));
         var hasAny = await _repo.HasAnyFor(new UserModel { Id = ObjectId.GenerateNewId() });
         Assert.IsFalse(hasAny);
     }
@@ -113,7 +113,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task TableHasWordsForUser_HasAnyReturnsTrue() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
+        await _repo.Add(new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, 0));
         var hasAny = await _repo.HasAnyFor(user);
         Assert.True(hasAny);
     }
@@ -121,7 +121,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task TableHasWordForUser_GetWordReturnIt() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
+        await _repo.Add(new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, 0));
         var word = await _repo.GetWordOrDefault(user, "table");
         Assert.IsNotNull(word);
         Assert.AreEqual("table", word.Word);
@@ -131,7 +131,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task TableHasWordForOtherUser_GetWordReturnNull() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        await _repo.Add(new UserWordModel(user.Id, "table", "стол", 0));
+        await _repo.Add(new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, 0));
         var word = await _repo.GetWordOrDefault(new UserModel { Id = ObjectId.GenerateNewId() }, "table");
         Assert.IsNull(word);
     }
@@ -139,7 +139,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task AddTranslations_Update_GetReturnsUpdated() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        var word = new UserWordModel(user.Id, "table", "стол");
+        var word = new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord);
         await _repo.Add(word);
         word.AddTranslations(
             new List<UserWordTranslation>

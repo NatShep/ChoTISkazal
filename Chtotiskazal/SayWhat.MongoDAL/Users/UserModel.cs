@@ -379,7 +379,7 @@ public class UserModel {
         var months = new Dictionary<DateTime, MonthsStats>();
         _countByCategoryScores = new int[8];
         //   _outdatedWordsCount = 0;
-        this._gamingScore = 0;
+        _gamingScore = 0;
         foreach (var word in allUserWords) {
             var creationTime = word.Id.CreationTime;
             var day = creationTime.Date;

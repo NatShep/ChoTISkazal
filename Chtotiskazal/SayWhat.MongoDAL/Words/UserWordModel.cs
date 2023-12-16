@@ -15,19 +15,23 @@ namespace SayWhat.MongoDAL.Words;
 
 [BsonIgnoreExtraElements]
 public class UserWordModel {
-    public UserWordModel(ObjectId userUserId, string word, string translation, double rate = 0) {
+    public UserWordModel(
+        ObjectId userUserId, string word, string translation,
+        UserWordType wordType, double rate = 0) {
         _userUserId = userUserId;
         _word = word;
         _currentOrderScore = Math.Pow(
             1.5, rate);
         _absoluteScore = rate;
         _scoreUpdatedTimestamp = DateTime.Now;
+        _wordType = wordType;
         RuTranslations = new[] { new UserWordTranslation(translation) };
+        
     }
 
     public UserWordModel(
         ObjectId userId, string word, TranslationDirection direction, double absScore,
-        UserWordTranslation translation) {
+        UserWordTranslation translation, UserWordType wordType) {
         _userUserId = userId;
         _word = word;
         _translationDirection = direction;
@@ -35,11 +39,11 @@ public class UserWordModel {
             1.5, absScore);
         _absoluteScore = absScore;
         _scoreUpdatedTimestamp = DateTime.Now;
+        _wordType = wordType;
         RuTranslations = new[] { translation };
     }
 
     public UserWordModel() { }
-
 
     #region mongo fields
 
@@ -87,7 +91,7 @@ public class UserWordModel {
     [BsonElement("tr")] public UserWordTranslation[] RuTranslations { get; set; }
 
     [BsonElement("t")] [BsonDefaultValue(UserWordType.UsualWord)] [BsonIgnoreIfDefault]
-    private UserWordType _type = UserWordType.UsualWord;
+    private UserWordType _wordType = UserWordType.UsualWord;
 
     /// <summary>
     /// Last updated
@@ -97,14 +101,15 @@ public class UserWordModel {
 
     #endregion
 
+    public bool IsWord => _wordType == UserWordType.UsualWord;
+
+    public bool IsPhrase => !IsWord;
 
     public string Word => _word;
 
     // current score is increased AgedScore
     // for increase the distance between two values
-    public double CurrentOrderScore =>
-        Math.Pow(
-            1.5, Score.AgedScore);
+    public double CurrentOrderScore => Math.Pow(1.5, Score.AgedScore);
 
     public double AbsoluteScore => _absoluteScore;
     public int QuestionPassed => _questionPassed;

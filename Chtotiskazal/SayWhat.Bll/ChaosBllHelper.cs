@@ -50,7 +50,8 @@ public static class ChaosBllHelper {
                     translationDirection: word.Language == Language.En
                         ? TranslationDirection.EnRu
                         : TranslationDirection.RuEn,
-                    phrases: t.Examples.Select(e => e.ExampleOrNull).ToList()
+                    phrases: t.Examples.Select(e => e.ExampleOrNull).ToList(), 
+                    wordType: UserWordType.UsualWord
                 ))
             .ToArray();
 

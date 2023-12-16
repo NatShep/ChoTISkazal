@@ -37,7 +37,7 @@ public class ShowWellKnownWordsFlow {
 
     public async Task EnterAsync() {
         var wellKnownWords = (await _usersWordsService.GetAllWords(Chat.User))
-            .Where(u => u.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
+            .Where(u => u.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore && u.IsWord)
             .ToArray();
         var paginationForWords = new List<List<UserWordModel>>();
         var i = 0;

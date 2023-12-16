@@ -139,8 +139,8 @@ static class Program {
     }
 
     private static void OnBotWokeUp(Update update) {
-        Telegram.Bot.Types.Chat chat = null;
-        Telegram.Bot.Types.User user = null;
+        Chat chat = null;
+        User user = null;
         try {
             if (update?.Message != null) {
                 chat = update.Message.Chat;
@@ -172,7 +172,7 @@ static class Program {
         }
     }
 
-    public static MainFlow GetOrCreate(Telegram.Bot.Types.Chat chat) {
+    public static MainFlow GetOrCreate(Chat chat) {
         if (Chats.TryGetValue(chat.Id, out var existedChatRoom))
             return existedChatRoom;
 

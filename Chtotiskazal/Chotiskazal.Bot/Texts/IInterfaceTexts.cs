@@ -53,7 +53,6 @@ public interface IInterfaceTexts {
     string DidYouWriteSomething { get; }
     string EnterWordOrStart { get; }
     string NoTranslationsFound { get; }
-    string PhraseBecomeSoon { get; }
     string StartButton { get; }
     string CancelButton { get; }
     string OneMoreLearnButton { get; }
@@ -122,6 +121,8 @@ public interface IInterfaceTexts {
     string DoNotRemind { get; }
     string ReminderLearn { get; }
     string PressTranslateToMoveStartTranslation { get; }
+    string ToLearnPhrase { get; }
+    string ItWasLongTimeAgo { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
@@ -133,7 +134,8 @@ public interface IInterfaceTexts {
     Markdown Help { get; }
     Markdown MainMenuText { get; }
     Markdown YouHaveATypoLetsTryAgain(string text);
-    Markdown HereAreTheTranslation(string word, string tr);
+    Markdown HereAreTranslations(string word, string tr);
+    public Markdown HereIsThePhraseTranslation(string tr);
     Markdown LearnMoreWords(in int length);
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);

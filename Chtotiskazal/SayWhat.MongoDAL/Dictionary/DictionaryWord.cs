@@ -20,7 +20,7 @@ public class DictionaryWord {
     public DictionaryTranslationDbEntity[] Translations { get; set; }
     [BsonElement("src")]
     public TranslationSource Source { get; set; }
-
+    
     public DictionaryTranslationDbEntity GetTranslationOrNull(string ru) => 
         Translations.FirstOrDefault(t => t.Word.Equals(ru, StringComparison.InvariantCultureIgnoreCase));
 

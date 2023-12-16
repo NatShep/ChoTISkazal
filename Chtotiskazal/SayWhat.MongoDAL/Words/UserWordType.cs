@@ -4,6 +4,6 @@ public enum UserWordType {
     // word
     UsualWord = 1,
 
-    // automaticly added phrase
-    AutoPhrase = 2
+    // phrase
+    Phrase = 2
 }

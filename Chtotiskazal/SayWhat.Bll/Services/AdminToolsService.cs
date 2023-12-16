@@ -54,7 +54,7 @@ public class AdminToolsService {
                 var translations = await _localDictionaryService.GetAllTranslationWords(word.Word);
                 if (!translations.Any()) {
                     Console.WriteLine($"No translations for {user.TelegramNick}:{word.Word}");
-                    await _addWordService.TranslateAndAddToDictionary(word.Word);
+                    await _addWordService.TranslateWordAndAddToDictionary(word.Word);
                 }
                 else {
                     var hasSimilar = word.RuTranslations.Any(

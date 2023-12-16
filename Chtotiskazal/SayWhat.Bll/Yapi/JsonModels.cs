@@ -27,14 +27,14 @@ public class YaTranslation {
 
     public List<Example> GetPhrases(string word) {
         var phrases = new List<Example>();
-        if (this.Ex == null)
+        if (Ex == null)
             return phrases;
-        phrases.AddRange(this.Ex.Select(example => new Example
+        phrases.AddRange(Ex.Select(example => new Example
         {
             OriginWord = word,
             OriginPhrase = example.Text,
             TranslatedPhrase = example.Tr.FirstOrDefault()?.Text,
-            TranslatedWord = this.Text,
+            TranslatedWord = Text,
             Direction = TranslationDirection.EnRu,
         }));
         return phrases;

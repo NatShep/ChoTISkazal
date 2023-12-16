@@ -199,7 +199,7 @@ public class EssentialService {
     private async Task<WordInLearningSet> CreateWordInLocalDictionary(EssentialWord essentialWord) {
         Console.Write("Get word translation...");
         //load translations from yandex translate
-        await _addWordService.TranslateAndAddToDictionary(essentialWord.En);
+        await _addWordService.TranslateWordAndAddToDictionary(essentialWord.En);
         var dicword = await _localDictionaryRepo.GetOrDefault(essentialWord.En);
         if (dicword == null) {
             throw new InvalidOperationException();

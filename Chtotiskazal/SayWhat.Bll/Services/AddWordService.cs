@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GTranslate.Translators;
+using SayWhat.Bll.Dto;
 using SayWhat.Bll.Strings;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Language = SayWhat.MongoDAL.Language;
-using Translation = SayWhat.Bll.Dto.Translation;
 
 namespace SayWhat.Bll.Services;
 
@@ -18,6 +19,8 @@ public class AddWordService {
     private readonly LocalDictionaryService _localDictionaryService;
     private readonly UserService _userService;
     private const int MaxWordsForTranslate = 3;
+    private const int MaxPhraseLengthForTranslate = 3000; //actually it is 4096 for telegram
+    private readonly AggregateTranslator _gTranslator = new();
 
     public AddWordService(
         UsersWordsService usersWordsService,
@@ -30,11 +33,13 @@ public class AddWordService {
         _userService = userService;
     }
 
-    public async Task<IReadOnlyList<Translation>> TranslateAndAddToDictionary(string originWord) {
+    /// <summary>
+    /// Returns null if it was phrase, or translation was not found
+    /// </summary>
+    public async Task<IReadOnlyList<Translation>> TranslateWordAndAddToDictionary(string originWord) {
         originWord = originWord.ToLower();
 
         if (originWord.Count(e => e == ' ') >= MaxWordsForTranslate) return null;
-        //todo go to translate api
 
         IReadOnlyList<Translation> res = null;
         return originWord.IsRussian()
@@ -42,12 +47,15 @@ public class AddWordService {
             : await TranslateEnRuWordAndAddItToDictionary(originWord);
     }
 
+    public Task<Translation> SmartTranslate(string input) =>
+        SmartTranslate(input, input.IsRussian() ? TranslationDirection.RuEn : TranslationDirection.EnRu);
+
     public async Task<IReadOnlyList<Translation>> GetOrDownloadTranslation(string enWord) {
         if (enWord.IsRussian())
             throw new ArgumentException("Only en words allowed");
         var translations = await FindInLocalDictionaryWithExamples(enWord);
         if (!translations.Any()) // if not, search it in Ya dictionary
-            translations = await TranslateAndAddToDictionary(enWord);
+            translations = await TranslateWordAndAddToDictionary(enWord);
 
         // Inline keyboards has limitation for size of the message 
         // Workaraound: exclude all translations that are more than 32 symbols
@@ -83,14 +91,47 @@ public class AddWordService {
         return word.ToDictionaryTranslations();
     }
 
-    public async Task<IReadOnlyList<Translation>> FindInLocalDictionaryWithExamples(string word)
-        => await _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.ToLower());
+    private async Task<Translation> SmartTranslate(string input,
+        TranslationDirection direction) {
+        var fromLang = direction == TranslationDirection.EnRu ? "En" : "Ru";
+        var toLang = direction == TranslationDirection.EnRu ? "Ru" : "En";
+
+        try {
+            var gTranlsation = await _gTranslator.TranslateAsync(input, toLanguage: toLang, fromLanguage: fromLang);
+            if (string.Equals(gTranlsation.Translation.Trim(), input.Trim(), StringComparison.CurrentCultureIgnoreCase))
+                return null;
+            var isPhrase = gTranlsation.Translation.Contains(" ") || gTranlsation.Source.Contains(" ");
+            return new Translation(
+                originText: input,
+                translatedText: gTranlsation.Translation,
+                originTranscription: null,
+                translationDirection: direction,
+                source: gTranlsation.Source switch
+                {
+                    "GoogleTranslator" => TranslationSource.GoogleTranslate,
+                    "GoogleTranslator2" => TranslationSource.Google2Translate,
+                    "BingTranslator" => TranslationSource.BingTranslate,
+                    "MicrosoftTranslator" => TranslationSource.MicrosoftTranslate,
+                    "YandexTranslator" => TranslationSource.YandexTranslate,
+                    _ => TranslationSource.UnknownGTranslate
+                },
+                wordType: isPhrase ? UserWordType.Phrase : UserWordType.UsualWord);
+        }
+        catch (Exception e) {
+            Reporter.ReportTranslationNotFound(null);
+            return null;
+        }
+    }
+
+    public Task<IReadOnlyList<Translation>> FindInLocalDictionaryWithExamples(string word)
+        => _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.ToLower());
 
     public async Task AddTranslationToUser(UserModel user, Translation translation) {
         if (translation == null) return;
         if (translation.TranslationDirection != TranslationDirection.EnRu)
             throw new InvalidOperationException("Only en-ru direction is supported");
-
+        if (!translation.CanBeSavedToDictionary)
+            return;
         var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
 
         if (alreadyExistsWord == null) {
@@ -100,6 +141,7 @@ public class AddWordService {
                 word: translation.OriginText,
                 direction: TranslationDirection.EnRu,
                 absScore: 0,
+                wordType: translation.WordType,
                 translation: new UserWordTranslation
                 {
                     Transcription = translation.EnTranscription,

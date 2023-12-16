@@ -7,6 +7,7 @@ using SayWhat.Bll.Dto;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.Words;
 
 namespace SayWhat.Bll.Services;
 
@@ -147,7 +148,9 @@ public class LocalDictionaryService {
                     translation.Word,
                     word.Transcription,
                     word.Language == Language.En ? TranslationDirection.EnRu : TranslationDirection.RuEn,
-                    word.Source, examples));
+                    word.Source, 
+                    examples, 
+                    UserWordType.UsualWord));
         }
 
         return result;
@@ -157,27 +160,6 @@ public class LocalDictionaryService {
         examplesId.Any()
             ? await _exampleRepository.GetAll(examplesId)
             : new List<Example>();
-
-    public async Task<IReadOnlyList<Translation>> GetTranslationsWithoutExamples(string enword) {
-        var word = await _dicRepository.GetOrDefault(enword);
-        if (word == null)
-            return new Translation[0];
-
-        return word.Translations
-            .Select(
-                translation => new Translation(
-                    originText: word.Word,
-                    translatedText: translation.Word,
-                    originTranscription: word.Transcription,
-                    translationDirection: word.Language == Language.En
-                        ? TranslationDirection.EnRu
-                        : TranslationDirection.RuEn,
-                    source: word.Source,
-                    translation.Examples
-                        .Select(e => new Example { Id = e.ExampleId })
-                        .ToList()))
-            .ToList();
-    }
 
     /// <summary>
     /// Adds word, its translation and examples to database

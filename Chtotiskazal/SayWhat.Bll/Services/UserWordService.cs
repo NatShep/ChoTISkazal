@@ -39,7 +39,7 @@ public class UsersWordsService {
 
         var examples = (await _examplesRepo.GetAll(ids)).ToDictionary(e => e.Id);
 
-        foreach (var word in words) {
+        foreach (var word in words.Where(w=>w.IsWord)) {
             foreach (var translation in word.RuTranslations) {
                 foreach (var example in translation.Examples) {
                     example.ExampleOrNull = examples[example.ExampleId];
@@ -223,6 +223,7 @@ public class UsersWordsService {
                 highRating,
                 sorting))
             .Shuffle()
+            .Where(u=>u.IsWord)
             .Take(count)
             .ToList();
 

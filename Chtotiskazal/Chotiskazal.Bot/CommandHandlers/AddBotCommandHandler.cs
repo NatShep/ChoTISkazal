@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
+using Chotiskazal.Bot.ChatFlows.FlowTranslation;
 using Chotiskazal.Bot.Hooks;
 using SayWhat.Bll.Services;
 
@@ -23,6 +24,6 @@ public class AddBotCommandHandler : IBotCommandHandler {
     public string ParseArgument(string text) => null;
 
     public Task Execute(string argument, ChatRoom chat) =>
-        new TranslateWordsFlow(chat, _addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook)
+        new TranslateFlow(chat, _addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook)
             .Enter(argument);
 }

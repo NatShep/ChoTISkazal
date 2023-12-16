@@ -27,7 +27,7 @@ public class RussianTexts : IInterfaceTexts {
     public string TodaysGoal => "Цель на день";
     public string Exams => "экзаменов";
     public string TodayGoalReached => "Цель на день - достигнута!";
-
+    
     public Markdown OutOfScopeWithCandidate(string otherMeaning) {
         return Markdown.Escaped("Перевод-то правильный, но учим мы не его (имелось ввиду ")
             .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
@@ -67,7 +67,7 @@ public class RussianTexts : IInterfaceTexts {
     public string DoNotRemind => "Не напоминать";
     public string ReminderLearn => "Вы не забыли про меня? Предлагаю повторить слова!\r\n";
     public string PressTranslateToMoveStartTranslation => $"Нажмите {BotCommands.Translate} для перевода слова";
-
+    public string ToLearnPhrase => "Я хочу это учить";
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
@@ -101,14 +101,12 @@ public class RussianTexts : IInterfaceTexts {
     public string DidYouWriteSomething => "Вы что то писали? Всё это время я спал...";
 
     public string EnterWordOrStart =>
-        "Введите английское или русское слово для перевода или жмякните /start что бы перейти в главное меню";
+        "Введите английское или русское слово или фразу для перевода или нажмите /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
-
-    public string PhraseBecomeSoon => "Сейчас я не умею переводить фразы. Но скоро это станет возможным!";
-
+    
     public Markdown LearningCarefullyStudyTheList =>
-        Markdown.Escaped("Ботаем").ToSemiBold()
+        Markdown.Escaped("Учим").ToSemiBold()
             .NewLine()
             .AddEscaped("Внимательно посмотрите слова из списка:");
 
@@ -121,6 +119,8 @@ public class RussianTexts : IInterfaceTexts {
     public string DontPeekUpward => "Попробуйте ответить не подглядывая на верх!";
 
     public string NeedToAddMoreWordsBeforeLearning => "Нужно перевести больше слов дабы начать ботать";
+
+    public string ItWasLongTimeAgo => "Это было слишком давно";
 
     public Markdown Help => Markdown
         .Escaped("Привет! Я переводчик и учитель.*\r\n\r\n").ToSemiBold()
@@ -145,8 +145,12 @@ public class RussianTexts : IInterfaceTexts {
 
     public string OopsSomethingGoesWrong =>
         "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
-
-    public Markdown HereAreTheTranslation(string word, string tr)
+    
+    public Markdown HereIsThePhraseTranslation(string tr)
+        => Markdown.Escaped("Перевод:").ToItalic().NewLine() +
+           Markdown.Escaped($"\r\n\r\n[{tr}]\r\n").ToQuotationMono();
+    
+    public Markdown HereAreTranslations(string word, string tr)
         => Markdown.Escaped("Вот что я перевел.\r\n" +
                             "Выберите один или несколько переводов, дабы заботать их в будущем").ToItalic()
             .NewLine()

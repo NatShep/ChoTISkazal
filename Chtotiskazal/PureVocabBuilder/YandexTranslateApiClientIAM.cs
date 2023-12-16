@@ -75,7 +75,7 @@ public class YaTransQuery
     public string TargetLanguageCode { get; set; }
 }
 
-public class Translation {
+public class YaTranslation {
     [JsonPropertyName("text")]
     public string Text { get; set; }
     
@@ -86,5 +86,5 @@ public class Translation {
 public class YaTransAnswer
 {
     [JsonPropertyName("translations")] 
-    public Translation[] Translations { get; set; }
+    public YaTranslation[] Translations { get; set; }
 }

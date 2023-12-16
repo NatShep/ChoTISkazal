@@ -37,12 +37,12 @@ public class AddWordServiceTest {
         var user = new UserModel(null, "vasa", "pupkin", "@vasa", UserSource.Telegram);
         await _userRepo.Add(user);
         await _service.AddTranslationToUser(
-            user, new Translation("piss", "моча", "", TranslationDirection.EnRu, TranslationSource.Manual));
+            user, new Translation("piss", "моча", "", TranslationDirection.EnRu, TranslationSource.Manual, UserWordType.UsualWord));
         await _service.AddTranslationToUser(
-            user, new Translation("piss", "писать", "", TranslationDirection.EnRu, TranslationSource.Manual));
+            user, new Translation("piss", "писать", "", TranslationDirection.EnRu, TranslationSource.Manual, UserWordType.UsualWord));
 
         await _service.RemoveTranslationFromUser(
-            user, new Translation("piss", "писать", "", TranslationDirection.EnRu, TranslationSource.Manual));
+            user, new Translation("piss", "писать", "", TranslationDirection.EnRu, TranslationSource.Manual, UserWordType.UsualWord));
 
         var word = await _userWordsRepo.GetWordOrDefault(user, "piss");
 
@@ -51,7 +51,7 @@ public class AddWordServiceTest {
 
 
         await _service.RemoveTranslationFromUser(
-            user, new Translation("piss", "моча", "", TranslationDirection.EnRu, TranslationSource.Manual));
+            user, new Translation("piss", "моча", "", TranslationDirection.EnRu, TranslationSource.Manual, UserWordType.UsualWord));
         Assert.IsNull(await _userWordsRepo.GetWordOrDefault(user, "piss"));
     }
 }

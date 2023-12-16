@@ -96,11 +96,9 @@ public class EnglishTexts : IInterfaceTexts {
     public string DidYouWriteSomething => "Did you write something? I was asleep the whole time...";
 
     public string EnterWordOrStart => 
-        "Enter english or russian word to translate or /start to open main menu ";
+        "Enter english or russian word or text to translate or /start to open main menu ";
 
     public string NoTranslationsFound => "No translations found. Check the word and try again";
-
-    public string PhraseBecomeSoon => "There is no phrase interpreter. It is are coming soon";
 
     public Markdown LearningCarefullyStudyTheList =>
         Markdown.Escaped("Learning").ToSemiBold()
@@ -145,14 +143,20 @@ public class EnglishTexts : IInterfaceTexts {
     public string ActionIsNotAllowed => "action is not allowed";
     public string OopsSomethingGoesWrong => 
         "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
-
-    public Markdown HereAreTheTranslation(string word, string tr)
-        => Markdown.Escaped("Here are the translations.").ToItalic().NewLine() +
+    public string ToLearnPhrase => "I want to learn it";
+    public string ItWasLongTimeAgo => "It was long time ago";
+    
+    public Markdown HereAreTranslations(string word, string tr)
+        => Markdown.Escaped("Here are translations.").ToItalic().NewLine() +
            Markdown.Escaped("Choose one of them to learn them in the future").ToItalic()
                .NewLine()
                .NewLine() +
            Markdown.Escaped(word.Capitalize()).ToSemiBold() +
            Markdown.Escaped($"{(tr == null ? "\r\n" : $"\r\n\r\n[{tr}]\r\n")}").ToQuotationMono();
+
+    public Markdown HereIsThePhraseTranslation(string tr)
+        => Markdown.Escaped("Translation:").ToItalic().NewLine() +
+           Markdown.Escaped($"\r\n\r\n[{tr}]\r\n").ToQuotationMono();
 
     public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
