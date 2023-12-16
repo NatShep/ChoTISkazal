@@ -10,7 +10,6 @@ public class ClearScreenQuestionDecorator:IQuestion {
     public double PassScore => _origin.PassScore;
     public double FailScore => _origin.FailScore;
 
-
     public ClearScreenQuestionDecorator(IQuestion origin)=> _origin = origin;
 
     public string Name => "Clean "+ _origin.Name;

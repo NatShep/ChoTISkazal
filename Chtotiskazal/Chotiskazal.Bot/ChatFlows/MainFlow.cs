@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.CommandHandlers;
 using Chotiskazal.Bot.Hooks;
+using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
@@ -19,7 +21,8 @@ public class MainFlow {
         UserService userService,
         LocalDictionaryService localDictionaryService,
         LearningSetService learningSetService,
-        ButtonCallbackDataService buttonCallbackDataService) {
+        ButtonCallbackDataService buttonCallbackDataService, 
+        QuestionSelector questionSelector) {
         ChatIo = chatIo;
         _userInfo = userInfo;
         _settings = settings;
@@ -29,7 +32,7 @@ public class MainFlow {
         _localDictionaryService = localDictionaryService;
         _learningSetService = learningSetService;
         _buttonCallbackDataService = buttonCallbackDataService;
-
+        _questionSelector = questionSelector;
     }
 
     private readonly AddWordService _addWordsService;
@@ -37,6 +40,7 @@ public class MainFlow {
     private readonly UserService _userService;
     private readonly LocalDictionaryService _localDictionaryService;
     private readonly ButtonCallbackDataService _buttonCallbackDataService;
+    private readonly QuestionSelector _questionSelector;
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
     private readonly BotSettings _settings;
@@ -112,7 +116,7 @@ public class MainFlow {
         ChatIo.CommandHandlers = new[] {
             HelpBotCommandHandler.Instance,
             new StatsBotCommandHandler(_settings.ExamSettings),
-            new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings),
+            new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings, _questionSelector),
             _addWordCommandHandler,
             new ShowLearningSetsBotCommandHandler(_learningSetService),
             new ShowWellLearnedWordsCommandHandler(_usersWordsService,_wellKnownWordsUpdateHook),

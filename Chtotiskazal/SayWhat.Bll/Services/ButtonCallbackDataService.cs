@@ -5,17 +5,7 @@ using SayWhat.MongoDAL.LongDataForTranslationButton;
 
 namespace SayWhat.Bll.Services;
 
-public class TranslationButtonData {
-    public TranslationButtonData(string origin, string translation, bool isSelected) {
-        Origin = origin;
-        Translation = translation;
-        IsSelected = isSelected;
-    }
-
-    public string Origin { get; }
-    public string Translation { get; }
-    public bool IsSelected { get; }
-}
+public record TranslationButtonData(string Origin, string Translation, bool IsSelected);
 
 public class ButtonCallbackDataService {
     private readonly LongCallbackDataRepo _longCallbackDataRepository;
@@ -73,19 +63,15 @@ public class ButtonCallbackDataService {
             return new TranslationButtonData(translationButtonData.Word, translationButtonData.Translation,
                 splitted[1] == "1");
         }
-
         return null;
     }
 
-    public async Task<LongCallbackData> GetLongButtonData(string translation) {
-        return await _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
-    }
+    private Task<LongCallbackData> GetLongButtonData(string translation) => 
+        _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
 
-    public async Task<LongCallbackData?> GetLongButtonData(ObjectId translation) {
-        return await _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
-    }
+    private Task<LongCallbackData?> GetLongButtonData(ObjectId translation) => 
+        _longCallbackDataRepository.GetCallbackDataOrDefault(translation);
 
-    public async Task AddLongButtonData(LongCallbackData callbackData) {
-        await _longCallbackDataRepository.Add(callbackData);
-    }
+    private Task AddLongButtonData(LongCallbackData callbackData) => 
+        _longCallbackDataRepository.Add(callbackData);
 }

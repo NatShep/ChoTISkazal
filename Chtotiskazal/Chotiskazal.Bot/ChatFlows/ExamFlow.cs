@@ -16,6 +16,7 @@ namespace Chotiskazal.Bot.ChatFlows;
 public class ExamFlow
 {
     private readonly ExamSettings _examSettings;
+    private readonly QuestionSelector _questionSelector;
     private ChatRoom Chat { get; }
     private readonly UserService _userService;
     private readonly UsersWordsService _usersWordsService;
@@ -24,12 +25,14 @@ public class ExamFlow
         ChatRoom chat, 
         UserService userService,
         UsersWordsService usersWordsService, 
-        ExamSettings examSettings)
+        ExamSettings examSettings, 
+        QuestionSelector questionSelector)
     {
         Chat = chat;
         _userService = userService;
         _usersWordsService = usersWordsService;
         _examSettings = examSettings;
+        _questionSelector = questionSelector;
     }
 
     public async Task EnterAsync()
@@ -153,7 +156,7 @@ public class ExamFlow
 
             var allLearningWordsWereShowedAtLeastOneTime = wordQuestionNumber < learningWordsCount;
             var question =
-                QuestionSelector.Singletone.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
+                _questionSelector.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word);
             wordQuestionNumber++;
 
             var learnList = distinctLearningWords;
@@ -282,7 +285,7 @@ public class ExamFlow
                 var qName = question.Name;
                 for (int iteration = 0;question.Name==qName; iteration++)
                 {
-                    question = QuestionSelector.Singletone.GetNextQuestionFor(wordQuestionNumber == 0, word);
+                    question = _questionSelector.GetNextQuestionFor(wordQuestionNumber == 0, word);
                     if(iteration>100)
                         return QuestionResult.Failed(Markdown.Empty,Markdown.Empty);
                 }

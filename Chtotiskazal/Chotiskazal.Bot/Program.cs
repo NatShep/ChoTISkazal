@@ -36,6 +36,7 @@ static class Program {
     private static BotSettings _settings;
     private static UserService _userService;
     private static LearningSetService _learningSetService;
+    private static QuestionSelector _questionSelector;
 
     private static async Task Main() {
         TaskScheduler.UnobservedTaskException +=
@@ -74,7 +75,7 @@ static class Program {
             _userService);
         _buttonCallbackDataService = new ButtonCallbackDataService(longDataForButtonRepo);
 
-        QuestionSelector.Singletone = new QuestionSelector(_localDictionaryService);
+        _questionSelector = new QuestionSelector(_localDictionaryService);
 
         _botClient = new TelegramBotClient(_settings.TelegramToken);
 
@@ -238,7 +239,8 @@ static class Program {
             _userService,
             _localDictionaryService,
             _learningSetService,
-            _buttonCallbackDataService);
+            _buttonCallbackDataService, 
+            _questionSelector);
         Chats.TryAdd(chat.Id, newChatRoom);
         return newChatRoom;
     }

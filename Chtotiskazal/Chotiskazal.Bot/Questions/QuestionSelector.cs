@@ -11,136 +11,134 @@ namespace Chotiskazal.Bot.Questions;
 
 public class QuestionSelector
 {
-    public static QuestionSelector Singletone { get; set; }
+    private readonly ExamAndPreferredScore _engChoose = new(
+        Question: new EngChooseQuestion(),
+        ExpectedScore: 0.6,
+        Frequency: 7);
 
-    private readonly ExamAndPreferredScore _engChoose = new ExamAndPreferredScore(
-        question: new EngChooseQuestion(),
-        expectedScore: 0.6,
-        frequency: 7);
+    private readonly ExamAndPreferredScore _ruChoose = new(
+        Question: new RuChooseQuestion(),
+        ExpectedScore: 0.6,
+        Frequency: 7);
 
-    private readonly ExamAndPreferredScore _ruChoose = new ExamAndPreferredScore(
-        question: new RuChooseQuestion(),
-        expectedScore: 0.6,
-        frequency: 7);
+    private readonly ExamAndPreferredScore _engTrust = new(
+        Question: new EnTrustQuestion(),
+        ExpectedScore: 2,
+        Frequency: 10);
 
-    private readonly ExamAndPreferredScore _engTrust = new ExamAndPreferredScore(
-        question: new EnTrustQuestion(),
-        expectedScore: 2,
-        frequency: 10);
+    private readonly ExamAndPreferredScore _ruTrust = new(
+        Question: new RuTrustQuestion(),
+        ExpectedScore: 2,
+        Frequency: 10);
 
-    private readonly ExamAndPreferredScore _ruTrust = new ExamAndPreferredScore(
-        question: new RuTrustQuestion(),
-        expectedScore: 2,
-        frequency: 10);
+    private readonly ExamAndPreferredScore _ruTrustSingle = new(
+        Question: new RuTrustSingleTranslationQuestion(), 
+        ExpectedScore: 2,
+        Frequency: 10);
 
-    private readonly ExamAndPreferredScore _ruTrustSingle = new ExamAndPreferredScore(
-        question: new RuTrustSingleTranslationQuestion(), 
-        expectedScore: 2,
-        frequency: 10);
+    private readonly ExamAndPreferredScore _engPhraseChoose = new(
+        Question: new EngChoosePhraseQuestion(),
+        ExpectedScore: 6,
+        Frequency: 4);
 
-    private readonly ExamAndPreferredScore _engPhraseChoose = new ExamAndPreferredScore(
-        question: new EngChoosePhraseQuestion(),
-        expectedScore: 6,
-        frequency: 4);
-
-    private readonly ExamAndPreferredScore _ruPhraseChoose = new ExamAndPreferredScore(
-        question: new RuChoosePhraseQuestion(),
-        expectedScore: 6,
-        frequency: 4);
+    private readonly ExamAndPreferredScore _ruPhraseChoose = new(
+        Question: new RuChoosePhraseQuestion(),
+        ExpectedScore: 6,
+        Frequency: 4);
 
         
     private ExamAndPreferredScore _engEasyWriteMissingLetter =>
-        new ExamAndPreferredScore(
-            question: new EngWriteMissingLettersQuestion(StarredHardness.Easy),
-            expectedScore: 2.1,
-            frequency: 7);
+        new(
+            Question: new EngWriteMissingLettersQuestion(StarredHardness.Easy),
+            ExpectedScore: 2.1,
+            Frequency: 7);
     private ExamAndPreferredScore _ruEasyWriteMissingLetter =>
-        new ExamAndPreferredScore(
-            question: new RuWriteMissingLettersQuestion(StarredHardness.Easy),
-            expectedScore: 2.1,
-            frequency: 7);
+        new(
+            Question: new RuWriteMissingLettersQuestion(StarredHardness.Easy),
+            ExpectedScore: 2.1,
+            Frequency: 7);
         
     private ExamAndPreferredScore _engHardWriteMissingLetter =>
-        new ExamAndPreferredScore(
-            question: new EngWriteMissingLettersQuestion(StarredHardness.Hard),
-            expectedScore: 2.6,
-            frequency: 7);
+        new(
+            Question: new EngWriteMissingLettersQuestion(StarredHardness.Hard),
+            ExpectedScore: 2.6,
+            Frequency: 7);
     private ExamAndPreferredScore _ruHardWriteMissingLetter =>
-        new ExamAndPreferredScore(
-            question: new RuWriteMissingLettersQuestion(StarredHardness.Hard),
-            expectedScore: 2.6,
-            frequency: 7);
+        new(
+            Question: new RuWriteMissingLettersQuestion(StarredHardness.Hard),
+            ExpectedScore: 2.6,
+            Frequency: 7);
 
-    private readonly ExamAndPreferredScore _engChooseWordInPhrase = new ExamAndPreferredScore(
+    private readonly ExamAndPreferredScore _engChooseWordInPhrase = new(
         new EngChooseWordInPhraseQuestion(), 4, 20);
 
-    private readonly ExamAndPreferredScore _clearEngChooseWordInPhrase = new ExamAndPreferredScore(
+    private readonly ExamAndPreferredScore _clearEngChooseWordInPhrase = new(
         new ClearScreenQuestionDecorator(new EngChooseWordInPhraseQuestion()), 2.3, 20);
 
-    private readonly ExamAndPreferredScore _engPhraseSubstitute = new ExamAndPreferredScore(
-        question: new EngPhraseSubstituteQuestion(),
-        expectedScore: 4,
-        frequency: 12);
+    private readonly ExamAndPreferredScore _engPhraseSubstitute = new(
+        Question: new EngPhraseSubstituteQuestion(),
+        ExpectedScore: 4,
+        Frequency: 12);
 
-    private readonly ExamAndPreferredScore _ruPhraseSubstitute = new ExamAndPreferredScore(
-        question: new RuPhraseSubstituteQuestion(),
-        expectedScore: 4,
-        frequency: 12);
+    private readonly ExamAndPreferredScore _ruPhraseSubstitute = new(
+        Question: new RuPhraseSubstituteQuestion(),
+        ExpectedScore: 4,
+        Frequency: 12);
 
-    private readonly ExamAndPreferredScore _assemblePhraseExam = new ExamAndPreferredScore(
+    private readonly ExamAndPreferredScore _assemblePhraseExam = new(
         new AssemblePhraseQuestion(), 2.3, 7);
 
-    private readonly ExamAndPreferredScore _clearEngPhraseSubstitute = new ExamAndPreferredScore(
-        question: new ClearScreenQuestionDecorator(new EngPhraseSubstituteQuestion()),
-        expectedScore: 6,
-        frequency: 12);
+    private readonly ExamAndPreferredScore _clearEngPhraseSubstitute = new(
+        Question: new ClearScreenQuestionDecorator(new EngPhraseSubstituteQuestion()),
+        ExpectedScore: 6,
+        Frequency: 12);
 
-    private readonly ExamAndPreferredScore _clearRuPhraseSubstitute = new ExamAndPreferredScore(
-        question: new ClearScreenQuestionDecorator(new RuPhraseSubstituteQuestion()),
-        expectedScore: 6,
-        frequency: 12);
+    private readonly ExamAndPreferredScore _clearRuPhraseSubstitute = new(
+        Question: new ClearScreenQuestionDecorator(new RuPhraseSubstituteQuestion()),
+        ExpectedScore: 6,
+        Frequency: 12);
 
         
     private ExamAndPreferredScore EngWrite(LocalDictionaryService service) =>
-        new ExamAndPreferredScore(
-            question: new EngWriteQuestion(service),
-            expectedScore: 2.6,
-            frequency: 14);
+        new(
+            Question: new EngWriteQuestion(service),
+            ExpectedScore: 2.6,
+            Frequency: 14);
 
-    private ExamAndPreferredScore RuWrite(LocalDictionaryService service) => new ExamAndPreferredScore(
-        question: new RuWriteQuestion(service),
-        expectedScore: 2.6,
-        frequency: 14);
+    private ExamAndPreferredScore RuWrite(LocalDictionaryService service) => new(
+        Question: new RuWriteQuestion(service),
+        ExpectedScore: 2.6,
+        Frequency: 14);
         
-    private readonly ExamAndPreferredScore _transcriptionExam = new ExamAndPreferredScore(
-        question: new TranscriptionChooseQuestion(),
-        expectedScore: 1.6,
-        frequency:10);
+    private readonly ExamAndPreferredScore _transcriptionExam = new(
+        Question: new TranscriptionChooseQuestion(),
+        ExpectedScore: 1.6,
+        Frequency:10);
 
-    private readonly ExamAndPreferredScore _engChooseByTranscriptionExam = new ExamAndPreferredScore(
-        question: new TranscriptionChooseEngQuestion(),
-        expectedScore: 2.7,
-        frequency: 7);
+    private readonly ExamAndPreferredScore _engChooseByTranscriptionExam = new(
+        Question: new TranscriptionChooseEngQuestion(),
+        ExpectedScore: 2.7,
+        Frequency: 7);
 
-    private readonly ExamAndPreferredScore _ruChooseByTranscriptionExam = new ExamAndPreferredScore(
-        question: new TranscriptionChooseRuQuestion(),
-        expectedScore: 3.3,
-        frequency: 7);
+    private readonly ExamAndPreferredScore _ruChooseByTranscriptionExam = new(
+        Question: new TranscriptionChooseRuQuestion(),
+        ExpectedScore: 3.3,
+        Frequency: 7);
         
-    private readonly ExamAndPreferredScore _isItRightTranslationExam = new ExamAndPreferredScore(
-        question:new IsItRightTranslationQuestion(), 
-        expectedScore:1.6,
-        frequency:7);
+    private readonly ExamAndPreferredScore _isItRightTranslationExam = new(
+        Question:new IsItRightTranslationQuestion(), 
+        ExpectedScore:1.6,
+        Frequency:7);
 
-    private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new ExamAndPreferredScore(
-        question:new EngChooseMultipleTranslationsQuestion(),  
-        expectedScore:1.6,
-        frequency:10);
+    private readonly ExamAndPreferredScore _engChooseMultipleTranslationExam = new(
+        Question:new EngChooseMultipleTranslationsQuestion(),  
+        ExpectedScore:1.6,
+        Frequency:10);
 
-    private ExamAndPreferredScore RuWriteSingleTranslationExam(LocalDictionaryService service) => new ExamAndPreferredScore(
-        question:new RuWriteSingleTarnslationQuestion(service),  
-        expectedScore:1.6,
-        frequency:10);
+    private ExamAndPreferredScore RuWriteSingleTranslationExam(LocalDictionaryService service) => new(
+        Question:new RuWriteSingleTarnslationQuestion(service),  
+        ExpectedScore:1.6,
+        Frequency:10);
 
     public QuestionSelector(LocalDictionaryService localDictionaryService)
     {
@@ -155,7 +153,7 @@ public class QuestionSelector
             _isItRightTranslationExam,
             _engChooseMultipleTranslationExam,
         };
-        _intermidiateExamsList = new[]
+        _intermediateExamsList = new[]
         {
             _engEasyWriteMissingLetter,
             _ruEasyWriteMissingLetter,
@@ -204,11 +202,11 @@ public class QuestionSelector
     }
 
     private readonly ExamAndPreferredScore[] _simpleExamsList;
-    private readonly ExamAndPreferredScore[] _intermidiateExamsList;
+    private readonly ExamAndPreferredScore[] _intermediateExamsList;
     private readonly ExamAndPreferredScore[] _advancedExamsList;
 
     public HashSet<ExamAndPreferredScore> AllQuestions =>
-        _simpleExamsList.Concat(_intermidiateExamsList).Concat(_advancedExamsList).ToHashSet();
+        _simpleExamsList.Concat(_intermediateExamsList).Concat(_advancedExamsList).ToHashSet();
     public IQuestion GetNextQuestionFor(bool isFirstExam, UserWordModel model)
     {
         if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.LearningWordMinScore)
@@ -218,7 +216,7 @@ public class QuestionSelector
         var score = model.AbsoluteScore - (isFirstExam ? WordLeaningGlobalSettings.LearningWordMinScore/2 : 0);
 
         return ChooseExam(score, model.AbsoluteScore < WordLeaningGlobalSettings.WellDoneWordMinScore 
-            ? _intermidiateExamsList 
+            ? _intermediateExamsList 
             : _advancedExamsList);
     }
 
@@ -239,17 +237,5 @@ public class QuestionSelector
         return choice ?? probability.Last().Value;
     }
 
-    public class ExamAndPreferredScore
-    {
-        public ExamAndPreferredScore(IQuestion question, double expectedScore, int frequency)
-        {
-            Question = question;
-            ExpectedScore = expectedScore;
-            Frequency = frequency;
-        }
-
-        public IQuestion Question { get; }
-        public double ExpectedScore { get; }
-        public int Frequency { get; }
-    }
+    public record ExamAndPreferredScore(IQuestion Question, double ExpectedScore, int Frequency);
 }

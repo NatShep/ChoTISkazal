@@ -7,8 +7,7 @@ public class QuestionResult
 {
     private readonly Markdown _openResultsText;
     private readonly Markdown _resultsBeforeHideousText;
-    public const string NoText = "";
-        
+
     private QuestionResult(Markdown openResultsText, Markdown resultsBeforeHideousText, ExamResult results)
     {
         _openResultsText = openResultsText;

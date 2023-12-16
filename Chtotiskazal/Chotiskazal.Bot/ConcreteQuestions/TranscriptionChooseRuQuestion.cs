@@ -13,7 +13,6 @@ public class TranscriptionChooseRuQuestion:IQuestion
     public double PassScore => 1.0;
     public double FailScore => 0.6;
 
-
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList)
     {
         var originTranslation = word.RuTranslations.GetRandomItemOrNull();

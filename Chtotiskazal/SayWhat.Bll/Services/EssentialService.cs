@@ -26,7 +26,7 @@ public class EssentialService {
         _learningSetsRepo = learningSetsRepo;
     }
 
-    public async Task<List<WordInLearningSet>> MergeEssentials(IList<EssentialWord> esWords) {
+    private async Task<List<WordInLearningSet>> MergeEssentials(IList<EssentialWord> esWords) {
         // для каждого слова - смотрим есть ли это слово в  бд
         // если нет - то создаем и добавляем фразы с ним связанные, сверху докатываем Yandex перевод из словаря
         // если есть - то:
