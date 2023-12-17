@@ -102,15 +102,16 @@ public class AddWordService {
         return word.ToDictionaryTranslations();
     }
 
-    private async Task<Translation> SmartTranslate(string input,
-        TranslationDirection direction) {
+    private async Task<Translation> SmartTranslate(string input, TranslationDirection direction) {
         var fromLang = direction == TranslationDirection.EnRu ? "En" : "Ru";
         var toLang = direction == TranslationDirection.EnRu ? "Ru" : "En";
 
         try {
             var gTranlsation = await _gTranslator.TranslateAsync(input, toLanguage: toLang, fromLanguage: fromLang);
+            // Translation service may return same string, as input. That means, that there is no known translations
             if (string.Equals(gTranlsation.Translation.Trim(), input.Trim(), StringComparison.CurrentCultureIgnoreCase))
-                return null;
+                return null; 
+            
             var isPhrase = gTranlsation.Translation.Contains(" ") || gTranlsation.Source.Contains(" ");
             return new Translation(
                 originText: input,

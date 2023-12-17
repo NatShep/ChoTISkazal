@@ -12,19 +12,17 @@ public class LastPhraseTranslationHandler : LastTranslationHandlerBase {
 
     public LastPhraseTranslationHandler(
         SayWhat.Bll.Dto.Translation phraseTranslation, ChatRoom chat,
-        AddWordService addWordService, ButtonCallbackDataService buttonCallbackDataService,
-        bool isSelected) : base(
+        AddWordService addWordService, ButtonCallbackDataService buttonCallbackDataService, bool isSelected) : base(
         phraseTranslation.OriginText,
         chat,
         addWordService,
-        buttonCallbackDataService,
-        chat.Texts.HereIsThePhraseTranslation(phraseTranslation.TranslatedText)) {
+        buttonCallbackDataService) {
         _phraseTranslation = phraseTranslation;
         _isSelected = isSelected;
     }
 
     protected override async Task<IList<InlineKeyboardButton[]>> CreateCustomButtons() {
-        var theButton = await AddWordHelper.CreateButtonFor(
+        var theButton = await TranslateWordHelper.CreateButtonFor(
             buttonCallbackDataService: ButtonCallbackDataService,
             text: Chat.Texts.ToLearnPhrase,
             translation: _phraseTranslation,

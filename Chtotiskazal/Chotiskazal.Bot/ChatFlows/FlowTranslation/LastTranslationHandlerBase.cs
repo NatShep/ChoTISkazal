@@ -15,7 +15,6 @@ public abstract class LastTranslationHandlerBase {
 
     protected readonly AddWordService AddWordService;
     protected readonly ButtonCallbackDataService ButtonCallbackDataService;
-    private readonly Markdown _message;
     private bool _isLastMessageInTheChat = true;
 
     /// <summary>
@@ -29,14 +28,12 @@ public abstract class LastTranslationHandlerBase {
         string originText,
         ChatRoom chat,
         AddWordService addWordService,
-        ButtonCallbackDataService buttonCallbackDataService,
-        Markdown message
+        ButtonCallbackDataService buttonCallbackDataService
         ) {
         Chat = chat;
         OriginWordText = originText;
         AddWordService = addWordService;
         ButtonCallbackDataService = buttonCallbackDataService;
-        _message = message;
     }
 
     /// <summary>
@@ -53,7 +50,7 @@ public abstract class LastTranslationHandlerBase {
     
     protected abstract Task<IList<InlineKeyboardButton[]>> CreateCustomButtons();
     
-    public async Task SendTranslationMessage() {
+    public async Task SendTranslationMessage(Markdown message) {
         var buttons = (await CreateButtons()).ToArray();
         if (!buttons.Any()) {
             await Chat.SendMessageAsync(Chat.Texts.NoTranslationsFound);
@@ -61,7 +58,7 @@ public abstract class LastTranslationHandlerBase {
             return;
         }
 
-        _originMessageId = await Chat.SendMarkdownMessageAsync(_message , buttons);
+        _originMessageId = await Chat.SendMarkdownMessageAsync(message , buttons);
     }  
     
     public abstract Task HandleButtonClick(Update update, TranslationButtonData buttonData);
@@ -83,13 +80,8 @@ public abstract class LastTranslationHandlerBase {
     
     private async Task<IList<InlineKeyboardButton[]>> CreateButtons() {
         var buttons = (await CreateCustomButtons()).ToList();
-        if (buttons.Count == 0) return buttons;
         if (_isLastMessageInTheChat)
-            buttons.Add(new[]
-            {
-                InlineButtons.MainMenu($"{Emojis.MainMenu} {Chat.Texts.MainMenuButton}"),
-                InlineButtons.Translation($"{Chat.Texts.ContinueTranslateButton} {Emojis.Translate}")
-            });
+            buttons.Add(TranslateWordHelper.GetTranslateMenuButtons(Chat.Texts));
         return buttons;
     }
 }

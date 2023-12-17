@@ -12,7 +12,6 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ChatFlows.FlowTranslation;
 
 internal class TranslateFlow {
-    private const int MaxButtonLength = 20;
     private ChatRoom Chat { get; }
     private readonly AddWordService _addWordService;
     private readonly ButtonCallbackDataService _buttonCallbackDataService;
@@ -65,15 +64,41 @@ internal class TranslateFlow {
                 Reporter.ReportTranslationNotFound(Chat.User.TelegramId);
                 return null;
             }
+
             // it is single "smart" translation
             translations = new List<Translation> { smartTranslation };
         }
 
-        var handler = await GetTranslationHandler(input, translations, alreadyExistUserWord);
+        LastWordTranslationHandler? handler = null;
 
-        if (handler != null) {
+        var firstTranslation = translations[0];
+        if (translations.Count == 1 && firstTranslation.WordType == UserWordType.Phrase) {
+            // it is a long phrase. If it is not very long, and not added yet - than save it
+            if (firstTranslation.CanBeSavedToDictionary && alreadyExistUserWord == null)
+                await _addWordService.AddTranslationToUser(Chat.User, firstTranslation.GetEnRu());
+
+            await Chat.SendMarkdownMessageAsync(
+                Chat.Texts.HereIsThePhraseTranslation(firstTranslation.TranslatedText),
+                TranslateWordHelper.GetTranslateMenuButtons(Chat.Texts));
+        }
+        else {
+            // Simple word translation handler
+            // get button selection marks. It works only for english words!
+            bool[] selectionMarks = GetSelectionMarks(translations, alreadyExistUserWord);
+
+            if (!selectionMarks[0]) {
+                // Automatically select first translation if it was not selected before
+                await _addWordService.AddTranslationToUser(Chat.User, translations[0].GetEnRu());
+                selectionMarks[0] = true;
+            }
+
+            // getting first transcription
+            var transcription = translations.FirstOrDefault(t =>
+                !string.IsNullOrWhiteSpace(t.EnTranscription))?.EnTranscription;
+            handler = new LastWordTranslationHandler(
+                translations, Chat, _addWordService, _buttonCallbackDataService, selectionMarks);
             _translationSelectedUpdateHook.SetLastTranslationHandler(handler);
-            await handler.SendTranslationMessage();
+            await handler.SendTranslationMessage(Chat.Texts.HereAreTranslations(input, transcription));
         }
 
         Reporter.ReportTranslationRequsted(Chat.User.TelegramId, input.IsRussian());
@@ -90,64 +115,6 @@ internal class TranslateFlow {
         finally {
             var _ = handler?.OnNextTranslationRequest();
         }
-    }
-
-    private async Task<LastTranslationHandlerBase?> GetTranslationHandler(string input, IReadOnlyList<Translation> translations, UserWordModel? alreadyExistUserWord) {
-        var firstTranslation = translations[0];
-        if (translations.Count != 1 
-            || firstTranslation.WordType != UserWordType.Phrase 
-            || firstTranslation.TranslatedText.Length <= MaxButtonLength)
-            // Simple word translation handler
-            return await GetWordTranslationHandler(input, translations, alreadyExistUserWord);
-        
-        if (!firstTranslation.CanBeSavedToDictionary) {
-            // it is too long phrase. Just translate it and not save
-            return GetLongPhraseWithoutTranslationSelector(firstTranslation);
-        }
-
-        // it is a long phrase. So we will show it differently
-        return await GetLongPhraseTranslationHandler(firstTranslation, alreadyExistUserWord != null);
-
-    }
-
-    private LastTranslationHandlerBase GetLongPhraseWithoutTranslationSelector(Translation phraseTranslation) =>
-        new DoNotSaveTranslationHandler(Chat, _addWordService, _buttonCallbackDataService,
-            Chat.Texts.HereIsThePhraseTranslation(phraseTranslation.TranslatedText));
-
-    private async Task<LastTranslationHandlerBase> GetLongPhraseTranslationHandler(Translation phraseTranslation, bool isAdded) {
-        if (!isAdded) {
-            // Automaticaly select first translation if it was not selected before
-            await _addWordService.AddTranslationToUser(Chat.User, phraseTranslation.GetEnRu());
-        }
-        return new LastPhraseTranslationHandler(chat: Chat,
-            phraseTranslation: phraseTranslation,
-            addWordService: _addWordService,
-            buttonCallbackDataService: _buttonCallbackDataService,
-            isSelected: true);
-    }
-
-    private async Task<LastTranslationHandlerBase> GetWordTranslationHandler(
-        string input,
-        IReadOnlyList<Translation> translations,
-        UserWordModel? alreadyExistUserWord) {
-        // get button selection marks. It works only for english words!
-        bool[] selectionMarks = GetSelectionMarks(translations, alreadyExistUserWord);
-
-        if (!selectionMarks[0]) {
-            // Automaticaly select first translation if it was not selected before
-            await _addWordService.AddTranslationToUser(Chat.User, translations[0].GetEnRu());
-            selectionMarks[0] = true;
-        }
-
-        // getting first transcription
-        var transcription = translations.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t.EnTranscription))
-            ?.EnTranscription;
-
-        return new LastWordTranslationHandler(
-            translations: translations,
-            chat: Chat,
-            addWordService: _addWordService,
-            buttonCallbackDataService: _buttonCallbackDataService, selectionMarks, input, transcription);
     }
 
     private bool[] GetSelectionMarks(

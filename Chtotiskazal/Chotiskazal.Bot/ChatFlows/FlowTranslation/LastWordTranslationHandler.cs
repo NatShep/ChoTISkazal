@@ -14,11 +14,8 @@ public class LastWordTranslationHandler : LastTranslationHandlerBase {
     public LastWordTranslationHandler(
         IReadOnlyList<SayWhat.Bll.Dto.Translation> translations, ChatRoom chat,
         AddWordService addWordService, ButtonCallbackDataService buttonCallbackDataService,
-        bool[] selectionMarks,
-        string input,
-        string? transcription) :
-        base(translations.FirstOrDefault()?.OriginText, chat, addWordService, buttonCallbackDataService,
-            chat.Texts.HereAreTranslations(input, transcription)) {
+        bool[] selectionMarks) :
+        base(translations.FirstOrDefault()?.OriginText, chat, addWordService, buttonCallbackDataService) {
         _translations = translations;
         AreSelected = selectionMarks;
     }
@@ -27,7 +24,7 @@ public class LastWordTranslationHandler : LastTranslationHandlerBase {
         var buttons = new List<InlineKeyboardButton[]>();
         var i = 0;
         foreach (var translation in _translations) {
-            var button = await AddWordHelper.CreateButtonFor(
+            var button = await TranslateWordHelper.CreateButtonFor(
                 buttonCallbackDataService: ButtonCallbackDataService,
                 text: translation.TranslatedText,
                 translation: translation,
@@ -72,7 +69,7 @@ public class LastWordTranslationHandler : LastTranslationHandlerBase {
 
         var selectionMarks = await GetSelectionMarks(ButtonCallbackDataService, allTranslations, originMessageButtons);
 
-        var index = AddWordHelper.FindIndexOf(allTranslations, buttonData.Translation);
+        var index = TranslateWordHelper.FindIndexOf(allTranslations, buttonData.Translation);
         if (index == -1) {
             await Chat.ConfirmCallback(update.CallbackQuery.Id);
             return;
@@ -95,8 +92,8 @@ public class LastWordTranslationHandler : LastTranslationHandlerBase {
 
         var buttons = new List<InlineKeyboardButton[]>();
         foreach (var translation in allTranslations) {
-            var translationIndex = AddWordHelper.FindIndexOf(allTranslations, translation.TranslatedText);
-            var button = await AddWordHelper.CreateButtonFor(
+            var translationIndex = TranslateWordHelper.FindIndexOf(allTranslations, translation.TranslatedText);
+            var button = await TranslateWordHelper.CreateButtonFor(
                 ButtonCallbackDataService, translation.TranslatedText, translation, selectionMarks[translationIndex]);
             buttons.Add(new[] { button });
         }
@@ -108,7 +105,7 @@ public class LastWordTranslationHandler : LastTranslationHandlerBase {
 
 
     private async Task HandleLocal(string translation, Update update) {
-        var index = AddWordHelper.FindIndexOf(_translations, translation);
+        var index = TranslateWordHelper.FindIndexOf(_translations, translation);
         if (index == -1)
             return;
 
