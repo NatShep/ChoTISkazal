@@ -341,11 +341,11 @@ class Program {
         var sb2 = new StringBuilder();
         var allQuestions = new QuestionSelector(new LocalDictionaryService(dictionaryRepo, new ExamplesRepo(db)))
             .AllQuestions;
-        var maxNameLen = allQuestions.Max(a => a.Question.Name.Length) + 2;
+        var maxNameLen = allQuestions.Max(a => a.Name.Length) + 2;
 
         foreach (var q in allQuestions) {
             sb2.Append(
-                $"\r\n{q.Question.Name.PadRight(maxNameLen)}  {q.ExpectedScore}  {q.Question.GetType().Name}");
+                $"\r\n{q.Name.PadRight(maxNameLen)}  {q.ExpectedScore}  {q.Scenario.GetType().Name}");
         }
 
         var s = sb2.ToString();

@@ -8,7 +8,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public static class QuestionHelper {
+public static class QuestionLogicHelper {
     public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
         => list
             .Where(p => p.Word != englishWord)

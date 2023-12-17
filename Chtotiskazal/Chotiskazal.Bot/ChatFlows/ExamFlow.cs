@@ -173,7 +173,7 @@ public class ExamFlow
             var result = await PassWithRetries(question, word, learnList, wordQuestionNumber);
             switch (result.Results)
             {
-                case ExamResult.Passed:
+                case QResult.Passed:
                     var succTask = _usersWordsService.RegisterSuccess(word, question.PassScore);
                     questionsCount++;
                     questionsPassed++;
@@ -182,7 +182,7 @@ public class ExamFlow
                     await succTask;
                     Chat.User.OnQuestionPassed(word.Score - originRate);
                     break;
-                case ExamResult.Failed:
+                case QResult.Failed:
                     var failureTask = _usersWordsService.RegisterFailure(word,question.FailScore);
                     questionMetric.OnExamFinished(word.Score, false);
                     Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
@@ -190,8 +190,8 @@ public class ExamFlow
                     await failureTask;
                     Chat.User.OnQuestionFailed(word.Score - originRate);
                     break;
-                case ExamResult.Retry:
-                case ExamResult.Impossible:
+                case QResult.Retry:
+                case QResult.Impossible:
                     throw new NotSupportedException(result.Results.ToString());
             }
 
@@ -271,7 +271,7 @@ public class ExamFlow
     }
 
     private async Task<QuestionResult> PassWithRetries(
-        IQuestion question, 
+        Question question, 
         UserWordModel word, 
         UserWordModel[] learnList, 
         int wordQuestionNumber)
@@ -279,8 +279,8 @@ public class ExamFlow
         int retrieNumber = 0;
         for(int i = 0; i<40; i++)
         {
-            var result = await question.Pass(Chat, word, learnList);
-            if (result.Results == ExamResult.Impossible)
+            var result = await question.Scenario.Pass(Chat, word, learnList);
+            if (result.Results == QResult.Impossible)
             {
                 var qName = question.Name;
                 for (int iteration = 0;question.Name==qName; iteration++)
@@ -290,7 +290,7 @@ public class ExamFlow
                         return QuestionResult.Failed(Markdown.Empty,Markdown.Empty);
                 }
             }
-            else if (result.Results == ExamResult.Retry)
+            else if (result.Results == QResult.Retry)
             {
                 wordQuestionNumber++;
                 retrieNumber++;
