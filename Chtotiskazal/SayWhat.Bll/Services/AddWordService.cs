@@ -20,7 +20,18 @@ public class AddWordService {
     private readonly UserService _userService;
     private const int MaxWordsForTranslate = 3;
     private const int MaxPhraseLengthForTranslate = 3000; //actually it is 4096 for telegram
-    private readonly AggregateTranslator _gTranslator = new();
+
+    private readonly AggregateTranslator _gTranslator = new AggregateTranslator(
+        new ITranslator[]
+        {
+            // that is translators priority:
+            new YandexTranslator(),
+            new GoogleTranslator2(),
+            new GoogleTranslator(),
+            new MicrosoftTranslator(),
+            new BingTranslator()
+        }
+    );
 
     public AddWordService(
         UsersWordsService usersWordsService,
