@@ -8,6 +8,8 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EngChoosePhraseLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         if (!word.HasAnyExamples)
             return QuestionResult.Impossible;

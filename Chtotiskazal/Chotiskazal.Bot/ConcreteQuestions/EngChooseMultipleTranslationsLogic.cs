@@ -7,6 +7,8 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EngChooseMultipleTranslationsLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) {
         var translations = string.Join(", ", word.TextTranslations.Shuffle().Take(3));

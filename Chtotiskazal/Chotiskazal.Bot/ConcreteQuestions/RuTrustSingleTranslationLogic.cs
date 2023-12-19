@@ -8,6 +8,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuTrustSingleTranslationLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var msg = QuestionMarkups.TranslateTemplate(
             word.RuTranslations.GetRandomItemOrNull().Word,

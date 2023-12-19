@@ -14,6 +14,8 @@ public class EngWriteMissingLettersLogic : IQuestionLogic {
         _hardness = hardness;
     }
 
+    public QuestionInputType InputType => QuestionInputType.NeedsRuInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var engWord = word.Word;
 

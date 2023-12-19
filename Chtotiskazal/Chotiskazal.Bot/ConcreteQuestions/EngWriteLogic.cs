@@ -15,6 +15,8 @@ public class EngWriteLogic : IQuestionLogic {
         _localDictionaryService = localDictionaryService;
     }
 
+    public QuestionInputType InputType => QuestionInputType.NeedsRuInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) {
         var translations = word.TextTranslations.ToArray();

@@ -7,6 +7,8 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class AssemblePhraseLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         if (!word.HasAnyExamples)
             return QuestionResult.Impossible;

@@ -13,9 +13,9 @@ public class RuWriteSingleTranslationLogic : IQuestionLogic {
         _localDictionaryService = localDictionaryService;
     }
 
-    public Task<QuestionResult> Pass(
-        ChatRoom chat, UserWordModel word,
-        UserWordModel[] examList) =>
+    public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
+
+    public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
         RuWriteQuestionHelper.PassRuWriteQuestion(
             chat, word, word.RuTranslations.GetRandomItemOrNull().Word, _localDictionaryService);
 }

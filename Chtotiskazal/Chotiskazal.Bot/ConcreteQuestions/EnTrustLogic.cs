@@ -9,6 +9,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EnTrustLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) {
         var msg = QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.DoYouKnowTranslation);
@@ -24,13 +26,11 @@ public class EnTrustLogic : IQuestionLogic {
             if (update.CallbackQuery?.Data == id.ToString())
                 break;
             var input = update.Message?.Text;
-            if (!string.IsNullOrWhiteSpace(input)) {
-                if (word.TextTranslations.Any(a =>
-                        input.AreEqualIgnoreCase(a)))
-                    return QuestionResult.Passed(chat.Texts);
+            if (string.IsNullOrWhiteSpace(input)) continue;
+            if (word.TextTranslations.Any(a => input.AreEqualIgnoreCase(a)))
+                return QuestionResult.Passed(chat.Texts);
 
-                await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
-            }
+            await chat.SendMessageAsync(chat.Texts.ItIsNotRightTryAgain);
         }
 
         await chat.SendMarkdownMessageAsync(Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()

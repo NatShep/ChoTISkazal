@@ -9,6 +9,8 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuPhraseSubstituteLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsRuInput; 
+
     public async Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,
         UserWordModel[] examList) {

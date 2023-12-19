@@ -9,6 +9,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class IsItRightTranslationLogic : IQuestionLogic {
+    public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var translation = examList.SelectMany(e => e.TextTranslations)
             .Where(e => word.RuTranslations.All(t => t.Word != e))

@@ -10,6 +10,8 @@ public record Question(
 ) {
     public bool NeedClearScreen { get; private init; }
 
+    public QuestionInputType InputType => Scenario.InputType;
+
     public Question Clear() =>
         new(
             Name: "Clean " + Name,

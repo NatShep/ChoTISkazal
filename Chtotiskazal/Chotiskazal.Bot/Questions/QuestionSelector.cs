@@ -4,69 +4,14 @@ using System.Linq;
 using SayWhat.Bll.Services;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
-using static Chotiskazal.Bot.Questions.Questions;
 
 namespace Chotiskazal.Bot.Questions;
 
 public class QuestionSelector {
     public QuestionSelector(LocalDictionaryService localDictionaryService) {
-        _simpleExamsList = new[]
-        {
-            EngChoose,
-            RuChoose,
-            RuPhraseChoose,
-            EngPhraseChoose,
-            EngChooseWordInPhrase,
-            TranscriptionExam,
-            IsItRightTranslationExam,
-            EngChooseMultipleTranslationExam,
-        };
-        _intermediateExamsList = new[]
-        {
-            EngEasyWriteMissingLetter,
-            RuEasyWriteMissingLetter,
-            EngHardWriteMissingLetter,
-            RuHardWriteMissingLetter,
-            EngChoose,
-            RuChoose,
-            RuPhraseChoose,
-            EngPhraseChoose,
-            EngPhraseSubstitute,
-            RuPhraseSubstitute,
-            AssemblePhraseExam,
-            EngTrust,
-            RuTrust,
-            RuTrustSingle,
-            EngChooseByTranscriptionExam,
-            RuChooseByTranscriptionExam,
-            TranscriptionExam,
-            IsItRightTranslationExam,
-            EngChooseMultipleTranslationExam,
-        };
-        _advancedExamsList = new[]
-        {
-            EngHardWriteMissingLetter,
-            RuHardWriteMissingLetter,
-            EngChoose,
-            RuChoose,
-            EngPhraseChoose,
-            RuPhraseChoose,
-            EngTrust,
-            RuTrust,
-            RuTrustSingle,
-            EngWrite(localDictionaryService),
-            RuWrite(localDictionaryService),
-            RuWriteSingleTranslationExam(localDictionaryService),
-            ClearEngPhraseSubstitute,
-            ClearRuPhraseSubstitute,
-            EngPhraseSubstitute,
-            RuPhraseSubstitute,
-            EngChooseWordInPhrase,
-            ClearEngChooseWordInPhrase,
-            AssemblePhraseExam,
-            IsItRightTranslationExam,
-            EngChooseMultipleTranslationExam,
-        };
+        _simpleExamsList = Questions.SimpleExamsList;
+        _intermediateExamsList = Questions.IntermediateExamsList;
+        _advancedExamsList = Questions.AdvancedExamsList(localDictionaryService);
     }
 
     private readonly Question[] _simpleExamsList;
