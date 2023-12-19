@@ -15,6 +15,13 @@ public static class Rand {
         var rnd = Rnd.Next(origin.Count);
         return origin[rnd];
     }
+    
+    public static T GetRandomItem<T>(params T[] origin) {
+        if (origin.Length == 0)
+            throw new ArgumentException("origin is empty");
+        var rnd = Rnd.Next(origin.Length);
+        return origin[rnd];
+    }
 
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> origin) {
         var list = origin.ToList();

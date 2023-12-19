@@ -215,7 +215,7 @@ public static class Questions {
             FailScore: 0.7
         );
     
-    public static readonly Question[] SimpleExamsList = {
+    public static readonly Question[] BeginnerQuestions = {
         EngChoose,
         RuChoose,
         RuPhraseChoose,
@@ -227,7 +227,7 @@ public static class Questions {
         EngChooseByTranscriptionExam,
     };
 
-    public static readonly Question[] IntermediateExamsList =
+    public static readonly Question[] IntermediateQuestions =
     {
         EngEasyWriteMissingLetter,
         RuEasyWriteMissingLetter,
@@ -250,7 +250,7 @@ public static class Questions {
         EngChooseMultipleTranslationExam,
     };
     
-    public static Question[] AdvancedExamsList(LocalDictionaryService localDictionaryService) => new[]
+    public static Question[] AdvancedQuestions(LocalDictionaryService localDictionaryService) => new[]
     {
         EngHardWriteMissingLetter,
         RuHardWriteMissingLetter,
