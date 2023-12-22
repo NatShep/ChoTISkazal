@@ -1,5 +1,10 @@
 namespace Chotiskazal.Bot.Questions;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Name">Unique quesion name</param>
+/// <param name="Frequency">Relative frequency score</param>
 public record Question(
     string Name,
     IQuestionLogic Scenario,
@@ -23,4 +28,7 @@ public record Question(
         {
             NeedClearScreen = true
         };
+
+    public Question WithFrequency(int frequency) => 
+        new(Name, Scenario, ExpectedScore, frequency, FailScore, PassScore);
 }

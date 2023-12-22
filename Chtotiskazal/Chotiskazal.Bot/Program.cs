@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.ChatFlows;
 using Chotiskazal.Bot.Jobs;
@@ -20,15 +21,16 @@ using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot;
-using Telegram.Bot.Args;
+using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 
 namespace Chotiskazal.Bot;
 
 static class Program {
     private static TelegramBotClient _botClient;
-    private static readonly ConcurrentDictionary<long, MainFlow> Chats = new ConcurrentDictionary<long, MainFlow>();
+    private static readonly ConcurrentDictionary<long, MainFlow> Chats = new();
     private static AddWordService _addWordService;
     private static ButtonCallbackDataService _buttonCallbackDataService;
     private static LocalDictionaryService _localDictionaryService;
@@ -94,27 +96,49 @@ static class Program {
 
         foreach (var update in allUpdates)
             OnBotWokeUp(update);
+        var messageOffset = 0;
         if (allUpdates.Any()) {
-            _botClient.MessageOffset = allUpdates.Last().Id + 1;
+            messageOffset = allUpdates.Last().Id + 1;
             Reporter.WriteInfo($"{Chats.Count} users were waiting for us");
         }
+    
+        //_botClient.OnUpdate += BotClientOnOnUpdate;
+        //_botClient.OnMessage += Bot_OnMessage;
 
-        _botClient.OnUpdate += BotClientOnOnUpdate;
-        _botClient.OnMessage += Bot_OnMessage;
-
-        _botClient.StartReceiving();
+        //_botClient.StartReceiving();
 
         ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
         var remindJobTask = RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
         var updateCurrentScoreJobTask = UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
-
+        var receiverOptions = new ReceiverOptions()
+        {
+            Offset = messageOffset,
+            AllowedUpdates = new[]
+            {
+                UpdateType.Message,
+                UpdateType.CallbackQuery,
+                UpdateType.ChosenInlineResult,
+                UpdateType.ShippingQuery,
+                UpdateType.InlineQuery,
+                UpdateType.PreCheckoutQuery,
+            },
+            ThrowPendingUpdates = true,
+        };
+        var updateHandler = new UpdateHandler();
+        var receiveTask = _botClient.ReceiveAsync(
+            updateHandler: updateHandler,
+            receiverOptions: receiverOptions,
+            cancellationToken: CancellationToken.None);
         Reporter.WriteInfo($"... and here i go!");
         // workaround for infinity awaiting
         new TaskCompletionSource<bool>().Task.Wait();
+        
+        //----
         await remindJobTask;
         await updateCurrentScoreJobTask;
+        await receiveTask;
         // it will never happens
-        _botClient.StopReceiving();
+        //_botClient.StopReceiving();
     }
 
     private static BotSettings ReadConfiguration(bool substitudeDebugConfig) {
@@ -197,38 +221,6 @@ static class Program {
             }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
-    private static void BotClientOnOnUpdate(object sender, UpdateEventArgs e) {
-        long? chatId = null;
-        MainFlow chatRoom = null;
-        try {
-            Reporter.WriteInfo($"Trying to got query: {e.Update.Type}...");
-
-            if (e.Update.Message != null) {
-                chatId = e.Update.Message.Chat?.Id;
-                Reporter.WriteInfo($"Got query: {e.Update.Type}", chatId.ToString());
-                chatRoom = GetOrCreate(e.Update.Message.Chat);
-                chatRoom?.ChatIo.OnUpdate(e.Update);
-            }
-            else if (e.Update.CallbackQuery != null) {
-                chatId = e.Update.CallbackQuery.Message.Chat?.Id;
-                Reporter.WriteInfo($"Got query: {e.Update.Type}", chatId.ToString());
-
-                chatRoom = GetOrCreate(e.Update.CallbackQuery.Message.Chat);
-                chatRoom?.ChatIo.OnUpdate(e.Update);
-            }
-        }
-        catch (Exception ex) {
-            Reporter.ReportError(chatId, $"BotClientOnOnUpdate Failed: {e.Update.Type}",
-                chatRoom?.ChatIo?.TryGetChatHistory(), ex);
-        }
-    }
-
-    private static void Bot_OnMessage(object sender, MessageEventArgs e) {
-        if (e.Message.Text != null) {
-            Reporter.WriteInfo($"Received a text message to chat {e.Message.Chat.Id}.", e.Message.Chat.Id.ToString());
-        }
-    }
-
     private static MainFlow CreateChatRoom(Chat chat) {
         var newChatRoom = new MainFlow(
             new ChatIO(_botClient, chat),
@@ -243,5 +235,42 @@ static class Program {
             _questionSelector);
         Chats.TryAdd(chat.Id, newChatRoom);
         return newChatRoom;
+    }
+
+    public class UpdateHandler : IUpdateHandler {
+        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+            CancellationToken cancellationToken) {
+            long? chatId = null;
+            MainFlow chatRoom = null;
+            try {
+                Reporter.WriteInfo($"Trying to got query: {update.Type}...");
+
+                if (update.Message != null) {
+                    chatId = update.Message.Chat?.Id;
+                    Reporter.WriteInfo($"Got query: {update.Type}", chatId.ToString());
+                    chatRoom = GetOrCreate(update.Message.Chat);
+                    chatRoom?.ChatIo.OnUpdate(update);
+                    if (update.Message.Text != null)
+                        Reporter.WriteInfo($"Received a text message to chat {update.Message.Chat.Id}.",
+                            update.Message.Chat.ToString());
+                }
+                else if (update.CallbackQuery != null) {
+                    chatId = update.CallbackQuery.Message.Chat?.Id;
+                    Reporter.WriteInfo($"Got query: {update.Type}", chatId.ToString());
+
+                    chatRoom = GetOrCreate(update.CallbackQuery.Message.Chat);
+                    chatRoom?.ChatIo.OnUpdate(update);
+                }
+            }
+            catch (Exception ex) {
+                Reporter.ReportError(chatId, $"BotClientOnOnUpdate Failed: {update.Type}",
+                    chatRoom?.ChatIo?.TryGetChatHistory(), ex);
+            }
+        }
+
+        public async Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
+            CancellationToken cancellationToken) {
+            Reporter.ReportPollingErrorError(botClient.BotId, exception);
+        }
     }
 }

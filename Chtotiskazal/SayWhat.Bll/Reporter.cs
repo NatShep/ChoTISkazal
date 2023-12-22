@@ -104,4 +104,8 @@ public static class Reporter {
 
     public static void ReportCommand(string eCommand, long chatIdIdentifier) =>
         Collector.OnCommand(chatIdIdentifier, eCommand);
+
+    public static void ReportPollingErrorError(long? botClient, Exception exception) {
+        ReportError(botClient, "Polling error", exception);
+    }
 }

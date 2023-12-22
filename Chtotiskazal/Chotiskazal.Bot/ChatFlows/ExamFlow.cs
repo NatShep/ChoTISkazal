@@ -9,27 +9,40 @@ using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows;
 
 public class ExamFlow {
-    private readonly ExamSettings _examSettings;
+    private readonly ExamSettings _regularExamSettings;
     private readonly QuestionSelector _questionSelector;
     private ChatRoom Chat { get; }
     private readonly UserService _userService;
     private readonly UsersWordsService _usersWordsService;
+    private readonly ExamSettings _noInputExamSettings;
 
     public ExamFlow(
         ChatRoom chat,
         UserService userService,
         UsersWordsService usersWordsService,
-        ExamSettings examSettings,
+        ExamSettings regularExamSettings,
         QuestionSelector questionSelector) {
         Chat = chat;
         _userService = userService;
         _usersWordsService = usersWordsService;
-        _examSettings = examSettings;
+        _regularExamSettings = regularExamSettings;
+        _noInputExamSettings = new ExamSettings
+        {
+            MinWordsQuestionsInOneExam = _regularExamSettings.MinWordsQuestionsInOneExam + 1,
+            MaxWordsQuestionsInOneExam = (int)(_regularExamSettings.MaxWordsQuestionsInOneExam * 1.5),
+            CountOfVariantsForChoose = _regularExamSettings.CountOfVariantsForChoose,
+            ExamsCountGoalForDay = _regularExamSettings.ExamsCountGoalForDay,
+            LearnedWordsInOneExam = _regularExamSettings.LearnedWordsInOneExam,
+            MaxExamSize = (int)(_regularExamSettings.MaxExamSize * 1.1),
+            LearningWordsInOneExam = (int)(_regularExamSettings.LearnedWordsInOneExam * 1.5),
+            MaxTranslationsInOneExam = _regularExamSettings.MaxTranslationsInOneExam,
+            WellDoneWordsInOneExam = (int)(_regularExamSettings.WellDoneWordsInOneExam * 1.5),
+            NewWordInOneExam = (int)(_regularExamSettings.NewWordInOneExam * 1.5)
+        };
         _questionSelector = questionSelector;
     }
 
@@ -38,60 +51,64 @@ public class ExamFlow {
             await Chat.SendMessageAsync(Chat.Texts.NeedToAddMoreWordsBeforeLearning);
             return;
         }
+
         // The idea is:
         // Either you input only with buttons,
-        // Either you input only ru input or buttons (so you need no to switch langugage on desktop)
-        // Either you input only en input or buttons (so you need no to switch langugage on desktop)
+        // Either you input only ru input or buttons (so you need no to switch language on desktop)
+        // Either you input only en input or buttons (so you need no to switch language on desktop)
         var examType = Rand.GetRandomItem(
             ExamType.NoInput,
             ExamType.EnInputOnly,
             ExamType.RuInputOnly);
 
+        var examSettings = examType == ExamType.NoInput ? _noInputExamSettings : _regularExamSettings;
+
         var wellDoneWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
-            _examSettings.WellDoneWordsInOneExam,
-            _examSettings.MaxTranslationsInOneExam,
+            examSettings.WellDoneWordsInOneExam,
+            examSettings.MaxTranslationsInOneExam,
             CurrentScoreSortingType.LongAsked,
             WordLeaningGlobalSettings.WellDoneWordMinScore,
             WordLeaningGlobalSettings.LearnedWordMinScore);
 
         var freeSpaceForWords = 0;
-        if (wellDoneWords.Length < _examSettings.WellDoneWordsInOneExam) {
-            freeSpaceForWords = _examSettings.WellDoneWordsInOneExam - wellDoneWords.Length;
+        if (wellDoneWords.Length < examSettings.WellDoneWordsInOneExam) {
+            freeSpaceForWords = examSettings.WellDoneWordsInOneExam - wellDoneWords.Length;
         }
 
         var learningWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
-            _examSettings.LearningWordsInOneExam + freeSpaceForWords,
-            _examSettings.MaxTranslationsInOneExam,
+            examSettings.LearningWordsInOneExam + freeSpaceForWords,
+            examSettings.MaxTranslationsInOneExam,
             CurrentScoreSortingType.LongAsked,
             WordLeaningGlobalSettings.LearningWordMinScore,
             WordLeaningGlobalSettings.WellDoneWordMinScore);
 
-        if (learningWords.Length < _examSettings.WellDoneWordsInOneExam + freeSpaceForWords)
-            freeSpaceForWords = _examSettings.WellDoneWordsInOneExam + _examSettings.NewWordInOneExam -
+        if (learningWords.Length < examSettings.WellDoneWordsInOneExam + freeSpaceForWords)
+            freeSpaceForWords = examSettings.WellDoneWordsInOneExam + examSettings.NewWordInOneExam -
                                 learningWords.Length;
         else
             freeSpaceForWords = 0;
 
         var newLearningWords = await _usersWordsService.GetRandomWordsWithPhrasesAsync(
             Chat.User,
-            _examSettings.NewWordInOneExam + freeSpaceForWords,
-            _examSettings.CountOfVariantsForChoose,
-            _examSettings.MaxTranslationsInOneExam,
+            examSettings.NewWordInOneExam + freeSpaceForWords,
+            examSettings.CountOfVariantsForChoose,
+            examSettings.MaxTranslationsInOneExam,
             CurrentScoreSortingType.JustAsked,
             WordLeaningGlobalSettings.StartScoreForWord,
             WordLeaningGlobalSettings.LearningWordMinScore);
 
-        await PrintNewWordsValues(newLearningWords);
+        await PrintExamStartsMessage(examType, newLearningWords);
+
         var needToContinue = await Chat.WaitInlineKeyboardInput();
         if (needToContinue != "/startExamination")
             return;
 
         var learnedWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
-            _examSettings.LearnedWordsInOneExam,
-            _examSettings.MaxTranslationsInOneExam,
+            examSettings.LearnedWordsInOneExam,
+            examSettings.MaxTranslationsInOneExam,
             CurrentScoreSortingType.LongAsked,
             WordLeaningGlobalSettings.LearnedWordMinScore);
 
@@ -122,7 +139,7 @@ public class ExamFlow {
             .Union(learnedWords)
             .ToArray();
 
-        var examsLearnedWords = CreateExamListForNewWords(distinctLearningWords, _examSettings);
+        var examsLearnedWords = CreateExamListForNewWords(examType, distinctLearningWords, examSettings);
         Console.WriteLine($"Количество экзаменов для всех слов {examsLearnedWords.Count}");
         Console.WriteLine(string.Join(" \r\n", examsLearnedWords.ToList()));
 
@@ -139,7 +156,6 @@ public class ExamFlow {
 
         //begin testing
         var started = DateTime.Now;
-        var gamingScoreBefore = Chat.User.GamingScore;
 
         var questionsCount = 0;
         var questionsPassed = 0;
@@ -176,14 +192,14 @@ public class ExamFlow {
                     questionsCount++;
                     questionsPassed++;
                     questionMetric.OnExamFinished(word.Score, true);
-                    Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
+                    Reporter.ReportQuestionDone(questionMetric, Chat.ChatId.ToString(), question.Name);
                     await succTask;
                     Chat.User.OnQuestionPassed(word.Score - originRate);
                     break;
                 case QResult.Failed:
                     var failureTask = _usersWordsService.RegisterFailure(word, question.FailScore);
                     questionMetric.OnExamFinished(word.Score, false);
-                    Reporter.ReportQuestionDone(questionMetric, Chat.ChatId, question.Name);
+                    Reporter.ReportQuestionDone(questionMetric, Chat.ChatId.ToString(), question.Name);
                     questionsCount++;
                     await failureTask;
                     Chat.User.OnQuestionFailed(word.Score - originRate);
@@ -209,17 +225,21 @@ public class ExamFlow {
             distinctLearningWords: distinctLearningWords,
             originWordsScore: originWordsScore,
             questionsPassed: questionsPassed,
-            questionsCount: questionsCount,
-            gamingScoreBefore: gamingScoreBefore);
+            questionsCount: questionsCount);
 
         await updateUserTask;
     }
 
-    private async Task PrintNewWordsValues(UserWordModel[] newLearningWords) {
-        var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold() +
-                       Chat.Texts.LearningCarefullyStudyTheList
-                           .NewLine()
-                           .NewLine();
+    private async Task PrintExamStartsMessage(ExamType examType, UserWordModel[] newLearningWords) {
+        var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold().Space();
+
+        markdown += examType == ExamType.NoInput
+            ? Markdown.Escaped(Chat.Texts.FastExamLearningHeader).ToSemiBold().NewLine()
+            : Markdown.Escaped(Chat.Texts.WriteExamLearningHeader).ToSemiBold();
+
+        markdown = markdown.NewLine() + Chat.Texts.CarefullyStudyTheList
+            .NewLine()
+            .NewLine();
 
         var messageWithListOfWords = newLearningWords.Shuffle()
             .Aggregate(Markdown.Empty, (current, pairModel) =>
@@ -233,30 +253,20 @@ public class ExamFlow {
         {
             new[]
             {
-                new InlineKeyboardButton
-                {
-                    CallbackData = "/startExamination",
-                    Text = Chat.Texts.StartButton
-                },
-                new InlineKeyboardButton
-                {
-                    CallbackData = BotCommands.Start,
-                    Text = Chat.Texts.CancelButton,
-                }
+                InlineButtons.Button(Chat.Texts.StartButton, "/startExamination"),
+                InlineButtons.Button(Chat.Texts.CancelButton, BotCommands.Start)
             }
         });
     }
 
     private async Task SendExamResultToUser(
         UserWordModel[] distinctLearningWords, Dictionary<string, double> originWordsScore, int questionsPassed,
-        int questionsCount,
-        double gamingScoreBefore) {
+        int questionsCount) {
         var doneMessage = CreateLearningResultsMessage(
             distinctLearningWords,
             originWordsScore,
             questionsPassed,
-            questionsCount,
-            gamingScoreBefore);
+            questionsCount);
 
         await Chat.SendMarkdownMessageAsync(
             doneMessage,
@@ -303,8 +313,7 @@ public class ExamFlow {
         UserWordModel[] wordsInExam,
         Dictionary<string, double> originWordsScore,
         int questionsPassed,
-        int questionsCount,
-        double gamingScoreBefore
+        int questionsCount
     ) {
         var newWellLearnedWords = new List<UserWordModel>();
         var forgottenWords = new List<UserWordModel>();
@@ -374,10 +383,10 @@ public class ExamFlow {
         doneMessageMarkdown = doneMessageMarkdown.NewLine() +
                               Markdown
                                   .Escaped(
-                                      $"{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_examSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}")
+                                      $"{Chat.Texts.TodaysGoal}: {todayStats.LearningDone}/{_regularExamSettings.ExamsCountGoalForDay} {Chat.Texts.Exams}")
                                   .ToSemiBold()
                                   .NewLine();
-        if (todayStats.LearningDone >= _examSettings.ExamsCountGoalForDay)
+        if (todayStats.LearningDone >= _regularExamSettings.ExamsCountGoalForDay)
             doneMessageMarkdown = doneMessageMarkdown
                 .AddEscaped($"{Emojis.GreenCircle} {Chat.Texts.TodayGoalReached}")
                 .NewLine();
@@ -400,7 +409,8 @@ public class ExamFlow {
         await Chat.SendMessageAsync("\U0001F648");
     }
 
-    private List<UserWordModel> CreateExamListForNewWords(UserWordModel[] learningWords, ExamSettings examSettings) {
+    private List<UserWordModel> CreateExamListForNewWords(ExamType examType, UserWordModel[] learningWords,
+        ExamSettings examSettings) {
         var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
 
         //Every learning word appears in exam from MIN to MAX times

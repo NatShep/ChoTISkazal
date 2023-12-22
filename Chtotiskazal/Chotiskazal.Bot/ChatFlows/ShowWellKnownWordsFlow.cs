@@ -14,9 +14,10 @@ public class WellKnownWordsHelper {
     public const string PrevData = "/wk<<";
     public const string NextData = "/wk>>";
 
-    public static InlineKeyboardButton[] GetPagingKeys() => new[] {
-        new InlineKeyboardButton { CallbackData = PrevData, Text = "<<" },
-        new InlineKeyboardButton { CallbackData = NextData, Text = ">>" },
+    public static InlineKeyboardButton[] GetPagingKeys() => new[]
+    {
+        InlineButtons.Button("<<", PrevData),
+        InlineButtons.Button(">>", NextData),
     };
 }
 
@@ -41,14 +42,13 @@ public class ShowWellKnownWordsFlow {
             .ToArray();
         var paginationForWords = new List<List<UserWordModel>>();
         var i = 0;
-        while (i < wellKnownWords.Length)
-        {
+        while (i < wellKnownWords.Length) {
             paginationForWords.Add(wellKnownWords.Skip(i).Take(10).ToList());
             i += 10;
         }
-        
+
         var message = Markdown.Empty;
-        
+
         if (!wellKnownWords.Any())
             message.AddEscaped(Chat.Texts.NoWellKnownWords);
         else if (wellKnownWords.Length == 1)
@@ -75,20 +75,22 @@ public class ShowWellKnownWordsFlow {
             msgWithWords += Chat.Texts.PageXofY(1, paginationForWords.Count);
 
         InlineKeyboardButton[][] buttons = null;
-        if (paginationForWords.Count > 1)
-        {
+        if (paginationForWords.Count > 1) {
             _wellKnownWordsUpdateHook.SetWellKnownWords(paginationForWords);
             _wellKnownWordsUpdateHook.SetNumberOfPaginate(0);
-            
-            buttons = new[] {
+
+            buttons = new[]
+            {
                 WellKnownWordsHelper.GetPagingKeys(),
-                new[] {
+                new[]
+                {
                     InlineButtons.MainMenu(Chat.Texts)
                 }
             };
         }
         else
-            buttons = new[] {
+            buttons = new[]
+            {
                 new[] { InlineButtons.MainMenu($"{Chat.Texts.TranslateButton} {Emojis.Translate}") }
             };
 

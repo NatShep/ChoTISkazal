@@ -5,11 +5,11 @@ using SayWhat.Bll.Strings;
 namespace Chotiskazal.Bot.Questions;
 
 public static class Questions {
-    private const int Low = 4;
-    private const int LowMid = 6;
-    private const int Mid = 10;
-    private const int HiMid = 15;
-    private const int Hi = 20;
+    private const int Low = 40;
+    private const int LowMid = 60;
+    private const int Mid = 100;
+    private const int HiMid = 150;
+    private const int Hi = 200;
     
     public static readonly Question EngChoose = new("Eng Choose", new EngChooseLogic(),
         Frequency: LowMid,
@@ -26,14 +26,14 @@ public static class Questions {
     );
 
     public static readonly Question EngTrust = new("Eng trust", new EnTrustLogic(),
-        Frequency: Mid,
+        Frequency: LowMid,
         ExpectedScore: 2,
         PassScore: 0.4,
         FailScore: 0.4
     );
 
     public static readonly Question RuTrust = new("Ru trust", new RuTrustLogic(),
-        Frequency: Mid,
+        Frequency: LowMid,
         ExpectedScore: 2,
         PassScore: 0.4,
         FailScore: 0.4
@@ -48,14 +48,14 @@ public static class Questions {
     );
 
     public static readonly Question EngPhraseChoose = new("Eng Choose Phrase", new EngChoosePhraseLogic(),
-        Frequency: Low,
+        Frequency: LowMid,
         ExpectedScore: 6,
         PassScore: 0.4,
         FailScore: 0.6
     );
 
     public static readonly Question RuPhraseChoose = new("Ru Choose Phrase", new RuChoosePhraseLogic(),
-        Frequency: Low,
+        Frequency: LowMid,
         ExpectedScore: 6,
         PassScore: 0.9,
         FailScore: 0.6
@@ -127,7 +127,7 @@ public static class Questions {
     );
 
     public static readonly Question AssemblePhraseExam = new("Assemble phrase", new AssemblePhraseLogic(),
-        Frequency: LowMid,
+        Frequency: Mid,
         ExpectedScore: 2.3,
         PassScore: 1.47,
         FailScore: 0.6

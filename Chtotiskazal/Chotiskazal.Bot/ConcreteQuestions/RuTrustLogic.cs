@@ -16,11 +16,7 @@ public class RuTrustLogic : IQuestionLogic {
         var id = Rand.Next();
 
         await chat.SendMarkdownMessageAsync(msg,
-            new InlineKeyboardButton()
-            {
-                CallbackData = id.ToString(),
-                Text = chat.Texts.ShowTheTranslationButton
-            });
+            InlineButtons.Button(chat.Texts.ShowTheTranslationButton, id.ToString()));
         while (true) {
             var update = await chat.WaitUserInputAsync();
             if (update.CallbackQuery?.Data == id.ToString())
@@ -39,22 +35,7 @@ public class RuTrustLogic : IQuestionLogic {
                                                 .NewLine()
                                                 .NewLine()
                                                 .AddEscaped(chat.Texts.DidYouGuess),
-            new[]
-            {
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "1",
-                        Text = chat.Texts.YesButton
-                    },
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "0",
-                        Text = chat.Texts.NoButton
-                    }
-                }
-            }
+            new[] { InlineButtons.YesNo(chat.Texts) }
         );
 
         var choice = await chat.WaitInlineIntKeyboardInput();

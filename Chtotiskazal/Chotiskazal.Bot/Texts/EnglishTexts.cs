@@ -82,6 +82,9 @@ public class EnglishTexts : IInterfaceTexts {
     public string FailedOpenButYouWereHonest => "But you were honest...";
     public string FailedHideousHonestyIsGold => "Honesty is gold...";
     public string FailedMistaken(string text) => $"Mistaken. Correct spelling is '{text}'";
+    public string FastExamLearningHeader  => "Fast learning. You only need to press buttons";
+    public string WriteExamLearningHeader => "Learning";
+
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Wrong. Origin phrase was");
     public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Origin phrase was");
     public Markdown FailedDefault => Markdown.Escaped("Noo...");
@@ -99,11 +102,9 @@ public class EnglishTexts : IInterfaceTexts {
         "Enter english or russian word or text to translate or /start to open main menu ";
 
     public string NoTranslationsFound => "No translations found. Check the word and try again";
-
-    public Markdown LearningCarefullyStudyTheList =>
-        Markdown.Escaped("Learning").ToSemiBold()
-            .NewLine()
-            .AddEscaped("Carefully study the words in the list below:");
+    
+    public Markdown CarefullyStudyTheList =>
+        Markdown.Escaped("Carefully study the words in the list below:");
 
     public string LearningDone => "Learning done";
     public string WordsInTestCount => "Words in test";

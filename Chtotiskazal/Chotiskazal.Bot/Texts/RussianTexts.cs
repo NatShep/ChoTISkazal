@@ -87,6 +87,9 @@ public class RussianTexts : IInterfaceTexts {
     public string FailedHideousHonestyIsGold => "Искренность - золото";
     public string FailedMistaken(string text) => $"Ой ой ой. Правильно будет - '{text}'";
     public string ThankYouForYourCommentInReport => "Спасибо :) Без обратной связи было бы тяжко!";
+    public string FastExamLearningHeader => "Быстрый экзамен. Вам нужно будет только нажимать на кнопки";
+    public string WriteExamLearningHeader => "Учим";
+
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Неа. Фраза была");
     public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Фраза была");
     public Markdown FailedDefault => Markdown.Escaped("Ой не...");
@@ -105,10 +108,8 @@ public class RussianTexts : IInterfaceTexts {
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
     
-    public Markdown LearningCarefullyStudyTheList =>
-        Markdown.Escaped("Учим").ToSemiBold()
-            .NewLine()
-            .AddEscaped("Внимательно посмотрите слова из списка:");
+    public Markdown CarefullyStudyTheList =>
+        Markdown.Escaped("Внимательно посмотрите слова из списка:");
 
     public string LearningDone => "Ботанье завершено";
     public string WordsInTestCount => "Слов в тренировке";

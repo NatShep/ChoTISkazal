@@ -18,7 +18,7 @@ public static class WordLeaningGlobalSettings {
     public const double AverageScoresForPassedQuestion = 0.4;
 
     public const double StartScoreForWord = 0;
-    public const double LearningWordMinScore = 4.0;
+    public const double LearningWordMinScore = 3.5;
     public const double WellDoneWordMinScore = 10.0;
     public const double LearnedWordMinScore = 14.0;
     public const double WellLearnedWordAbsScore = 16.0;

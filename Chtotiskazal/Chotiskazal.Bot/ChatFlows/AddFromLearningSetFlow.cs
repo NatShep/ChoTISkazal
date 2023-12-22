@@ -60,11 +60,9 @@ public class AddFromLearningSetFlow {
             GetWordKeyboard());
 
         var continueAddWords = true;
-        while (continueAddWords)
-        {
+        while (continueAddWords) {
             var userInput = await Chat.WaitUserInputAsync();
-            if(userInput.CallbackQuery!=null)
-            {
+            if (userInput.CallbackQuery != null) {
                 continueAddWords = await HandleWordButton(userInput, selector);
                 var _ = SaveTrainingSetOffset(selector.Page);
             } //todo - Это должно сразу переводиться. Значит нужно выносить обработчики страниц в обработчики ???
@@ -74,13 +72,11 @@ public class AddFromLearningSetFlow {
 
     private async Task SaveTrainingSetOffset(int offset) {
         var currentSet = Chat.User.TrainingSets?.FirstOrDefault(f => f.SetId == _set.Id);
-        if (currentSet == null)
-        {
+        if (currentSet == null) {
             Chat.User.TrainingSets ??= new List<UserTrainSet>();
             Chat.User.TrainingSets.Add(new UserTrainSet { SetId = _set.Id, LastSeenWordOffset = offset });
         }
-        else
-        {
+        else {
             if (currentSet.LastSeenWordOffset == offset)
                 return;
             currentSet.LastSeenWordOffset = offset;
@@ -90,23 +86,20 @@ public class AddFromLearningSetFlow {
     }
 
     async Task<bool> HandleWordButton(Update update, PaginationCollection<WordInLearningSet> selector) {
-        if (selector.Count == 0)
-        {
+        if (selector.Count == 0) {
             await Chat.ConfirmCallback(update.CallbackQuery.Id);
             return false;
         }
 
         var moveResult = false;
-        if (update.CallbackQuery.Data == SelectLearningSetData)
-        {
+        if (update.CallbackQuery.Data == SelectLearningSetData) {
             await AddWordToUser(selector.Current);
             //Todo почему то не работает
             await Chat.AnswerCallbackQueryWithTooltip(
                 update.CallbackQuery.Id, Chat.Texts.WordIsAddedForLearning(selector.Current.Word));
             moveResult = await MoveOnNextWord(selector, true);
         }
-        else if (update.CallbackQuery.Data == MoveNextData)
-        {
+        else if (update.CallbackQuery.Data == MoveNextData) {
             await Chat.AnswerCallbackQueryWithTooltip(
                 update.CallbackQuery.Id, Chat.Texts.WordIsSkippedForLearning(selector.Current.Word));
             moveResult = await MoveOnNextWord(selector, true);
@@ -116,10 +109,8 @@ public class AddFromLearningSetFlow {
 
         DictionaryWord word = null;
         IReadOnlyList<Translation> translations = null;
-        while (word == null)
-        {
-            if (!moveResult)
-            {
+        while (word == null) {
+            if (!moveResult) {
                 await SendAllWordsAreLearnedMessage(update.CallbackQuery.Message.MessageId);
                 return false;
             }
@@ -138,11 +129,11 @@ public class AddFromLearningSetFlow {
     }
 
     private async Task SendAllWordsAreLearnedMessage(int messageId) =>
-        await Chat.EditMessageTextMarkdown(messageId, Markdown.Escaped(Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName)));
+        await Chat.EditMessageTextMarkdown(messageId,
+            Markdown.Escaped(Chat.Texts.AllWordsAreLearnedMessage(_set.ShortName)));
 
     private async Task<bool> MoveOnNextWord(PaginationCollection<WordInLearningSet> selector, bool moveNext) {
-        for (int i = 0; i < selector.Count; i++)
-        {
+        for (int i = 0; i < selector.Count; i++) {
             if (moveNext)
                 selector.MoveNext();
             else
@@ -170,24 +161,22 @@ public class AddFromLearningSetFlow {
     }
 
     private InlineKeyboardButton[][] GetWordKeyboard() =>
-        new[] {
-            new[] {
-                new InlineKeyboardButton {
-                    CallbackData = SelectLearningSetData,
-                    Text = $"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}"
-                }
+        new[]
+        {
+            new[]
+            {
+                InlineButtons.Button($"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}", SelectLearningSetData)
             },
-            new[] {
-                new InlineKeyboardButton {
-                    CallbackData = MoveNextData,
-                    Text = $"{Emojis.SoftNext}  {Chat.Texts.Skip}"
-                },
+            new[]
+            {
+                InlineButtons.Button($"{Emojis.SoftNext}  {Chat.Texts.Skip}", MoveNextData)
             },
-            new[] {
+            new[]
+            {
                 InlineButtons.MainMenu(Chat.Texts),
             }
         };
-    
+
     private Markdown GetWordMarkdown(
         PaginationCollection<WordInLearningSet> collection,
         DictionaryWord dictionaryWord,
@@ -199,7 +188,7 @@ public class AddFromLearningSetFlow {
         var example = GetExampleOrNull(wordInLearningSet, allowedTranslations);
 
         var msgWithMarkdownFormatted = new StringBuilder();
-        
+
         msgWithMarkdownFormatted.AppendLine($"*{Markdown.Escaped(engWord.Capitalize()).GetMarkdownString()}*");
         if (!string.IsNullOrWhiteSpace(transcription))
             msgWithMarkdownFormatted.Append($"```\r\n[{Markdown.Escaped(transcription).GetMarkdownString()}]\r\n```");
@@ -211,8 +200,9 @@ public class AddFromLearningSetFlow {
                 $"{Emojis.OpenQuote}{Markdown.Escaped(example.OriginPhrase).GetMarkdownString()}{Emojis.CloseQuote}\r\n" +
                 $"{Emojis.OpenQuote}{Markdown.Escaped(example.TranslatedPhrase).GetMarkdownString()}{Emojis.CloseQuote}" +
                 $"\r\n```");
-        msgWithMarkdownFormatted.AppendLine($"\r\n{Chat.Texts.XofY(collection.Page + 1, collection.Count).GetMarkdownString()}");
-    
+        msgWithMarkdownFormatted.AppendLine(
+            $"\r\n{Chat.Texts.XofY(collection.Page + 1, collection.Count).GetMarkdownString()}");
+
         return Markdown.Bypassed(msgWithMarkdownFormatted.ToString());
     }
 

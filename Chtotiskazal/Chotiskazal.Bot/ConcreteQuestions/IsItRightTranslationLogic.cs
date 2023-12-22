@@ -26,23 +26,7 @@ public class IsItRightTranslationLogic : IQuestionLogic {
             translation,
             chat.Texts.IsItRightTranslation);
 
-        await chat.SendMarkdownMessageAsync(msg,
-            new[]
-            {
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "1",
-                        Text = chat.Texts.YesButton
-                    },
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "0",
-                        Text = chat.Texts.NoButton
-                    }
-                }
-            });
+        await chat.SendMarkdownMessageAsync(msg, new[] { InlineButtons.YesNo(chat.Texts) });
 
         var choice = await chat.WaitInlineIntKeyboardInput();
         if (

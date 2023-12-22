@@ -21,10 +21,7 @@ public class SettingsFlow {
 
     public async Task EnterAsync() {
         await Chat.SendMessageAsync(Chat.Texts.AllowedSettings,
-            new InlineKeyboardButton
-            {
-                CallbackData = RemindInlineData,  Text = Chat.Texts.RemindSettingsButton
-            },
+            InlineButtons.Button(Chat.Texts.RemindSettingsButton, RemindInlineData),
             InlineButtons.Chlang(Chat.Texts),
             InlineButtons.MainMenu(Chat.Texts)
         );
@@ -43,26 +40,11 @@ public class SettingsFlow {
     private async Task SetRemindFrequency(UserModel user) {
         await Chat.SendMessageAsync(
             Chat.Texts.RemindSettingsMessage,
-            new InlineKeyboardButton
-            {
-                CallbackData = "1", Text = Chat.Texts.RemindEveryDay
-            },
-            new InlineKeyboardButton
-            {
-                CallbackData = "3", Text = Chat.Texts.RemindEveryThreeDays
-            },
-            new InlineKeyboardButton
-            {
-                CallbackData = "7", Text = Chat.Texts.RemindEveryWeek
-            },
-            new InlineKeyboardButton
-            {
-                CallbackData = "-1", Text = Chat.Texts.DoNotRemind
-            },
-            new InlineKeyboardButton
-            {
-                CallbackData = BotCommands.Start, Text = Chat.Texts.CancelButton
-            }
+            InlineButtons.Button(Chat.Texts.RemindEveryDay, "1"),
+            InlineButtons.Button(Chat.Texts.RemindEveryThreeDays, "3"),
+            InlineButtons.Button(Chat.Texts.RemindEveryWeek, "7"),
+            InlineButtons.Button(Chat.Texts.DoNotRemind, "-1"),
+            InlineButtons.Button(Chat.Texts.CancelButton, BotCommands.Start)
         );
 
         user.SetRemindFrequency(int.Parse(await Chat.WaitInlineKeyboardInput()));

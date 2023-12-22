@@ -1,6 +1,8 @@
 namespace SayWhat.Bll.Strings;
 
 public static class MarkdownExtension {
+    public static Markdown Space(this Markdown m) => m.AddBypassed(" ");
+
     public static Markdown NewLine(this Markdown m) => m.AddBypassed("\r\n");
 
     public static Markdown ToStrike(this Markdown m) => m.Wrap("~~");

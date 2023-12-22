@@ -123,6 +123,8 @@ public interface IInterfaceTexts {
     string PressTranslateToMoveStartTranslation { get; }
     string ToLearnPhrase { get; }
     string ItWasLongTimeAgo { get; }
+    string FastExamLearningHeader { get; }
+    string WriteExamLearningHeader { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
@@ -130,12 +132,12 @@ public interface IInterfaceTexts {
     Markdown FailedDefault { get; }
     Markdown PassedDefault { get; }
     Markdown IgnoredDefault { get; }
-    Markdown LearningCarefullyStudyTheList { get; }
+    Markdown CarefullyStudyTheList { get; }
     Markdown Help { get; }
     Markdown MainMenuText { get; }
     Markdown YouHaveATypoLetsTryAgain(string text);
     Markdown HereAreTranslations(string word, string tr);
-    public Markdown HereIsThePhraseTranslation(string tr);
+    Markdown HereIsThePhraseTranslation(string tr);
     Markdown LearnMoreWords(in int length);
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);

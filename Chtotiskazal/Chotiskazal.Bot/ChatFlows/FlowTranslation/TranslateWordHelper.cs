@@ -22,13 +22,9 @@ public static class TranslateWordHelper {
 
     public static async Task<InlineKeyboardButton> CreateButtonFor(ButtonCallbackDataService buttonCallbackDataService,
         string text, Translation translation, bool selected) =>
-        new InlineKeyboardButton
-        {
-            CallbackData = await CreateButtonDataFor(buttonCallbackDataService, translation, selected),
-            Text = selected
-                ? $"{Emojis.Selected} {text}"
-                : text
-        };
+        InlineButtons.Button(
+            selected ? $"{Emojis.Selected} {text}" : text,
+            await CreateButtonDataFor(buttonCallbackDataService, translation, selected));
 
     public static int FindIndexOf(IReadOnlyList<Translation> translations, string translation) {
         for (int i = 0; i < translations.Count; i++) {

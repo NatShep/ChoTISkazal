@@ -3,7 +3,6 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
@@ -18,11 +17,7 @@ public class RuTrustSingleTranslationLogic : IQuestionLogic {
         var id = Rand.Next();
 
         await chat.SendMarkdownMessageAsync(msg,
-            new InlineKeyboardButton()
-            {
-                CallbackData = id.ToString(),
-                Text = chat.Texts.ShowTheTranslationButton
-            });
+            InlineButtons.Button(chat.Texts.ShowTheTranslationButton, id.ToString()));
         while (true) {
             var update = await chat.WaitUserInputAsync();
             if (update.CallbackQuery?.Data == id.ToString())
@@ -41,24 +36,7 @@ public class RuTrustSingleTranslationLogic : IQuestionLogic {
                   .NewLine()
                   .NewLine().AddEscaped(chat.Texts.DidYouGuess);
 
-        await chat.SendMarkdownMessageAsync(msg,
-            new[]
-            {
-                new[]
-                {
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "1",
-                        Text = chat.Texts.YesButton
-                    },
-                    new InlineKeyboardButton
-                    {
-                        CallbackData = "0",
-                        Text = chat.Texts.NoButton
-                    }
-                }
-            }
-        );
+        await chat.SendMarkdownMessageAsync(msg, new[] { InlineButtons.YesNo(chat.Texts)} );
 
         var choice = await chat.WaitInlineIntKeyboardInput();
         return choice == 1

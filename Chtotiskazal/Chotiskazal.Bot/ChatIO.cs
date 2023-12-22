@@ -112,7 +112,7 @@ public class ChatIO {
     }
 
     public async Task<Update> WaitUserInputAsync() {
-        Reporter.WriteInfo($"Wait for update", ChatId);
+        Reporter.WriteInfo($"Wait for update", ChatId.ToString());
         var upd = await _senderChannel.Reader.ReadAsync();
         _chatHistory.OnInput(upd);
         string text = null;
@@ -174,7 +174,7 @@ public class ChatIO {
 
     public Task SendTyping() {
         _chatHistory.OnSendTyping();
-        return _client.SendChatActionAsync(ChatId, ChatAction.Typing, CancellationToken.None);
+        return _client.SendChatActionAsync(ChatId, ChatAction.Typing, null, CancellationToken.None);
     }
 
     public async Task<bool> EditMessageButtons(int messageId, InlineKeyboardButton[] buttons) {

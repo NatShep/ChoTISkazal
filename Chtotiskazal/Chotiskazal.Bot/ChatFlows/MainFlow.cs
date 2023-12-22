@@ -21,7 +21,7 @@ public class MainFlow {
         UserService userService,
         LocalDictionaryService localDictionaryService,
         LearningSetService learningSetService,
-        ButtonCallbackDataService buttonCallbackDataService, 
+        ButtonCallbackDataService buttonCallbackDataService,
         QuestionSelector questionSelector) {
         ChatIo = chatIo;
         _userInfo = userInfo;
@@ -52,41 +52,35 @@ public class MainFlow {
     public UserModel User => Chat?.User;
 
     public async Task Run() {
-        try
-        {
+        try {
             await Initialize();
 
             (string Command, IBotCommandHandler CommandHandler)? mainMenuCommandOrNull = null;
 
-            while (true)
-            {
-                try
-                {
+            while (true) {
+                try {
                     //run main scenario or mainMenuCommand
                     await HandleMainScenario(mainMenuCommandOrNull);
                     mainMenuCommandOrNull = null;
                 }
-                catch (UserAFKException)
-                {
+                catch (UserAFKException) {
                     return;
                 }
-                catch (ProcessInterruptedWithMenuCommand e)
-                {
-                    Reporter.ReportCommand(e.Command, ChatIo.ChatId.Identifier);
+                catch (ProcessInterruptedWithMenuCommand e) {
+                    Reporter.ReportCommand(e.Command, ChatIo.ChatId.Identifier ?? 0L);
                     //main scenario may be interrupted with main menu command
                     mainMenuCommandOrNull = (e.Command, e.CommandHandler);
                 }
-                catch (Exception e)
-                {
-                    Reporter.ReportError(ChatIo.ChatId.Identifier, $"Main failure for{ChatIo.ChatId.Username}",ChatIo?.TryGetChatHistory(),e);
+                catch (Exception e) {
+                    Reporter.ReportError(ChatIo.ChatId.Identifier, $"Main failure for{ChatIo.ChatId.Username}",
+                        ChatIo?.TryGetChatHistory(), e);
                     await ChatIo.SendMessageAsync(Chat.Texts.OopsSomethingGoesWrong);
                     throw;
                 }
             }
         }
-        catch (Exception e)
-        {
-            Reporter.ReportError(ChatIo?.ChatId?.Identifier, $"Fatal on run",ChatIo?.TryGetChatHistory(), e);
+        catch (Exception e) {
+            Reporter.ReportError(ChatIo?.ChatId?.Identifier, $"Fatal on run", ChatIo?.TryGetChatHistory(), e);
             throw;
         }
     }
@@ -94,8 +88,7 @@ public class MainFlow {
     private async Task Initialize() {
         //Initialize user
         var user = await _userService.GetUserOrNull(_userInfo);
-        if (user == null)
-        {
+        if (user == null) {
             var addUserTask = _userService.AddUserFromTelegram(_userInfo);
             await ChatIo.SendMessageAsync(_settings.WelcomeMessage);
             user = await addUserTask;
@@ -104,29 +97,31 @@ public class MainFlow {
 
         Chat = new ChatRoom(ChatIo, user);
         // Initialize update hooks
-        _translationSelectedUpdateHook = new TranslationSelectedUpdateHook(Chat, _addWordsService, _buttonCallbackDataService);
+        _translationSelectedUpdateHook =
+            new TranslationSelectedUpdateHook(Chat, _addWordsService, _buttonCallbackDataService);
         _wellKnownWordsUpdateHook = new LeafWellKnownWordsUpdateHook(Chat);
 
         ChatIo.AddUpdateHook(_translationSelectedUpdateHook);
         ChatIo.AddUpdateHook(_wellKnownWordsUpdateHook);
 
         // Initialize  command handlers
-        _addWordCommandHandler = new AddBotCommandHandler(_addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook);
+        _addWordCommandHandler =
+            new AddBotCommandHandler(_addWordsService, _buttonCallbackDataService, _translationSelectedUpdateHook);
 
-        ChatIo.CommandHandlers = new[] {
+        ChatIo.CommandHandlers = new[]
+        {
             HelpBotCommandHandler.Instance,
             new StatsBotCommandHandler(_settings.ExamSettings),
             new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings, _questionSelector),
             _addWordCommandHandler,
             new ShowLearningSetsBotCommandHandler(_learningSetService),
-            new ShowWellLearnedWordsCommandHandler(_usersWordsService,_wellKnownWordsUpdateHook),
+            new ShowWellLearnedWordsCommandHandler(_usersWordsService, _wellKnownWordsUpdateHook),
             new SelectLearningSet(
                 _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
             new StartBotCommandHandler(ShowMainMenu),
             new ChlangBotCommandHandler(_userService),
             ReportBotCommandHandler.Instance,
             new SettingsBotCommandHelper(_userService)
-            
         };
     }
 
@@ -134,13 +129,11 @@ public class MainFlow {
 
     private async Task HandleMainScenario((string Command, IBotCommandHandler CommandHandler)? command) {
         Chat.User.OnAnyActivity();
-        if (command.HasValue)
-        {
+        if (command.HasValue) {
             // if main scenario was interrupted by command - then handle the command
             await command.Value.CommandHandler.Execute(command.Value.Command, Chat);
         }
-        else
-        {
+        else {
             // handle user input as "translate" handler
             var message = await ChatIo.WaitUserInputAsync();
             if (message.Message?.Text != null)
@@ -153,36 +146,32 @@ public class MainFlow {
     private Task SendNotAllowedTooltip() => ChatIo.SendTooltip(Chat.Texts.ActionIsNotAllowed);
 
     private async Task ShowMainMenu() {
-        while (true)
-        {
-            var commands =  new[] {
+        while (true) {
+            var commands = new[]
+            {
                 new[] { InlineButtons.Translation(Chat.Texts) },
                 new[] { InlineButtons.Exam(Chat.Texts) },
                 new[] { InlineButtons.LearningSets(Chat.Texts) },
-                Chat.User.WasInterfaceLanguageChanged ? null : new [] { InlineButtons.Chlang(Chat.Texts)},
+                Chat.User.WasInterfaceLanguageChanged ? null : new[] { InlineButtons.Chlang(Chat.Texts) },
                 new[] { InlineButtons.Stats(Chat.Texts), InlineButtons.HowToUse(Chat.Texts) },
                 new[] { InlineButtons.Settings(Chat.Texts) }
             };
             await ChatIo.SendMessageAsync(Markdown.Escaped($"{Emojis.MainMenu}") + Chat.Texts.MainMenuText,
-                commands.Where(c=>c!=null).ToArray());
+                commands.Where(c => c != null).ToArray());
 
-            while (true)
-            {
+            while (true) {
                 var action = await ChatIo.WaitUserInputAsync();
 
-                if (action.Message != null)
-                {
+                if (action.Message != null) {
                     await _addWordCommandHandler.Execute(action.Message.Text, Chat);
                     return;
                 }
 
-                if (action.CallbackQuery != null)
-                {
+                if (action.CallbackQuery != null) {
                     var btn = action.CallbackQuery.Data;
                     // button data contains same commands as in menu items 
                     var commandHandler = ChatIo.CommandHandlers.FirstOrDefault(c => c.Acceptable(btn));
-                    if (commandHandler != null)
-                    {
+                    if (commandHandler != null) {
                         await commandHandler.Execute(null, Chat);
                         return;
                     }
