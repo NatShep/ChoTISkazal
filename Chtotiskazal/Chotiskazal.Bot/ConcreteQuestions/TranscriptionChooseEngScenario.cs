@@ -6,18 +6,18 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class TranscriptionChooseRuLogic : IQuestionLogic {
+public class TranscriptionChooseEngScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        var originTranslation = word.RuTranslations.GetRandomItemOrNull();
+        var originTranslation = word.RuTranslations.Where(r => r.HasTranscription).GetRandomItemOrNull();
 
-        if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription != "")
+        if (originTranslation == null)
             return QuestionResult.Impossible;
 
         string[] variants = examList
             .Where(e => !e.ContainsTranscription(originTranslation.Transcription))
-            .GetRuVariants(originTranslation, 5);
+            .GetEngVariants(word.Word, 5);
 
         var msg = QuestionMarkups.TranscriptionTemplate(originTranslation.Transcription,
             chat.Texts.ChooseWhichWordHasThisTranscription);
@@ -26,8 +26,7 @@ public class TranscriptionChooseRuLogic : IQuestionLogic {
         var choice = await chat.TryWaitInlineIntKeyboardInput();
         if (choice == null)
             return QuestionResult.RetryThisQuestion;
-
-        if (word.TextTranslations.Contains(variants[choice.Value]))
+        if (word.Word.Equals(variants[choice.Value]))
             return QuestionResult.Passed(chat.Texts);
         return QuestionResult.Failed(chat.Texts);
     }

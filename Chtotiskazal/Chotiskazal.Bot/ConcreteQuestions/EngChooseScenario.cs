@@ -7,14 +7,14 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EngChooseLogic : IQuestionLogic {
+public class EngChooseScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
         var variants = examList.GetRuVariants(originTranslation, 5);
 
-        var choice = await QuestionLogicHelper.ChooseVariantsFlow(chat, word.Word, variants);
+        var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, word.Word, variants);
         if (choice == null)
             return QuestionResult.RetryThisQuestion;
 

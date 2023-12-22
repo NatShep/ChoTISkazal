@@ -253,7 +253,7 @@ public class ExamFlow {
         if (examType != ExamType.NoInput) {
             markdown = markdown.NewLine().NewLine() +
                        Chat.Texts.TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(
-                           QuestionLogicHelper.IDontKnownSubcommand);
+                           QuestionScenarioHelper.IDontKnownSubcommand);
         }
 
         await Chat.SendMarkdownMessageAsync(markdown, new[]

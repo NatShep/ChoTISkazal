@@ -8,10 +8,10 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EngWriteLogic : IQuestionLogic {
+public class EngWriteScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
 
-    public EngWriteLogic(LocalDictionaryService localDictionaryService) {
+    public EngWriteScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;
     }
 
@@ -25,7 +25,7 @@ public class EngWriteLogic : IQuestionLogic {
         if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.LearningWordMinScore)
             return QuestionResult.Impossible;
 
-        var (result, entry) = await QuestionLogicHelper.GetRussianUserInputOrIDontKnow(chat,
+        var (result, entry) = await QuestionScenarioHelper.GetRussianUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.WriteTheTranslation));
         
         if(result == OptionalUserInputResult.IDontKnow)

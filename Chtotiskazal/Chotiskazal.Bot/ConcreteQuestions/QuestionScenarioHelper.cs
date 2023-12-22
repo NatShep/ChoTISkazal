@@ -9,8 +9,9 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public static class QuestionLogicHelper {
-    public const string IDontKnownSubcommand = "/idontknow"; 
+public static class QuestionScenarioHelper {
+    public const string IDontKnownSubcommand = "/idontknow";
+
     public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
         => list
             .Where(p => p.Word != englishWord)
@@ -92,12 +93,13 @@ public static class QuestionLogicHelper {
         return (result, input);
     }
 
-    private static async Task<(OptionalUserInputResult, string)> GetUserInputOrIDontKnow(ChatRoom chat, Markdown message) {
+    private static async Task<(OptionalUserInputResult, string)> GetUserInputOrIDontKnow(ChatRoom chat,
+        Markdown message) {
         await chat.SendMarkdownMessageAsync(message);
         var update = await chat.WaitUserTextInputAsync();
-        if(update.Trim().Equals(IDontKnownSubcommand, StringComparison.InvariantCultureIgnoreCase))
+        if (update.Trim().Equals(IDontKnownSubcommand, StringComparison.InvariantCultureIgnoreCase))
             return (OptionalUserInputResult.IDontKnow, null);
-         
+
         return string.IsNullOrEmpty(update)
             ? (OptionalUserInputResult.NotAnInput, "")
             : (OptionalUserInputResult.Input, update);

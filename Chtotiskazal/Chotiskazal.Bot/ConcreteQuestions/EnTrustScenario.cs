@@ -8,7 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EnTrustLogic : IQuestionLogic {
+public class EnTrustScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word,

@@ -5,17 +5,17 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuWriteLogic : IQuestionLogic {
+public class RuWriteScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
 
-    public RuWriteLogic(LocalDictionaryService localDictionaryService) {
+    public RuWriteScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;
     }
 
     public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
 
     public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
-        RuWriteQuestionHelper.PassRuWriteQuestion(
+        RuWriteQuestionScenarioHelper.PassRuWriteQuestion(
             chat,
             word,
             word.AllTranslationsAsSingleString,

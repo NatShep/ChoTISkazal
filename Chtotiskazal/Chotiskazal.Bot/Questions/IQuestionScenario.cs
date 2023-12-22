@@ -3,7 +3,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions;
 
-public interface IQuestionLogic {
+public interface IQuestionScenario {
     QuestionInputType InputType { get; }
     Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList);
 }

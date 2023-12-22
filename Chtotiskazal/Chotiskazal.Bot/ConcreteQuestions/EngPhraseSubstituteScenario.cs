@@ -9,7 +9,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EngPhraseSubstituteLogic : IQuestionLogic {
+public class EngPhraseSubstituteScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
@@ -28,7 +28,7 @@ public class EngPhraseSubstituteLogic : IQuestionLogic {
         if (enReplaced == enPhrase)
             return QuestionResult.Impossible;
 
-        var (result, enter) = await QuestionLogicHelper.GetEnglishUserInputOrIDontKnow(chat,
+        var (result, enter) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslatesAsTemplate(
                 ruPhrase,
                 chat.Texts.translatesAs,

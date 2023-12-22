@@ -6,16 +6,16 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuWriteSingleTranslationLogic : IQuestionLogic {
+public class RuWriteSingleTranslationScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
 
-    public RuWriteSingleTranslationLogic(LocalDictionaryService localDictionaryService) {
+    public RuWriteSingleTranslationScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;
     }
 
     public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
 
     public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) =>
-        RuWriteQuestionHelper.PassRuWriteQuestion(
+        RuWriteQuestionScenarioHelper.PassRuWriteQuestion(
             chat, word, word.RuTranslations.GetRandomItemOrNull().Word, _localDictionaryService);
 }

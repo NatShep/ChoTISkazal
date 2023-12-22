@@ -7,7 +7,7 @@ namespace Chotiskazal.Bot.Questions;
 /// <param name="Frequency">Relative frequency score</param>
 public record Question(
     string Name,
-    IQuestionLogic Scenario,
+    IQuestionScenario Scenario,
     double ExpectedScore,
     int Frequency,
     double FailScore,
@@ -20,7 +20,7 @@ public record Question(
     public Question Clear() =>
         new(
             Name: "Clean " + Name,
-            Scenario: new ClearScreenLogicDecorator(Scenario),
+            Scenario: new ClearScreenScenarioDecorator(Scenario),
             ExpectedScore: ExpectedScore,
             Frequency: Frequency,
             FailScore: FailScore,

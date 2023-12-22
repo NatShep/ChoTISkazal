@@ -6,7 +6,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class AssemblePhraseLogic : IQuestionLogic {
+public class AssemblePhraseScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
@@ -32,7 +32,7 @@ public class AssemblePhraseLogic : IQuestionLogic {
                 chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
                     .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
 
-        var (result, entry) = await QuestionLogicHelper.GetEnglishUserInputOrIDontKnow(chat,
+        var (result, entry) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,
             QuestionMarkups.FreeTemplateMarkdown(
                 chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
                     .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));

@@ -3,11 +3,11 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.Questions;
 
-public class ClearScreenLogicDecorator: IQuestionLogic {
+public class ClearScreenScenarioDecorator: IQuestionScenario {
 
-    private readonly IQuestionLogic _origin;
+    private readonly IQuestionScenario _origin;
 
-    public ClearScreenLogicDecorator(IQuestionLogic origin)=> _origin = origin;
+    public ClearScreenScenarioDecorator(IQuestionScenario origin)=> _origin = origin;
 
     public QuestionInputType InputType => _origin.InputType;
 

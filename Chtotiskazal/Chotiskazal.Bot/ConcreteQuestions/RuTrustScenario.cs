@@ -1,19 +1,18 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuTrustSingleTranslationLogic : IQuestionLogic {
+public class RuTrustScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        var msg = QuestionMarkups.TranslateTemplate(
-            word.RuTranslations.GetRandomItemOrNull().Word,
+        var msg = QuestionMarkups.TranslateTemplate(word.AllTranslationsAsSingleString,
             chat.Texts.DoYouKnowTranslation);
-
         var id = Rand.Next();
 
         await chat.SendMarkdownMessageAsync(msg,
@@ -30,13 +29,14 @@ public class RuTrustSingleTranslationLogic : IQuestionLogic {
             }
         }
 
-        msg = Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()
-                  .NewLine() +
-              Markdown.Escaped($"\"{word.Word}\"").ToSemiBold()
-                  .NewLine()
-                  .NewLine().AddEscaped(chat.Texts.DidYouGuess);
-
-        await chat.SendMarkdownMessageAsync(msg, new[] { InlineButtons.YesNo(chat.Texts)} );
+        await chat.SendMarkdownMessageAsync(Markdown.Escaped(chat.Texts.TranslationIs).ToItalic()
+                                                .NewLine() +
+                                            Markdown.Escaped($"\"{word.Word}\"").ToSemiBold()
+                                                .NewLine()
+                                                .NewLine()
+                                                .AddEscaped(chat.Texts.DidYouGuess),
+            new[] { InlineButtons.YesNo(chat.Texts) }
+        );
 
         var choice = await chat.WaitInlineIntKeyboardInput();
         return choice == 1

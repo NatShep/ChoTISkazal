@@ -8,7 +8,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-static class RuWriteQuestionHelper {
+static class RuWriteQuestionScenarioHelper {
     public static async Task<QuestionResult> PassRuWriteQuestion(
         ChatRoom chat,
         UserWordModel word,
@@ -19,7 +19,7 @@ static class RuWriteQuestionHelper {
             word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.LearningWordMinScore)
             return QuestionResult.Impossible;
 
-        var (result, input) = await QuestionLogicHelper.GetEnglishUserInputOrIDontKnow(chat,
+        var (result, input) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslation));
         if(result== OptionalUserInputResult.IDontKnow)
             return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);

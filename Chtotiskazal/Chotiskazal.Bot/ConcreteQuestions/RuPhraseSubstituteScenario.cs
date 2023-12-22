@@ -8,7 +8,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuPhraseSubstituteLogic : IQuestionLogic {
+public class RuPhraseSubstituteScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsRuInput;
 
     public async Task<QuestionResult> Pass(
@@ -22,7 +22,7 @@ public class RuPhraseSubstituteLogic : IQuestionLogic {
         if (replacedRuPhrase == ruPhrase)
             return QuestionResult.Impossible;
 
-        var (result, enter) = await QuestionLogicHelper.GetRussianUserInputOrIDontKnow(chat,
+        var (result, enter) = await QuestionScenarioHelper.GetRussianUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslatesAsTemplate(
                 enPhrase, chat.Texts.translatesAs, replacedRuPhrase, chat.Texts.EnterMissingWord + ":"));
         if (result == OptionalUserInputResult.IDontKnow)
