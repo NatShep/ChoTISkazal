@@ -88,8 +88,8 @@ static class Program {
         Reporter.ReportBotWokeup(me.Id, me.Username);
 
         _botClient.SetMyCommandsAsync(BotCommands.Descriptions).Wait();
+        Update[] allUpdates = _botClient.GetUpdatesAsync().Result;
 
-        var allUpdates = _botClient.GetUpdatesAsync().Result;
         Reporter.WriteInfo($"{allUpdates.Length} messages were missed");
 
         foreach (var update in allUpdates)
@@ -239,7 +239,7 @@ static class Program {
             _userService,
             _localDictionaryService,
             _learningSetService,
-            _buttonCallbackDataService, 
+            _buttonCallbackDataService,
             _questionSelector);
         Chats.TryAdd(chat.Id, newChatRoom);
         return newChatRoom;

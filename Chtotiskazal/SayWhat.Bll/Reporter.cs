@@ -80,7 +80,7 @@ public static class Reporter {
     public static void ReportTranslationNotFound(long? userTelegramId)
         => Collector.OnTranslationNotFound(userTelegramId);
 
-    public static void ReportBotWokeup(int meId, string meUsername) {
+    public static void ReportBotWokeup(long meId, string meUsername) {
         var message = $"Waking up. I am {meId}:{meUsername} ";
         _log.Information(message);
         _telegramLog?.Error("✅ " + message);
