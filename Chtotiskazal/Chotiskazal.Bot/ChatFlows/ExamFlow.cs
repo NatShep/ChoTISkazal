@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.ConcreteQuestions;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
@@ -232,11 +233,11 @@ public class ExamFlow {
 
     private async Task PrintExamStartsMessage(ExamType examType, UserWordModel[] newLearningWords) {
         var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold().Space();
-
+        
         markdown += examType == ExamType.NoInput
             ? Markdown.Escaped(Chat.Texts.FastExamLearningHeader).ToSemiBold().NewLine()
             : Markdown.Escaped(Chat.Texts.WriteExamLearningHeader).ToSemiBold();
-
+        
         markdown = markdown.NewLine() + Chat.Texts.CarefullyStudyTheList
             .NewLine()
             .NewLine();
@@ -248,6 +249,12 @@ public class ExamFlow {
         markdown += messageWithListOfWords.ToQuotationMono()
             .NewLine()
             .AddEscaped($"... {Chat.Texts.thenClickStart}");
+
+        if (examType != ExamType.NoInput) {
+            markdown = markdown.NewLine().NewLine() +
+                       Chat.Texts.TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(
+                           QuestionLogicHelper.IDontKnownSubcommand);
+        }
 
         await Chat.SendMarkdownMessageAsync(markdown, new[]
         {

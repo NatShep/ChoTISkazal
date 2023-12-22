@@ -32,12 +32,15 @@ public class AssemblePhraseLogic : IQuestionLogic {
                 chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
                     .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
 
-        var entry = await chat.WaitUserTextInputAsync();
+        var (result, entry) = await QuestionLogicHelper.GetEnglishUserInputOrIDontKnow(chat,
+            QuestionMarkups.FreeTemplateMarkdown(
+                chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
+                    .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
 
-        if (entry.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
+        if (result == OptionalUserInputResult.IDontKnow)
+            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+        if (result == OptionalUserInputResult.NotAnInput) 
             return QuestionResult.RetryThisQuestion;
-        }
 
         var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
 

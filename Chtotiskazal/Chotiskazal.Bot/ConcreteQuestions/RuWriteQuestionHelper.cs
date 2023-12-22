@@ -19,20 +19,14 @@ static class RuWriteQuestionHelper {
             word.AbsoluteScore < wordsInPhraseCount * WordLeaningGlobalSettings.LearningWordMinScore)
             return QuestionResult.Impossible;
 
-        await chat.SendMarkdownMessageAsync(
+        var (result, input) = await QuestionLogicHelper.GetEnglishUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslation));
-
-        var enUserEntry = await chat.WaitUserTextInputAsync();
-
-        if (string.IsNullOrEmpty(enUserEntry))
+        if(result== OptionalUserInputResult.IDontKnow)
+            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+        if(result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
-        if (enUserEntry.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
-            return QuestionResult.RetryThisQuestion;
-        }
-
-        var comparation = word.Word.CheckCloseness(enUserEntry);
+        var comparation = word.Word.CheckCloseness(input);
 
         if (comparation == StringsCompareResult.Equal)
             return QuestionResult.Passed(chat.Texts);
@@ -54,7 +48,7 @@ static class RuWriteQuestionHelper {
         // Question is about 'коэффициент' (Coefficient)
         // User answers 'Rate'
         // Search for 'Rate' translations
-        var otherRuTranslationsOfUserInput = await localDictionaryService.GetAllTranslationWords(enUserEntry.ToLower());
+        var otherRuTranslationsOfUserInput = await localDictionaryService.GetAllTranslationWords(input.ToLower());
 
         // if otherRuTranslationsOfUserInput contains 'коэффициент' or something like it
         // then retry question
@@ -73,7 +67,7 @@ static class RuWriteQuestionHelper {
 
         Markdown failedMessage = Markdown.Empty;
         if (!string.IsNullOrWhiteSpace(translates))
-            failedMessage = Markdown.Escaped($"{enUserEntry} {chat.Texts.translatesAs} {translates}").NewLine();
+            failedMessage = Markdown.Escaped($"{input} {chat.Texts.translatesAs} {translates}").NewLine();
         failedMessage += Markdown.Escaped($"{chat.Texts.RightTranslationWas}: ") +
                          Markdown.Escaped($"\"{word.Word}\"").ToSemiBold();
 

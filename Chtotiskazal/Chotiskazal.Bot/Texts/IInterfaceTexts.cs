@@ -126,7 +126,8 @@ public interface IInterfaceTexts {
     string FastExamLearningHeader { get; }
     string WriteExamLearningHeader { get; }
     string EnterWordToRemove { get; }
-    
+    string IDontKnow { get; }
+
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
     Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }
@@ -146,4 +147,5 @@ public interface IInterfaceTexts {
     Markdown XofY(in int x, in int y);
     Markdown WordNotFound(string argument);
     Markdown WordRemoved(string argument);
+    Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand);
 }

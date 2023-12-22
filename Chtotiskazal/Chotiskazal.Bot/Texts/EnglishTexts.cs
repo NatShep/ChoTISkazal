@@ -147,7 +147,8 @@ public class EnglishTexts : IInterfaceTexts {
         "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
     public string ToLearnPhrase => "I want to learn it";
     public string ItWasLongTimeAgo => "It was long time ago";
-    
+    public string IDontKnow => "I don't know";
+
     public Markdown HereAreTranslations(string word, string tr)
         => Markdown.Escaped("Here are translations.").ToItalic().NewLine() +
            Markdown.Escaped("Choose one of them to learn them in the future").ToItalic()
@@ -187,8 +188,10 @@ public class EnglishTexts : IInterfaceTexts {
         Markdown.Escaped("Success. Word").Space() +
         Markdown.Escaped(argument).ToSemiBold().Space() +
         Markdown.Escaped("is removed from questions and stats").Space();
-
     
+    public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
+        Markdown.Escaped($"Tip: Enter {dontKnownSubcommand} if you don't know the answer for write question");
+
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
 

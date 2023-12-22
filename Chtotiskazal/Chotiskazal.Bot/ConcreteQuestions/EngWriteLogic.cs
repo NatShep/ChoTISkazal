@@ -25,18 +25,13 @@ public class EngWriteLogic : IQuestionLogic {
         if (minCount > 0 && word.AbsoluteScore < minCount * WordLeaningGlobalSettings.LearningWordMinScore)
             return QuestionResult.Impossible;
 
-
-        await chat.SendMarkdownMessageAsync(
+        var (result, entry) = await QuestionLogicHelper.GetRussianUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.WriteTheTranslation));
-        var entry = await chat.WaitUserTextInputAsync();
-
-        if (string.IsNullOrEmpty(entry))
+        
+        if(result == OptionalUserInputResult.IDontKnow)
+            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+        if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
-
-        if (!entry.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
-            return QuestionResult.RetryThisQuestion;
-        }
 
         var (text, comparation) = translations.GetClosestTo(entry.Trim());
 

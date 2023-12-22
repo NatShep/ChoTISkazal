@@ -9,7 +9,7 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuPhraseSubstituteLogic : IQuestionLogic {
-    public QuestionInputType InputType => QuestionInputType.NeedsRuInput; 
+    public QuestionInputType InputType => QuestionInputType.NeedsRuInput;
 
     public async Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,
@@ -22,19 +22,13 @@ public class RuPhraseSubstituteLogic : IQuestionLogic {
         if (replacedRuPhrase == ruPhrase)
             return QuestionResult.Impossible;
 
-        await chat.SendMarkdownMessageAsync(
+        var (result, enter) = await QuestionLogicHelper.GetRussianUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslatesAsTemplate(
-                enPhrase,
-                chat.Texts.translatesAs,
-                replacedRuPhrase,
-                chat.Texts.EnterMissingWord + ":"));
-
-        var enter = await chat.WaitNonEmptyUserTextInputAsync();
-
-        if (!enter.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
+                enPhrase, chat.Texts.translatesAs, replacedRuPhrase, chat.Texts.EnterMissingWord + ":"));
+        if (result == OptionalUserInputResult.IDontKnow)
+            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+        if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
-        }
 
         var comparation = translation.Word.CheckCloseness(enter.Trim());
 

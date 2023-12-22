@@ -27,7 +27,7 @@ public class RussianTexts : IInterfaceTexts {
     public string TodaysGoal => "Цель на день";
     public string Exams => "экзаменов";
     public string TodayGoalReached => "Цель на день - достигнута!";
-    
+
     public Markdown OutOfScopeWithCandidate(string otherMeaning) {
         return Markdown.Escaped("Перевод-то правильный, но учим мы не его (имелось ввиду ")
             .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
@@ -90,6 +90,7 @@ public class RussianTexts : IInterfaceTexts {
     public string FastExamLearningHeader => "Быстрый экзамен. Вам нужно будет только нажимать на кнопки";
     public string WriteExamLearningHeader => "Учим";
     public string EnterWordToRemove => "Введите слово для его удаления из вопросов";
+    public string IDontKnow => "Я не знаю";
 
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Неа. Фраза была");
     public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Фраза была");
@@ -108,7 +109,7 @@ public class RussianTexts : IInterfaceTexts {
         "Введите английское или русское слово или фразу для перевода или нажмите /start что бы перейти в главное меню";
 
     public string NoTranslationsFound => "Я не нашел переводов для этого слова. Оно точно существует?";
-    
+
     public Markdown CarefullyStudyTheList =>
         Markdown.Escaped("Внимательно посмотрите слова из списка:");
 
@@ -147,11 +148,11 @@ public class RussianTexts : IInterfaceTexts {
 
     public string OopsSomethingGoesWrong =>
         "Ойойой. Что то сломалось во мне. Но вы не обращайте внимания. Нужные люди уже оповещены ;(";
-    
+
     public Markdown HereIsThePhraseTranslation(string tr)
         => Markdown.Escaped("Перевод:").ToItalic().NewLine() +
            Markdown.Escaped($"\r\n\r\n[{tr}]\r\n").ToQuotationMono();
-    
+
     public Markdown HereAreTranslations(string word, string tr)
         => Markdown.Escaped("Вот что я перевел.\r\n" +
                             "Выберите один или несколько переводов, дабы заботать их в будущем").ToItalic()
@@ -187,6 +188,9 @@ public class RussianTexts : IInterfaceTexts {
         Markdown.Escaped("Успех. Слово").Space() +
         Markdown.Escaped(argument).ToSemiBold().Space() +
         Markdown.Escaped("больше не будет попадаться вам в вопросах").Space();
+
+    public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
+        Markdown.Escaped($"Подсказка: Если вы не знаете ответа на письменный вопрос - то введите {dontKnownSubcommand}");
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";

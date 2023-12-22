@@ -32,16 +32,12 @@ public class EngWriteMissingLettersLogic : IQuestionLogic {
             starred,
             chat.Texts.WriteMissingLettersOrTheWholeWord);
 
-        await chat.SendMarkdownMessageAsync(msg);
-        var entry = await chat.WaitUserTextInputAsync();
+        var (result, entry) = await QuestionLogicHelper.GetRussianUserInputOrIDontKnow(chat, msg);
 
-        if (string.IsNullOrEmpty(entry))
+        if (result == OptionalUserInputResult.IDontKnow)
+            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+        if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
-
-        if (!entry.IsRussian()) {
-            await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
-            return QuestionResult.RetryThisQuestion;
-        }
 
         var bodyCloseness = entry.CheckCloseness(body);
         var wordCloseness = entry.CheckCloseness(ruWord);

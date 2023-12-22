@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using SayWhat.MongoDAL.Words;
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public static class QuestionLogicHelper {
+    public const string IDontKnownSubcommand = "/idontknow"; 
     public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
         => list
             .Where(p => p.Word != englishWord)
@@ -69,4 +71,41 @@ public static class QuestionLogicHelper {
         return chat.SendMarkdownMessageAsync(markup, InlineButtons.CreateVariants(
             variants.Select((_, i) => (i + 1).ToString())));
     }
+
+    public static async Task<(OptionalUserInputResult, string)> GetEnglishUserInputOrIDontKnow(ChatRoom chat,
+        Markdown message) {
+        var (result, input) = await GetUserInputOrIDontKnow(chat, message);
+        if (result == OptionalUserInputResult.NotAnInput ||
+            (result == OptionalUserInputResult.Input && input.IsRussian()))
+            await chat.SendMessageAsync(chat.Texts.EnglishInputExpected);
+
+        return (result, input);
+    }
+
+    public static async Task<(OptionalUserInputResult, string)> GetRussianUserInputOrIDontKnow(ChatRoom chat,
+        Markdown message) {
+        var (result, input) = await GetUserInputOrIDontKnow(chat, message);
+        if (result == OptionalUserInputResult.NotAnInput ||
+            (result == OptionalUserInputResult.Input && !input.IsRussian()))
+            await chat.SendMessageAsync(chat.Texts.RussianInputExpected);
+
+        return (result, input);
+    }
+
+    private static async Task<(OptionalUserInputResult, string)> GetUserInputOrIDontKnow(ChatRoom chat, Markdown message) {
+        await chat.SendMarkdownMessageAsync(message);
+        var update = await chat.WaitUserTextInputAsync();
+        if(update.Trim().Equals(IDontKnownSubcommand, StringComparison.InvariantCultureIgnoreCase))
+            return (OptionalUserInputResult.IDontKnow, null);
+         
+        return string.IsNullOrEmpty(update)
+            ? (OptionalUserInputResult.NotAnInput, "")
+            : (OptionalUserInputResult.Input, update);
+    }
+}
+
+public enum OptionalUserInputResult {
+    IDontKnow,
+    Input,
+    NotAnInput
 }
