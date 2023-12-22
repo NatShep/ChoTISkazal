@@ -14,6 +14,7 @@ public class BotCommands {
     public const string LearningSetPrefix = "/set";
     public const string Report = "/report";
     public const string Settings = "/settings";
+    public const string RemoveWord = "/removeword";
 
 
     public static readonly BotCommand[] Descriptions =
@@ -28,5 +29,6 @@ public class BotCommands {
         new() { Command = Chlang, Description = "Change interface language (Сменить язык интерфейса)" },
         new() { Command = Report, Description = "Report an bug or inaccuracy  (Сообщить об ошибке или неточности)" },
         new() { Command = Settings, Description = "Bot settings  (Настройки бота)" },
+        new() { Command = RemoveWord, Description = "Remove word  (Убрать слово из изучения)" },
     };
 }

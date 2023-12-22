@@ -174,5 +174,5 @@ public class UserWordModel {
         $"{Word} absolute_score: {AbsoluteScore} current_order_score: {CurrentOrderScore} ages_score:{Score.AgedScore} updated {ScoreUpdatedTimestamp} LastAnswer: {LastQuestionAskedTimestamp}";
 
 
-    public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText));
+    public bool HasTranslation(string translatedText) => RuTranslations.Any(t => t.Word.Equals(translatedText, StringComparison.InvariantCultureIgnoreCase));
 }

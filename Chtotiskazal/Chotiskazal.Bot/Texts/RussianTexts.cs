@@ -89,6 +89,7 @@ public class RussianTexts : IInterfaceTexts {
     public string ThankYouForYourCommentInReport => "Спасибо :) Без обратной связи было бы тяжко!";
     public string FastExamLearningHeader => "Быстрый экзамен. Вам нужно будет только нажимать на кнопки";
     public string WriteExamLearningHeader => "Учим";
+    public string EnterWordToRemove => "Введите слово для его удаления из вопросов";
 
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Неа. Фраза была");
     public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Фраза была");
@@ -176,6 +177,16 @@ public class RussianTexts : IInterfaceTexts {
 
     public Markdown XofY(in int number, in int y)
         => Markdown.Escaped($"\r\nСлово {number} из {y}...").ToMono();
+
+    public Markdown WordNotFound(string argument) =>
+        Markdown.Escaped("Слово").Space() +
+        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped("не найдено").Space();
+
+    public Markdown WordRemoved(string argument) =>
+        Markdown.Escaped("Успех. Слово").Space() +
+        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped("больше не будет попадаться вам в вопросах").Space();
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";

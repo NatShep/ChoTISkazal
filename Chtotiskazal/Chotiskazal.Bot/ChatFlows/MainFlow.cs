@@ -121,7 +121,8 @@ public class MainFlow {
             new StartBotCommandHandler(ShowMainMenu),
             new ChlangBotCommandHandler(_userService),
             ReportBotCommandHandler.Instance,
-            new SettingsBotCommandHelper(_userService)
+            new SettingsBotCommandHelper(_userService),
+            new RemoveWordCommandHandler(_usersWordsService)
         };
     }
 

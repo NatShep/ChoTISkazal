@@ -84,6 +84,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string FailedMistaken(string text) => $"Mistaken. Correct spelling is '{text}'";
     public string FastExamLearningHeader  => "Fast learning. You only need to press buttons";
     public string WriteExamLearningHeader => "Learning";
+    public string EnterWordToRemove => "Enter word to remove from questions and stats";
 
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Wrong. Origin phrase was");
     public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Origin phrase was");
@@ -176,7 +177,18 @@ public class EnglishTexts : IInterfaceTexts {
 
     public Markdown XofY(in int x,in int y)
         => Markdown.Escaped($"{x} of {y}").ToMono();
+    
+    public Markdown WordNotFound(string argument) =>
+        Markdown.Escaped("Word").Space() +
+        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped("is not found").Space();
 
+    public Markdown WordRemoved(string argument) =>
+        Markdown.Escaped("Success. Word").Space() +
+        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped("is removed from questions and stats").Space();
+
+    
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
 

@@ -125,6 +125,7 @@ public interface IInterfaceTexts {
     string ItWasLongTimeAgo { get; }
     string FastExamLearningHeader { get; }
     string WriteExamLearningHeader { get; }
+    string EnterWordToRemove { get; }
     
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginExampleWas2 { get; }
@@ -135,6 +136,7 @@ public interface IInterfaceTexts {
     Markdown CarefullyStudyTheList { get; }
     Markdown Help { get; }
     Markdown MainMenuText { get; }
+
     Markdown YouHaveATypoLetsTryAgain(string text);
     Markdown HereAreTranslations(string word, string tr);
     Markdown HereIsThePhraseTranslation(string tr);
@@ -142,4 +144,6 @@ public interface IInterfaceTexts {
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);
     Markdown XofY(in int x, in int y);
+    Markdown WordNotFound(string argument);
+    Markdown WordRemoved(string argument);
 }
