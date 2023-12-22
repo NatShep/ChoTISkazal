@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureVocabBuilder", "PureVoc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SayWhat.UnitTests", "SayWhat.UnitTests\SayWhat.UnitTests.csproj", "{89314E6C-866E-437A-A741-07D9AF3BEF63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPolingApi", "TestPolingApi\TestPolingApi.csproj", "{416B5541-0535-4129-AD3E-01457E35EF1C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
