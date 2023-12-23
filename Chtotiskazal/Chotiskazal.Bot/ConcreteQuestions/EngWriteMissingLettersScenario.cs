@@ -35,7 +35,7 @@ public class EngWriteMissingLettersScenario : IQuestionScenario {
         var (result, entry) = await QuestionScenarioHelper.GetRussianUserInputOrIDontKnow(chat, msg);
 
         if (result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+            return Failed();
         if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
@@ -50,9 +50,11 @@ public class EngWriteMissingLettersScenario : IQuestionScenario {
                 await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(ruWord));
                 return QuestionResult.RetryThisQuestion;
             case StringsCompareResult.BigMistakes:
-                return QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord), chat.Texts);
+                return Failed();
         }
 
-        return QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord), chat.Texts);
+        return Failed();
+
+        QuestionResult Failed() => QuestionResult.Failed(chat.Texts.FailedMistaken(ruWord), chat.Texts);
     }
 }

@@ -8,9 +8,9 @@ namespace Chotiskazal.Bot.Questions;
 
 public class ExamQuestionsSet {
     public ExamQuestionsSet(Question[] beginner, Question[] intermediate, Question[] advanced) {
-        this.Beginner = beginner;
-        this.Intermediate = intermediate;
-        this.Advanced = advanced;
+        Beginner = beginner;
+        Intermediate = intermediate;
+        Advanced = advanced;
     }
 
     private Question[] Beginner { get; }

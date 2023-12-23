@@ -4,7 +4,6 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 

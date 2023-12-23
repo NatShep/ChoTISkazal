@@ -21,9 +21,9 @@ static class RuWriteQuestionScenarioHelper {
 
         var (result, input) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,
             QuestionMarkups.TranslateTemplate(ruTranslationCaption, chat.Texts.WriteTheTranslation));
-        if(result== OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
-        if(result == OptionalUserInputResult.NotAnInput)
+        if (result == OptionalUserInputResult.IDontKnow)
+            return Failed();
+        if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
         var comparation = word.Word.CheckCloseness(input);
@@ -63,16 +63,20 @@ static class RuWriteQuestionScenarioHelper {
             return QuestionResult.RetryThisQuestion;
         }
 
-        var translates = string.Join(",", otherRuTranslationsOfUserInput);
+        return Failed(otherRuTranslationsOfUserInput);
 
-        Markdown failedMessage = Markdown.Empty;
-        if (!string.IsNullOrWhiteSpace(translates))
-            failedMessage = Markdown.Escaped($"{input} {chat.Texts.translatesAs} {translates}").NewLine();
-        failedMessage += Markdown.Escaped($"{chat.Texts.RightTranslationWas}: ") +
-                         Markdown.Escaped($"\"{word.Word}\"").ToSemiBold();
+        QuestionResult Failed(string[] otherRuTranslationsOfUserInput = null) {
+            var translates = otherRuTranslationsOfUserInput == null
+                ? null
+                : string.Join(",", otherRuTranslationsOfUserInput);
 
-        return QuestionResult.Failed(
-            failedMessage,
-            chat.Texts);
+            Markdown failedMessage = Markdown.Empty;
+            if (!string.IsNullOrWhiteSpace(translates))
+                failedMessage = Markdown.Escaped($"{input} {chat.Texts.translatesAs} {translates}").NewLine();
+            failedMessage += Markdown.Escaped($"{chat.Texts.RightTranslationWas}: ") +
+                             Markdown.Escaped($"\"{word.Word}\"").ToSemiBold();
+
+            return QuestionResult.Failed(failedMessage, chat.Texts);
+        }
     }
 }

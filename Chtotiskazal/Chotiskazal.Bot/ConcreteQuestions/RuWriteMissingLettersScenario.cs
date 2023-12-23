@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
@@ -36,7 +37,7 @@ public class RuWriteMissingLettersScenario : IQuestionScenario {
 
         var (result, entry) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat, msg);
         if (result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+            return Failed();
         if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
@@ -50,10 +51,13 @@ public class RuWriteMissingLettersScenario : IQuestionScenario {
             case StringsCompareResult.SmallMistakes:
                 await chat.SendMarkdownMessageAsync(chat.Texts.YouHaveATypoLetsTryAgain(engWord));
                 return QuestionResult.RetryThisQuestion;
+            
             case StringsCompareResult.BigMistakes:
-                return QuestionResult.Failed(chat.Texts.FailedMistaken(engWord), chat.Texts);
+            case StringsCompareResult.NotEqual:
+            default:
+                return Failed();
         }
 
-        return QuestionResult.Failed(chat.Texts.FailedMistaken(engWord), chat.Texts);
+        QuestionResult Failed() => QuestionResult.Failed(chat.Texts.FailedMistaken(engWord), chat.Texts);
     }
 }

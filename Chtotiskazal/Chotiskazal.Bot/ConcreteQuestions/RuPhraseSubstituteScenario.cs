@@ -26,7 +26,7 @@ public class RuPhraseSubstituteScenario : IQuestionScenario {
             QuestionMarkups.TranslatesAsTemplate(
                 enPhrase, chat.Texts.translatesAs, replacedRuPhrase, chat.Texts.EnterMissingWord + ":"));
         if (result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+            return Failed();
         if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
@@ -54,8 +54,10 @@ public class RuPhraseSubstituteScenario : IQuestionScenario {
             return QuestionResult.RetryThisQuestion;
         }
 
-        return QuestionResult.Failed(
-            chat.Texts.FailedOriginExampleWas2 +
-            Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(), chat.Texts);
+        return Failed();
+
+        QuestionResult Failed() => QuestionResult.Failed(
+                chat.Texts.FailedOriginExampleWas2 +
+                Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(), chat.Texts);
     }
 }

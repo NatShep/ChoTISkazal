@@ -38,8 +38,8 @@ public class AssemblePhraseScenario : IQuestionScenario {
                     .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()));
 
         if (result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
-        if (result == OptionalUserInputResult.NotAnInput) 
+            return Failed();
+        if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
         var closeness = targetPhrase.OriginPhrase.CheckCloseness(entry.Trim());
@@ -53,11 +53,13 @@ public class AssemblePhraseScenario : IQuestionScenario {
                 return QuestionResult.RetryThisQuestion;
             case StringsCompareResult.NotEqual:
             default:
-                return QuestionResult.Failed(
-                    Markdown.Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
-                        .NewLine()
-                        .AddMarkdown($"\"{targetPhrase.OriginPhrase}\"".ToSemiBoldMarkdown()),
-                    chat.Texts);
+                return Failed();
         }
+
+        QuestionResult Failed() => QuestionResult.Failed(
+            Markdown.Escaped($"{chat.Texts.FailedOriginExampleWas2}:")
+                .NewLine()
+                .AddMarkdown($"\"{targetPhrase.OriginPhrase}\"".ToSemiBoldMarkdown()),
+            chat.Texts);
     }
 }

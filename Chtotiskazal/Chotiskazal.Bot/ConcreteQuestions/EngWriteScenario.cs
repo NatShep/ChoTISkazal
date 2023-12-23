@@ -29,7 +29,7 @@ public class EngWriteScenario : IQuestionScenario {
             QuestionMarkups.TranslateTemplate(word.Word, chat.Texts.WriteTheTranslation));
         
         if(result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+            return Failed();
         if (result == OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
 
@@ -63,9 +63,11 @@ public class EngWriteScenario : IQuestionScenario {
             return QuestionResult.RetryThisQuestion;
         }
 
-        return QuestionResult.Failed(
-            Markdown.Escaped(chat.Texts.FailedTranslationWas).NewLine() +
-            Markdown.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold(),
-            chat.Texts);
+        return Failed();
+
+        QuestionResult Failed() => QuestionResult.Failed(
+                Markdown.Escaped(chat.Texts.FailedTranslationWas).NewLine() +
+                Markdown.Escaped($"\"{word.AllTranslationsAsSingleString}\"").ToSemiBold(),
+                chat.Texts);
     }
 }

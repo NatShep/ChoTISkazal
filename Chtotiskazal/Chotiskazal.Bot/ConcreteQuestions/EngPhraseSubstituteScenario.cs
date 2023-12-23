@@ -33,10 +33,10 @@ public class EngPhraseSubstituteScenario : IQuestionScenario {
                 ruPhrase,
                 chat.Texts.translatesAs,
                 enReplaced,
-                chat.Texts.EnterMissingWord + ":"));
+                chat.Texts.EnterMissingWord));
         
         if(result == OptionalUserInputResult.IDontKnow)
-            return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
+            return Failed();
         if(result== OptionalUserInputResult.NotAnInput)
             return QuestionResult.RetryThisQuestion;
         
@@ -63,9 +63,11 @@ public class EngPhraseSubstituteScenario : IQuestionScenario {
             return QuestionResult.RetryThisQuestion;
         }
 
-        return QuestionResult.Failed(
-            chat.Texts.FailedOriginExampleWas.NewLine() +
-            Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
-            chat.Texts);
+        return Failed();
+
+        QuestionResult Failed() => QuestionResult.Failed(
+                chat.Texts.FailedOriginExampleWas.NewLine() +
+                Markdown.Escaped($"\"{phrase.OriginPhrase}\"").ToSemiBold(),
+                chat.Texts);
     }
 }
