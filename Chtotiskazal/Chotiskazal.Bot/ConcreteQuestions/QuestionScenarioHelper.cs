@@ -25,7 +25,7 @@ public static class QuestionScenarioHelper {
     public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation,
         int count)
         => list
-            .Where(l=>l.IsWord)
+            .Where(l => l.IsWord)
             .SelectMany(e => e.TextTranslations)
             .Where(e => e != translation.Word)
             .Distinct()
@@ -35,24 +35,36 @@ public static class QuestionScenarioHelper {
             .Shuffle()
             .ToArray();
 
-    public static string[] GetRuPhraseVariants(this IEnumerable<UserWordModel> list, string originRuPhrase, int count, int maxLength = int.MaxValue) {
+    public static string[] GetRuPhraseVariants(this IEnumerable<UserWordModel> list, int count, string originRuPhrase,
+        int maxLength = int.MaxValue) {
         var otherPhrases = list
             .Where(l => l.IsPhrase)
             .Select(o => o.RuTranslations.First().Word);
         var samples = list.SelectMany(l => l.Examples).Select(s => s.TranslatedPhrase);
-        var all = otherPhrases.Concat(samples).Append(originRuPhrase).Distinct().Where(s=>s.Length<maxLength);
-        return all.Shuffle().Take(count).ToArray();
-    }
-    
-    public static string[] GetEnPhraseVariants(this IEnumerable<UserWordModel> list, string originRuPhrase, int count, int maxLength = int.MaxValue) {
+        var all = otherPhrases.Concat(samples).Distinct().Where(s => s.Length < maxLength).Shuffle();
+        if (count > 1)
+            all = all.Take(count - 1);
+        return all.Append(originRuPhrase).Shuffle().ToArray();
+    }   
+
+    public static string[] GetEnPhraseVariants(this IEnumerable<UserWordModel> list, int count,
+        string originEnPhrase = null, int maxLength = int.MaxValue) {
         var otherPhrases = list
-            .Where(l => l.IsPhrase)
+            .Where(l => l.IsPhrase && (originEnPhrase==null || !l.Word.Equals(originEnPhrase, StringComparison.InvariantCultureIgnoreCase)))
             .Select(o => o.Word);
         var samples = list.SelectMany(l => l.Examples).Select(s => s.OriginPhrase);
-        var all = otherPhrases.Concat(samples).Append(originRuPhrase).Distinct().Where(s=>s.Length<maxLength);
-        return all.Shuffle().Take(count).ToArray();
+        var all = otherPhrases.Concat(samples).Distinct().Where(s => s.Length < maxLength).Shuffle();
+        if (originEnPhrase != null) {
+            if (count == 1)
+                return new[] { originEnPhrase };
+            all = all.Take(count - 1).Append(originEnPhrase).Shuffle();
+        }
+        else
+            all = all.Take(count);
+            
+        return all.ToArray();
     }
-    
+
 
     public static async Task<string> ChooseVariantsFlow(ChatRoom chat, string target, string[] variants) {
         if (variants.Any(c => c.Length < 38))

@@ -11,15 +11,18 @@ public class PhraseRuChooseScenario : IQuestionScenario {
     public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        string[] variants = examList.GetEnPhraseVariants(word.Word, 5, 30);
+        var phrases = examList.GetEnPhraseVariants(
+            count: 5,
+            originEnPhrase: word.Word,
+            maxLength: 30);
 
         var ruWord = word.RuTranslations.First().Word;
-        var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, ruWord, variants);
+        var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, ruWord, phrases);
         if (choice == null)
             return QuestionResult.RetryThisQuestion;
 
         return choice.AreEqualIgnoreCase(word.Word)
             ? QuestionResult.Passed(chat.Texts)
-            : QuestionResult.Failed(chat.Texts);
+            : QuestionResult.FailedResultPhraseWas(word.Word, chat.Texts);
     }
 }

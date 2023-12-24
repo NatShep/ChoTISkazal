@@ -23,7 +23,7 @@ public class MutualPhrasesService {
 
     public Task<List<Example>> GetAllExamples() => _examplesRepo.GetAll();
 
-    public async Task<int> AddMutualPhrasesToUser(UserModel user, IList<MutualPhrase> phrases) {
+    public async Task<int> AddMutualPhrasesToUser(UserModel user, IList<MutualPhrase> phrases, int maxCount) {
         _logger.Debug($"AddMutualPhrasesToUser {user.TelegramNick}");
         var resultPhraseCount = 0;
         var allUserWords = await _usersWordsService.GetAllWords(user);
@@ -49,6 +49,8 @@ public class MutualPhrasesService {
             _logger.Debug("        Add phrase " + word.Word + " -> " + word.RuTranslations[0].Word);
             await _usersWordsService.AddUserWord(word);
             resultPhraseCount++;
+            if(resultPhraseCount>=maxCount)
+                break;
         }
 
         return resultPhraseCount;

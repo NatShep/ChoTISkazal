@@ -31,6 +31,14 @@ public class QuestionResult {
     public static QuestionResult Failed(Markdown text, IInterfaceTexts texts) =>
         new(text, Markdown.Escaped(texts.FailedHideousDefault), QResult.Failed);
 
+    public static QuestionResult FailedResultPhraseWas(string originPhrase, IInterfaceTexts texts) => Failed(
+        texts.FailedOriginPhraseWas2 +
+        Markdown.Escaped(":")
+            .NewLine()
+        + ($"\"{originPhrase}\"".ToSemiBoldMarkdown()),
+        texts);
+
+
     public static QuestionResult Failed(string text, IInterfaceTexts texts) =>
         new(text.ToEscapedMarkdown(), Markdown.Escaped(texts.FailedHideousDefault), QResult.Failed);
 

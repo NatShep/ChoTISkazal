@@ -60,7 +60,7 @@ public static class MutualPhraseJob {
 
         var phrases = await mutualPhrasesService.FindMutualPhrases(user, examples);
         logger.Debug($"Mutual: {phrases.Count} phrases found. Add phrases");
-        var count = await mutualPhrasesService.AddMutualPhrasesToUser(user, phrases);
+        var count = await mutualPhrasesService.AddMutualPhrasesToUser(user, phrases, 2);
         logger.Debug($"Mutual: {count} new phrases added for user {user.TelegramNick}");
         return count;
     }

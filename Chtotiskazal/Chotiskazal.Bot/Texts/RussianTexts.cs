@@ -74,9 +74,9 @@ public class RussianTexts : IInterfaceTexts {
 
     public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
         Markdown.Escaped("Фраза").NewLine() +
-        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine() +
+        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine().NewLine() +
         Markdown.Escaped("Переводится как").NewLine() +
-        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine() +
+        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine().NewLine() +
         Markdown.Escaped("Но слава в переводе перепутаны местами. Напишите оригинальный перевод");
 
     public Markdown YouHaveATypoLetsTryAgain(string text)

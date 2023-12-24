@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
@@ -12,12 +13,32 @@ public class IsItRightTranslationScenario : IQuestionScenario {
     public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.WordAndPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        var translation = examList.SelectMany(e => e.TextTranslations)
-            .Where(e => word.RuTranslations.All(t => t.Word != e))
-            .Shuffle()
-            .Take(1)
+        string wrongTranslation;
+        if (word.IsWord) {
+            wrongTranslation = examList
+                .Where(e=>e.IsWord)
+                .SelectMany(e => e.TextTranslations)
+                .Where(e => word.RuTranslations.All(t => t.Word != e))
+                .Shuffle()
+                .Take(1).FirstOrDefault();
+        }
+        else {
+            wrongTranslation = examList
+                                   .Where(e=>e.IsPhrase)
+                                   .SelectMany(e => e.TextTranslations)
+                                   .Where(e => word.RuTranslations.All(t => t.Word != e))
+                                   .Shuffle()
+                                   .Take(1)
+                                   .FirstOrDefault()
+                               ?? examList
+                                   .GetEnPhraseVariants(1)
+                                   .FirstOrDefault();
+        }
+
+        if (string.IsNullOrEmpty(wrongTranslation))
+            return QuestionResult.Impossible;
+        var translation = new[] { wrongTranslation }
             .Union(word.TextTranslations)
-            .ToList()
             .GetRandomItemOrNull();
 
         var msg = QuestionMarkups.TranslatesAsTemplate(

@@ -19,9 +19,7 @@ public static class AssemblePhraseScenarioHelper {
                 .NewLine() + Markdown.Escaped(shuffled).ToSemiBold()
             : chat.Texts.WordsInPhraseWithClueAreShuffledWriteThemInOrder(shuffled, ruTranslation);
 
-        await chat.SendMarkdownMessageAsync(QuestionMarkups.FreeTemplateMarkdown(msg));
-
-        return await HandleAssemblePhraseUserInput(chat, enPhrase, shuffled);
+        return await HandleAssemblePhraseUserInput(chat, msg, originPhrase: enPhrase);
     }
 
     private static string ShuffleWordsOrNull(string phrase) {
@@ -37,12 +35,8 @@ public static class AssemblePhraseScenarioHelper {
         }
     }
 
-    private static async Task<QuestionResult> HandleAssemblePhraseUserInput(ChatRoom chat, string originPhrase,
-        string shuffledPhrase) {
-        var (result, entry) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,
-            QuestionMarkups.FreeTemplateMarkdown(
-                chat.Texts.WordsInPhraseAreShuffledWriteThemInOrder.AddEscaped(":")
-                    .NewLine() + Markdown.Escaped(shuffledPhrase).ToSemiBold()));
+    private static async Task<QuestionResult> HandleAssemblePhraseUserInput(ChatRoom chat, Markdown questionText, string originPhrase) {
+        var (result, entry) = await QuestionScenarioHelper.GetEnglishUserInputOrIDontKnow(chat,questionText);
 
         if (result == OptionalUserInputResult.IDontKnow)
             return Failed();
@@ -64,7 +58,7 @@ public static class AssemblePhraseScenarioHelper {
         }
 
         QuestionResult Failed() => QuestionResult.Failed(
-            Markdown.Escaped($"{chat.Texts.FailedOriginPhraseWas2}:")
+            chat.Texts.FailedOriginPhraseWas2 + Markdown.Escaped(":")
                 .NewLine()
                 .AddMarkdown($"\"{originPhrase}\"".ToSemiBoldMarkdown()),
             chat.Texts);

@@ -39,6 +39,6 @@ public class ExampleEngChooseScenario : IQuestionScenario {
 
         return choice.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase)
             ? QuestionResult.Passed(chat.Texts)
-            : QuestionResult.Failed(chat.Texts);
+            : QuestionResult.FailedResultPhraseWas(targetPhrase.TranslatedPhrase, chat.Texts);
     }
 }

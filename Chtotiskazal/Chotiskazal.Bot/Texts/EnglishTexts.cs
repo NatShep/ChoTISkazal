@@ -67,14 +67,14 @@ public class EnglishTexts : IInterfaceTexts {
     public string PressTranslateToMoveStartTranslation => $"Press {BotCommands.Translate} to tranlate word";
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
-        Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
+        Markdown.Escaped("Words in phrase are shuffled. Write them in correct order");
 
     public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
         Markdown.Escaped("Phrase").NewLine() +
-        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine() +
+        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine().NewLine() +
         Markdown.Escaped("Translates as").NewLine() +
-        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine() +
-        Markdown.Escaped("But words in the translation are shuffled. Write them in correct order.");
+        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine().NewLine() +
+        Markdown.Escaped("But words in the translation are shuffled. Write them in correct order");
 
     public Markdown YouHaveATypoLetsTryAgain(string text)
         => Markdown.Escaped("You have a typo. Correct spelling is ") +

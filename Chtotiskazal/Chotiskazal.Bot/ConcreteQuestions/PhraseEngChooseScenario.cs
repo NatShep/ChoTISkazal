@@ -13,7 +13,7 @@ public class PhraseEngChooseScenario : IQuestionScenario {
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
-        var variants = examList.GetRuPhraseVariants(originTranslation.Word, 5, 30);
+        var variants = examList.GetRuPhraseVariants(5, originTranslation.Word, 30);
         if(variants.Length<2)
             return QuestionResult.Impossible;
         
@@ -23,6 +23,6 @@ public class PhraseEngChooseScenario : IQuestionScenario {
 
         return word.TextTranslations.Any(t => t.AreEqualIgnoreCase(choice))
             ? QuestionResult.Passed(chat.Texts)
-            : QuestionResult.Failed(chat.Texts);
+            : QuestionResult.FailedResultPhraseWas(word.TextTranslations.First(), chat.Texts);
     }
 }

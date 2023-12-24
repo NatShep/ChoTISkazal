@@ -18,6 +18,7 @@ public class ExampleRuChooseScenario : IQuestionScenario {
         var targetPhrase = word.GetRandomExample();
 
         var other = examList
+            .Where(e=>e!= word)
             .SelectMany(e => e.Examples)
             .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) &&
                         p.TranslatedPhrase != targetPhrase.TranslatedPhrase)
@@ -40,6 +41,6 @@ public class ExampleRuChooseScenario : IQuestionScenario {
 
         return choice.AreEqualIgnoreCase(targetPhrase.OriginPhrase)
             ? QuestionResult.Passed(chat.Texts)
-            : QuestionResult.Failed(chat.Texts);
+            : QuestionResult.FailedResultPhraseWas(targetPhrase.OriginPhrase, chat.Texts);
     }
 }

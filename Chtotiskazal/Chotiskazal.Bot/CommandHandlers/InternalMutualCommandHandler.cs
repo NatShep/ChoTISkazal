@@ -20,7 +20,7 @@ public class InternalMutualCommandHandler : IBotCommandHandler {
         await chat.SendMessageAsync("Samples loaded. Find phrases");
         var phrases = await _mutualPhrasesService.FindMutualPhrases(chat.User, samples);
         await chat.SendMessageAsync($"{phrases.Count} phrases found. Add phrases");
-        var count = await _mutualPhrasesService.AddMutualPhrasesToUser(chat.User, phrases);
+        var count = await _mutualPhrasesService.AddMutualPhrasesToUser(chat.User, phrases, 1);
         await chat.SendMessageAsync($"{count} new phrases added. Job finished");
     }
 }
