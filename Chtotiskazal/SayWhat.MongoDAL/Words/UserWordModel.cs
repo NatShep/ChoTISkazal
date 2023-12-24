@@ -17,7 +17,7 @@ namespace SayWhat.MongoDAL.Words;
 public class UserWordModel {
     public UserWordModel(
         ObjectId userUserId, string word, string translation,
-        UserWordType wordType, double rate = 0) {
+        UserWordType wordType, TranslationSource source, double rate = 0) {
         _userUserId = userUserId;
         _word = word;
         _currentOrderScore = Math.Pow(
@@ -25,13 +25,14 @@ public class UserWordModel {
         _absoluteScore = rate;
         _scoreUpdatedTimestamp = DateTime.Now;
         _wordType = wordType;
+        _source = source;
         RuTranslations = new[] { new UserWordTranslation(translation) };
         
     }
 
     public UserWordModel(
         ObjectId userId, string word, TranslationDirection direction, double absScore,
-        UserWordTranslation translation, UserWordType wordType) {
+        UserWordTranslation translation, TranslationSource source, UserWordType wordType) {
         _userUserId = userId;
         _word = word;
         _translationDirection = direction;
@@ -40,6 +41,7 @@ public class UserWordModel {
         _absoluteScore = absScore;
         _scoreUpdatedTimestamp = DateTime.Now;
         _wordType = wordType;
+        _source = source;
         RuTranslations = new[] { translation };
     }
 
@@ -99,8 +101,13 @@ public class UserWordModel {
     [BsonElement(UserWordsRepo.LastUpdateScoreTime)]
     private DateTime _scoreUpdatedTimestamp = DateTime.Now;
 
+    [BsonElement(UserWordsRepo.TranslationSource)]
+    private TranslationSource _source = TranslationSource.Yadic;
+    
     #endregion
 
+    public TranslationSource Source => _source;
+    
     public bool IsWord => _wordType == UserWordType.UsualWord;
 
     public bool IsPhrase => !IsWord;

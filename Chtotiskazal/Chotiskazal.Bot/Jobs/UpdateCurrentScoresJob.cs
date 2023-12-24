@@ -6,6 +6,7 @@ using Timer = System.Timers.Timer;
 
 namespace Chotiskazal.Bot.Jobs;
 
+
 public static class UpdateCurrentScoresJob {
 
     private static DateTime _launchTime;

@@ -45,7 +45,7 @@ public class UserWordsRepoTests {
         for (int i = 0; i < worstCount; i++) {
             string word1 = $"table{i}";
             string tranlation = $"стол{i}";
-            var word = new UserWordModel(user.Id, word1, tranlation, UserWordType.UsualWord, i);
+            var word = new UserWordModel(user.Id, word1, tranlation, UserWordType.UsualWord, TranslationSource.Manual, i);
             worstOnes.Add(word);
         }
 
@@ -59,7 +59,7 @@ public class UserWordsRepoTests {
             string word = $"table{i}";
             string tranlation = $"стол{i}";
             double rate = i + worstCount;
-            await _repo.Add(new UserWordModel(user.Id, word, tranlation, UserWordType.UsualWord, rate));
+            await _repo.Add(new UserWordModel(user.Id, word, tranlation, UserWordType.UsualWord, TranslationSource.Manual, rate));
         }
 
         #endregion
@@ -139,7 +139,7 @@ public class UserWordsRepoTests {
     [Test]
     public async Task AddTranslations_Update_GetReturnsUpdated() {
         var user = new UserModel { Id = ObjectId.GenerateNewId() };
-        var word = new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord);
+        var word = new UserWordModel(user.Id, "table", "стол", UserWordType.UsualWord, TranslationSource.Yadic);
         await _repo.Add(word);
         word.AddTranslations(
             new List<UserWordTranslation>

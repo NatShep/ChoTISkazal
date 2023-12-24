@@ -67,10 +67,10 @@ public class ExamFlow {
         var wellDoneWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
             examSettings.WellDoneWordsInOneExam,
-            examSettings.MaxTranslationsInOneExam,
-            CurrentScoreSortingType.LongAsked,
+            WordSortingType.Ascending,
             WordLeaningGlobalSettings.WellDoneWordMinScore,
-            WordLeaningGlobalSettings.LearnedWordMinScore);
+            WordLeaningGlobalSettings.LearnedWordMinScore,
+            examSettings.MaxTranslationsInOneExam);
 
         var freeSpaceForWords = 0;
         if (wellDoneWords.Length < examSettings.WellDoneWordsInOneExam) {
@@ -80,10 +80,10 @@ public class ExamFlow {
         var learningWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
             examSettings.LearningWordsInOneExam + freeSpaceForWords,
-            examSettings.MaxTranslationsInOneExam,
-            CurrentScoreSortingType.LongAsked,
+            WordSortingType.Ascending,
             WordLeaningGlobalSettings.LearningWordMinScore,
-            WordLeaningGlobalSettings.WellDoneWordMinScore);
+            WordLeaningGlobalSettings.WellDoneWordMinScore,
+            examSettings.MaxTranslationsInOneExam);
 
         if (learningWords.Length < examSettings.WellDoneWordsInOneExam + freeSpaceForWords)
             freeSpaceForWords = examSettings.WellDoneWordsInOneExam + examSettings.NewWordInOneExam -
@@ -96,7 +96,7 @@ public class ExamFlow {
             examSettings.NewWordInOneExam + freeSpaceForWords,
             examSettings.CountOfVariantsForChoose,
             examSettings.MaxTranslationsInOneExam,
-            CurrentScoreSortingType.JustAsked,
+            WordSortingType.Descending,
             WordLeaningGlobalSettings.StartScoreForWord,
             WordLeaningGlobalSettings.LearningWordMinScore);
 
@@ -109,9 +109,9 @@ public class ExamFlow {
         var learnedWords = await _usersWordsService.GetWordsWithPhrasesAsync(
             Chat.User,
             examSettings.LearnedWordsInOneExam,
-            examSettings.MaxTranslationsInOneExam,
-            CurrentScoreSortingType.LongAsked,
-            WordLeaningGlobalSettings.LearnedWordMinScore);
+            WordSortingType.Ascending,
+            WordLeaningGlobalSettings.LearnedWordMinScore,
+            maxTranslations: examSettings.MaxTranslationsInOneExam);
 
 
         //TODO before this values used for count questions for advanced words. Maybe they are important. Maybe not
@@ -233,11 +233,11 @@ public class ExamFlow {
 
     private async Task PrintExamStartsMessage(ExamType examType, UserWordModel[] newLearningWords) {
         var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold().Space();
-        
+
         markdown += examType == ExamType.NoInput
             ? Markdown.Escaped(Chat.Texts.FastExamLearningHeader).ToSemiBold().NewLine()
             : Markdown.Escaped(Chat.Texts.WriteExamLearningHeader).ToSemiBold();
-        
+
         markdown = markdown.NewLine() + Chat.Texts.CarefullyStudyTheList
             .NewLine()
             .NewLine();

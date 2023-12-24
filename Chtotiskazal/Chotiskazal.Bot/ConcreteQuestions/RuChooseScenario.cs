@@ -10,7 +10,7 @@ public class RuChooseScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        string[] variants = QuestionScenarioHelper.GetEngVariants(examList, word.Word, 5);
+        string[] variants = examList.GetEngVariants(word.Word, 5);
 
         var ruWord = word.RuTranslations.First().Word;
         var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, ruWord, variants);

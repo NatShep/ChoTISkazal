@@ -39,6 +39,7 @@ static class Program {
     private static UserService _userService;
     private static LearningSetService _learningSetService;
     private static QuestionSelector _questionSelector;
+    private static MutualPhrasesService _mutualPhraseService;
 
     private static async Task Main() {
         TaskScheduler.UnobservedTaskException +=
@@ -65,6 +66,7 @@ static class Program {
         await learningSetsRepo.UpdateDb();
 
         Reporter.QuestionMetricRepo = questionMetricsRepo;
+        var telegramLogger = TelegramLogger.CreateLogger(_settings.BotHelperToken, _settings.ControlPanelChatId);
 
         _userWordService = new UsersWordsService(userWordRepo, examplesRepo);
         _localDictionaryService = new LocalDictionaryService(dictionaryRepo, examplesRepo);
@@ -76,12 +78,12 @@ static class Program {
             _localDictionaryService,
             _userService);
         _buttonCallbackDataService = new ButtonCallbackDataService(longDataForButtonRepo);
+        _mutualPhraseService = new MutualPhrasesService(examplesRepo, _userWordService, telegramLogger);
 
         _questionSelector = new QuestionSelector(_localDictionaryService);
 
         _botClient = new TelegramBotClient(_settings.TelegramToken);
 
-        var telegramLogger = TelegramLogger.CreateLogger(_settings.BotHelperToken, _settings.ControlPanelChatId);
 
         Reporter.SetTelegramLogger(telegramLogger);
 
@@ -101,13 +103,14 @@ static class Program {
             messageOffset = allUpdates.Last().Id + 1;
             Reporter.WriteInfo($"{Chats.Count} users were waiting for us");
         }
-    
+
         //_botClient.OnUpdate += BotClientOnOnUpdate;
         //_botClient.OnMessage += Bot_OnMessage;
 
         //_botClient.StartReceiving();
 
         ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
+        var mutualJobTask = MutualPhraseJob.Launch(_mutualPhraseService, _userService, telegramLogger, launchHour: 4);
         var remindJobTask = RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
         var updateCurrentScoreJobTask = UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
         var receiverOptions = new ReceiverOptions()
@@ -132,13 +135,13 @@ static class Program {
         Reporter.WriteInfo($"... and here i go!");
         // workaround for infinity awaiting
         new TaskCompletionSource<bool>().Task.Wait();
-        
+
         //----
+        // it will never happens
+        await mutualJobTask;
         await remindJobTask;
         await updateCurrentScoreJobTask;
         await receiveTask;
-        // it will never happens
-        //_botClient.StopReceiving();
     }
 
     private static BotSettings ReadConfiguration(bool substitudeDebugConfig) {
@@ -232,6 +235,7 @@ static class Program {
             _localDictionaryService,
             _learningSetService,
             _buttonCallbackDataService,
+            _mutualPhraseService,
             _questionSelector);
         Chats.TryAdd(chat.Id, newChatRoom);
         return newChatRoom;

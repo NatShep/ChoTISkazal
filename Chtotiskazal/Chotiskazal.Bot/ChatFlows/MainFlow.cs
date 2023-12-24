@@ -7,6 +7,7 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.Bll;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
+using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.Users;
 
 namespace Chotiskazal.Bot.ChatFlows;
@@ -22,6 +23,7 @@ public class MainFlow {
         LocalDictionaryService localDictionaryService,
         LearningSetService learningSetService,
         ButtonCallbackDataService buttonCallbackDataService,
+        MutualPhrasesService mutualPhrasesService,
         QuestionSelector questionSelector) {
         ChatIo = chatIo;
         _userInfo = userInfo;
@@ -32,6 +34,7 @@ public class MainFlow {
         _localDictionaryService = localDictionaryService;
         _learningSetService = learningSetService;
         _buttonCallbackDataService = buttonCallbackDataService;
+        _mutualPhrasesService = mutualPhrasesService;
         _questionSelector = questionSelector;
     }
 
@@ -40,6 +43,7 @@ public class MainFlow {
     private readonly UserService _userService;
     private readonly LocalDictionaryService _localDictionaryService;
     private readonly ButtonCallbackDataService _buttonCallbackDataService;
+    private readonly MutualPhrasesService _mutualPhrasesService;
     private readonly QuestionSelector _questionSelector;
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
@@ -122,7 +126,8 @@ public class MainFlow {
             new ChlangBotCommandHandler(_userService),
             ReportBotCommandHandler.Instance,
             new SettingsBotCommandHelper(_userService),
-            new RemoveWordCommandHandler(_usersWordsService)
+            new RemoveWordCommandHandler(_usersWordsService),
+            new InternalMutualCommandHandler(_mutualPhrasesService)
         };
     }
 

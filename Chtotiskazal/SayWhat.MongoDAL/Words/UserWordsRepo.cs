@@ -16,13 +16,14 @@ public class UserWordsRepo : IMongoRepo {
     public const string OriginWordFieldName = "w";
     public const string LastUpdateScoreTime = "updt";
     public const string LastQuestionAskedTimestampFieldName = "askt";
+    public const string TranslationSource = "src";
     private readonly IMongoDatabase _db;
 
     public UserWordsRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(UserWordModel word) => Collection.InsertOneAsync(word);
 
-    public Task<List<UserWordModel>> GetWordsForLearningBetweenLowAndHighScores(UserModel user,
+    public Task<List<UserWordModel>> GetWordsBetweenLowAndHighScores(UserModel user,
         int count,
         double lowRate,
         double highRate,
@@ -38,7 +39,7 @@ public class UserWordsRepo : IMongoRepo {
             .Limit(count)
             .ToListAsync();
 
-    public Task<List<UserWordModel>> GetWordsForLearningAboveScore(UserModel user, int count, double lowRate)
+    public Task<List<UserWordModel>> GetWordsAboveScore(UserModel user, int count, double lowRate)
         => Collection
             .Find(
                 Builders<UserWordModel>.Filter.And(

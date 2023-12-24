@@ -186,8 +186,10 @@ public class MarkdownTest {
                                   .NewLine();
         var newWellLearnedWords = new List<UserWordModel>()
         {
-            new(ObjectId.GenerateNewId(), "Foo", TranslationDirection.EnRu, 0, new UserWordTranslation("Фуу"), UserWordType.UsualWord),
-            new(ObjectId.GenerateNewId(), "Bar", TranslationDirection.EnRu, 0, new UserWordTranslation("Бар"), UserWordType.UsualWord),
+            new(ObjectId.GenerateNewId(), "Foo", TranslationDirection.EnRu, 0, new UserWordTranslation("Фуу"),
+                TranslationSource.Yadic, UserWordType.UsualWord),
+            new(ObjectId.GenerateNewId(), "Bar", TranslationDirection.EnRu, 0, new UserWordTranslation("Бар"),
+                TranslationSource.Yadic, UserWordType.UsualWord),
         };
 
 

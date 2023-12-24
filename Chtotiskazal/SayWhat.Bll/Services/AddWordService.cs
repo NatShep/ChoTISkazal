@@ -110,8 +110,8 @@ public class AddWordService {
             var gTranlsation = await _gTranslator.TranslateAsync(input, toLanguage: toLang, fromLanguage: fromLang);
             // Translation service may return same string, as input. That means, that there is no known translations
             if (string.Equals(gTranlsation.Translation.Trim(), input.Trim(), StringComparison.CurrentCultureIgnoreCase))
-                return null; 
-            
+                return null;
+
             var isPhrase = gTranlsation.Translation.Contains(" ") || gTranlsation.Source.Contains(" ");
             return new Translation(
                 originText: input,
@@ -153,6 +153,7 @@ public class AddWordService {
                 word: translation.OriginText,
                 direction: TranslationDirection.EnRu,
                 absScore: 0,
+                source: translation.Source,
                 wordType: translation.WordType,
                 translation: new UserWordTranslation
                 {
