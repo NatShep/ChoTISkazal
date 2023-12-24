@@ -45,6 +45,8 @@ public static class Questions {
         PassScore: 0.4,
         FailScore: 1
     );
+    
+   
 
     public static readonly Question EngChoose = new("Eng Choose", new EngChooseScenario(),
         Frequency: LowMid,
@@ -115,43 +117,78 @@ public static class Questions {
         FailScore: 0.56
     );
 
-    public static readonly Question EngChooseWordInPhrase = new("Eng Choose word in phrase",
-        Scenario: new EngChooseWordInPhraseScenario(),
+    public static readonly Question EngChooseWordInExample = new("Eng Choose word in phrase",
+        Scenario: new EngChooseWordInExampleScenario(),
         Frequency: Hi,
         ExpectedScore: Intermediate1,
         PassScore: 0.6,
         FailScore: 0.8
     );
 
-    public static readonly Question ClearEngChooseWordInPhrase = new Question("Eng Choose word in phrase",
-        new EngChooseWordInPhraseScenario(),
+    public static readonly Question ClearEngChooseWordInExample = new Question("Eng Choose word in phrase",
+        new EngChooseWordInExampleScenario(),
         Frequency: Hi,
         ExpectedScore: Intermediate2,
         PassScore: 0.6,
         FailScore: 0.8
     ).Clear();
 
-    public static readonly Question EngPhraseSubstitute = new("Eng phrase substitute",
-        new EngPhraseSubstituteScenario(),
+    public static readonly Question ExampleEngSubstitute = new("Eng phrase substitute",
+        new ExampleEngSubstituteScenario(),
         Frequency: HiMid,
         ExpectedScore: Intermediate3,
         PassScore: 0.8,
         FailScore: 0.4
     );
 
-    public static readonly Question RuPhraseSubstitute = new("Ru phrase substitute",
-        new RuPhraseSubstituteScenario(),
+    public static readonly Question ExampleRuSubstitute = new("Ru phrase substitute",
+        new ExampleRuSubstituteScenario(),
         Frequency: HiMid,
         ExpectedScore: Intermediate3,
         PassScore: 0.73,
         FailScore: 0.4
     );
 
-    public static readonly Question AssemblePhraseExam = new("Assemble phrase", new AssemblePhraseScenario(),
+    public static readonly Question ExampleAssembleWithClueExam = new("Assemble phrase with clue", new ExampleAssembleWithClueScenario(),
+        Frequency: Mid,
+        ExpectedScore: Intermediate1,
+        PassScore: 1,
+        FailScore: 1
+    );
+    
+    public static readonly Question ExampleAssembleExam = new("Assemble phrase", new ExampleAssembleScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate2,
         PassScore: 1.47,
         FailScore: 0.6
+    );
+    
+    
+    public static readonly Question PhraseAssembleWithClueExam = new("Phrase: Assemble with clue", new PhraseAssembleWithClueScenario(),
+        Frequency: Mid,
+        ExpectedScore: Intermediate2,
+        PassScore: 1,
+        FailScore: 1
+    );
+    
+    public static readonly Question PhraseAssembleExam = new("Phrase: Assemble", new PhraseAssembleScenario(),
+        Frequency: Mid,
+        ExpectedScore: Intermediate3,
+        PassScore: 1.47,
+        FailScore: 0.6
+    );
+    
+    public static readonly Question PhraseRuChoose = new("Phrase: RuChoose", new PhraseRuChooseScenario(),
+        Frequency: Mid,
+        ExpectedScore: Intermediate2,
+        PassScore: 1,
+        FailScore: 1
+    );
+    public static readonly Question PhraseEngChoose = new("Phrase: Eng Choose", new PhraseEngChooseScenario(),
+        Frequency: Mid,
+        ExpectedScore: Intermediate2,
+        PassScore: 1,
+        FailScore: 1
     );
 
     public static Question EngWrite(LocalDictionaryService service) => new("Eng Write",
@@ -186,37 +223,37 @@ public static class Questions {
         FailScore: 0.6
     );
 
-    public static readonly Question EngPhraseChoose = new("Eng Choose Phrase", new EngChoosePhraseScenario(),
+    public static readonly Question EngExampleChoose = new("Eng Choose Phrase", new ExampleEngChooseScenario(),
         Frequency: LowMid,
         ExpectedScore: Intermediate4,
         PassScore: 0.4,
         FailScore: 0.6
     );
 
-    public static readonly Question RuPhraseChoose = new("Ru Choose Phrase", new RuChoosePhraseScenario(),
+    public static readonly Question RuExampleChoose = new("Ru Choose Phrase", new ExampleRuChooseScenario(),
         Frequency: LowMid,
         ExpectedScore: Intermediate4,
         PassScore: 0.9,
         FailScore: 0.6
     );
 
-    public static readonly Question ClearEngPhraseSubstitute = new Question("Eng phrase substitute",
-        Scenario: new EngPhraseSubstituteScenario(),
+    public static readonly Question ClearExampleEngSubstitute = new Question("Eng phrase substitute",
+        Scenario: new ExampleEngSubstituteScenario(),
         Frequency: HiMid,
         ExpectedScore: Intermediate4,
         PassScore: 0.8,
         FailScore: 0.4
     ).Clear();
 
-    public static readonly Question ClearRuPhraseSubstitute = new("Ru phrase substitute",
-        Scenario: new RuPhraseSubstituteScenario(),
+    public static readonly Question ClearExampleRuSubstitute = new("Ru phrase substitute",
+        Scenario: new ExampleRuSubstituteScenario(),
         Frequency: HiMid,
         ExpectedScore: Intermediate4,
         PassScore: 0.73,
         FailScore: 0.4
     );
 
-    public static Question RuWriteSingleTranslationExam(LocalDictionaryService service) =>
+    public static Question RuWriteSingleTranslation(LocalDictionaryService service) =>
         new("Ru Write Single Translation",
             Scenario: new RuWriteSingleTranslationScenario(service),
             Frequency: Mid,
@@ -229,13 +266,15 @@ public static class Questions {
     {
         EngChoose,
         RuChoose,
-        RuPhraseChoose,
-        EngPhraseChoose,
-        EngChooseWordInPhrase,
+        RuExampleChoose,
+        EngExampleChoose,
+        EngChooseWordInExample,
         TranscriptionExam,
         IsItRightTranslationExam,
         EngChooseMultipleTranslationExam,
         EngChooseByTranscriptionExam,
+        PhraseEngChoose,
+        PhraseRuChoose,
     };
 
     public static readonly Question[] IntermediateQuestions =
@@ -246,11 +285,14 @@ public static class Questions {
         RuHardWriteMissingLetter,
         EngChoose,
         RuChoose,
-        RuPhraseChoose,
-        EngPhraseChoose,
-        EngPhraseSubstitute,
-        RuPhraseSubstitute,
-        AssemblePhraseExam,
+        RuExampleChoose,
+        EngExampleChoose,
+        ExampleEngSubstitute,
+        ExampleRuSubstitute,
+        ExampleAssembleExam,
+        ExampleAssembleWithClueExam,
+        PhraseAssembleExam,
+        PhraseAssembleWithClueExam,
         EngTrust,
         RuTrust,
         RuTrustSingle,
@@ -259,6 +301,8 @@ public static class Questions {
         TranscriptionExam,
         IsItRightTranslationExam,
         EngChooseMultipleTranslationExam,
+        PhraseEngChoose,
+        PhraseRuChoose,
     };
 
     public static Question[] AdvancedQuestions(LocalDictionaryService localDictionaryService) => new[]
@@ -267,23 +311,28 @@ public static class Questions {
         RuHardWriteMissingLetter,
         EngChoose,
         RuChoose,
-        EngPhraseChoose,
-        RuPhraseChoose,
+        EngExampleChoose,
+        RuExampleChoose,
         EngTrust,
         RuTrust,
         RuTrustSingle,
         EngWrite(localDictionaryService),
         RuWrite(localDictionaryService),
-        RuWriteSingleTranslationExam(localDictionaryService),
-        ClearEngPhraseSubstitute,
-        ClearRuPhraseSubstitute,
-        EngPhraseSubstitute,
-        RuPhraseSubstitute,
-        EngChooseWordInPhrase,
-        ClearEngChooseWordInPhrase,
-        AssemblePhraseExam,
+        RuWriteSingleTranslation(localDictionaryService),
+        ClearExampleEngSubstitute,
+        ClearExampleRuSubstitute,
+        ExampleEngSubstitute,
+        ExampleRuSubstitute,
+        EngChooseWordInExample,
+        ClearEngChooseWordInExample,
+        ExampleAssembleExam,
+        ExampleAssembleWithClueExam,
+        PhraseAssembleExam,
+        PhraseAssembleWithClueExam,
         IsItRightTranslationExam,
         EngChooseMultipleTranslationExam,
         RuChooseByTranscriptionExam,
+        PhraseEngChoose,
+        PhraseRuChoose,
     };
 }

@@ -9,6 +9,8 @@ public class ClearScreenScenarioDecorator: IQuestionScenario {
 
     public ClearScreenScenarioDecorator(IQuestionScenario origin)=> _origin = origin;
 
+    public ScenarioWordTypeFit Fit => _origin.Fit;
+    
     public QuestionInputType InputType => _origin.InputType;
 
     public Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) 

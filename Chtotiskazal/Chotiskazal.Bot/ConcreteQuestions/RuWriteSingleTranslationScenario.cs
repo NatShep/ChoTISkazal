@@ -8,6 +8,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuWriteSingleTranslationScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public RuWriteSingleTranslationScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;

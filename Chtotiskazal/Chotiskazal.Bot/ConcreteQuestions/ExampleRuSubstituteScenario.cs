@@ -8,8 +8,9 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuPhraseSubstituteScenario : IQuestionScenario {
+public class ExampleRuSubstituteScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsRuInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public async Task<QuestionResult> Pass(
         ChatRoom chat, UserWordModel word,
@@ -57,7 +58,7 @@ public class RuPhraseSubstituteScenario : IQuestionScenario {
         return Failed();
 
         QuestionResult Failed() => QuestionResult.Failed(
-                chat.Texts.FailedOriginExampleWas2 +
+                chat.Texts.FailedOriginPhraseWas2 +
                 Markdown.Escaped($"\"{phrase.TranslatedPhrase}\"").ToSemiBold(), chat.Texts);
     }
 }

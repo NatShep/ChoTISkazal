@@ -3,12 +3,12 @@ using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuTrustScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.WordAndPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var msg = QuestionMarkups.TranslateTemplate(word.AllTranslationsAsSingleString,

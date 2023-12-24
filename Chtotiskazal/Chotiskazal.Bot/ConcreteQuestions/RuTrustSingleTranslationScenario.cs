@@ -8,6 +8,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuTrustSingleTranslationScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.WordAndPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var msg = QuestionMarkups.TranslateTemplate(

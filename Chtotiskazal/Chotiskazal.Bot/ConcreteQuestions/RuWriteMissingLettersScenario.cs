@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
@@ -10,6 +9,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuWriteMissingLettersScenario : IQuestionScenario {
     private readonly StarredHardness _hardness;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public RuWriteMissingLettersScenario(StarredHardness hardness) {
         _hardness = hardness;

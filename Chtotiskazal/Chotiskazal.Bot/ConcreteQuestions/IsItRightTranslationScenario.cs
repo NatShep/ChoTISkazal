@@ -9,6 +9,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class IsItRightTranslationScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.WordAndPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var translation = examList.SelectMany(e => e.TextTranslations)

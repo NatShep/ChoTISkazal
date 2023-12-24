@@ -68,6 +68,14 @@ public class EnglishTexts : IInterfaceTexts {
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
         Markdown.Escaped("Words in phrase are shuffled. Write them in correct order.");
+
+    public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
+        Markdown.Escaped("Phrase").NewLine() +
+        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine() +
+        Markdown.Escaped("Translates as").NewLine() +
+        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine() +
+        Markdown.Escaped("But words in the translation are shuffled. Write them in correct order.");
+
     public Markdown YouHaveATypoLetsTryAgain(string text)
         => Markdown.Escaped("You have a typo. Correct spelling is ") +
            Markdown.Escaped(text).ToSemiBold() +
@@ -87,7 +95,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string EnterWordToRemove => "Enter word to remove from questions and stats";
 
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Wrong. Origin phrase was");
-    public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Origin phrase was");
+    public Markdown FailedOriginPhraseWas2 => Markdown.Escaped("Origin phrase was");
     public Markdown FailedDefault => Markdown.Escaped("Noo...");
     public Markdown PassedDefault => Markdown.Escaped("It's right!");
     public Markdown IgnoredDefault => Markdown.Escaped("So so...");
@@ -105,7 +113,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string NoTranslationsFound => "No translations found. Check the word and try again";
     
     public Markdown CarefullyStudyTheList =>
-        Markdown.Escaped("Carefully study the words in the list below:");
+        Markdown.Escaped("Carefully study translations in the list bellow:");
 
     public string LearningDone => "Learning done";
     public string WordsInTestCount => "Words in test";

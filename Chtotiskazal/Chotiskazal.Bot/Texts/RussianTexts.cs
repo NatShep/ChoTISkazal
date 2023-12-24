@@ -72,6 +72,13 @@ public class RussianTexts : IInterfaceTexts {
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
 
+    public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
+        Markdown.Escaped("Фраза").NewLine() +
+        Markdown.Escaped(ruPhrase).ToSemiBold().NewLine() +
+        Markdown.Escaped("Переводится как").NewLine() +
+        Markdown.Escaped(shuffledEnTranslation).ToSemiBold().NewLine() +
+        Markdown.Escaped("Но слава в переводе перепутаны местами. Напишите оригинальный перевод");
+
     public Markdown YouHaveATypoLetsTryAgain(string text)
         => Markdown.Escaped("Ошибочка\\. Правильно будет ")
             .AddMarkdown(text.ToSemiBoldMarkdown())
@@ -93,7 +100,7 @@ public class RussianTexts : IInterfaceTexts {
     public string IDontKnow => "Я не знаю";
 
     public Markdown FailedOriginExampleWas => Markdown.Escaped("Неа. Фраза была");
-    public Markdown FailedOriginExampleWas2 => Markdown.Escaped("Фраза была");
+    public Markdown FailedOriginPhraseWas2 => Markdown.Escaped("Фраза была");
     public Markdown FailedDefault => Markdown.Escaped("Ой не...");
     public Markdown PassedDefault => Markdown.Escaped("И это правильный ответ!");
     public Markdown IgnoredDefault => Markdown.Escaped("Ну такое...");
@@ -190,7 +197,8 @@ public class RussianTexts : IInterfaceTexts {
         Markdown.Escaped("больше не будет попадаться вам в вопросах").Space();
 
     public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
-        Markdown.Escaped($"Подсказка: Если вы не знаете ответа на письменный вопрос - то введите {dontKnownSubcommand}");
+        Markdown.Escaped(
+            $"Подсказка: Если вы не знаете ответа на письменный вопрос - то введите {dontKnownSubcommand}");
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";

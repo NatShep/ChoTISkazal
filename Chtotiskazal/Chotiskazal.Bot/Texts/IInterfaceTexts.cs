@@ -129,7 +129,7 @@ public interface IInterfaceTexts {
     string IDontKnow { get; }
 
     Markdown FailedOriginExampleWas { get; }
-    Markdown FailedOriginExampleWas2 { get; }
+    Markdown FailedOriginPhraseWas2 { get; }
     Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; }
     Markdown FailedDefault { get; }
     Markdown PassedDefault { get; }
@@ -138,6 +138,7 @@ public interface IInterfaceTexts {
     Markdown Help { get; }
     Markdown MainMenuText { get; }
 
+    Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);
     Markdown HereAreTranslations(string word, string tr);
     Markdown HereIsThePhraseTranslation(string tr);

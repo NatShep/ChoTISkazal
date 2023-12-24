@@ -9,6 +9,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EngWriteMissingLettersScenario : IQuestionScenario {
     private readonly StarredHardness _hardness;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public EngWriteMissingLettersScenario(StarredHardness hardness) {
         _hardness = hardness;

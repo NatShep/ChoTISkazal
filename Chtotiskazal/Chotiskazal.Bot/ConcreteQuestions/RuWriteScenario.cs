@@ -7,6 +7,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class RuWriteScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public RuWriteScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;

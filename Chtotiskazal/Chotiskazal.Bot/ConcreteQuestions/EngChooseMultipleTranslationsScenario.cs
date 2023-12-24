@@ -8,6 +8,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EngChooseMultipleTranslationsScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var translations = string.Join(", ", word.TextTranslations.Shuffle().Take(3));

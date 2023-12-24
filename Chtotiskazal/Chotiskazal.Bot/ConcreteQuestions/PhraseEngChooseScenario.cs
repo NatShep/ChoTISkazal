@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Strings;
@@ -7,14 +7,16 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EngChooseScenario : IQuestionScenario {
+public class PhraseEngChooseScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
-    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyPhrase;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var originTranslation = word.RuTranslations.ToList().GetRandomItemOrNull();
-        var variants = examList.GetRuVariants(originTranslation, 5);
-
+        var variants = examList.GetRuPhraseVariants(originTranslation.Word, 5, 30);
+        if(variants.Length<2)
+            return QuestionResult.Impossible;
+        
         var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, word.Word, variants);
         if (choice == null)
             return QuestionResult.RetryThisQuestion;

@@ -16,6 +16,7 @@ public record Question(
     public bool NeedClearScreen { get; private init; }
 
     public QuestionInputType InputType => Scenario.InputType;
+    public ScenarioWordTypeFit Fit => Scenario.Fit;
 
     public Question Clear() =>
         new(
@@ -29,6 +30,6 @@ public record Question(
             NeedClearScreen = true
         };
 
-    public Question WithFrequency(int frequency) => 
+    public Question WithFrequency(int frequency) =>
         new(Name, Scenario, ExpectedScore, frequency, FailScore, PassScore);
 }

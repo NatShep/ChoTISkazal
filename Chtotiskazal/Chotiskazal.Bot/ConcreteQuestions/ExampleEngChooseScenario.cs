@@ -7,19 +7,19 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class RuChoosePhraseScenario : IQuestionScenario {
+public class ExampleEngChooseScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsNoInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
-        if (!word.Examples.Any())
+        if (!word.HasAnyExamples)
             return QuestionResult.Impossible;
 
         var targetPhrase = word.GetRandomExample();
 
         var other = examList
             .SelectMany(e => e.Examples)
-            .Where(p => !string.IsNullOrWhiteSpace(p?.OriginPhrase) &&
-                        p.TranslatedPhrase != targetPhrase.TranslatedPhrase)
+            .Where(p => !p.TranslatedPhrase.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase))
             .Shuffle()
             .Take(5)
             .ToArray();
@@ -29,15 +29,15 @@ public class RuChoosePhraseScenario : IQuestionScenario {
 
         var variants = other
             .Append(targetPhrase)
-            .Select(e => e.OriginPhrase)
+            .Select(e => e.TranslatedPhrase)
             .Shuffle()
             .ToArray();
 
-        var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, targetPhrase.TranslatedPhrase, variants);
+        var choice = await QuestionScenarioHelper.ChooseVariantsFlow(chat, targetPhrase.OriginPhrase, variants);
         if (choice == null)
             return QuestionResult.RetryThisQuestion;
 
-        return choice.AreEqualIgnoreCase(targetPhrase.OriginPhrase)
+        return choice.AreEqualIgnoreCase(targetPhrase.TranslatedPhrase)
             ? QuestionResult.Passed(chat.Texts)
             : QuestionResult.Failed(chat.Texts);
     }

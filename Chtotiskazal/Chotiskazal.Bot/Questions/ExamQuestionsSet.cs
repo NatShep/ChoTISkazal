@@ -19,14 +19,14 @@ public class ExamQuestionsSet {
     
     public Question GetNextQuestionFor(bool isFirstExam, UserWordModel model) {
         if (isFirstExam && model.AbsoluteScore < WordLeaningGlobalSettings.LearningWordMinScore)
-            return Beginner.GetRandomItemOrNull();
+            return PhraseOrWordQuestions(Beginner, model.IsWord).GetRandomItemOrNull();
 
         //что это?Как выбираются экзамены. Покапоменяла похожим оразом, но надо разобраться, что за score
         var score = model.AbsoluteScore - (isFirstExam ? WordLeaningGlobalSettings.LearningWordMinScore / 2 : 0);
 
         return ChooseQuestion(score, model.AbsoluteScore < WordLeaningGlobalSettings.WellDoneWordMinScore
-            ? Intermediate
-            : Advanced);
+            ? PhraseOrWordQuestions(Intermediate, model.IsWord)
+            : PhraseOrWordQuestions(Advanced, model.IsWord));
     }
 
     private static Question ChooseQuestion(double score, Question[] exams) {
@@ -42,5 +42,12 @@ public class ExamQuestionsSet {
         var randomValue = Rand.NextDouble() * accumulator;
         var choice = (probability.FirstOrDefault(p => p.Key >= randomValue).Value);
         return choice ?? probability.Last().Value;
+    }
+
+    private static Question[] PhraseOrWordQuestions(Question[] questions, bool isWord) {
+        if (isWord)
+            return questions.Where(q => q.Fit != ScenarioWordTypeFit.OnlyPhrase).ToArray();
+        else
+            return questions.Where(q => q.Fit != ScenarioWordTypeFit.OnlyWord).ToArray();
     }
 }

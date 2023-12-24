@@ -10,6 +10,7 @@ namespace Chotiskazal.Bot.ConcreteQuestions;
 
 public class EngWriteScenario : IQuestionScenario {
     private readonly LocalDictionaryService _localDictionaryService;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public EngWriteScenario(LocalDictionaryService localDictionaryService) {
         _localDictionaryService = localDictionaryService;

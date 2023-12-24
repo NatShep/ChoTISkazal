@@ -14,7 +14,7 @@ public static class QuestionScenarioHelper {
 
     public static string[] GetEngVariants(this IEnumerable<UserWordModel> list, string englishWord, int count)
         => list
-            .Where(p => p.Word != englishWord)
+            .Where(p => p.Word != englishWord && p.IsWord)
             .Select(e => e.Word)
             .Shuffle()
             .Take(count)
@@ -25,6 +25,7 @@ public static class QuestionScenarioHelper {
     public static string[] GetRuVariants(this IEnumerable<UserWordModel> list, UserWordTranslation translation,
         int count)
         => list
+            .Where(l=>l.IsWord)
             .SelectMany(e => e.TextTranslations)
             .Where(e => e != translation.Word)
             .Distinct()
@@ -33,6 +34,25 @@ public static class QuestionScenarioHelper {
             .Append(translation.Word)
             .Shuffle()
             .ToArray();
+
+    public static string[] GetRuPhraseVariants(this IEnumerable<UserWordModel> list, string originRuPhrase, int count, int maxLength = int.MaxValue) {
+        var otherPhrases = list
+            .Where(l => l.IsPhrase)
+            .Select(o => o.RuTranslations.First().Word);
+        var samples = list.SelectMany(l => l.Examples).Select(s => s.TranslatedPhrase);
+        var all = otherPhrases.Concat(samples).Append(originRuPhrase).Distinct().Where(s=>s.Length<maxLength);
+        return all.Shuffle().Take(count).ToArray();
+    }
+    
+    public static string[] GetEnPhraseVariants(this IEnumerable<UserWordModel> list, string originRuPhrase, int count, int maxLength = int.MaxValue) {
+        var otherPhrases = list
+            .Where(l => l.IsPhrase)
+            .Select(o => o.Word);
+        var samples = list.SelectMany(l => l.Examples).Select(s => s.OriginPhrase);
+        var all = otherPhrases.Concat(samples).Append(originRuPhrase).Distinct().Where(s=>s.Length<maxLength);
+        return all.Shuffle().Take(count).ToArray();
+    }
+    
 
     public static async Task<string> ChooseVariantsFlow(ChatRoom chat, string target, string[] variants) {
         if (variants.Any(c => c.Length < 38))

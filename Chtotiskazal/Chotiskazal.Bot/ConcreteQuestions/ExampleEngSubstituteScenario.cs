@@ -9,8 +9,9 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ConcreteQuestions;
 
-public class EngPhraseSubstituteScenario : IQuestionScenario {
+public class ExampleEngSubstituteScenario : IQuestionScenario {
     public QuestionInputType InputType => QuestionInputType.NeedsEnInput;
+    public ScenarioWordTypeFit Fit => ScenarioWordTypeFit.OnlyWord;
 
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var (phrase, _) = word.GetExamplesThatLoadedAndFits().GetRandomItemOrNull();

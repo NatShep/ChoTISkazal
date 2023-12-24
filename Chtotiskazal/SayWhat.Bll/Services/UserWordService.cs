@@ -143,7 +143,6 @@ public class UsersWordsService {
                 highRating,
                 sorting))
             .Shuffle()
-            .Where(u => u.IsWord)
             .Take(count)
             .ToList();
 
@@ -154,12 +153,7 @@ public class UsersWordsService {
 
             var usedTranslations = translations.Shuffle().Take(maxTranslations).ToArray();
             wordForLearning.RuTranslations = usedTranslations;
-
-            // TODO Remove Phrases added as learning words
         }
-
-        Console.WriteLine($"Количество слов: {wordsForLearning.Count()}");
-        Console.WriteLine(string.Join(" \r\n", wordsForLearning.ToList()));
 
         await IncludeExamples(wordsForLearning);
         return wordsForLearning.ToArray();
