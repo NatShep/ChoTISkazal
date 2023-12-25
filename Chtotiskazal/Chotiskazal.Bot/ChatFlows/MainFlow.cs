@@ -24,7 +24,8 @@ public class MainFlow
         LearningSetService learningSetService,
         ButtonCallbackDataService buttonCallbackDataService,
         MutualPhrasesService mutualPhrasesService,
-        QuestionSelector questionSelector)
+        QuestionSelector questionSelector, 
+        FrequentWordService frequentWordService)
     {
         ChatIo = chatIo;
         _userInfo = userInfo;
@@ -37,6 +38,7 @@ public class MainFlow
         _buttonCallbackDataService = buttonCallbackDataService;
         _mutualPhrasesService = mutualPhrasesService;
         _questionSelector = questionSelector;
+        _frequentWordService = frequentWordService;
     }
 
     private readonly AddWordService _addWordsService;
@@ -49,6 +51,7 @@ public class MainFlow
     private readonly LearningSetService _learningSetService;
     private readonly TelegramUserInfo _userInfo;
     private readonly BotSettings _settings;
+    private readonly FrequentWordService _frequentWordService;
 
     private TranslationSelectedUpdateHook _translationSelectedUpdateHook;
     private LeafWellKnownWordsUpdateHook _wellKnownWordsUpdateHook;
@@ -139,7 +142,8 @@ public class MainFlow
             new SettingsBotCommandHelper(_userService),
             new RemoveWordCommandHandler(_usersWordsService),
             new InternalMutualCommandHandler(_mutualPhrasesService),
-            new InternalStatsUpdateCommandHandler(_userService, _usersWordsService)
+            new InternalStatsUpdateCommandHandler(_userService, _usersWordsService),
+            new InternalAddFrequentWordsHandler(_frequentWordService, _userService, _usersWordsService, _addWordsService, _localDictionaryService)
         };
     }
 

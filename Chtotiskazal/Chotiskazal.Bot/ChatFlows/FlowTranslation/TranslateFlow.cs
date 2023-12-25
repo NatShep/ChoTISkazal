@@ -36,7 +36,7 @@ internal class TranslateFlow {
     }
 
     private async Task<string?> EnterSingleWordAsync(string? input = null) {
-        if (string.IsNullOrWhiteSpace(input)) {
+        if (string.IsNullOrWhiteSpace(input) || input.StartsWith("/")) {
             await Chat.SendMessageAsync($"{Emojis.Translate} {Chat.Texts.EnterWordOrStart}");
             input = await Chat.WaitUserTextInputAsync();
         }

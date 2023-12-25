@@ -15,6 +15,7 @@ using SayWhat.Bll.Statistics;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.FrequentWords;
 using SayWhat.MongoDAL.LearningSets;
 using SayWhat.MongoDAL.LongDataForTranslationButton;
 using SayWhat.MongoDAL.QuestionMetrics;
@@ -40,6 +41,7 @@ static class Program {
     private static LearningSetService _learningSetService;
     private static QuestionSelector _questionSelector;
     private static MutualPhrasesService _mutualPhraseService;
+    private static FrequentWordService _frequentWordService;
 
     private static async Task Main() {
         TaskScheduler.UnobservedTaskException +=
@@ -57,14 +59,16 @@ static class Program {
         var questionMetricsRepo = new QuestionMetricRepo(db);
         var learningSetsRepo = new LearningSetsRepo(db);
         var longDataForButtonRepo = new LongCallbackDataRepo(db);
-
+        var frequentWordsRepo = new FrequentWordsRepo(db);
+        
         await userWordRepo.UpdateDb();
         await dictionaryRepo.UpdateDb();
         await userRepo.UpdateDb();
         await examplesRepo.UpdateDb();
         await questionMetricsRepo.UpdateDb();
         await learningSetsRepo.UpdateDb();
-
+        await frequentWordsRepo.UpdateDb();
+        
         Reporter.QuestionMetricRepo = questionMetricsRepo;
         var telegramLogger = TelegramLogger.CreateLogger(_settings.BotHelperToken, _settings.ControlPanelChatId);
 
@@ -79,7 +83,7 @@ static class Program {
             _userService);
         _buttonCallbackDataService = new ButtonCallbackDataService(longDataForButtonRepo);
         _mutualPhraseService = new MutualPhrasesService(examplesRepo, _userWordService, telegramLogger);
-
+        _frequentWordService = new FrequentWordService(frequentWordsRepo);
         _questionSelector = new QuestionSelector(_localDictionaryService);
 
         _botClient = new TelegramBotClient(_settings.TelegramToken);
@@ -236,7 +240,8 @@ static class Program {
             _learningSetService,
             _buttonCallbackDataService,
             _mutualPhraseService,
-            _questionSelector);
+            _questionSelector, 
+            _frequentWordService);
         Chats.TryAdd(chat.Id, newChatRoom);
         return newChatRoom;
     }
