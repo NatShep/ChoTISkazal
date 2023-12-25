@@ -195,20 +195,43 @@ public class RussianTexts : IInterfaceTexts {
     public Markdown XofY(in int number, in int y)
         => Markdown.Escaped($"\r\nСлово {number} из {y}...").ToMono();
 
-    public Markdown WordNotFound(string argument) =>
+    public Markdown WordNotFound(string word) =>
         Markdown.Escaped("Слово").Space() +
-        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped(word).ToSemiBold().Space() +
         Markdown.Escaped("не найдено").Space();
 
-    public Markdown WordRemoved(string argument) =>
+    public Markdown WordRemoved(string word) =>
         Markdown.Escaped("Успех. Слово").Space() +
-        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped(word).ToSemiBold().Space() +
         Markdown.Escaped("больше не будет попадаться вам в вопросах").Space();
 
     public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
         Markdown.Escaped(
             $"Подсказка: Если вы не знаете ответа на письменный вопрос - то введите {dontKnownSubcommand}");
 
+    public Markdown YouHaveGoalStreak(int goalStreak, bool hasGap)
+    {
+        var msg = Markdown.Escaped("Дней подряд: " + goalStreak);
+        if (hasGap) msg += Markdown.Escaped(" c учетом выходных");
+        return msg;
+    }
+
+    public Markdown GoalStreakStatsFooter(int maxGoalStreak, int currentGoalStreak, bool currentHasGap)
+    {
+        var msg = Markdown.Empty;
+        if (currentGoalStreak > 1)
+        {
+            msg += Markdown.Escaped("Цель выполнена дней подряд: " + currentGoalStreak).ToSemiBold().NewLine();
+            if (currentHasGap)
+                msg += Markdown.Escaped("c учетом выходных");
+        }
+        if (maxGoalStreak > 0)
+            msg += Markdown.Escaped("Рекорд выполненных дней подряд: " + maxGoalStreak).NewLine();
+        return msg;
+    }
+
+    public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Поздравляю! Вы ответили на все вопросы без ошибок!");
+    
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
 
@@ -236,7 +259,7 @@ public class RussianTexts : IInterfaceTexts {
     public string CancelButton => "Отмена";
     public string OneMoreLearnButton => "Еще разок";
     public string TranslateButton => "Перевод";
-    public string ContinueTranslateButton => "Продолжить";
+    public string ContinueButton => "Продолжить";
     public string LearnButton => "Ботать";
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
@@ -245,7 +268,6 @@ public class RussianTexts : IInterfaceTexts {
     public string ShowWellKnownWords => "Посмотреть, что уже выучил";
 
     #endregion
-
 
     #region stats
 

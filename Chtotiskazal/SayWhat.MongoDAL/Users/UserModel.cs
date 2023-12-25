@@ -14,10 +14,14 @@ using SayWhat.MongoDAL.Words;
 namespace SayWhat.MongoDAL.Users;
 
 [BsonIgnoreExtraElements]
-public class UserModel {
-    public UserModel() { }
+public class UserModel
+{
+    public UserModel()
+    {
+    }
 
-    public UserModel(long? telegramId, string firstName, string lastName, string telegramNick, UserSource source) {
+    public UserModel(long? telegramId, string firstName, string lastName, string telegramNick, UserSource source)
+    {
         Id = ObjectId.GenerateNewId();
 
         _source = source;
@@ -54,6 +58,7 @@ public class UserModel {
     [BsonElement("ru_wtc")] private int _russianWordTranslationRequestsCount;
     [BsonElement("remindFr")] private int? _remindFrequency;
     [BsonElement("remindLast")] private DateTime? _lastReminder;
+    [BsonElement("mgs")] private int _maxGoalStreak;
 
 
     [BsonDefaultValue(false)] [BsonIgnoreIfDefault] [BsonElement("engInterface")]
@@ -116,15 +121,23 @@ public class UserModel {
     public int EnglishWordTranslationRequestsCount => _englishWordTranslationRequestsCount;
     public int RussianWordTranslationRequestsCount => _russianWordTranslationRequestsCount;
 
+    public int MaxGoalStreak
+    {
+        get => _maxGoalStreak;
+        set => _maxGoalStreak = value;
+    }
+
     public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore, 10);
 
     public double GamingScore => _gamingScore;
 
-    public int CountOf(int minScoreCategory, int maxScoreCategory) {
+    public int CountOf(int minScoreCategory, int maxScoreCategory)
+    {
         if (_countByCategoryScores == null)
             return 0;
         int acc = 0;
-        for (int i = minScoreCategory; i < maxScoreCategory && i < _countByCategoryScores.Length; i++) {
+        for (int i = minScoreCategory; i < maxScoreCategory && i < _countByCategoryScores.Length; i++)
+        {
             acc += _countByCategoryScores[i];
         }
 
@@ -133,14 +146,16 @@ public class UserModel {
 
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
 
-    public void OnQuestionActivity() {
+    public void OnQuestionActivity()
+    {
         OnAnyActivity();
         _lastExam = DateTime.Now;
     }
 
     public void SetRemindFrequency(int frequency) => _remindFrequency = frequency;
 
-    public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount) {
+    public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+    {
         _wordsCount++;
         var (today, month) = FixStatsAndGetCurrent();
 
@@ -159,13 +174,15 @@ public class UserModel {
                    examplesCount: examplesCount);
     }
 
-    private (DailyStats, MonthsStats) FixStatsAndGetCurrent() {
+    private (DailyStats, MonthsStats) FixStatsAndGetCurrent()
+    {
         var daily = GetToday();
         var monthly = GetLastMonth();
         return (daily, monthly);
     }
 
-    public MonthsStats GetLastMonth() {
+    public MonthsStats GetLastMonth()
+    {
         if (LastMonthStats == null || LastMonthStats.Count == 0)
             return InitializeLastMonthStats();
 
@@ -175,7 +192,8 @@ public class UserModel {
         var thisMonth = new DateTime(today.Year, today.Month, 1);
 
         monthly = LastMonthStats.Last();
-        if (monthly.Date != thisMonth) {
+        if (monthly.Date != thisMonth)
+        {
             monthly = new MonthsStats { Date = thisMonth };
             LastMonthStats.Add(monthly);
         }
@@ -183,7 +201,8 @@ public class UserModel {
         return monthly;
     }
 
-    private MonthsStats InitializeLastMonthStats() {
+    private MonthsStats InitializeLastMonthStats()
+    {
         var today = DateTime.Today;
         var thisMonth = new DateTime(today.Year, today.Month, 1);
 
@@ -195,21 +214,26 @@ public class UserModel {
         return monthly;
     }
 
-    public DailyStats GetToday() {
+    public DailyStats GetToday()
+    {
         var today = DateTime.Today;
         DailyStats daily;
 
-        if (LastDaysStats == null || LastDaysStats.Count == 0) {
+        if (LastDaysStats == null || LastDaysStats.Count == 0)
+        {
             daily = new DailyStats { Date = today };
             LastDaysStats = new List<DailyStats>();
             LastDaysStats.Add(daily);
         }
-        else {
-            while (LastDaysStats.Any() && (today - LastDaysStats[0].Date).TotalDays > 49) {
+        else
+        {
+            while (LastDaysStats.Any() && (today - LastDaysStats[0].Date).TotalDays > 49)
+            {
                 LastDaysStats.RemoveAt(0);
             }
 
-            if (LastDaysStats.Count == 0) {
+            if (LastDaysStats.Count == 0)
+            {
                 daily = new DailyStats { Date = today };
                 LastDaysStats = new List<DailyStats>();
                 LastDaysStats.Add(daily);
@@ -226,7 +250,8 @@ public class UserModel {
         return daily;
     }
 
-    private DailyStats InitializeTodayStats(DateTime today) {
+    private DailyStats InitializeTodayStats(DateTime today)
+    {
         if (LastDaysStats == null)
             LastDaysStats = new List<DailyStats>();
         var daily = new DailyStats { Date = today };
@@ -234,7 +259,8 @@ public class UserModel {
         return daily;
     }
 
-    public double OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount) {
+    public double OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+    {
         _pairsCount += pairsCount;
         _examplesCount += examplesCount;
 
@@ -249,7 +275,8 @@ public class UserModel {
         return gamingScore;
     }
 
-    public void OnPairRemoved(UserWordTranslation tr, WordStatsChanging wordScoreDelta) {
+    public void OnPairRemoved(UserWordTranslation tr, WordStatsChanging wordScoreDelta)
+    {
         var examplesCount = tr.Examples?.Length ?? 0;
         _pairsCount--;
         _examplesCount -= examplesCount;
@@ -264,7 +291,8 @@ public class UserModel {
         OnAnyActivity();
     }
 
-    public void OnWordRemoved(UserWordModel alreadyExistsWord) {
+    public void OnWordRemoved(UserWordModel alreadyExistsWord)
+    {
         _wordsCount--;
         if (_wordsCount < 0) _wordsCount = 0;
 
@@ -278,13 +306,15 @@ public class UserModel {
         ApplyWordStatsChangings(scoreDelta, today, month, gamingScore);
     }
 
-    public void OnStatsChangings(WordStatsChanging changing) {
+    public void OnStatsChangings(WordStatsChanging changing)
+    {
         var (today, month) = FixStatsAndGetCurrent();
         ApplyWordStatsChangings(changing, today, month, 0);
     }
 
     private void ApplyWordStatsChangings(
-        WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, double gamingScore) {
+        WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, double gamingScore)
+    {
         dailyStats.AppendStats(statsChanging);
         monthsStats.AppendStats(statsChanging);
         dailyStats.OnGameScoreIncreased(gamingScore);
@@ -303,17 +333,20 @@ public class UserModel {
 //        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
     }
 
-    public void OnEnglishWordTranslationRequest() {
+    public void OnEnglishWordTranslationRequest()
+    {
         _englishWordTranslationRequestsCount++;
         OnAnyActivity();
     }
 
-    public void OnRussianWordTranslationRequest() {
+    public void OnRussianWordTranslationRequest()
+    {
         _russianWordTranslationRequestsCount++;
         OnAnyActivity();
     }
 
-    public void OnQuestionPassed(WordStatsChanging statsChanging) {
+    public void OnQuestionPassed(WordStatsChanging statsChanging)
+    {
         _questionPassed++;
         var (today, month) = FixStatsAndGetCurrent();
 
@@ -327,7 +360,8 @@ public class UserModel {
         //       return gamingScore;
     }
 
-    public double OnQuestionFailed(WordStatsChanging statsChanging) {
+    public double OnQuestionFailed(WordStatsChanging statsChanging)
+    {
         _questionFailed++;
         var (today, month) = FixStatsAndGetCurrent();
 
@@ -342,7 +376,8 @@ public class UserModel {
         //    return gamingScore;
     }
 
-    public void OnLearningDone() {
+    public void OnLearningDone()
+    {
         _learningDone++;
         var (today, month) = FixStatsAndGetCurrent();
 
@@ -356,11 +391,13 @@ public class UserModel {
         //    return gamingScore;
     }
 
-    public IReadOnlyList<DailyStats> GetLastWeek() {
+    public IReadOnlyList<DailyStats> GetLastWeek()
+    {
         var today = GetToday();
         var dailyStats = new List<DailyStats>(7);
         dailyStats.Add(today);
-        for (int i = 1; i < LastDaysStats.Count - 1; i++) {
+        for (int i = 1; i < LastDaysStats.Count - 1; i++)
+        {
             var stats = LastDaysStats[^i];
             if ((today.Date - stats.Date).TotalDays > 7)
                 break;
@@ -370,7 +407,8 @@ public class UserModel {
         return dailyStats;
     }
 
-    public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords) {
+    public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords)
+    {
         if (_wordsCount == _countByCategoryScores?.Sum())
             return;
 
@@ -379,10 +417,12 @@ public class UserModel {
         _countByCategoryScores = new int[8];
         //   _outdatedWordsCount = 0;
         _gamingScore = 0;
-        foreach (var word in allUserWords) {
+        foreach (var word in allUserWords)
+        {
             var creationTime = word.Id.CreationTime;
             var day = creationTime.Date;
-            if (!days.TryGetValue(day, out var dailyStats)) {
+            if (!days.TryGetValue(day, out var dailyStats))
+            {
                 dailyStats = new DailyStats()
                 {
                     Date = day
@@ -391,7 +431,8 @@ public class UserModel {
             }
 
             var month = new DateTime(creationTime.Year, creationTime.Month, 1);
-            if (!months.TryGetValue(month, out var monthsStats)) {
+            if (!months.TryGetValue(month, out var monthsStats))
+            {
                 monthsStats = new MonthsStats()
                 {
                     Date = month
@@ -432,13 +473,15 @@ public class UserModel {
         else
             LastMonthStats.Clear();
 
-        foreach (var day in days) {
+        foreach (var day in days)
+        {
             LastDaysStats.Add(day.Value);
         }
 
         LastDaysStats.Sort((d1, d2) => d1.Day.CompareTo(d2.Day));
 
-        foreach (var month in months) {
+        foreach (var month in months)
+        {
             LastMonthStats.Add(month.Value);
         }
 

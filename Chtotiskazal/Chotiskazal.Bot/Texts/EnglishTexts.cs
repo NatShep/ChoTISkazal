@@ -194,18 +194,43 @@ public class EnglishTexts : IInterfaceTexts {
     public Markdown XofY(in int x,in int y)
         => Markdown.Escaped($"{x} of {y}").ToMono();
     
-    public Markdown WordNotFound(string argument) =>
+    public Markdown WordNotFound(string word) =>
         Markdown.Escaped("Word").Space() +
-        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped(word).ToSemiBold().Space() +
         Markdown.Escaped("is not found").Space();
 
-    public Markdown WordRemoved(string argument) =>
+    public Markdown WordRemoved(string word) =>
         Markdown.Escaped("Success. Word").Space() +
-        Markdown.Escaped(argument).ToSemiBold().Space() +
+        Markdown.Escaped(word).ToSemiBold().Space() +
         Markdown.Escaped("is removed from questions and stats").Space();
     
     public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
         Markdown.Escaped($"Tip: Enter {dontKnownSubcommand} if you don't know the answer for write question");
+
+    public Markdown YouHaveGoalStreak(int goalStreak, bool hasGap)
+    {
+        var msg = Markdown.Empty.NewLine().AddEscaped("Goal streak: " + goalStreak);
+        if (hasGap) msg += Markdown.Escaped(" including rest days");
+        return msg;
+    }
+
+    public Markdown GoalStreakStatsFooter(int maxGoalStreak, int currentGoalStreak, bool currentHasGap)
+    {
+        var msg = Markdown.Empty;
+        if (currentGoalStreak > 1)
+        {
+            msg += Markdown.Escaped("Current goal streak: " + currentGoalStreak).ToSemiBold().NewLine();
+            if (currentHasGap)
+                msg += Markdown.Escaped("including rest days");
+        }
+
+        if (maxGoalStreak > 0)
+            msg += Markdown.Escaped("Max goal streak: " + maxGoalStreak).NewLine();
+        return msg;
+    }
+
+    public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Congratulations! You answered all the questions without mistakes!");
+
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
@@ -229,7 +254,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string CancelButton => "Cancel";
     public string OneMoreLearnButton => "One more learn";
     public string TranslateButton => "Translate";
-    public string ContinueTranslateButton => "Continue";
+    public string ContinueButton => "Continue";
     public string LearnButton => "Learn";
     public string StatsButton => "Stats";
     public string LearningSetsButton => "Sets of words";

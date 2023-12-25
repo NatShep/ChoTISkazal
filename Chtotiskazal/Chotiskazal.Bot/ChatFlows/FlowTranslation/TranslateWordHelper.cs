@@ -40,6 +40,6 @@ public static class TranslateWordHelper {
         new[]
         {
             InlineButtons.MainMenu($"{Emojis.MainMenu} {texts.MainMenuButton}"),
-            InlineButtons.Translation($"{texts.ContinueTranslateButton} {Emojis.Translate}")
+            InlineButtons.Translation($"{texts.ContinueButton} {Emojis.Translate}")
         };
 }

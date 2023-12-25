@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using Chotiskazal.Bot.ChatFlows.FlowLearning;
 using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
@@ -19,23 +20,23 @@ public static class StatsRenderer
     private const string S5 = Emojis.GreenSquare;
     private const string S6 = Emojis.Fire;
 
-    public static Markdown GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat) =>
-        RenderStatsMarkdown(settings, chat) +
-        Render7WeeksCalendarMarkdown(settings, chat.User.LastDaysStats
-                .Select(d => new CalendarItem(d.Date, d.LearningDone, d.GameScoreChanging))
-                .ToArray(), chat.Texts)
+    public static Markdown GetStatsTextMarkdown(ExamSettings settings, ChatRoom chat)
+    {
+        var msg = RenderStatsMarkdown(settings, chat);
+        var calendat = chat.User.GetCalendar();
+        msg += Render7WeeksCalendarMarkdown(settings, calendat, chat.Texts)
             .ToQuotationMono()
-            .NewLine(); //+
-    //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
+            .NewLine();
+        var (goalStreakCount, hasGaps) = StatsHelper.GetGoalsStreak(calendat, settings.ExamsCountGoalForDay);
+        msg += chat.Texts.GoalStreakStatsFooter(chat.User.MaxGoalStreak, goalStreakCount, hasGaps);
+        return msg;
+    }
 
     private static Markdown Render7WeeksCalendarMarkdown(
         ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts)
     {
         var today = DateTime.Today;
-        var offsets = items.ToDictionary(
-            i => (int)(today - i.Date.Date).TotalDays,
-            k => k.ExamsCount / (double)examSettings.ExamsCountGoalForDay
-        );
+        var offsets = items.GetOffsets(examSettings.ExamsCountGoalForDay);
         //7 weeks. 42-49 days
         var minDay = today.AddDays(-49);
         var undoneInLastWeek = 0;
@@ -43,38 +44,48 @@ public static class StatsRenderer
             undoneInLastWeek = (7 - (int)minDay.DayOfWeek);
 
 
-        var sbWithMarkwownFormatted = new StringBuilder("----------------------\r\n");
+        var sbWithMarkdownFormatted = new StringBuilder("----------------------\r\n");
 
         for (int day = 0; day < 7; day++)
         {
-            sbWithMarkwownFormatted.Append(Markdown.Escaped(texts.ShortDayNames[day] + " ").GetMarkdownString());
+            sbWithMarkdownFormatted.Append(Markdown.Escaped(texts.ShortDayNames[day] + " ").GetMarkdownString());
             for (int week = 7; week > 0; week--)
             {
                 var offset = 7 * week - undoneInLastWeek - day - 1;
                 if (offset < 0)
-                    sbWithMarkwownFormatted.Append(Empty);
+                    sbWithMarkdownFormatted.Append(Empty);
                 else if (offsets.TryGetValue(offset, out var v))
                 {
-                    var symbol
-                        = v < 0.1 ? S1
-                        : v < 0.2 ? S2
-                        : v < 0.5 ? S3
-                        : v < 1.0 ? S4
-                        : v <= 2.0 ? S5
-                        : S6;
-                    sbWithMarkwownFormatted.Append(symbol);
+                    var symbol = v switch
+                    {
+                        DayGoalResult.S1 => S1,
+                        DayGoalResult.S2 => S2,
+                        DayGoalResult.S3 => S3,
+                        DayGoalResult.S4 => S4,
+                        DayGoalResult.Goal => S5,
+                        DayGoalResult.Overreaching => S6,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                    // = v < 0.1 ? S1
+                    // : v < 0.2 ? S2
+                    // : v < 0.5 ? S3
+                    // : v < 1.0 ? S4
+                    // : v <= 2.0 ? S5
+                    // : S6;
+                    sbWithMarkdownFormatted.Append(symbol);
                 }
                 else
-                    sbWithMarkwownFormatted.Append(S0);
+                    sbWithMarkdownFormatted.Append(S0);
             }
 
-            sbWithMarkwownFormatted.Append("\r\n");
+            sbWithMarkdownFormatted.Append("\r\n");
         }
 
-        sbWithMarkwownFormatted.Append("----------------------\r\n ");
-        sbWithMarkwownFormatted.Append(
+        sbWithMarkdownFormatted.Append("----------------------\r\n ");
+        sbWithMarkdownFormatted.Append(
             $"{Markdown.Escaped(texts.less).GetMarkdownString()} {S1}{S2}{S3}{S4}{S5} {Markdown.Escaped(texts.more).GetMarkdownString()}\r\n");
-        return Markdown.Bypassed(sbWithMarkwownFormatted.ToString());
+
+        return Markdown.Bypassed(sbWithMarkdownFormatted.ToString());
     }
 
     private static Markdown RenderStatsMarkdown(ExamSettings settings, ChatRoom chat)
@@ -103,24 +114,4 @@ public static class StatsRenderer
 
         return statsTextMarkdown;
     }
-
-    /*
-     private static Markdown RenderRecomendationsMarkdown(UserModel user, IInterfaceTexts texts) {
-
-        if (user.Zen.Rate < -15)
-            return Markdown.Escaped(texts.Zen1WeNeedMuchMoreNewWords);
-        else if (user.Zen.Rate < -10)
-            return Markdown.Escaped(texts.Zen2TranslateNewWords);
-        else if (user.Zen.Rate < -5)
-            return Markdown.Escaped(texts.Zen3TranslateNewWordsAndPassExams);
-        else if (user.Zen.Rate < 5)
-            return Markdown.Escaped(texts.Zen3EverythingIsGood);
-        else if (user.Zen.Rate < 10)
-            return Markdown.Escaped(texts.Zen4PassExamsAndTranslateNewWords);
-        else if (user.Zen.Rate < 20)
-            return Markdown.Escaped(texts.Zen5PassExams);
-        else
-            return Markdown.Escaped(texts.Zen6YouNeedToLearn);
-    }
-    */
 }

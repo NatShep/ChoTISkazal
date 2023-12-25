@@ -45,7 +45,7 @@ public interface IInterfaceTexts {
     string PassedHideousDefault { get; }
     string IgnoredHideousDefault { get; }
     string TranslateButton { get; }
-    string ContinueTranslateButton { get; }
+    string ContinueButton { get; }
     string LearnButton { get; }
     string StatsButton { get; }
     string HelpButton { get; }
@@ -60,19 +60,9 @@ public interface IInterfaceTexts {
     string WordsInTestCount { get; }
     string YouHaveLearnedOneWord { get; }
     string YouForgotOneWord { get; }
-    string EarnedScore { get; }
-    string TotalScore { get; }
     string DontPeekUpward { get; }
     string NeedToAddMoreWordsBeforeLearning { get; }
     string less { get; }
-    string ZenRecomendationAfterExamWeNeedMoreNewWords { get; }
-    string Zen1WeNeedMuchMoreNewWords { get; }
-    string Zen2TranslateNewWords { get; }
-    string Zen3TranslateNewWordsAndPassExams { get; }
-    string Zen3EverythingIsGood { get; }
-    string Zen4PassExamsAndTranslateNewWords { get; }
-    string Zen5PassExams { get; }
-    string Zen6YouNeedToLearn { get; }
     string StatsYourStats { get; }
     string StatsWordsAdded { get; }
     string StatsLearnedWell { get; }
@@ -126,7 +116,6 @@ public interface IInterfaceTexts {
     string FastExamLearningHeader { get; }
     string WriteExamLearningHeader { get; }
     string EnterWordToRemove { get; }
-    string IDontKnow { get; }
 
     Markdown FailedOriginExampleWas { get; }
     Markdown FailedOriginPhraseWas2 { get; }
@@ -138,6 +127,7 @@ public interface IInterfaceTexts {
     Markdown Help { get; }
     Markdown MainMenuText { get; }
     Markdown MainMenuTextForNewUserText { get; }
+    Markdown CongratulateAllQuestionPassed { get; }
 
     Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);
@@ -147,7 +137,10 @@ public interface IInterfaceTexts {
     Markdown LearnSomeWords(in int length);
     Markdown PageXofY(in int number, in int count);
     Markdown XofY(in int x, in int y);
-    Markdown WordNotFound(string argument);
-    Markdown WordRemoved(string argument);
+    Markdown WordNotFound(string word);
+    Markdown WordRemoved(string word);
     Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand);
+    Markdown YouHaveGoalStreak(int goalStreak, bool hasGap);
+    Markdown GoalStreakStatsFooter(int maxGoalStreak, int currentGoalStreak, bool currentHasGap);
+
 }

@@ -5,7 +5,7 @@ public class ExamSettings {
     public int MaxWordsQuestionsInOneExam { get; set; } = 3;
     public int MaxExamSize { get; set; } = 25;
 
-    public int ExamsCountGoalForDay { get; set; } = 10;
+    public int ExamsCountGoalForDay { get; set; } = 7;
     public int MaxTranslationsInOneExam { get; set; } = 3;
 
     public int NewWordInOneExam { get; set; } = 3;
