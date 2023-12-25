@@ -136,16 +136,23 @@ public class EnglishTexts : IInterfaceTexts {
                     $"3⃣ Earn scores for your action and watch your progress using {BotCommands.Stats} command.\r\n\r\n" +
                     $"4⃣ Use {BotCommands.Help} command to see info how it works.\r\n\r\n" +
                     "\uD83D\uDE09Yes, it's free. We have done this bot for us and our friends. " +
-                    "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!");
+                    "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!").NewLine().NewLine()
+        .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group").NewLine()
+        .AddEscaped("https://t.me/chtotiskazalna").NewLine().NewLine()
+        .AddEscaped("or create issue on the github").NewLine()
+        .AddEscaped("https://github.com/NatShep/ChoTISkazal/issues");
         
     public Markdown MainMenuText =>
         Markdown.Escaped("I am a translator and teacher.\r\n" +
                          "First you can use me as a regular translator." +
                          "After that " +
                          "learn this words and it helps you to speak English easily.");
-    /*Отчет отправлен разработчикам. Когда они проснуться - они его обязательно посмотрят!
 
-Что бы лучше понять что произошло, вы можете отправить ответным сообщением любую дополнительный комментарий: */
+    public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
+        .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group")
+        .NewLine()
+        .AddEscaped("https://t.me/chtotiskazalna");
+    
     public string ReportWasSentEnterAdditionalInformationAboutTheReport 
         => "The report has been sent to the developers. When they wake up, they will definitely watch it!\r\n\r\n" +
            "To better understand what happened, you can send any additional comment by reply message:";

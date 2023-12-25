@@ -137,6 +137,7 @@ public interface IInterfaceTexts {
     Markdown CarefullyStudyTheList { get; }
     Markdown Help { get; }
     Markdown MainMenuText { get; }
+    Markdown MainMenuTextForNewUserText { get; }
 
     Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);

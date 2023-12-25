@@ -140,10 +140,14 @@ public class RussianTexts : IInterfaceTexts {
             "2⃣ Затем, когда будет времечко нажми на кнопку ")
         .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
         .AddEscaped($" или набери команду {BotCommands.Learn}, что бы начать учить переведенные ранее слова.\r\n\r\n" +
-                    $"3⃣ Зарабатывай очки и следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
-                    $"4⃣ Жмякай команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
+                    $"3⃣ Следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
+                    $"4⃣ Введи команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
                     "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
-                    "Надеюсь это порадует вас и вы выучите миллион слов. Мои создатели проверили - это работает!");
+                    "Надеюсь это порадует вас и вы выучите миллион слов!").NewLine().NewLine()
+        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу").NewLine()
+        .AddEscaped("https://t.me/chtotiskazalna").NewLine().NewLine()
+        .AddEscaped("или создайте задачу тут").NewLine()
+        .AddEscaped("https://github.com/NatShep/ChoTISkazal/issues");
 
     public Markdown MainMenuText =>
         Markdown.Escaped("Я переводчик и учитель.\r\n" +
@@ -151,6 +155,11 @@ public class RussianTexts : IInterfaceTexts {
                          $"Затем, когда будет свободная минутка, нажми на кнопку \"Ботать {Emojis.Learning}\" или " +
                          $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова");
 
+    public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
+        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу").NewLine()
+        .AddEscaped("https://t.me/chtotiskazalna");
+
+    
     public string ActionIsNotAllowed => "Действие не разрешено";
 
     public string OopsSomethingGoesWrong =>
