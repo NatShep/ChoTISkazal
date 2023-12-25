@@ -29,7 +29,7 @@ public class UserModel
         _telegramNick = telegramNick;
         _telegramFirstName = firstName;
         _telegramLastName = lastName;
-        _countByCategoryScores = new int[8];
+        _totalScoreBaskets = Baskets.CreateBaskets();
 
         InitializeTodayStats(DateTime.Today);
         InitializeLastMonthStats();
@@ -44,7 +44,7 @@ public class UserModel
     [BsonElement(UsersRepo.UserTelegramIdFieldName)]
     private long? _telegramId = null;
 
-    [BsonElement("sc")] private int[] _countByCategoryScores;
+    [BsonElement("sc")] private int[] _totalScoreBaskets;
     [BsonElement("a")] private DateTime _lastActivity;
     [BsonElement("last_ex")] private DateTime _lastExam;
     [BsonElement("tfn")] private string _telegramFirstName;
@@ -127,26 +127,13 @@ public class UserModel
         set => _maxGoalStreak = value;
     }
 
-    public int WordsLearned => CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore, 10);
+    public int WordsLearned => _totalScoreBaskets.BasketCountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
 
     public double GamingScore => _gamingScore;
 
-    public int CountOf(int minScoreCategory, int maxScoreCategory)
-    {
-        if (_countByCategoryScores == null)
-            return 0;
-        int acc = 0;
-        for (int i = minScoreCategory; i < maxScoreCategory && i < _countByCategoryScores.Length; i++)
-        {
-            acc += _countByCategoryScores[i];
-        }
-
-        return acc;
-    }
-
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
 
-    public void OnQuestionActivity()
+    private void OnQuestionActivity()
     {
         OnAnyActivity();
         _lastExam = DateTime.Now;
@@ -154,7 +141,7 @@ public class UserModel
 
     public void SetRemindFrequency(int frequency) => _remindFrequency = frequency;
 
-    public double OnNewWordAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+    public double OnNewWordAdded(WordStatsChange statsChange, int pairsCount, int examplesCount)
     {
         _wordsCount++;
         var (today, month) = FixStatsAndGetCurrent();
@@ -169,7 +156,7 @@ public class UserModel
 
         return gamingScore +
                OnPairsAdded(
-                   statsChanging: statsChanging,
+                   statsChange: statsChange,
                    pairsCount: pairsCount,
                    examplesCount: examplesCount);
     }
@@ -259,7 +246,7 @@ public class UserModel
         return daily;
     }
 
-    public double OnPairsAdded(WordStatsChanging statsChanging, int pairsCount, int examplesCount)
+    public double OnPairsAdded(WordStatsChange statsChange, int pairsCount, int examplesCount)
     {
         _pairsCount += pairsCount;
         _examplesCount += examplesCount;
@@ -270,12 +257,12 @@ public class UserModel
         month.PairsAdded += pairsCount;
         month.ExamplesAdded += examplesCount;
         var gamingScore = pairsCount * WordLeaningGlobalSettings.NewPairGamingScore; // * Zen.AddWordsBonusRate;
-        ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
+        ApplyWordStatsChanges(statsChange, today, month, gamingScore);
         OnAnyActivity();
         return gamingScore;
     }
 
-    public void OnPairRemoved(UserWordTranslation tr, WordStatsChanging wordScoreDelta)
+    public void OnPairRemoved(UserWordTranslation tr, WordStatsChange wordScoreDelta)
     {
         var examplesCount = tr.Examples?.Length ?? 0;
         _pairsCount--;
@@ -287,7 +274,7 @@ public class UserModel
         month.ExamplesAdded -= examplesCount;
 
         var gamingScore = -WordLeaningGlobalSettings.NewPairGamingScore; // * Zen.AddWordsBonusRate;
-        ApplyWordStatsChangings(wordScoreDelta, today, month, gamingScore);
+        ApplyWordStatsChanges(wordScoreDelta, today, month, gamingScore);
         OnAnyActivity();
     }
 
@@ -303,34 +290,31 @@ public class UserModel
         var scoreDelta = UserWordScore.Zero - alreadyExistsWord.Score;
         var gamingScore = -WordLeaningGlobalSettings.NewWordGamingScore; // * Zen.AddWordsBonusRate;
 
-        ApplyWordStatsChangings(scoreDelta, today, month, gamingScore);
+        ApplyWordStatsChanges(scoreDelta, today, month, gamingScore);
     }
 
-    public void OnStatsChangings(WordStatsChanging changing)
+    public void OnStatsChangings(WordStatsChange change)
     {
         var (today, month) = FixStatsAndGetCurrent();
-        ApplyWordStatsChangings(changing, today, month, 0);
+        ApplyWordStatsChanges(change, today, month, 0);
     }
 
-    private void ApplyWordStatsChangings(
-        WordStatsChanging statsChanging, DailyStats dailyStats, MonthsStats monthsStats, double gamingScore)
+    private void ApplyWordStatsChanges(
+        WordStatsChange statsChange, DailyStats dailyStats, MonthsStats monthsStats, double gamingScore)
     {
-        dailyStats.AppendStats(statsChanging);
-        monthsStats.AppendStats(statsChanging);
+        dailyStats.AppendStats(statsChange);
+        monthsStats.AppendStats(statsChange);
         dailyStats.OnGameScoreIncreased(gamingScore);
         monthsStats.OnGameScoreIncreased(gamingScore);
         _gamingScore += gamingScore;
         if (_gamingScore <= 0) _gamingScore = 0;
 
-        if (_countByCategoryScores == null)
-            _countByCategoryScores = statsChanging.WordScoreChangings ?? new int[8];
+        if (_totalScoreBaskets == null)
+            _totalScoreBaskets = statsChange.Baskets?.ToArray()
+                                 ?? Baskets.CreateBaskets();
         else
-            _countByCategoryScores.AddValuesInplace(statsChanging.WordScoreChangings);
-        _countByCategoryScores.SetLowLimitInplace(0);
-
-        //  _outdatedWordsCount += statsChanging.OutdatedChanging;
-
-//        if (_outdatedWordsCount < 0) _outdatedWordsCount = 0;
+            _totalScoreBaskets.AddValuesInplace(statsChange.Baskets);
+        _totalScoreBaskets.SetLowLimitInplace(0);
     }
 
     public void OnEnglishWordTranslationRequest()
@@ -345,7 +329,7 @@ public class UserModel
         OnAnyActivity();
     }
 
-    public void OnQuestionPassed(WordStatsChanging statsChanging)
+    public void OnQuestionPassed(WordStatsChange statsChange)
     {
         _questionPassed++;
         var (today, month) = FixStatsAndGetCurrent();
@@ -355,12 +339,11 @@ public class UserModel
 
         OnQuestionActivity();
 
-        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore; // * Zen.LearnWordsBonusRate;
-        ApplyWordStatsChangings(statsChanging, today, month, gamingScore);
-        //       return gamingScore;
+        var gamingScore = WordLeaningGlobalSettings.QuestionPassedGamingScore;
+        ApplyWordStatsChanges(statsChange, today, month, gamingScore);
     }
 
-    public double OnQuestionFailed(WordStatsChanging statsChanging)
+    public double OnQuestionFailed(WordStatsChange statsChange)
     {
         _questionFailed++;
         var (today, month) = FixStatsAndGetCurrent();
@@ -370,10 +353,8 @@ public class UserModel
 
         OnQuestionActivity();
 
-        ApplyWordStatsChangings(statsChanging, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
+        ApplyWordStatsChanges(statsChange, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
         return WordLeaningGlobalSettings.QuestionFailedGamingScore;
-
-        //    return gamingScore;
     }
 
     public void OnLearningDone()
@@ -385,10 +366,8 @@ public class UserModel
         month.LearningDone++;
 
         var gamingScore = WordLeaningGlobalSettings.LearningDoneGamingScore; // * Zen.LearnWordsBonusRate;
-        ApplyWordStatsChangings(WordStatsChanging.Zero, today, month, gamingScore);
+        ApplyWordStatsChanges(WordStatsChange.Zero, today, month, gamingScore);
         OnAnyActivity();
-
-        //    return gamingScore;
     }
 
     public IReadOnlyList<DailyStats> GetLastWeek()
@@ -409,16 +388,17 @@ public class UserModel
 
     public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords)
     {
-        if (_wordsCount == _countByCategoryScores?.Sum())
+        if (_wordsCount == _totalScoreBaskets?.Sum())
             return;
 
         var days = new Dictionary<DateTime, DailyStats>();
         var months = new Dictionary<DateTime, MonthsStats>();
-        _countByCategoryScores = new int[8];
-        //   _outdatedWordsCount = 0;
+        _totalScoreBaskets = Baskets.CreateBaskets();
+        var totalChange = WordStatsChange.Zero;
         _gamingScore = 0;
         foreach (var word in allUserWords)
         {
+            totalChange += WordStatsChange.CreateForScore(word.AbsoluteScore);
             var creationTime = word.Id.CreationTime;
             var day = creationTime.Date;
             if (!days.TryGetValue(day, out var dailyStats))
@@ -453,14 +433,14 @@ public class UserModel
             dailyStats.QuestionsFailed += word.QuestionAsked - word.QuestionPassed;
             monthsStats.QuestionsFailed += word.QuestionAsked - word.QuestionPassed;
 
-            var wc = WordStatsChanging.CreateForNewWord(word.AbsoluteScore);
+            var wc = WordStatsChange.CreateForScore(word.AbsoluteScore);
 
             var score = WordLeaningGlobalSettings.NewWordGamingScore +
                         WordLeaningGlobalSettings.NewPairGamingScore * word.RuTranslations.Length +
                         WordLeaningGlobalSettings.AverageScoresForPassedQuestion * word.QuestionPassed +
                         WordLeaningGlobalSettings.QuestionFailedGamingScore *
                         (word.QuestionAsked - word.QuestionPassed);
-            ApplyWordStatsChangings(wc, dailyStats, monthsStats, (int)score);
+            ApplyWordStatsChanges(wc, dailyStats, monthsStats, (int)score);
         }
 
         if (LastDaysStats == null)
@@ -487,5 +467,6 @@ public class UserModel
 
         LastMonthStats.Sort((d1, d2) => d1.Months.CompareTo(d2.Months));
         _wordsCount = allUserWords.Count();
+        _totalScoreBaskets = totalChange.Baskets.ToArray();
     }
 }

@@ -35,25 +35,14 @@ public class UserWordScore
         _lastAskTime = lastAskTime;
     }
 
-    public static WordStatsChanging operator - (UserWordScore laterScore,UserWordScore earlierScore)
+    public static WordStatsChange operator - (UserWordScore laterScore,UserWordScore earlierScore)
     {
-        var scores = new int[8];
-        scores[WordStatsChanging.CategorizedScore(earlierScore.AbsoluteScore)]--;
-        scores[WordStatsChanging.CategorizedScore(laterScore.AbsoluteScore)]++;
+        var scoreChangeBaskets = Baskets.CreateBaskets();
+        scoreChangeBaskets[Baskets.ScoreToBasketNumber(earlierScore.AbsoluteScore)]--;
+        scoreChangeBaskets[Baskets.ScoreToBasketNumber(laterScore.AbsoluteScore)]++;
             
-        /*
-        int outdatedChanging = 0;
-        var agedScoreBefore = earlierScore.AgedScore;
-        var agedScoreAfter  = laterScore.AgedScore;
-        if (agedScoreBefore < WordLeaningGlobalSettings.LearnedWordMinScore)
-            outdatedChanging--;
-        if (agedScoreAfter < WordLeaningGlobalSettings.LearnedWordMinScore)
-            outdatedChanging++;
-        */
-            
-        return new WordStatsChanging(
-            scores,
+        return new WordStatsChange(
+            scoreChangeBaskets,
             laterScore.AbsoluteScore - earlierScore.AbsoluteScore);
-        // laterScore.AbsoluteScore - earlierScore.AbsoluteScore);
     }
 }

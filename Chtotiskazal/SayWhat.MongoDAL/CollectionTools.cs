@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SayWhat.MongoDAL;
 
@@ -38,20 +39,20 @@ public static class CollectionTools {
         return -1;
     }
 
-    public static void AddValuesInplace(this int[] targetArray, int[] other) {
+    public static void AddValuesInplace(this int[] targetArray, IReadOnlyList<int> other) {
         if (other == null)
             return;
-        for (int i = 0; i < targetArray.Length && i < other.Length; i++)
+        for (int i = 0; i < targetArray.Length && i < other.Count; i++)
             targetArray[i] += other[i];
     }
 
-    public static int[] Sum(this int[] targetArray, int[] other) {
+    public static int[] Sum(this IReadOnlyList<int> targetArray, IReadOnlyList<int> other) {
         if (other == null)
-            return targetArray;
+            return targetArray.ToArray();
         if (targetArray == null)
-            return other;
-        int[] res = new int[targetArray.Length];
-        for (int i = 0; i < targetArray.Length; i++)
+            return other.ToArray();
+        int[] res = new int[targetArray.Count];
+        for (int i = 0; i < targetArray.Count; i++)
             res[i] = targetArray[i] + other[i];
         return res;
     }

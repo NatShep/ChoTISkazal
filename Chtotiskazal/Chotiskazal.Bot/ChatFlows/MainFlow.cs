@@ -138,7 +138,8 @@ public class MainFlow
             ReportBotCommandHandler.Instance,
             new SettingsBotCommandHelper(_userService),
             new RemoveWordCommandHandler(_usersWordsService),
-            new InternalMutualCommandHandler(_mutualPhrasesService)
+            new InternalMutualCommandHandler(_mutualPhrasesService),
+            new InternalStatsUpdateCommandHandler(_userService, _usersWordsService)
         };
     }
 

@@ -93,7 +93,7 @@ public class UserRepoTests {
     public async Task OnPairsAdded_UpdatedModelContainsMothlyAndDailyStats(int updateCount) {
         var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
         for (int i = 0; i < updateCount; i++)
-            model.OnPairsAdded(WordStatsChanging.Zero, 1, 1);
+            model.OnPairsAdded(WordStatsChange.Zero, 1, 1);
         await _repo.Update(model);
 
         var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -107,7 +107,7 @@ public class UserRepoTests {
     public async Task OnQuestionPassed_UpdatedModelContainsMonthlyAndDailyStats(int updateCount) {
         var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
         for (int i = 0; i < updateCount; i++)
-            model.OnQuestionPassed(WordStatsChanging.Zero);
+            model.OnQuestionPassed(WordStatsChange.Zero);
         await _repo.Update(model);
 
         var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -120,7 +120,7 @@ public class UserRepoTests {
     public async Task OnQuestionFailed_UpdatedModelContainsMothlyAndDailyStats(int updateCount) {
         var model = await _repo.AddFromTelegram(1234567, "vasa", "popov", "vasa97");
         for (int i = 0; i < updateCount; i++)
-            model.OnQuestionFailed(WordStatsChanging.Zero);
+            model.OnQuestionFailed(WordStatsChange.Zero);
         await _repo.Update(model);
 
         var read = await _repo.GetOrDefaultByTelegramIdOrNull(1234567);
@@ -135,7 +135,7 @@ public class UserRepoTests {
         model.OnLearningDone();
         model.OnLearningDone();
 
-        model.OnNewWordAdded(WordStatsChanging.CreateForNewWord(0), 24, 124);
+        model.OnNewWordAdded(WordStatsChange.CreateForScore(0), 24, 124);
         model.OnEnglishWordTranslationRequest();
         model.OnEnglishWordTranslationRequest();
         model.OnEnglishWordTranslationRequest();

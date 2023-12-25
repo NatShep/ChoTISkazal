@@ -166,7 +166,7 @@ public class AddWordService {
             await _usersWordsService.AddUserWord(word);
 
             user.OnNewWordAdded(
-                statsChanging: WordStatsChanging.CreateForNewWord(word.AbsoluteScore),
+                statsChange: WordStatsChange.CreateForScore(word.AbsoluteScore),
                 pairsCount: word.RuTranslations.Length,
                 examplesCount: word.RuTranslations.Sum(t => t.Examples?.Length ?? 0));
         }
@@ -195,7 +195,7 @@ public class AddWordService {
             alreadyExistsWord.AddTranslations(newTranslations);
             await _usersWordsService.UpdateWord(alreadyExistsWord);
             user.OnPairsAdded(
-                statsChanging: alreadyExistsWord.Score - originRate,
+                statsChange: alreadyExistsWord.Score - originRate,
                 newTranslations.Count,
                 newTranslations.Sum(t => t.Examples?.Length ?? 0));
         }
