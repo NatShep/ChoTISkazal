@@ -230,7 +230,8 @@ public class EnglishTexts : IInterfaceTexts {
     }
 
     public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Congratulations! You answered all the questions without mistakes!");
-
+    
+    public Markdown TwoExamsToGoal => Markdown.Escaped("Almost done! There are two more exams left before the goal of the day!");
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";

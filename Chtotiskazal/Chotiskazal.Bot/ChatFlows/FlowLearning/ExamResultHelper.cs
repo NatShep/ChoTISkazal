@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +11,13 @@ namespace Chotiskazal.Bot.ChatFlows.FlowLearning;
 
 public static class ExamResultHelper
 {
+    public static async Task SendMotivation(ChatRoom chat, string emoji, Markdown message)
+    {
+        await chat.SendMessageAsync(emoji);
+        await chat.SendMarkdownMessageAsync(message, InlineButtons.Button(chat.Texts.ContinueButton, "/$continue"));
+        await chat.WaitInlineKeyboardInput();
+    }
+
     public static Markdown CreateLearningResultsMessage(
         ChatRoom chat,
         ExamSettings examSettings,

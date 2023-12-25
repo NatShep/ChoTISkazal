@@ -280,20 +280,13 @@ public class ExamFlow
         int questionsCount)
     {
         if (questionsCount == questionsPassed)
-        {
-            await Chat.SendMessageAsync("\U0001F973");
-            await Chat.SendMarkdownMessageAsync(Chat.Texts.CongratulateAllQuestionPassed,
-                InlineButtons.Button(Chat.Texts.ContinueButton, "/$continue"));
-            await Chat.WaitInlineKeyboardInput();
-        }
+            await ExamResultHelper.SendMotivation(Chat, "\U0001F973", Chat.Texts.CongratulateAllQuestionPassed);
+
+        if (Chat.User.GetToday().LearningDone == _regularExamSettings.ExamsCountGoalForDay - 2)
+            await ExamResultHelper.SendMotivation(Chat, "\U0001F90F", Chat.Texts.TwoExamsToGoal);
         
         if (Chat.User.GetToday().LearningDone == _regularExamSettings.ExamsCountGoalForDay)
-        {
-            await Chat.SendMessageAsync("\U0001F389");
-            await Chat.SendMarkdownMessageAsync(Markdown.Escaped(Chat.Texts.TodayGoalReached),
-                InlineButtons.Button(Chat.Texts.ContinueButton, "/$continue"));
-            await Chat.WaitInlineKeyboardInput();
-        }
+            await ExamResultHelper.SendMotivation(Chat, "\U00002705", Markdown.Escaped(Chat.Texts.TodayGoalReached));
 
         var doneMessage = ExamResultHelper.CreateLearningResultsMessage(
             chat: Chat,

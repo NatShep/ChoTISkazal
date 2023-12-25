@@ -128,6 +128,7 @@ public interface IInterfaceTexts {
     Markdown MainMenuText { get; }
     Markdown MainMenuTextForNewUserText { get; }
     Markdown CongratulateAllQuestionPassed { get; }
+    Markdown TwoExamsToGoal { get; }
 
     Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);

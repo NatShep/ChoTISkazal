@@ -231,6 +231,8 @@ public class RussianTexts : IInterfaceTexts {
     }
 
     public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Поздравляю! Вы ответили на все вопросы без ошибок!");
+
+    public Markdown TwoExamsToGoal => Markdown.Escaped("Еще чуть-чуть! Осталось два ботания до цели дня!");
     
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
