@@ -19,8 +19,7 @@ public class StatsBase
     private double _gameScoreChanging;
 
     public int CountOf(int minLearnCategory, int maxLearnCategory)
-        =>
-            CummulativeStatsChanging.CountOf(minLearnCategory, maxLearnCategory);
+        => CummulativeStatsChanging.CountOf(minLearnCategory, maxLearnCategory);
         
     public void OnGameScoreIncreased(double gameScoreChanging)
     {

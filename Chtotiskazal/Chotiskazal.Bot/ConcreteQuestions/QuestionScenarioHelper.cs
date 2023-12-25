@@ -36,15 +36,23 @@ public static class QuestionScenarioHelper {
             .ToArray();
 
     public static string[] GetRuPhraseVariants(this IEnumerable<UserWordModel> list, int count, string originRuPhrase,
-        int maxLength = int.MaxValue) {
+        int maxLength = int.MaxValue)
+    {
+        if (count == 1)
+            return new[] { originRuPhrase };
         var otherPhrases = list
             .Where(l => l.IsPhrase)
             .Select(o => o.RuTranslations.First().Word);
         var samples = list.SelectMany(l => l.Examples).Select(s => s.TranslatedPhrase);
-        var all = otherPhrases.Concat(samples).Distinct().Where(s => s.Length < maxLength).Shuffle();
-        if (count > 1)
-            all = all.Take(count - 1);
-        return all.Append(originRuPhrase).Shuffle().ToArray();
+        return otherPhrases
+            .Concat(samples)
+            .Where(s => s.Length < maxLength && !s.Equals(originRuPhrase, StringComparison.InvariantCultureIgnoreCase))
+            .Distinct()
+            .Shuffle()
+            .Take(count - 1)
+            .Append(originRuPhrase)
+            .Shuffle()
+            .ToArray();
     }   
 
     public static string[] GetEnPhraseVariants(this IEnumerable<UserWordModel> list, int count,

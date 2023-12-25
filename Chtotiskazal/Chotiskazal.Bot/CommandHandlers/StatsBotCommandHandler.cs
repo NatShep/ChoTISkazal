@@ -29,7 +29,7 @@ public class StatsBotCommandHandler : IBotCommandHandler {
                 new[]
                 {
                     InlineButtons.WellLearnedWords(
-                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore / 2, 10)}) {Emojis.SoftMark}")
+                        $"{chat.Texts.ShowWellKnownWords} ({chat.User.CountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore, 10)}) {Emojis.SoftMark}")
                 }
             });
 }

@@ -8,7 +8,8 @@ using SayWhat.MongoDAL;
 
 namespace Chotiskazal.Bot.ChatFlows;
 
-public static class StatsRenderer {
+public static class StatsRenderer
+{
     private const string Empty = "✖";
     private const string S0 = "➖";
     private const string S1 = "▫️";
@@ -28,8 +29,8 @@ public static class StatsRenderer {
     //RenderRecomendationsMarkdown(chat.User, chat.Texts).ToSemiBold();
 
     private static Markdown Render7WeeksCalendarMarkdown(
-        
-        ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts) {
+        ExamSettings examSettings, CalendarItem[] items, IInterfaceTexts texts)
+    {
         var today = DateTime.Today;
         var offsets = items.ToDictionary(
             i => (int)(today - i.Date.Date).TotalDays,
@@ -44,13 +45,16 @@ public static class StatsRenderer {
 
         var sbWithMarkwownFormatted = new StringBuilder("----------------------\r\n");
 
-        for (int day = 0; day < 7; day++) {
+        for (int day = 0; day < 7; day++)
+        {
             sbWithMarkwownFormatted.Append(Markdown.Escaped(texts.ShortDayNames[day] + " ").GetMarkdownString());
-            for (int week = 7; week > 0; week--) {
+            for (int week = 7; week > 0; week--)
+            {
                 var offset = 7 * week - undoneInLastWeek - day - 1;
                 if (offset < 0)
                     sbWithMarkwownFormatted.Append(Empty);
-                else if (offsets.TryGetValue(offset, out var v)) {
+                else if (offsets.TryGetValue(offset, out var v))
+                {
                     var symbol
                         = v < 0.1 ? S1
                         : v < 0.2 ? S2
@@ -66,25 +70,28 @@ public static class StatsRenderer {
 
             sbWithMarkwownFormatted.Append("\r\n");
         }
+
         sbWithMarkwownFormatted.Append("----------------------\r\n ");
-        sbWithMarkwownFormatted.Append($"{Markdown.Escaped(texts.less).GetMarkdownString()} {S1}{S2}{S3}{S4}{S5} {Markdown.Escaped(texts.more).GetMarkdownString()}\r\n");
+        sbWithMarkwownFormatted.Append(
+            $"{Markdown.Escaped(texts.less).GetMarkdownString()} {S1}{S2}{S3}{S4}{S5} {Markdown.Escaped(texts.more).GetMarkdownString()}\r\n");
         return Markdown.Bypassed(sbWithMarkwownFormatted.ToString());
     }
 
-    private static Markdown RenderStatsMarkdown(ExamSettings settings, ChatRoom chat) {
+    private static Markdown RenderStatsMarkdown(ExamSettings settings, ChatRoom chat)
+    {
         var lastMonth = chat.User.GetLastMonth();
         var lastDay = chat.User.GetToday();
 
         var statsTextMarkdown = Markdown.Escaped(chat.Texts.StatsYourStats + ":\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {chat.User.WordsCount}\r\n" +
-                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int) WordLeaningGlobalSettings.WellDoneWordMinScore/2, 10)}\r\n" +
-                                                 $"  {chat.Texts.StatsScore}: {(int) chat.User.GamingScore}\r\n")
+                                                 $"  {chat.Texts.StatsLearnedWell}: {chat.User.CountOf((int)(WordLeaningGlobalSettings.WellDoneWordMinScore / 2), 10)}\r\n" +
+                                                 $"  {chat.Texts.StatsScore}: {(int)chat.User.GamingScore}\r\n")
                                     .ToQuotationMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisMonth}:\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastMonth.WordsAdded}\r\n" +
                                                  $"  {chat.Texts.StatsLearnedWell}: {lastMonth.WordsLearnt}\r\n" +
                                                  $"  {chat.Texts.StatsExamsPassed}: {lastMonth.LearningDone}\r\n" +
-                                                 $"  {chat.Texts.StatsScore}: {(int) lastMonth.GameScoreChanging}\r\n")
+                                                 $"  {chat.Texts.StatsScore}: {(int)lastMonth.GameScoreChanging}\r\n")
                                     .ToQuotationMono() +
                                 Markdown.Escaped($"{chat.Texts.StatsThisDay}:\r\n") +
                                 Markdown.Escaped($"  {chat.Texts.StatsWordsAdded}: {lastDay.WordsAdded}\r\n" +

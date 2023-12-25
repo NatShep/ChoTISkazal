@@ -83,7 +83,7 @@ public class QuestionSelector {
 
     public HashSet<Question> AllQuestions { get; }
 
-    public Question GetNextQuestionFor(bool isFirstExam, UserWordModel model, ExamType examType) {
+    public Question GetNextQuestionFor(UserWordModel model, ExamType examType) {
         var questionSet =
             examType switch
             {
@@ -93,7 +93,7 @@ public class QuestionSelector {
                 ExamType.Everything => _allQuestionsSet,
                 _ => throw new ArgumentOutOfRangeException(nameof(examType), examType, null)
             };
-        return questionSet.GetNextQuestionFor(isFirstExam, model);
+        return questionSet.GetNextQuestionFor(model);
     }
 }
 

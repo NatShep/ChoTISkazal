@@ -12,16 +12,13 @@ public static class Questions {
     private const int Hi = 200;
 
     //Expected Score:
-    // Beginner < 1.75 < Intermediate < 5 < Advanced
-    private const double Beginner1 = 0.6;
-    private const double Beginner2 = 1.6;
-    private const double Intermediate1 = 2;
-    private const double Intermediate2 = 2.5;
-    private const double Intermediate3 = 3;
-    private const double Intermediate4 = 4;
-    private const double Advanced1 = 5;
-    private const double Advanced2 = 6;
-    private const double Advanced3 = 7;
+    private const double Beginner1 = 1;
+    private const double Beginner2 = 2;
+    private const double Intermediate1 = 3;
+    private const double Intermediate2 = 4;
+    private const double Intermediate3 = 5;
+    private const double Intermediate4 = 6;
+    private const double Advanced = 7;
 
     public static readonly Question EngChooseMultipleTranslationExam = new("Eng m-choose",
         Scenario: new EngChooseMultipleTranslationsScenario(),
@@ -257,7 +254,7 @@ public static class Questions {
         new("Ru Write Single Translation",
             Scenario: new RuWriteSingleTranslationScenario(service),
             Frequency: Mid,
-            ExpectedScore: Advanced1,
+            ExpectedScore: Advanced,
             PassScore: 2.0,
             FailScore: 0.7
         );

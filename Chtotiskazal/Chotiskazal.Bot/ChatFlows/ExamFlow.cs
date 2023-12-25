@@ -13,7 +13,8 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows;
 
-public class ExamFlow {
+public class ExamFlow
+{
     private readonly ExamSettings _regularExamSettings;
     private readonly QuestionSelector _questionSelector;
     private ChatRoom Chat { get; }
@@ -26,7 +27,8 @@ public class ExamFlow {
         UserService userService,
         UsersWordsService usersWordsService,
         ExamSettings regularExamSettings,
-        QuestionSelector questionSelector) {
+        QuestionSelector questionSelector)
+    {
         Chat = chat;
         _userService = userService;
         _usersWordsService = usersWordsService;
@@ -47,8 +49,10 @@ public class ExamFlow {
         _questionSelector = questionSelector;
     }
 
-    public async Task EnterAsync() {
-        if (!await _usersWordsService.HasWordsFor(Chat.User)) {
+    public async Task EnterAsync()
+    {
+        if (!await _usersWordsService.HasWordsFor(Chat.User))
+        {
             await Chat.SendMessageAsync(Chat.Texts.NeedToAddMoreWordsBeforeLearning);
             return;
         }
@@ -73,7 +77,8 @@ public class ExamFlow {
             examSettings.MaxTranslationsInOneExam);
 
         var freeSpaceForWords = 0;
-        if (wellDoneWords.Length < examSettings.WellDoneWordsInOneExam) {
+        if (wellDoneWords.Length < examSettings.WellDoneWordsInOneExam)
+        {
             freeSpaceForWords = examSettings.WellDoneWordsInOneExam - wellDoneWords.Length;
         }
 
@@ -147,10 +152,9 @@ public class ExamFlow {
         Console.WriteLine($"Количество всех слов: {distinctLearningWords.Count()}");
         Console.WriteLine(string.Join(" \r\n", distinctLearningWords.ToList()));
 
-        var learningWordsCount = distinctLearningWords.Length;
-
         var originWordsScore = new Dictionary<string, double>();
-        foreach (var word in distinctLearningWords) {
+        foreach (var word in distinctLearningWords)
+        {
             if (!originWordsScore.ContainsKey(word.Word))
                 originWordsScore.Add(word.Word, word.AbsoluteScore);
         }
@@ -164,15 +168,14 @@ public class ExamFlow {
         QuestionResult lastExamResult = null;
 
         var previousWord = new UserWordModel();
-        foreach (var word in examsLearnedWords.Shuffle()) {
+        foreach (var word in examsLearnedWords.Shuffle())
+        {
             //exclude the next same exam
             if (previousWord == word)
                 continue;
             previousWord = word;
 
-            var allLearningWordsWereShowedAtLeastOneTime = wordQuestionNumber < learningWordsCount;
-            var question =
-                _questionSelector.GetNextQuestionFor(allLearningWordsWereShowedAtLeastOneTime, word, examType);
+            var question = _questionSelector.GetNextQuestionFor(word, examType);
             wordQuestionNumber++;
 
             var learnList = distinctLearningWords;
@@ -186,8 +189,9 @@ public class ExamFlow {
             var originRate = word.Score;
 
             var questionMetric = new QuestionMetric(word, question.Name);
-            var result = await PassWithRetries(question, word, learnList, wordQuestionNumber, examType);
-            switch (result.Results) {
+            var result = await PassWithRetries(question, word, learnList, examType);
+            switch (result.Results)
+            {
                 case QResult.Passed:
                     var succTask = _usersWordsService.RegisterSuccess(word, question.PassScore);
                     questionsCount++;
@@ -231,7 +235,8 @@ public class ExamFlow {
         await updateUserTask;
     }
 
-    private async Task PrintExamStartsMessage(ExamType examType, UserWordModel[] newLearningWords) {
+    private async Task PrintExamStartsMessage(ExamType examType, UserWordModel[] newLearningWords)
+    {
         var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold().Space();
 
         markdown += examType == ExamType.NoInput
@@ -250,7 +255,8 @@ public class ExamFlow {
             .NewLine()
             .AddEscaped($"... {Chat.Texts.thenClickStart}");
 
-        if (examType != ExamType.NoInput) {
+        if (examType != ExamType.NoInput)
+        {
             markdown = markdown.NewLine().NewLine() +
                        Chat.Texts.TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(
                            QuestionScenarioHelper.IDontKnownSubcommand);
@@ -268,7 +274,8 @@ public class ExamFlow {
 
     private async Task SendExamResultToUser(
         UserWordModel[] distinctLearningWords, Dictionary<string, double> originWordsScore, int questionsPassed,
-        int questionsCount) {
+        int questionsCount)
+    {
         var doneMessage = CreateLearningResultsMessage(
             distinctLearningWords,
             originWordsScore,
@@ -291,21 +298,24 @@ public class ExamFlow {
     private async Task<QuestionResult> PassWithRetries(Question question,
         UserWordModel word,
         UserWordModel[] learnList,
-        int wordQuestionNumber,
-        ExamType examType) {
+        ExamType examType)
+    {
         int retrieNumber = 0;
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 40; i++)
+        {
             var result = await question.Scenario.Pass(Chat, word, learnList);
-            if (result.Results == QResult.Impossible) {
+            if (result.Results == QResult.Impossible)
+            {
                 var qName = question.Name;
-                for (int iteration = 0; question.Name == qName; iteration++) {
-                    question = _questionSelector.GetNextQuestionFor(wordQuestionNumber == 0, word, examType);
+                for (int iteration = 0; question.Name == qName; iteration++)
+                {
+                    question = _questionSelector.GetNextQuestionFor(word, examType);
                     if (iteration > 100)
                         return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
                 }
             }
-            else if (result.Results == QResult.Retry) {
-                wordQuestionNumber++;
+            else if (result.Results == QResult.Retry)
+            {
                 retrieNumber++;
                 if (retrieNumber >= 4)
                     return QuestionResult.Failed(Markdown.Empty, Markdown.Empty);
@@ -321,16 +331,20 @@ public class ExamFlow {
         Dictionary<string, double> originWordsScore,
         int questionsPassed,
         int questionsCount
-    ) {
+    )
+    {
         var newWellLearnedWords = new List<UserWordModel>();
         var forgottenWords = new List<UserWordModel>();
 
-        foreach (var word in wordsInExam) {
-            if (word.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore) {
+        foreach (var word in wordsInExam)
+        {
+            if (word.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
+            {
                 if (originWordsScore[word.Word] < WordLeaningGlobalSettings.WellDoneWordMinScore)
                     newWellLearnedWords.Add(word);
             }
-            else {
+            else
+            {
                 if (originWordsScore[word.Word] > WordLeaningGlobalSettings.WellDoneWordMinScore)
                     forgottenWords.Add(word);
             }
@@ -343,7 +357,8 @@ public class ExamFlow {
                                       .AddEscaped($" {wordsInExam.Length}")
                                       .NewLine();
 
-        if (newWellLearnedWords.Any()) {
+        if (newWellLearnedWords.Any())
+        {
             if (newWellLearnedWords.Count > 1)
                 doneMessageMarkdown = doneMessageMarkdown.NewLine() +
                                       Chat.Texts.LearnMoreWords(newWellLearnedWords.Count).ToSemiBold().AddEscaped(":")
@@ -354,7 +369,8 @@ public class ExamFlow {
                                           .Escaped($"{Chat.Texts.YouHaveLearnedOneWord}:").ToSemiBold()
                                           .NewLine();
 
-            foreach (var word in newWellLearnedWords) {
+            foreach (var word in newWellLearnedWords)
+            {
                 doneMessageMarkdown = doneMessageMarkdown
                     .AddEscaped($"{Emojis.HeavyPlus} ")
                     .AddEscaped(word.Word)
@@ -362,7 +378,8 @@ public class ExamFlow {
             }
         }
 
-        if (forgottenWords.Any()) {
+        if (forgottenWords.Any())
+        {
             if (forgottenWords.Count > 1)
                 doneMessageMarkdown = doneMessageMarkdown
                     .NewLine()
@@ -374,7 +391,8 @@ public class ExamFlow {
                     .AddEscaped($"{Chat.Texts.YouForgotOneWord}:").ToSemiBold()
                     .NewLine();
 
-            foreach (var word in forgottenWords) {
+            foreach (var word in forgottenWords)
+            {
                 doneMessageMarkdown = doneMessageMarkdown
                     .AddEscaped($"{Emojis.HeavyMinus} ")
                     .AddEscaped(word.Word)
@@ -405,7 +423,8 @@ public class ExamFlow {
         return doneMessageMarkdown;
     }
 
-    private async Task WriteDontPeakMessage(string resultsBeforeHideousText) {
+    private async Task WriteDontPeakMessage(string resultsBeforeHideousText)
+    {
         //it is not an empty string;
         // it contains invisible character, that allows to show blank message
         string emptySymbol = "‎";
@@ -417,7 +436,8 @@ public class ExamFlow {
     }
 
     private List<UserWordModel> CreateExamListForNewWords(ExamType examType, UserWordModel[] learningWords,
-        ExamSettings examSettings) {
+        ExamSettings examSettings)
+    {
         var examsList = new List<UserWordModel>(examSettings.MaxExamSize);
 
         //Every learning word appears in exam from MIN to MAX times
