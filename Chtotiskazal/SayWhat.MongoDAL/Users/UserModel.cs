@@ -90,7 +90,12 @@ public class UserModel
     //   [BsonElement("oc")] private int _outdatedWordsCount;
     [BsonElement("gs")] private double _gamingScore;
 
+    [BsonElement("fr")] private UserFrequencyState _frequencyState;
+    
     #endregion
+
+    public IEnumerable<UserFreqItem> OrderedFrequentItems => (IEnumerable<UserFreqItem>)
+        _frequencyState?.OrderedWords ?? Array.Empty<UserFreqItem>();
 
     public bool IsEnglishInterface
     {
@@ -469,4 +474,34 @@ public class UserModel
         _wordsCount = allUserWords.Count();
         _totalScoreBaskets = totalChange.Baskets.ToArray();
     }
+}
+
+[BsonIgnoreExtraElements]
+public class UserFrequencyState
+{
+    [BsonElement("w")] public List<UserFreqItem> OrderedWords { get; set; }
+}
+
+[BsonIgnoreExtraElements]
+public class UserFreqItem
+{
+    public UserFreqItem()
+    {
+        
+    }
+    public UserFreqItem(int number, FreqWordResult result)
+    {
+        Number = number;
+        Result = result;
+    }
+    [BsonElement("n")] public int Number { get; set; }
+    [BsonElement("r")] public FreqWordResult Result { get; set; }
+}
+
+public enum FreqWordResult
+{
+    Learning = 0,
+    Known = 1,
+    AlreadyLearning = 2,
+    AlreadyLearned = 3,
 }

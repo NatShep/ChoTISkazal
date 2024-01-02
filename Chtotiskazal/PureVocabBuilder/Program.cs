@@ -6,6 +6,7 @@ using SayWhat.Bll.Services;
 using SayWhat.Bll.Yapi;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
+using SayWhat.MongoDAL.FrequentWords;
 using SayWhat.MongoDAL.LearningSets;
 using SayWhat.MongoDAL.QuestionMetrics;
 using SayWhat.MongoDAL.Users;
@@ -27,10 +28,12 @@ class Program {
     private static UsersRepo _userRepo;
     private static QuestionMetricRepo _questionMetricsRepo;
     private static AdminToolsService _toolsService;
+    private static FrequentWordsRepo _frequentWordsRepo;
 
     static async Task Main(string[] args) {
         Initialize();
-        await _toolsService.ReportForNotSynchronizedUserWordsAndLocalDictionary();
+        await _toolsService.InitializeFreqWords();
+        //await _toolsService.ReportForNotSynchronizedUserWordsAndLocalDictionary();
         Console.ReadLine();
         // var essentialPath =
         //     "/Users/iurii.sukhanov/Desktop/Features/Buldozerowords/Zip/Final.essential";
@@ -61,7 +64,7 @@ class Program {
 
         _yandexDictionaryClient = new YandexDictionaryApiClient(settings.YadicapiKey, settings.YadicapiTimeout);
         var client = new MongoClient(settings.MongoConnectionString);
-        var db = client.GetDatabase(settings.MongoDbName);
+        var db = client.GetDatabase("resp");
 
         _userWordRepo = new UserWordsRepo(db);
         _localDictionaryRepo = new LocalDictionaryRepo(db);
@@ -69,7 +72,7 @@ class Program {
         _examplesRepo = new ExamplesRepo(db);
         _questionMetricsRepo = new QuestionMetricRepo(db);
         _learningSetRepo = new LearningSetsRepo(db);
-
+        _frequentWordsRepo = new FrequentWordsRepo(db);
         if (!_userRepo.GetCount().Wait(10000))
         {
             throw new TimeoutException($"Could not connect to mongo db at {settings.MongoConnectionString}}}");
@@ -81,7 +84,7 @@ class Program {
         _examplesRepo.UpdateDb();
         _questionMetricsRepo.UpdateDb();
         _learningSetRepo.UpdateDb();
-        
+        _frequentWordsRepo.UpdateDb();
         Reporter.QuestionMetricRepo = _questionMetricsRepo;
 
         _userWordService = new UsersWordsService(_userWordRepo, _examplesRepo);
@@ -94,6 +97,6 @@ class Program {
             _localDictionaryService,
             _userService);
         _toolsService = new AdminToolsService(
-            _userRepo, _userWordRepo, _localDictionaryService, _addWordService);
+            _userRepo, _userWordRepo, _localDictionaryService, _addWordService, _learningSetService, _frequentWordsRepo);
     }
 }
