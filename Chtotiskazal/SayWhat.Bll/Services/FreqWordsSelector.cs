@@ -66,10 +66,8 @@ public class FreqWordsSelector
                 break;
         }
 
-        if (left > right || left == -1)
-        {
+        if (left > right || left == -1) 
             (left, right) = (right, left);
-        }
 
         int leftNumber;
         if (left != -1)

@@ -13,7 +13,7 @@ public class TranscriptionChooseRuScenario : IQuestionScenario {
     public async Task<QuestionResult> Pass(ChatRoom chat, UserWordModel word, UserWordModel[] examList) {
         var originTranslation = word.RuTranslations.GetRandomItemOrNull();
 
-        if (string.IsNullOrWhiteSpace(originTranslation.Transcription) || originTranslation.Transcription != "")
+        if (string.IsNullOrWhiteSpace(originTranslation.Transcription))
             return QuestionResult.Impossible;
 
         string[] variants = examList

@@ -68,7 +68,7 @@ public static class Questions {
 
     public static readonly Question TranscriptionExam = new("Trans Choose",
         Scenario: new TranscriptionChooseScenario(),
-        Frequency: Mid,
+        Frequency: LowMid,
         ExpectedScore: Intermediate1,
         PassScore: 0.4,
         FailScore: 0.7
@@ -85,17 +85,17 @@ public static class Questions {
     public static readonly Question EngEasyWriteMissingLetter = new("Eng write mising",
         new EngWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate2,
+        ExpectedScore: Intermediate4,
         PassScore: 1.3,
-        FailScore: 0.52
+        FailScore: 0.5
     );
 
     public static readonly Question RuEasyWriteMissingLetter = new("Ru write mising",
         new RuWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate2,
+        ExpectedScore: Intermediate4,
         PassScore: 1.1,
-        FailScore: 0.56
+        FailScore: 0.5
     );
 
     public static readonly Question EngHardWriteMissingLetter = new("Eng write mising hard",
@@ -206,7 +206,7 @@ public static class Questions {
 
     public static readonly Question EngChooseByTranscriptionExam = new("Choose Eng By Transcription",
         Scenario: new TranscriptionChooseEngScenario(),
-        Frequency: LowMid,
+        Frequency: Low,
         ExpectedScore: Intermediate3,
         PassScore: 0.9,
         FailScore: 0.6

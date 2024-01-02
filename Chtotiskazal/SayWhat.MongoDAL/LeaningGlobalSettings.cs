@@ -4,15 +4,17 @@ namespace SayWhat.MongoDAL;
 
 public static class WordLeaningGlobalSettings {
     /// <summary>
+    /// Minimum = 1. Addition to Delta between score of question, and question hardness
+    /// The highter it is - the more random question appears for target words
+    /// the lower it is - the more expected, that only closest to word by hardness question appears  
+    /// </summary>
+    public const double TheDampingFactorOfTheChoiceOfQuestions = 4;
+    /// <summary>
     /// Absolute score reduced by {AgingFactor} per day in AgedScore calculation
     /// </summary>
     public const double AgingFactor = 0.33;
     //probability reduces by reducingPerPointFactor for every res point
 
-    /// <summary>
-    /// Order index (probability of word appearing in exam) reduces
-    /// for {ReducingPerPointFactor} times for each AgedScore
-    /// </summary>
     public const double AverageScoresForFailedQuestion = 0.4;
 
     public const double AverageScoresForPassedQuestion = 0.4;
@@ -22,7 +24,7 @@ public static class WordLeaningGlobalSettings {
     public const double WellDoneWordMinScore = 10.0;
     public const double LearnedWordMinScore = 14.0;
     public const double WellLearnedWordAbsScore = 16.0;
-
+        
     //scores:
     public static double NewWordGamingScore { get; set; } = 4;
     public static double NewPairGamingScore { get; set; } = 0.1;
