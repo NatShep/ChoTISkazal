@@ -1,6 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using SayWhat.Bll.Services;
+using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.UnitTests;
 
@@ -118,9 +119,14 @@ public class FreqWordsTest
     public void CentralSection19() =>
         // [-]r-r-r-
         AssertSection(0, 10, Red(10), Red(20), Red(40));
+
+    [Test]
+    public void CentralSection20() =>
+        // --g--g[--]
+        AssertSection(50, null, Green(10), Green(50));
     
 
-    private void AssertSection(int left, int? right, params FreqWordUsage[] words)
+    private void AssertSection(int left, int? right, params UserFreqItem[] words)
     {
         int size = 100;
         var selector = new FreqWordsSelector(words.ToList(), size);
@@ -131,12 +137,12 @@ public class FreqWordsTest
     /// <summary>
     /// Immitate unknown word (word that is learning)
     /// </summary>
-    private FreqWordUsage Red(int number) => new(number, FreqWordResult.Learning);
+    private UserFreqItem Red(int number) => new(number, FreqWordResult.ToLearn);
 
     /// <summary>
     /// Immitate known word (word that user already knows)
     /// </summary>
     /// <param name="number"></param>
     /// <returns></returns>
-    private FreqWordUsage Green(int number) => new(number, FreqWordResult.Known);
+    private UserFreqItem Green(int number) => new(number, FreqWordResult.Skip);
 }

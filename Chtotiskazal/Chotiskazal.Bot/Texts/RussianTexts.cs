@@ -266,7 +266,7 @@ public class RussianTexts : IInterfaceTexts {
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
     public string MainMenuButton => "Глав меню";
-    public string LearningSetsButton => "Наборы слов";
+    public string FrequentWordsButton => "Добавить частотные слов";
     public string ShowWellKnownWords => "Посмотреть, что уже выучил";
 
     #endregion

@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SayWhat.MongoDAL.Users;
 
 namespace SayWhat.Bll.Services;
 
 public class FreqWordsSelector
 {
     private readonly int _size;
-    private readonly List<FreqWordUsage> _orderedHistory;
+    private readonly List<UserFreqItem> _orderedHistory;
 
-    public FreqWordsSelector(List<FreqWordUsage> history, int size)
+    public FreqWordsSelector(List<UserFreqItem> history, int size)
     {
         _size = size;
         _orderedHistory = history.OrderBy(h => h.Number).ToList();
     }
 
     public bool IsEmpty => !_orderedHistory.Any();
+    public int Count => _orderedHistory.Count;
+    public int MaxSize => _size;
 
     public CentralKnowledgeSection CalcCentralSection()
     {
@@ -66,7 +69,7 @@ public class FreqWordsSelector
                 break;
         }
 
-        if (left > right || left == -1) 
+        if (left > right || left == -1)
             (left, right) = (right, left);
 
         int leftNumber;
@@ -104,7 +107,61 @@ public class FreqWordsSelector
         return -1;
     }
 
-    private bool IsRed(int index) => _orderedHistory[index].Result != FreqWordResult.Known;
-}
+    private bool IsRed(int index) => _orderedHistory[index].Result != FreqWordResult.Skip;
 
-public record CentralKnowledgeSection(int Left, int Right);
+    public void Add(int currentOrderNumber, FreqWordResult result)
+    {
+        int number = 0;
+        foreach (var wordUsage in _orderedHistory)
+        {
+            if (wordUsage.Number > currentOrderNumber)
+                break;
+            if (wordUsage.Number == currentOrderNumber)
+                throw new InvalidOperationException("Number " + currentOrderNumber + " already used");
+            number++;
+        }
+
+        var item = new UserFreqItem(currentOrderNumber, result);
+        if (number >= _orderedHistory.Count)
+            _orderedHistory.Add(item);
+        else
+            _orderedHistory.Insert(number, item);
+    }
+
+    public int? GetFreeLeft(int middle)
+    {
+        var order = middle;
+        while (order >= 0)
+        {
+            var item = FindOrNull(order);
+            if (item == null)
+            {
+                return order;
+            }
+
+            order--;
+        }
+
+        return null;
+    }
+    
+    public int? GetFreeRight(int middle)
+    {
+        // var order = middle;
+        // while (order >= 0)
+        // {
+        //     var item = FindOrNull(order);
+        //     if (item == null)
+        //     {
+        //         return order;
+        //     }
+        //
+        //     order--;
+        // }
+
+        return null;
+    }
+
+    private UserFreqItem FindOrNull(int number) => _orderedHistory.FirstOrDefault(o => o.Number == number);
+    public bool Contains(int number) => _orderedHistory.Any(o => o.Number == number);
+}

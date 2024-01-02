@@ -14,7 +14,9 @@ public class FrequentWordsRepo : IMongoRepo {
     public FrequentWordsRepo(IMongoDatabase db) => _db = db;
 
     public Task Add(FrequentWord word) => Collection.InsertOneAsync(word);
+    public Task Add(List<FrequentWord> words) => Collection.InsertManyAsync(words);
 
+    
     public Task Update(FrequentWord word) => Collection.ReplaceOneAsync(o => o.Id == word.Id, word);
 
     public Task<FrequentWord> GetOrDefault(ObjectId id) =>

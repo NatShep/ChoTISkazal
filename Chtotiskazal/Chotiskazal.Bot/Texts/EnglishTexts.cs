@@ -258,7 +258,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string ContinueButton => "Continue";
     public string LearnButton => "Learn";
     public string StatsButton => "Stats";
-    public string LearningSetsButton => "Sets of words";
+    public string FrequentWordsButton => "Add new frequent words";
     public string HelpButton => "Help";
     public string MainMenuButton => "Main menu";
     public string ShowWellKnownWords => "My learned words";

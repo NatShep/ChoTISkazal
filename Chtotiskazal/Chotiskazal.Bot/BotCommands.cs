@@ -23,7 +23,7 @@ public class BotCommands {
         new() { Command = Start, Description = "Main menu (Главное меню)" },
         new() { Command = Translate, Description = "Translator (Переводчик)" },
         new() { Command = Learn, Description = "Learning translated words (Учить слова)" },
-        new() { Command = New, Description = "Show learning sets (Показать наборы для изучения)" },
+        new() { Command = New, Description = "Learn frequent words (Учить новые частотные слова)" },
         new() { Command = Stats, Description = "Your stats (Твоя статистика)" },
         new() { Command = Words, Description = "Your learned words (Твои выученные слова)" },
         new() { Command = Chlang, Description = "Change interface language (Сменить язык интерфейса)" },

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using SayWhat.Bll.Dto;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
+using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Dictionary;
 using SayWhat.MongoDAL.Examples;
 using SayWhat.MongoDAL.FrequentWords;
-using Telegram.Bot.Types;
+using SayWhat.MongoDAL.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows;
@@ -25,12 +26,14 @@ public class AddWordFromFrequentWordsFlow
     private const string SelectLearningSetData = "/lsselect";
     private const string MoveNextData = "/ls>>";
     private const string MovePrevData = "/ls<<";
+    private FreqWordsSelector _selector;
+    private CurrentFrequentWord _current;
     public AddWordFromFrequentWordsFlow(
-        ChatRoom chat, 
+        ChatRoom chat,
         FrequentWordService frequentWordService,
         UserService userService,
         UsersWordsService usersWordsService,
-        AddWordService addWordService, 
+        AddWordService addWordService,
         LocalDictionaryService localDictionaryService)
     {
         Chat = chat;
@@ -40,108 +43,57 @@ public class AddWordFromFrequentWordsFlow
         _addWordService = addWordService;
         _localDictionaryService = localDictionaryService;
     }
-    
+
     public async Task EnterAsync()
     {
-        var state = new FreqWordsState(new List<FreqWordUsage>());
-        var currentPosition = state.NextNumber;
-        var frequentWord =  await _frequentWordService.GetWord(currentPosition);
-        if (frequentWord == null)
-        {
-            //todo
-            return;
-        }
-
-        var (word, translations) =
-            await _localDictionaryService.GetTranslationWithExamplesByEnWord(frequentWord.Word);
-        await Chat.SendMarkdownMessageAsync(GetWordMarkdown(word, translations, frequentWord), GetWordKeyboard());
+        var typing = Chat.SendTyping();
         
-        while (true) {
-            var userInput = await Chat.WaitUserInputAsync();
-            if (userInput.CallbackQuery != null) {
-                await HandleWordButton(userInput, state, frequentWord);
-            } //todo - Это должно сразу переводиться. Значит нужно выносить обработчики страниц в обработчики ???
-            else 
+        var count = await _frequentWordService.Count();
+
+        _selector = new FreqWordsSelector(Chat.User.OrderedFrequentItems.ToList() ?? new List<UserFreqItem>(), count);
+        await MoveToNextFrequentWord();
+        await typing;
+        await Chat.SendMarkdownMessageAsync(GetCurrentMessage(), GetCurrentKeyboard());
+        while (true)
+        {
+            var update = await Chat.WaitUserInputAsync();
+            var userInput = update.CallbackQuery;
+            if (userInput == null)
+            {
                 await Chat.SendMessageAsync(Chat.Texts.PressTranslateToMoveStartTranslation);
-        }
-    }
-    
-    async Task HandleWordButton(Update update, FreqWordsState state, FrequentWord frequentWord) {
-        if (update.CallbackQuery.Data == SelectLearningSetData) {
-            await AddWordToUser(frequentWord);
-            //Todo почему то не работает
-            await Chat.AnswerCallbackQueryWithTooltip(
-                update.CallbackQuery.Id, Chat.Texts.WordIsAddedForLearning(frequentWord.Word));
-            await MoveOnNextWord(state, FreqWordResult.Learning, frequentWord);
-        }
-        else if (update.CallbackQuery.Data == MoveNextData) {
-            await Chat.AnswerCallbackQueryWithTooltip(
-                update.CallbackQuery.Id, Chat.Texts.WordIsSkippedForLearning(frequentWord.Word));
-            await MoveOnNextWord(state, FreqWordResult.Known, frequentWord);
-        }
-        else
-            await Chat.ConfirmCallback(update.CallbackQuery.Id);
-
-        DictionaryWord word = null;
-        IReadOnlyList<Translation> translations = null;
-        while (word == null)
-        {
-            (word, translations) =
-                await _localDictionaryService.GetTranslationWithExamplesByEnWord(frequentWord.Word);
-            if (word == null) //it is an error
-                await MoveOnNextWord(state, FreqWordResult.Known, frequentWord);
-        }
-
-        await Chat.EditMessageTextMarkdown(
-            update.CallbackQuery.Message.MessageId,
-            GetWordMarkdown(word, translations, frequentWord),
-            GetWordKeyboard());
-    }
-
-    
-    private async Task MoveOnNextWord(FreqWordsState state, FreqWordResult result, FrequentWord frequentWord)
-    {
-        state.AddHistory(frequentWord.OrderNumber, result);
-        
-        //todo
-        return;
-    }
-
-    private Task<bool> HasUserWord(FrequentWord current) =>
-        _usersWordsService.Contains(Chat.User, current.Word.ToLower());
-
-    
-    private async Task AddWordToUser(FrequentWord word)
-    {
-        //todo
-    }
-
-
-    private InlineKeyboardButton[][] GetWordKeyboard() =>
-        new[]
-        {
-            new[]
-            {
-                InlineButtons.Button($"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}", SelectLearningSetData)
-            },
-            new[]
-            {
-                InlineButtons.Button($"{Emojis.SoftNext}  {Chat.Texts.Skip}", MoveNextData)
-            },
-            new[]
-            {
-                InlineButtons.MainMenu(Chat.Texts),
+                continue;
             }
-        };
-    
-    private Markdown GetWordMarkdown(
-        DictionaryWord dictionaryWord,
-        IReadOnlyList<Translation> translations,
-        FrequentWord wordInLearningSet) {
-        var engWord = dictionaryWord.Word;
-        var transcription = dictionaryWord.Transcription;
-        var allowedTranslations = SearchForAllowedTranslations(translations, wordInLearningSet);
-        var example = GetExampleOrNull(wordInLearningSet, allowedTranslations);
+
+            if (userInput.Data == SelectLearningSetData)
+            {
+                //Todo почему то не работает
+                await Chat.AnswerCallbackQueryWithTooltip(
+                    userInput.Id, Chat.Texts.WordIsAddedForLearning(_current.FrequentWord.Word));
+                await SaveCurrent(FreqWordResult.ToLearn);
+            }
+            else if (userInput.Data == MoveNextData)
+            {
+                await Chat.AnswerCallbackQueryWithTooltip(
+                    userInput.Id, Chat.Texts.WordIsSkippedForLearning(_current.FrequentWord.Word));
+                await SaveCurrent(FreqWordResult.Skip);
+            }
+            else
+                await Chat.ConfirmCallback(userInput.Id);
+
+            await MoveToNextFrequentWord();
+            await Chat.EditMessageTextMarkdown(userInput.Message.MessageId,
+                GetCurrentMessage(), GetCurrentKeyboard());
+            // await HandleWordButton(userInput);
+            //todo - Это должно сразу переводиться. Значит нужно выносить обработчики страниц в обработчики ???
+        }
+    }
+
+    private Markdown GetCurrentMessage()
+    {
+        var engWord =  _current.DictionaryWord.Word;
+        var transcription = _current.DictionaryWord.Transcription;
+        var allowedTranslations = SearchForAllowedTranslations(_current.Translations, _current.FrequentWord);
+        var example = GetExampleOrNull(_current.FrequentWord, allowedTranslations);
 
         var msgWithMarkdownFormatted = new StringBuilder();
 
@@ -160,19 +112,127 @@ public class AddWordFromFrequentWordsFlow
         return Markdown.Bypassed(msgWithMarkdownFormatted.ToString());
     }
 
+    private async Task MoveToNextFrequentWord()
+    {
+        for (int i = 0; i < 20; i++)
+        {
+            var word = await SearchNextFrequentWord();
+            if (word != null)
+            {
+                _current = word;
+                return;
+            }
+        }
+        // за 20 попыток мы не смогли найти ни одного подходящего слова. Либо пользователь выучил вообще все, любо у нас ошибка
+        throw new UserCannotFindFrequentWordException();
+    }
+    private async Task<CurrentFrequentWord> SearchNextFrequentWord()
+    {
+        var order = -1;
+        //если слов меньше 10, то берем рандомные слова
+        //далее - чем больше слов, тем увеличивается дисперсия
+        if (_selector.Count <= 10)
+            order = Rand.Rnd.Next(0, _selector.MaxSize - 1);
+        else
+        {
+            while (order < 0 || order > _selector.MaxSize - 1)
+            {
+                var dispersion = _selector.Count switch
+                {
+                    < 15 => 60,
+                    < 20 => 50,
+                    < 40 => 15,
+                    _ => 10
+                };
+                var section = _selector.CalcCentralSection();
+                var middle = (section.Left + section.Right) / 2;
+                order = (int)Rand.RandomNormal(middle, (middle * dispersion) / 100);
+            }
+        }
+        //Console.WriteLine("Order: "+ order);    
+
+        var foundNumber = _selector.GetFreeLeft(order) 
+                         ?? _selector.GetFreeRight(order) 
+                         ?? throw new Exception("There are no free numbers");
+        
+        var freqWord = await _frequentWordService.GetWord(foundNumber);
+        if (string.IsNullOrEmpty(freqWord?.Word))
+        {
+            //Слово не найдено, или слово зарезервировано - начинаем заново
+            return null;
+        }
+
+        var (dictionaryWord, translations) = await _localDictionaryService.GetTranslationWithExamplesByEnWord(freqWord.Word);
+        if (dictionaryWord == null)
+        {
+            //Почему то не найден перевод для указанного слова. Это странно но окэй
+            return null;
+        }
+
+        var userWord = await _usersWordsService.GetWordNullByEngWord(Chat.User, dictionaryWord.Word.ToLower());
+        if (userWord != null)
+        {
+            // Указанное слово уже изучается пользователем
+            if(userWord.AbsoluteScore> WordLeaningGlobalSettings.LearnedWordMinScore)
+                _selector.Add(foundNumber, FreqWordResult.AlreadyLearned);
+            else
+                _selector.Add(foundNumber, FreqWordResult.AlreadyLearning);
+            return null;
+        }
+        
+        return new CurrentFrequentWord(freqWord, dictionaryWord, translations.ToArray());
+    }
+        
+
+    
+    private async Task SaveCurrent(FreqWordResult status)
+    {
+        _selector.Add(_current.FrequentWord.OrderNumber, status);
+        if (status == FreqWordResult.ToLearn)
+        {
+            // add word to user learning
+            foreach (var translation in _current.Translations) {
+                await _addWordService.AddTranslationToUser(Chat.User, translation);
+            }
+        }
+        // save user freq word progress
+        Chat.User.AddFrequentWord(_current.FrequentWord.OrderNumber, status);
+        await _userService.Update(Chat.User);
+    }
+
+
+    private InlineKeyboardButton[][] GetCurrentKeyboard() =>
+        new[]
+        {
+            new[]
+            {
+                InlineButtons.Button($"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}", SelectLearningSetData)
+            },
+            new[]
+            {
+                InlineButtons.Button($"{Emojis.SoftNext}  {Chat.Texts.Skip}", MoveNextData)
+            },
+            new[]
+            {
+                InlineButtons.MainMenu(Chat.Texts),
+            }
+        };
+
     private static Example GetExampleOrNull(
-        FrequentWord wordInLearningSet, Translation[] allowedTranslations) {
+        FrequentWord wordInLearningSet, Translation[] allowedTranslations)
+    {
         var allowed = allowedTranslations.SelectMany(t => t.Examples)
             .Where(e => wordInLearningSet.AllowedExamples.Contains(e.Id));
         var bestFit = allowed.Where(
-            a => a.TranslatedPhrase.Contains(
-                a.TranslatedWord, StringComparison.InvariantCultureIgnoreCase))
+                a => a.TranslatedPhrase.Contains(
+                    a.TranslatedWord, StringComparison.InvariantCultureIgnoreCase))
             .MinBy(e => e.TranslatedPhrase.Length);
         return bestFit ?? allowed.MinBy(e => e.TranslatedPhrase.Length);
     }
 
     private static Translation[] SearchForAllowedTranslations(
-        IReadOnlyList<Translation> translations, FrequentWord wordInLearningSet) {
+        IReadOnlyList<Translation> translations, FrequentWord wordInLearningSet)
+    {
         var allowedTranslations = translations.Where(
                 t =>
                     wordInLearningSet.AllowedTranslations.Any(
@@ -187,15 +247,9 @@ public class AddWordFromFrequentWordsFlow
             allowedTranslations = new[] { translations.First() };
         return allowedTranslations;
     }
+    
+    record CurrentFrequentWord(FrequentWord FrequentWord, DictionaryWord DictionaryWord, Translation[] Translations);
 }
 
-class CurrentFreqState
-{
-    public CurrentFreqState(FrequentWord current)
-    {
-        Current = current;
-    }
-    
-    public FrequentWord Current { get; set; }
-    public int PrevPosition { get; set; }
-}
+public class UserCannotFindFrequentWordException : Exception{}
+

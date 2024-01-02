@@ -4,14 +4,14 @@ using SayWhat.Bll.Services;
 
 namespace Chotiskazal.Bot.CommandHandlers;
 
-public class InternalAddFrequentWordsHandler : IBotCommandHandler {
+public class AddFrequentWordsCommandHandler : IBotCommandHandler {
     private readonly FrequentWordService _frequentWordService;
     private readonly UserService _userService;
     private readonly UsersWordsService _usersWordsService;
     private readonly AddWordService _addWordService;
     private readonly LocalDictionaryService _localDictionary;
 
-    public InternalAddFrequentWordsHandler(   
+    public AddFrequentWordsCommandHandler(   
         FrequentWordService frequentWordService,
         UserService userService,
         UsersWordsService usersWordsService,
@@ -25,7 +25,7 @@ public class InternalAddFrequentWordsHandler : IBotCommandHandler {
         _localDictionary = localDictionary;
     }
 
-    public bool Acceptable(string text) => text == "/addfreq";
+    public bool Acceptable(string text) => text == BotCommands.New;
     
     public string ParseArgument(string text) => null;
 

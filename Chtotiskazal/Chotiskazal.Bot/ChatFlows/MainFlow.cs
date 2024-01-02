@@ -132,18 +132,18 @@ public class MainFlow
             new StatsBotCommandHandler(_settings.ExamSettings),
             new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings, _questionSelector),
             _addWordCommandHandler,
-            new ShowLearningSetsBotCommandHandler(_learningSetService),
             new ShowWellLearnedWordsCommandHandler(_usersWordsService, _wellKnownWordsUpdateHook),
-            new SelectLearningSet(
-                _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
             new StartBotCommandHandler(ShowMainMenu),
             new ChlangBotCommandHandler(_userService),
             ReportBotCommandHandler.Instance,
             new SettingsBotCommandHelper(_userService),
             new RemoveWordCommandHandler(_usersWordsService),
+            new AddFrequentWordsCommandHandler(_frequentWordService, _userService, _usersWordsService, _addWordsService, _localDictionaryService),
             new InternalMutualCommandHandler(_mutualPhrasesService),
             new InternalStatsUpdateCommandHandler(_userService, _usersWordsService),
-            new InternalAddFrequentWordsHandler(_frequentWordService, _userService, _usersWordsService, _addWordsService, _localDictionaryService)
+            //new ShowLearningSetsBotCommandHandler(_learningSetService),
+            // new SelectLearningSet(
+            //     _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
         };
     }
 

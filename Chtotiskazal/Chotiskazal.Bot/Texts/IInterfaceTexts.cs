@@ -80,7 +80,7 @@ public interface IInterfaceTexts {
     string SelectWordInLearningSet { get; }
     string Skip { get; }
     string ChooseLearningSet { get; }
-    string LearningSetsButton { get; }
+    string FrequentWordsButton { get; }
     string RussianInputExpected { get; }
     string EnglishInputExpected { get; }
     string TodaysGoal { get; }
