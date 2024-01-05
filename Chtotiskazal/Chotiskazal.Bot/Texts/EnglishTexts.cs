@@ -150,7 +150,7 @@ public class EnglishTexts : IInterfaceTexts {
         Markdown.Escaped("I am a translator and teacher.\r\n" +
                          "First you can use me as a regular translator." +
                          "After that " +
-                         "learn this words and it helps you to speak English easily.");
+                         "learn these words and it helps you to speak English easily.");
 
     public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
         .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group")
@@ -279,20 +279,7 @@ public class EnglishTexts : IInterfaceTexts {
         "sat",
         "sun"
     };
-        
-    public string ZenRecomendationAfterExamWeNeedMoreNewWords => 
-        $"Your words are well learned! It is time to press {BotCommands.AddNewWords} and add 10-15 new words from word sets to learn";
 
-    public string Zen1WeNeedMuchMoreNewWords => "We need much more new words!";
-    public string Zen2TranslateNewWords => "Add new words";
-    public string Zen3TranslateNewWordsAndPassExams => "Add new words and pass exams.";
-
-    public string Zen3EverythingIsGood => "Everything is perfect! " +
-                                          "\r\nTranslate new words and pass exams.";
-
-    public string Zen4PassExamsAndTranslateNewWords => "Pass exams and translate new words.";
-    public string Zen5PassExams => "I recommend you to pass exams";
-    public string Zen6YouNeedToLearn => "Learning learning learning!";
     public string StatsYourStats => "Your stats";
     public string StatsWordsAdded => "Words added";
     public string StatsLearnedWell => "Learned well";

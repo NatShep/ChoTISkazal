@@ -14,7 +14,7 @@ using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Chotiskazal.Bot.ChatFlows;
+namespace Chotiskazal.Bot.ChatFlows.FlowLearning;
 
 public class AddWordFromFrequentWordsFlow
 {

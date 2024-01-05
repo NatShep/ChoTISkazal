@@ -147,7 +147,7 @@ public class RussianTexts : IInterfaceTexts
             $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода.\r\n\r\n" +
             "2⃣ Затем, когда будет времечко нажми на кнопку ")
         .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
-        .AddEscaped($" или набери команду {BotCommands.Learn}, что бы начать учить переведенные ранее слова.\r\n\r\n" +
+        .AddEscaped($" или набери команду {BotCommands.Learn}, что учить слова.\r\n\r\n" +
                     $"3⃣ Следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
                     $"4⃣ Введи команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
                     "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
@@ -162,7 +162,7 @@ public class RussianTexts : IInterfaceTexts
         Markdown.Escaped("Я переводчик и учитель.\r\n" +
                          "Можешь использовать меня как русско-английский переводчик.\r\n\r\n" +
                          $"Затем, когда будет свободная минутка, нажми на кнопку \"Ботать {Emojis.Learning}\" или " +
-                         $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова");
+                         $"набери команду {BotCommands.Learn} что бы учить слова");
 
     public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
         .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу")
@@ -271,7 +271,7 @@ public class RussianTexts : IInterfaceTexts
     public string NoButton => "Нет";
     public string StartButton => "Start";
     public string CancelButton => "Отмена";
-    public string OneMoreLearnButton => "Еще разок";
+    public string OneMoreLearnButton => "Продолжить изучение";
     public string TranslateButton => "Перевод";
     public string ContinueButton => "Продолжить";
     public string LearnButton => "Ботать";
@@ -296,19 +296,6 @@ public class RussianTexts : IInterfaceTexts
         "вск"
     };
 
-    public string ZenRecomendationAfterExamWeNeedMoreNewWords =>
-        $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.AddNewWords}!";
-
-    public string Zen1WeNeedMuchMoreNewWords => $"Нам нужно сильно больше слов! Срочно нажимай {BotCommands.AddNewWords}";
-    public string Zen2TranslateNewWords => $"Хватит ботать! Пора изучать новые слова в команде {BotCommands.AddNewWords}";
-    public string Zen3TranslateNewWordsAndPassExams => "Отличный баланс новых слов и их выученности";
-
-    public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +
-                                                  $"\r\nПереводите и ботайте.";
-
-    public string Zen4PassExamsAndTranslateNewWords => "Тренируйтесь и переводите.";
-    public string Zen5PassExams => "Вам бы поботать";
-    public string Zen6YouNeedToLearn => "Только ботать! Только хардкор";
     public string StatsYourStats => "Ваши статы";
     public string StatsWordsAdded => "Добавлено слов";
     public string StatsLearnedWell => "Выучено";

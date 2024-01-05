@@ -59,6 +59,7 @@ public class UserModel
     [BsonElement("remindFr")] private int? _remindFrequency;
     [BsonElement("remindLast")] private DateTime? _lastReminder;
     [BsonElement("mgs")] private int _maxGoalStreak;
+    [BsonElement("exr")] private int _examsInARow = -1;
 
 
     [BsonDefaultValue(false)] [BsonIgnoreIfDefault] [BsonElement("engInterface")]
@@ -97,7 +98,11 @@ public class UserModel
     private static readonly HashSet<int> AllowedFreqWordsResults = 
         Enum.GetValues<FreqWordResult>().Select(e=>(int)e).ToHashSet();
     
-    
+    public int ExamsInARow
+    {
+        get => _examsInARow;
+        set => _examsInARow = value;
+    }
     public IEnumerable<UserFreqWord> OrderedFrequentItems
     {
         get
@@ -150,11 +155,10 @@ public class UserModel
         get => _maxGoalStreak;
         set => _maxGoalStreak = value;
     }
-
+    
     public int WordsLearned => _totalScoreBaskets.BasketCountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
-
-    public double GamingScore => _gamingScore;
-
+    public int LearningDone => _learningDone;
+    
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
 
     private void OnQuestionActivity()

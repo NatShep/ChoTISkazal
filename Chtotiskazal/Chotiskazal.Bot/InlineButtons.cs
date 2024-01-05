@@ -23,9 +23,6 @@ public static class InlineButtons {
     public static InlineKeyboardButton Translation(string text) =>
         Button(text, BotCommands.Translate);
 
-    public static InlineKeyboardButton LearningSets(IInterfaceTexts texts) =>
-        Button($"{texts.FrequentWordsButton} {Emojis.LearningSets}", BotCommands.AddNewWords);
-
     public static InlineKeyboardButton Settings(IInterfaceTexts texts) =>
         Button($"{texts.SettingsButton} {Emojis.Gear}", BotCommands.Settings);
 

@@ -24,7 +24,7 @@ public class MainFlow
         LearningSetService learningSetService,
         ButtonCallbackDataService buttonCallbackDataService,
         MutualPhrasesService mutualPhrasesService,
-        QuestionSelector questionSelector, 
+        QuestionSelector questionSelector,
         FrequentWordService frequentWordService)
     {
         ChatIo = chatIo;
@@ -130,7 +130,9 @@ public class MainFlow
         {
             HelpBotCommandHandler.Instance,
             new StatsBotCommandHandler(_settings.ExamSettings),
-            new LearnBotCommandHandler(_userService, _usersWordsService, _settings.ExamSettings, _questionSelector),
+            new LearnBotCommandHandler(
+                _userService, _usersWordsService, _questionSelector, _settings.ExamSettings,
+                _frequentWordService, _addWordsService, _localDictionaryService),
             _addWordCommandHandler,
             new ShowWellLearnedWordsCommandHandler(_usersWordsService, _wellKnownWordsUpdateHook),
             new StartBotCommandHandler(ShowMainMenu),
@@ -139,13 +141,8 @@ public class MainFlow
             new SettingsBotCommandHelper(_userService),
             new RemoveWordCommandHandler(_usersWordsService),
             new AddFrequentWordsCommandHandler(
-                _frequentWordService, 
-                _userService, 
-                _usersWordsService, 
-                _addWordsService, 
-                _localDictionaryService, 
-                _questionSelector, 
-                _settings.ExamSettings),
+                _frequentWordService, _userService, _usersWordsService, _addWordsService,
+                _localDictionaryService, _questionSelector, _settings.ExamSettings),
             new InternalMutualCommandHandler(_mutualPhrasesService),
             new InternalStatsUpdateCommandHandler(_userService, _usersWordsService),
             //new ShowLearningSetsBotCommandHandler(_learningSetService),
@@ -185,7 +182,6 @@ public class MainFlow
             {
                 new[] { InlineButtons.Translation(Chat.Texts) },
                 new[] { InlineButtons.Exam(Chat.Texts) },
-                new[] { InlineButtons.LearningSets(Chat.Texts) },
                 Chat.User.WasInterfaceLanguageChanged ? null : new[] { InlineButtons.Chlang(Chat.Texts) },
                 new[] { InlineButtons.Stats(Chat.Texts), InlineButtons.HowToUse(Chat.Texts) },
                 new[] { InlineButtons.Settings(Chat.Texts) }

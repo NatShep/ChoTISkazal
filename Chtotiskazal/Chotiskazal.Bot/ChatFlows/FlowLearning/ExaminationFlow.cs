@@ -12,7 +12,7 @@ using SayWhat.MongoDAL.Words;
 
 namespace Chotiskazal.Bot.ChatFlows.FlowLearning;
 
-public class ExamFlow
+public class ExaminationFlow
 {
     private readonly ExamSettings _regularExamSettings;
     private readonly QuestionSelector _questionSelector;
@@ -21,7 +21,7 @@ public class ExamFlow
     private readonly UsersWordsService _usersWordsService;
     private readonly ExamSettings _noInputExamSettings;
 
-    public ExamFlow(
+    public ExaminationFlow(
         ChatRoom chat,
         UserService userService,
         UsersWordsService usersWordsService,
@@ -289,3 +289,9 @@ public class ExamFlow
         return examsList;
     }
 }
+
+public record ExamResults(
+    UserWordModel[] Words,
+    Dictionary<string, double> OriginWordsScore,
+    int QuestionsPassed,
+    int QuestionsCount);
