@@ -24,7 +24,7 @@ public static class InlineButtons {
         Button(text, BotCommands.Translate);
 
     public static InlineKeyboardButton LearningSets(IInterfaceTexts texts) =>
-        Button($"{texts.FrequentWordsButton} {Emojis.LearningSets}", BotCommands.New);
+        Button($"{texts.FrequentWordsButton} {Emojis.LearningSets}", BotCommands.AddNewWords);
 
     public static InlineKeyboardButton Settings(IInterfaceTexts texts) =>
         Button($"{texts.SettingsButton} {Emojis.Gear}", BotCommands.Settings);
@@ -55,4 +55,9 @@ public static class InlineButtons {
 
     public static InlineKeyboardButton Chlang(IInterfaceTexts texts) =>
         Button(texts.ChangeLanguageButton, BotCommands.Chlang);
+
+    public const string StartExaminationButtonData = "/startExamination";
+    
+    public static InlineKeyboardButton StartExaminationButton(IInterfaceTexts texts) =>
+        Button(texts.StartButton, StartExaminationButtonData);
 }

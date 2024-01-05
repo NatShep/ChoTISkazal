@@ -5,7 +5,8 @@ using SayWhat.Bll.Strings;
 
 namespace Chotiskazal.Bot.Texts;
 
-public class RussianTexts : IInterfaceTexts {
+public class RussianTexts : IInterfaceTexts
+{
     public string more => "больше";
     public string less => "меньше";
 
@@ -19,7 +20,9 @@ public class RussianTexts : IInterfaceTexts {
     public string InterfaceLanguageSetuped => "Язык интрфейса - русский.";
     public string NoWellKnownWords => "Выученных слов нет! Нажми \"учить\" и проходи тесты.";
     public string JustOneLearnedWord => "Выучено только одно слово! Какая жалость.";
-    public string SelectWordInLearningSet => "Хочу учить";
+    public string SelectToLearnWordInLearningSet => "Хочу учить";
+    public string SelectWordIsKnownInLearningSet => "Я знаю это";
+
     public string Skip => "Пропустить";
     public string ChooseLearningSet => "Выберите набор слов для изучения";
     public string RussianInputExpected => "Ожидался ответ на русском";
@@ -28,7 +31,8 @@ public class RussianTexts : IInterfaceTexts {
     public string Exams => "экзаменов";
     public string TodayGoalReached => "Цель на день - достигнута!";
 
-    public Markdown OutOfScopeWithCandidate(string otherMeaning) {
+    public Markdown OutOfScopeWithCandidate(string otherMeaning)
+    {
         return Markdown.Escaped("Перевод-то правильный, но учим мы не его (имелось ввиду ")
             .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
             .AddEscaped("?).\r\nОжидаемые переводы");
@@ -68,9 +72,13 @@ public class RussianTexts : IInterfaceTexts {
     public string ReminderLearn => "Вы не забыли про меня? Предлагаю повторить слова!\r\n";
     public string PressTranslateToMoveStartTranslation => $"Нажмите {BotCommands.Translate} для перевода слова";
     public string ToLearnPhrase => "Я хочу это учить";
+    public Markdown YourNewWords { get; } = Markdown.Escaped("Новые добавленные слова");
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
+
+    public Markdown GoToLearnAfterAddition { get; } = Markdown.Escaped("Теперь давайте закрепим эти новые слова");
+
 
     public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
         Markdown.Escaped("Фраза").NewLine() +
@@ -144,7 +152,8 @@ public class RussianTexts : IInterfaceTexts {
                     $"4⃣ Введи команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
                     "\uD83D\uDE09Да, я бесплатен. Меня сделали для себя и для друзей. " +
                     "Надеюсь это порадует вас и вы выучите миллион слов!").NewLine().NewLine()
-        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу").NewLine()
+        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу")
+        .NewLine()
         .AddEscaped("https://t.me/chtotiskazalna").NewLine().NewLine()
         .AddEscaped("или создайте задачу тут").NewLine()
         .AddEscaped("https://github.com/NatShep/ChoTISkazal/issues");
@@ -156,10 +165,11 @@ public class RussianTexts : IInterfaceTexts {
                          $"набери команду {BotCommands.Learn} что бы начать учить переведенные ранее слова");
 
     public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
-        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу").NewLine()
+        .AddEscaped($"Если у вас возникли вопросы, предложения или вы обнаружили проблему - заходите в нашу группу")
+        .NewLine()
         .AddEscaped("https://t.me/chtotiskazalna");
 
-    
+
     public string ActionIsNotAllowed => "Действие не разрешено";
 
     public string OopsSomethingGoesWrong =>
@@ -225,15 +235,17 @@ public class RussianTexts : IInterfaceTexts {
             if (currentHasGap)
                 msg += Markdown.Escaped("c учетом выходных");
         }
+
         if (maxGoalStreak > 0)
             msg += Markdown.Escaped("Рекорд выполненных дней подряд: " + maxGoalStreak).NewLine();
         return msg;
     }
 
-    public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Поздравляю! Вы ответили на все вопросы без ошибок!");
+    public Markdown CongratulateAllQuestionPassed =>
+        Markdown.Escaped("Поздравляю! Вы ответили на все вопросы без ошибок!");
 
     public Markdown TwoExamsToGoal => Markdown.Escaped("Еще чуть-чуть! Осталось два ботания до цели дня!");
-    
+
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Слово {Emojis.OpenQuote}{word}{Emojis.CloseQuote} добавлено для изучения";
 
@@ -285,10 +297,10 @@ public class RussianTexts : IInterfaceTexts {
     };
 
     public string ZenRecomendationAfterExamWeNeedMoreNewWords =>
-        $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.New}!";
+        $"Хватит ботать старье. Пора изучать новые слова в команде {BotCommands.AddNewWords}!";
 
-    public string Zen1WeNeedMuchMoreNewWords => $"Нам нужно сильно больше слов! Срочно нажимай {BotCommands.New}";
-    public string Zen2TranslateNewWords => $"Хватит ботать! Пора изучать новые слова в команде {BotCommands.New}";
+    public string Zen1WeNeedMuchMoreNewWords => $"Нам нужно сильно больше слов! Срочно нажимай {BotCommands.AddNewWords}";
+    public string Zen2TranslateNewWords => $"Хватит ботать! Пора изучать новые слова в команде {BotCommands.AddNewWords}";
     public string Zen3TranslateNewWordsAndPassExams => "Отличный баланс новых слов и их выученности";
 
     public string Zen3EverythingIsGood { get; } = $"Хорошо идёте! " +

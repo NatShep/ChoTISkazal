@@ -165,7 +165,7 @@ public class AddFromLearningSetFlow {
         {
             new[]
             {
-                InlineButtons.Button($"{Emojis.HeavyPlus} {Chat.Texts.SelectWordInLearningSet}", SelectLearningSetData)
+                InlineButtons.Button($"{Emojis.HeavyPlus} {Chat.Texts.SelectToLearnWordInLearningSet}", SelectLearningSetData)
             },
             new[]
             {

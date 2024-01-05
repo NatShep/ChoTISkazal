@@ -79,7 +79,6 @@ public class UsersWordsService {
     public Task<UserWordModel> GetWordNullByEngWord(UserModel user, string enWord)
         => _userWordsRepository.GetWordOrDefault(user, enWord);
     
-
     public async Task<UserWordModel[]> GetWordsWithPhrasesAsync(
         UserModel user,
         int count,
@@ -119,11 +118,38 @@ public class UsersWordsService {
         await IncludeExamples(words);
         return words.ToArray();
     }
+    
+    public Task<UserWordModel[]> GetWellDoneWords(UserModel user, int maxCount, int maxTranslations) =>
+        GetWordsWithPhrasesAsync(
+            user,
+            maxCount,
+            WordSortingType.Ascending,
+            WordLeaningGlobalSettings.WellDoneWordMinScore,
+            WordLeaningGlobalSettings.LearnedWordMinScore,
+            maxTranslations);
 
-    public async Task<UserWordModel[]> GetRandomWordsWithPhrasesAsync(
+    public Task<UserWordModel[]> GetLearningWords(UserModel user, int maxCount, int maxTranslations) =>
+        GetWordsWithPhrasesAsync(
+            user,
+            maxCount,
+            WordSortingType.Ascending,
+            WordLeaningGlobalSettings.LearningWordMinScore,
+            WordLeaningGlobalSettings.WellDoneWordMinScore,
+            maxTranslations);
+
+    public Task<UserWordModel[]> GetBeginnerWords(UserModel user, int maxCount, int maxTranslations) =>
+        GetRandomWordsWithPhrasesAsync(
+            user: user,
+            count: maxCount,
+            maxTranslations: maxTranslations,
+            sortType: WordSortingType.Descending,
+            lowRating: WordLeaningGlobalSettings.StartScoreForWord,
+            highRating: WordLeaningGlobalSettings.LearningWordMinScore);
+
+
+    private async Task<UserWordModel[]> GetRandomWordsWithPhrasesAsync(
         UserModel user,
         int count,
-        int fromNumber,
         int maxTranslations,
         WordSortingType sortType,
         double lowRating,
@@ -138,12 +164,11 @@ public class UsersWordsService {
         }
 
         var wordsForLearning = (await _userWordsRepository.GetWordsBetweenLowAndHighScores(user,
-                fromNumber,
+                count,
                 lowRating,
                 highRating,
                 sorting))
             .Shuffle()
-            .Take(count)
             .ToList();
 
         foreach (var wordForLearning in wordsForLearning) {

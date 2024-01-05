@@ -8,19 +8,24 @@ namespace Chotiskazal.Bot.Questions;
 
 public class ExamQuestionsSet
 {
-    public ExamQuestionsSet(Question[] beginner, Question[] intermediate, Question[] advanced)
+    public ExamQuestionsSet(Question[] firstOnes, Question[] beginner, Question[] intermediate, Question[] advanced)
     {
+        FirstOnes = firstOnes;
         Beginner = beginner;
         Intermediate = intermediate;
         Advanced = advanced;
     }
 
+    private Question[] FirstOnes { get; }
     private Question[] Beginner { get; }
     private Question[] Intermediate { get; }
     private Question[] Advanced { get; }
 
     public Question GetNextQuestionFor(UserWordModel model)
     {
+        if (model.QuestionAsked == 0 || model.QuestionPassed == 0)
+            return PhraseOrWordQuestions(FirstOnes, model.IsWord).GetRandomItemOrNull();
+        
         if (model.AbsoluteScore < WordLeaningGlobalSettings.LearningWordMinScore)
             return PhraseOrWordQuestions(Beginner, model.IsWord).GetRandomItemOrNull();
 

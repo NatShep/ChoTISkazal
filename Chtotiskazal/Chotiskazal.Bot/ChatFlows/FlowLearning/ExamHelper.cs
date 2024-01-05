@@ -1,52 +1,117 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Chotiskazal.Bot.ConcreteQuestions;
+using Chotiskazal.Bot.Questions;
 using Chotiskazal.Bot.Texts;
 using SayWhat.Bll.Services;
 using SayWhat.Bll.Strings;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.Words;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot.ChatFlows.FlowLearning;
 
-public static class ExamResultHelper
+public static class ExamHelper
 {
-    public static async Task SendMotivation(ChatRoom chat, string emoji, Markdown message)
+    public static Markdown GetCarefullyLearnTheseWordsMessage(
+        IInterfaceTexts texts, ExamType examType, UserWordModel[] newLearningWords)
+    {
+        var markdown = Markdown.Escaped($"{Emojis.Learning}").ToSemiBold().Space();
+
+        markdown += examType == ExamType.NoInput
+            ? Markdown.Escaped(texts.FastExamLearningHeader).ToSemiBold().NewLine()
+            : Markdown.Escaped(texts.WriteExamLearningHeader).ToSemiBold();
+
+        markdown = markdown.NewLine() + texts.CarefullyStudyTheList
+            .NewLine()
+            .NewLine();
+
+        var messageWithListOfWords = newLearningWords.Shuffle()
+            .Aggregate(Markdown.Empty, (current, pairModel) =>
+                current + Markdown.Escaped($"{pairModel.Word}\t\t:{pairModel.AllTranslationsAsSingleString}\r\n"));
+        markdown += messageWithListOfWords.ToQuotationMono();
+        return markdown;
+    }
+
+    public static Markdown GetExamStartsMessage(
+        IInterfaceTexts texts, ExamType examType, UserWordModel[] newLearningWords)
+    {
+        var markdown = GetCarefullyLearnTheseWordsMessage(texts, examType, newLearningWords);
+        markdown = markdown.NewLine().AddEscaped($"... {texts.thenClickStart}");
+
+        if (examType != ExamType.NoInput)
+        {
+            markdown = markdown.NewLine().NewLine() +
+                       texts.TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(
+                           QuestionScenarioHelper.IDontKnownSubcommand);
+        }
+
+        return markdown;
+    }
+
+    public static InlineKeyboardButton[][] GetStartExaminationButtons(IInterfaceTexts texts) =>
+        new[]
+        {
+            new[]
+            {
+                InlineButtons.StartExaminationButton(texts),
+                InlineButtons.Button(texts.CancelButton, BotCommands.Start)
+            }
+        };
+
+    public static async Task SendMotivationMessages(ChatRoom chat, ExamSettings settings, ExamResults examResults)
+    {
+        if (examResults.QuestionsCount == examResults.QuestionsPassed)
+            await SendMotivation(chat, "\U0001F973", chat.Texts.CongratulateAllQuestionPassed);
+
+        if (chat.User.GetToday().LearningDone == settings.ExamsCountGoalForDay - 2)
+            await SendMotivation(chat, "\U0001F90F", chat.Texts.TwoExamsToGoal);
+
+        if (chat.User.GetToday().LearningDone == settings.ExamsCountGoalForDay)
+            await SendMotivation(chat, "\U00002705", Markdown.Escaped(chat.Texts.TodayGoalReached));
+    }
+
+    private static async Task SendMotivation(ChatRoom chat, string emoji, Markdown message)
     {
         await chat.SendMessageAsync(emoji);
         await chat.SendMarkdownMessageAsync(message, InlineButtons.Button(chat.Texts.ContinueButton, "/$continue"));
         await chat.WaitInlineKeyboardInput();
     }
 
-    public static Markdown CreateLearningResultsMessage(
-        ChatRoom chat,
-        ExamSettings examSettings,
-        UserWordModel[] wordsInExam,
-        Dictionary<string, double> originWordsScore,
-        int questionsPassed,
-        int questionsCount
-    )
+    public static InlineKeyboardButton[][] GetButtonsForExamResultMessage(IInterfaceTexts texts) =>
+        new[]
+        {
+            new[] { InlineButtons.Exam($"🔁 {texts.OneMoreLearnButton}") },
+            new[]
+            {
+                InlineButtons.Stats(texts),
+                InlineButtons.Translation(texts)
+            }
+        };
+
+    public static Markdown CreateLearningResultsMessage(ChatRoom chat, ExamSettings examSettings, ExamResults results)
     {
         var message = Markdown.Escaped($"{chat.Texts.LearningDone}:").ToSemiBold()
-                          .AddEscaped($" {questionsPassed}/{questionsCount}")
+                          .AddEscaped($" {results.QuestionsPassed}/{results.QuestionsCount}")
                           .NewLine() +
                       Markdown.Escaped($"{chat.Texts.WordsInTestCount}:").ToSemiBold()
-                          .AddEscaped($" {wordsInExam.Length}")
+                          .AddEscaped($" {results.Words.Length}")
                           .NewLine();
 
         var forgottenWords = new List<UserWordModel>();
         var newWellLearnedWords = new List<UserWordModel>();
 
-        foreach (var word in wordsInExam)
+        foreach (var word in results.Words)
         {
             if (word.AbsoluteScore >= WordLeaningGlobalSettings.WellDoneWordMinScore)
             {
-                if (originWordsScore[word.Word] < WordLeaningGlobalSettings.WellDoneWordMinScore)
+                if (results.OriginWordsScore[word.Word] < WordLeaningGlobalSettings.WellDoneWordMinScore)
                     newWellLearnedWords.Add(word);
             }
             else
             {
-                if (originWordsScore[word.Word] > WordLeaningGlobalSettings.WellDoneWordMinScore)
+                if (results.OriginWordsScore[word.Word] > WordLeaningGlobalSettings.WellDoneWordMinScore)
                     forgottenWords.Add(word);
             }
         }
@@ -57,7 +122,7 @@ public static class ExamResultHelper
         return message;
     }
 
-    private static Markdown GetGoalStreakMessage(ChatRoom chat, ExamSettings examSettings)
+    public static Markdown GetGoalStreakMessage(ChatRoom chat, ExamSettings examSettings)
     {
         var todayStats = chat.User.GetToday();
 

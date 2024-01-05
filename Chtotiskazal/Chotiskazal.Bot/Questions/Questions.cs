@@ -258,6 +258,17 @@ public static class Questions {
             PassScore: 2.0,
             FailScore: 0.7
         );
+    
+    /// <summary>
+    /// Воросы, которые задаются в первый раз для слова.
+    /// Тут только тапательные вопросы
+    /// </summary>
+    public static readonly Question[] FirstQuestions =
+    {
+        IsItRightTranslationExam,
+        EngTrust,
+        RuTrust
+    };
 
     public static readonly Question[] BeginnerQuestions =
     {
@@ -272,6 +283,8 @@ public static class Questions {
         EngChooseByTranscriptionExam,
         PhraseEngChoose,
         PhraseRuChoose,
+        RuEasyWriteMissingLetter,
+        EngEasyWriteMissingLetter
     };
 
     public static readonly Question[] IntermediateQuestions =

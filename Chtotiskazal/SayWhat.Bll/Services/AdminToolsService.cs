@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using SayWhat.MongoDAL;
 using SayWhat.MongoDAL.FrequentWords;
-using SayWhat.MongoDAL.LearningSets;
 using SayWhat.MongoDAL.Users;
 using SayWhat.MongoDAL.Words;
 

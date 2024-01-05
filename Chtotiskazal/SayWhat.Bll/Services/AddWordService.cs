@@ -138,14 +138,14 @@ public class AddWordService {
     public Task<IReadOnlyList<Translation>> FindInLocalDictionaryWithExamples(string word)
         => _localDictionaryService.GetTranslationsWithExamplesByEnWord(word.ToLower());
 
-    public async Task AddTranslationToUser(UserModel user, Translation translation) {
-        if (translation == null) return;
+    public async Task<UserWordModel> AddTranslationToUser(UserModel user, Translation translation) {
+        if (translation == null) return null;
         if (translation.TranslationDirection != TranslationDirection.EnRu)
             throw new InvalidOperationException("Only en-ru direction is supported");
         if (!translation.CanBeSavedToDictionary)
-            return;
+            return null;
         var alreadyExistsWord = await _usersWordsService.GetWordNullByEngWord(user, translation.OriginText);
-
+        UserWordModel answer = null; 
         if (alreadyExistsWord == null) {
             //the Word is new for the user
             var word = new UserWordModel(
@@ -169,6 +169,7 @@ public class AddWordService {
                 statsChange: WordStatsChange.CreateForScore(word.AbsoluteScore),
                 pairsCount: word.RuTranslations.Length,
                 examplesCount: word.RuTranslations.Sum(t => t.Examples?.Length ?? 0));
+            answer = word;
         }
         else {
             // User already have the word.
@@ -189,7 +190,7 @@ public class AddWordService {
 
             if (newTranslations.Count == 0) {
                 await _usersWordsService.UpdateWordMetrics(alreadyExistsWord);
-                return;
+                return null;
             }
 
             alreadyExistsWord.AddTranslations(newTranslations);
@@ -198,9 +199,11 @@ public class AddWordService {
                 statsChange: alreadyExistsWord.Score - originRate,
                 newTranslations.Count,
                 newTranslations.Sum(t => t.Examples?.Length ?? 0));
+            answer = alreadyExistsWord;
         }
 
         await _userService.Update(user);
+        return answer;
     }
 
     public async Task RemoveTranslationFromUser(UserModel user, Translation translation) {

@@ -94,8 +94,27 @@ public class UserModel
     
     #endregion
     
-    public IEnumerable<UserFreqItem> OrderedFrequentItems => (IEnumerable<UserFreqItem>)
-        _frequencyState?.OrderedWords ?? Array.Empty<UserFreqItem>();
+    private static readonly HashSet<int> AllowedFreqWordsResults = 
+        Enum.GetValues<FreqWordResult>().Select(e=>(int)e).ToHashSet();
+    
+    
+    public IEnumerable<UserFreqWord> OrderedFrequentItems
+    {
+        get
+        {
+            if (_frequencyState?.OrderedWords == null)
+                return Array.Empty<UserFreqWord>();
+            
+            var answer = new List<UserFreqWord>();
+            foreach (var word in _frequencyState.OrderedWords)
+            {
+                if(AllowedFreqWordsResults.Contains(word.Result))
+                    answer.Add(new UserFreqWord(word.Number, (FreqWordResult)word.Result));
+            }
+
+            return answer;
+        }
+    }
 
     public bool IsEnglishInterface
     {
@@ -149,8 +168,8 @@ public class UserModel
     public void AddFrequentWord(int frequentWordOrderNumber, FreqWordResult status)
     {
         _frequencyState ??= new UserFrequencyState();
-        _frequencyState.OrderedWords ??= new List<UserFreqItem>();
-        _frequencyState.OrderedWords.Add(new UserFreqItem(frequentWordOrderNumber, status));
+        _frequencyState.OrderedWords ??= new List<UserFreqStoredItem>();
+        _frequencyState.OrderedWords.Add(new UserFreqStoredItem(frequentWordOrderNumber, (int)status));
         _frequencyState.OrderedWords = _frequencyState.OrderedWords.OrderBy(o => o.Number).ToList();
     }
 
@@ -488,29 +507,54 @@ public class UserModel
 [BsonIgnoreExtraElements]
 public class UserFrequencyState
 {
-    [BsonElement("w")] public List<UserFreqItem> OrderedWords { get; set; }
+    [BsonElement("w")] public List<UserFreqStoredItem> OrderedWords { get; set; }
 }
 
 [BsonIgnoreExtraElements]
-public class UserFreqItem
+public class UserFreqStoredItem
 {
-    public UserFreqItem()
+    public UserFreqStoredItem()
     {
         
     }
-    public UserFreqItem(int number, FreqWordResult result)
+    public UserFreqStoredItem(int number, int result)
     {
         Number = number;
         Result = result;
     }
     [BsonElement("n")] public int Number { get; set; }
-    [BsonElement("r")] public FreqWordResult Result { get; set; }
+    [BsonElement("r")] public int Result { get; set; }
+}
+
+public class UserFreqWord
+{
+    public UserFreqWord()
+    {
+        
+    }
+    public UserFreqWord(int number, FreqWordResult result)
+    {
+        Number = number;
+        Result = result;
+    }
+    public int Number { get; set; }
+    public FreqWordResult Result { get; set; }
 }
 
 public enum FreqWordResult
-{
-    ToLearn = 0,
-    Skip = 1,
-    AlreadyLearning = 2,
-    AlreadyLearned = 3,
+{   
+    /// <summary>
+    /// User choose to learn word
+    /// </summary>
+    UserSelectToLearn = 0,
+    /// <summary>
+    /// User choose that word is known
+    /// </summary>
+    UserSelectThatItIsKnown = 10,
+    /// <summary>
+    /// User choose to skip the word
+    /// </summary>
+    UserSelectToSkip = 20,
+    AlreadyLearning = 30,
+    AlreadyLearned = 40,
 }

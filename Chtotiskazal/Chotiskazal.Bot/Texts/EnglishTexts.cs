@@ -19,7 +19,8 @@ public class EnglishTexts : IInterfaceTexts {
     public string InterfaceLanguageSetuped => "Interface language: English";
     public string NoWellKnownWords => "You haven't learned words!";
     public string JustOneLearnedWord => "You have learned just one word!";
-    public string SelectWordInLearningSet => "Learn it";
+    public string SelectToLearnWordInLearningSet => "Learn it";
+    public string SelectWordIsKnownInLearningSet => "I know that";
     public string Skip => "Skip it";
     public string ChooseLearningSet => "Choose learning set";
     public string RussianInputExpected => "Russian input is expected"; 
@@ -69,6 +70,9 @@ public class EnglishTexts : IInterfaceTexts {
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder { get; } =
         Markdown.Escaped("Words in phrase are shuffled. Write them in correct order");
 
+    public Markdown GoToLearnAfterAddition { get; } = Markdown.Escaped("Now let's learn these new words");
+    public Markdown YourNewWords { get; } = Markdown.Escaped("New added words");
+
     public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
         Markdown.Escaped("Phrase").NewLine() +
         Markdown.Escaped(ruPhrase).ToSemiBold().NewLine().NewLine() +
@@ -113,7 +117,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string NoTranslationsFound => "No translations found. Check the word and try again";
     
     public Markdown CarefullyStudyTheList =>
-        Markdown.Escaped("Carefully study translations in the list bellow:");
+        Markdown.Escaped("Study translations in the list bellow:");
 
     public string LearningDone => "Learning done";
     public string WordsInTestCount => "Words in test";
@@ -277,7 +281,7 @@ public class EnglishTexts : IInterfaceTexts {
     };
         
     public string ZenRecomendationAfterExamWeNeedMoreNewWords => 
-        $"Your words are well learned! It is time to press {BotCommands.New} and add 10-15 new words from word sets to learn";
+        $"Your words are well learned! It is time to press {BotCommands.AddNewWords} and add 10-15 new words from word sets to learn";
 
     public string Zen1WeNeedMuchMoreNewWords => "We need much more new words!";
     public string Zen2TranslateNewWords => "Add new words";

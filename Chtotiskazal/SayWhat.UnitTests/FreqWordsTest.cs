@@ -137,12 +137,12 @@ public class FreqWordsTest
     /// <summary>
     /// Immitate unknown word (word that is learning)
     /// </summary>
-    private UserFreqItem Red(int number) => new(number, FreqWordResult.ToLearn);
+    private UserFreqItem Red(int number) => new(number, FreqWordResult.UserSelectToLearn);
 
     /// <summary>
     /// Immitate known word (word that user already knows)
     /// </summary>
     /// <param name="number"></param>
     /// <returns></returns>
-    private UserFreqItem Green(int number) => new(number, FreqWordResult.Skip);
+    private UserFreqItem Green(int number) => new(number, FreqWordResult.UserSelectToSkip);
 }

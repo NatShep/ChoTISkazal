@@ -77,7 +77,8 @@ public interface IInterfaceTexts {
     string ShowWellKnownWords { get; }
     string NoWellKnownWords { get; }
     string JustOneLearnedWord { get; }
-    string SelectWordInLearningSet { get; }
+    string SelectToLearnWordInLearningSet { get; }
+    string SelectWordIsKnownInLearningSet { get; }
     string Skip { get; }
     string ChooseLearningSet { get; }
     string FrequentWordsButton { get; }
@@ -129,6 +130,8 @@ public interface IInterfaceTexts {
     Markdown MainMenuTextForNewUserText { get; }
     Markdown CongratulateAllQuestionPassed { get; }
     Markdown TwoExamsToGoal { get; }
+    Markdown GoToLearnAfterAddition { get; }
+    Markdown YourNewWords { get; }
 
     Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);

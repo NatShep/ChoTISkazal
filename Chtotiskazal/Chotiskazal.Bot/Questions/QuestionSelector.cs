@@ -49,28 +49,33 @@ public class QuestionSelector {
             .ToArray();
     }
 
-    public QuestionSelector(LocalDictionaryService localDictionaryService) {
+    public QuestionSelector(LocalDictionaryService localDictionaryService)
+    {
+        var firstList = Questions.FirstQuestions;
         var beginnerList = Questions.BeginnerQuestions;
         var intermediateList = Questions.IntermediateQuestions;
         var advancedList = Questions.AdvancedQuestions(localDictionaryService);
         AllQuestions = beginnerList.Concat(intermediateList).Concat(advancedList).ToHashSet();
 
-        _allQuestionsSet = new ExamQuestionsSet(beginnerList, intermediateList, advancedList);
+        _allQuestionsSet = new ExamQuestionsSet(firstList, beginnerList, intermediateList, advancedList);
 
         _noInputQuestionsSet =
             new ExamQuestionsSet(
+                firstList,
                 CreateBalancedSet(ExamType.NoInput, beginnerList),
                 CreateBalancedSet(ExamType.NoInput, intermediateList),
                 CreateBalancedSet(ExamType.NoInput, advancedList));
 
         _enInputQuestionsSet =
             new ExamQuestionsSet(
+                firstList,
                 CreateBalancedSet(ExamType.EnInputOnly, beginnerList),
                 CreateBalancedSet(ExamType.EnInputOnly, intermediateList),
                 CreateBalancedSet(ExamType.EnInputOnly, advancedList));
 
         _ruInputQuestionsSet =
             new ExamQuestionsSet(
+                firstList,
                 CreateBalancedSet(ExamType.RuInputOnly, beginnerList),
                 CreateBalancedSet(ExamType.RuInputOnly, intermediateList),
                 CreateBalancedSet(ExamType.RuInputOnly, advancedList));

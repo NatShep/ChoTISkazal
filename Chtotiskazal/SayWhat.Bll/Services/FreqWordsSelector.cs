@@ -8,9 +8,9 @@ namespace SayWhat.Bll.Services;
 public class FreqWordsSelector
 {
     private readonly int _size;
-    private readonly List<UserFreqItem> _orderedHistory;
+    private readonly List<UserFreqWord> _orderedHistory;
 
-    public FreqWordsSelector(List<UserFreqItem> history, int size)
+    public FreqWordsSelector(List<UserFreqWord> history, int size)
     {
         _size = size;
         _orderedHistory = history.OrderBy(h => h.Number).ToList();
@@ -23,7 +23,8 @@ public class FreqWordsSelector
     public CentralKnowledgeSection CalcCentralSection()
     {
         /*
-         * Отрезок разделения классов - минимально возможный отрезок, внутри которого нету провернного слова, при этом красных точек справа будет столько же сколько и синих слева
+         * Отрезок разделения классов - минимально возможный отрезок, внутри которого нету провернного слова,
+         * при этом красных точек справа будет столько же сколько и синих слева
          *
          *  Считаем что в этом отрезке вероятность знания слова равна 50 процентов, справа меньше 50, а слева больше 50.
          *
@@ -107,7 +108,14 @@ public class FreqWordsSelector
         return -1;
     }
 
-    private bool IsRed(int index) => _orderedHistory[index].Result != FreqWordResult.Skip;
+    private bool IsRed(int index)
+    {
+        var result = _orderedHistory[index].Result;
+        if (result is FreqWordResult.AlreadyLearned or FreqWordResult.UserSelectThatItIsKnown)
+            return false;
+        else
+            return true;
+    }
 
     public void Add(int currentOrderNumber, FreqWordResult result)
     {
@@ -121,7 +129,7 @@ public class FreqWordsSelector
             number++;
         }
 
-        var item = new UserFreqItem(currentOrderNumber, result);
+        var item = new UserFreqWord(currentOrderNumber, result);
         if (number >= _orderedHistory.Count)
             _orderedHistory.Add(item);
         else
@@ -144,24 +152,23 @@ public class FreqWordsSelector
 
         return null;
     }
-    
+
     public int? GetFreeRight(int middle)
     {
-        // var order = middle;
-        // while (order >= 0)
-        // {
-        //     var item = FindOrNull(order);
-        //     if (item == null)
-        //     {
-        //         return order;
-        //     }
-        //
-        //     order--;
-        // }
+        var order = middle;
+        while (order < MaxSize)
+        {
+            var item = FindOrNull(order);
+            if (item == null)
+            {
+                return order;
+            }
+            order++;
+        }
 
         return null;
     }
 
-    private UserFreqItem FindOrNull(int number) => _orderedHistory.FirstOrDefault(o => o.Number == number);
+    private UserFreqWord FindOrNull(int number) => _orderedHistory.FirstOrDefault(o => o.Number == number);
     public bool Contains(int number) => _orderedHistory.Any(o => o.Number == number);
 }

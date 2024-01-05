@@ -6,7 +6,7 @@ public class BotCommands {
     public const string Help = "/help";
     public const string Translate = "/translate";
     public const string Chlang = "/chlang";
-    public const string New = "/addnewwords";
+    public const string AddNewWords = "/addnewwords";
     public const string Learn = "/learn";
     public const string Stats = "/stats";
     public const string Start = "/start";
@@ -23,7 +23,7 @@ public class BotCommands {
         new() { Command = Start, Description = "Main menu (Главное меню)" },
         new() { Command = Translate, Description = "Translator (Переводчик)" },
         new() { Command = Learn, Description = "Learning translated words (Учить слова)" },
-        new() { Command = New, Description = "Learn frequent words (Учить новые частотные слова)" },
+        new() { Command = AddNewWords, Description = "Learn frequent words (Учить новые частотные слова)" },
         new() { Command = Stats, Description = "Your stats (Твоя статистика)" },
         new() { Command = Words, Description = "Your learned words (Твои выученные слова)" },
         new() { Command = Chlang, Description = "Change interface language (Сменить язык интерфейса)" },

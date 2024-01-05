@@ -11,7 +11,7 @@ public class ShowLearningSetsBotCommandHandler : IBotCommandHandler {
         _learningSetService = learningSetService;
     }
 
-    public bool Acceptable(string text) => text == BotCommands.New;
+    public bool Acceptable(string text) => text == BotCommands.AddNewWords;
     public string ParseArgument(string text) => null;
 
     public async Task Execute(string argument, ChatRoom chat) {
