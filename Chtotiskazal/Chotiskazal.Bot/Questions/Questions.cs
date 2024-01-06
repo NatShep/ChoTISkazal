@@ -279,7 +279,6 @@ public static class Questions {
         EngChooseWordInExample,
         IsItRightTranslationExam,
         EngChooseMultipleTranslationExam,
-        EngChooseByTranscriptionExam,
         PhraseEngChoose,
         PhraseRuChoose,
         RuEasyWriteMissingLetter,

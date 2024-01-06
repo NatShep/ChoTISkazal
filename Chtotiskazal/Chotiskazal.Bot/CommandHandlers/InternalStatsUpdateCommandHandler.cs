@@ -21,7 +21,7 @@ public class InternalStatsUpdateCommandHandler : IBotCommandHandler {
     {
         await chat.SendTyping();
         var allWords = await _usersWordsService.GetAllWords(chat.User);
-        chat.User.RecreateStatistic(allWords);
+        chat.User.RecreateTotalStatisticScores(allWords);
         await _userService.Update(chat.User);
         await chat.SendMessageAsync("All stats updated");
     }

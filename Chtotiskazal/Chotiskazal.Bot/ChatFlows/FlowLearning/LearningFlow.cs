@@ -62,6 +62,7 @@ public class LearningFlow
         // Для новых пользователей:
         //Если пользователь никогда не проходил добавление - то добавление
         //Если слов <5 то добавление
+        //Если новых слов у пользователя >8 - то изучение
         //Первые два раза - добавление
         //Третий раз - экзамен
         
@@ -75,19 +76,26 @@ public class LearningFlow
         //Если cлов >40 то: 20 изучений 1 добавление
         
         var wordsCount = Chat.User.WordsCount;
+        //Для самых новичков
         if(Chat.User.ExamsInARow<0) 
             //пользователь не проходил изучение с момента обновления бота. Покажем ему новую возможность
             return LearnType.Addition;
         if(wordsCount<5) 
             // Если слов не достаточно - то добавление
             return LearnType.Addition;
+        
+        
+        if (Chat.User.WordsNewby > 8) //Пользователь мог сам надобавлять слова - можно и нужно экзаминовать в таком случае
+            return LearnType.Exam;
+        
+        //Продолжение для новичков
         if(Chat.User.LearningDone<=2) //первые два раза - добавление
             return LearnType.Addition;
         if (Chat.User.LearningDone == 3) //на третьем - экзамен
             return LearnType.Exam;
-        
         if (wordsCount < 10)
             return LearnType.Addition;
+        // Для продолжающих
         if(wordsCount - Chat.User.WordsLearned<10)
             return LearnType.Addition;
        
@@ -95,9 +103,9 @@ public class LearningFlow
             return Chat.User.ExamsInARow >= 2 ? LearnType.Addition : LearnType.Exam;
         if (wordsCount < 40)
             return Chat.User.ExamsInARow >= 3 ? LearnType.Addition : LearnType.Exam;
-        else
-            return Chat.User.ExamsInARow >= 20 ? LearnType.Addition : LearnType.Exam;
-
+        
+        //для старожилов
+        return Chat.User.ExamsInARow >= 20 ? LearnType.Addition : LearnType.Exam;
     }
     
     enum LearnType

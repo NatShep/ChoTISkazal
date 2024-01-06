@@ -98,11 +98,18 @@ public class UserModel
     private static readonly HashSet<int> AllowedFreqWordsResults = 
         Enum.GetValues<FreqWordResult>().Select(e=>(int)e).ToHashSet();
     
+    /// <summary>
+    /// Сколько экзаменов (а не изучений) было у пользователей подряд.
+    /// 0 - если последним было добавление слов а не экзамен 
+    /// </summary>
     public int ExamsInARow
     {
         get => _examsInARow;
         set => _examsInARow = value;
     }
+    /// <summary>
+    /// Набор сортированных по порядку выборов частотных слов для пользователя
+    /// </summary>
     public IEnumerable<UserFreqWord> OrderedFrequentItems
     {
         get
@@ -155,8 +162,15 @@ public class UserModel
         get => _maxGoalStreak;
         set => _maxGoalStreak = value;
     }
-    
-    public int WordsLearned => _totalScoreBaskets.BasketCountOf((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
+    /// <summary>
+    /// Количество выученных слов у пользователя
+    /// </summary>
+    public int WordsLearned => _totalScoreBaskets.BasketCountOfScores((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
+    /// <summary>
+    /// Количество новых слов у пользователя
+    /// </summary>
+    public int WordsNewby => _totalScoreBaskets.BasketCountOfScores(0, (int)WordLeaningGlobalSettings.LearnedWordMinScore);
+
     public int LearningDone => _learningDone;
     
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
@@ -422,6 +436,20 @@ public class UserModel
         return dailyStats;
     }
 
+    public void RecreateTotalStatisticScores(IEnumerable<UserWordModel> allUserWords)
+    {
+        var days = new Dictionary<DateTime, DailyStats>();
+        var months = new Dictionary<DateTime, MonthsStats>();
+        _totalScoreBaskets = Baskets.CreateBaskets();
+        var totalChange = WordStatsChange.Zero;
+        foreach (var word in allUserWords)
+        {
+            totalChange += WordStatsChange.CreateForScore(word.AbsoluteScore);
+        }
+        _wordsCount = allUserWords.Count();
+        _totalScoreBaskets = totalChange.Baskets.ToArray();
+    }
+
     public void RecreateStatistic(IEnumerable<UserWordModel> allUserWords)
     {
         if (_wordsCount == _totalScoreBaskets?.Sum())
@@ -541,7 +569,13 @@ public class UserFreqWord
         Number = number;
         Result = result;
     }
+    /// <summary>
+    /// Частотный номер слова
+    /// </summary>
     public int Number { get; set; }
+    /// <summary>
+    /// Статус выбора
+    /// </summary>
     public FreqWordResult Result { get; set; }
 }
 
@@ -556,9 +590,15 @@ public enum FreqWordResult
     /// </summary>
     UserSelectThatItIsKnown = 10,
     /// <summary>
-    /// User choose to skip the word
+    /// User choose to skip the word. Such a word does not saves to user model, and resstarts after bot resstart
     /// </summary>
     UserSelectToSkip = 20,
+    /// <summary>
+    /// User already learning the word 
+    /// </summary>
     AlreadyLearning = 30,
+    /// <summary>
+    /// User already learned the word with bot 
+    /// </summary>
     AlreadyLearned = 40,
 }
