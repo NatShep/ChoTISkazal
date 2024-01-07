@@ -126,7 +126,7 @@ public class FreqWordsTest
         AssertSection(50, null, Green(10), Green(50));
     
 
-    private void AssertSection(int left, int? right, params UserFreqItem[] words)
+    private void AssertSection(int left, int? right, params UserFreqWord[] words)
     {
         int size = 100;
         var selector = new FreqWordsSelector(words.ToList(), size);
@@ -137,12 +137,12 @@ public class FreqWordsTest
     /// <summary>
     /// Immitate unknown word (word that is learning)
     /// </summary>
-    private UserFreqItem Red(int number) => new(number, FreqWordResult.UserSelectToLearn);
+    private UserFreqWord Red(int number) => new(number, FreqWordResult.UserSelectToLearn);
 
     /// <summary>
     /// Immitate known word (word that user already knows)
     /// </summary>
     /// <param name="number"></param>
     /// <returns></returns>
-    private UserFreqItem Green(int number) => new(number, FreqWordResult.UserSelectToSkip);
+    private UserFreqWord Green(int number) => new(number, FreqWordResult.UserSelectThatItIsKnown);
 }
