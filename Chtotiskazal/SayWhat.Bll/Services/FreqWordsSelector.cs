@@ -108,15 +108,16 @@ public class FreqWordsSelector
         return -1;
     }
 
-    private bool IsRed(int index)
+    private bool IsRed(int index) => IsRed(_orderedHistory[index].Result);
+
+    private bool IsRed(FreqWordResult result)
     {
-        var result = _orderedHistory[index].Result;
         if (result is FreqWordResult.AlreadyLearned or FreqWordResult.UserSelectThatItIsKnown)
             return false;
         else
             return true;
     }
-
+    
     public void Add(int currentOrderNumber, FreqWordResult result)
     {
         int number = 0;
@@ -171,4 +172,18 @@ public class FreqWordsSelector
 
     private UserFreqWord FindOrNull(int number) => _orderedHistory.FirstOrDefault(o => o.Number == number);
     public bool Contains(int number) => _orderedHistory.Any(o => o.Number == number);
+
+    public (int red, int green) LETCount(int sectionLeft)
+    {
+        var red = _orderedHistory.Count(c => c.Number <= sectionLeft && IsRed(c.Result));
+        var green = _orderedHistory.Count(c => c.Number <= sectionLeft && !IsRed(c.Result));
+        return (red, green);
+    }
+
+    public (int red, int green) GETCount(int sectionRight)
+    {
+        var red = _orderedHistory.Count(c => c.Number >= sectionRight && IsRed(c.Result));
+        var green = _orderedHistory.Count(c => c.Number >= sectionRight && !IsRed(c.Result));
+        return (red, green);
+    }
 }

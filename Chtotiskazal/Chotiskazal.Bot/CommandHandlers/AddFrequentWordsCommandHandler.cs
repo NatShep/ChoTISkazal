@@ -37,7 +37,10 @@ public class AddFrequentWordsCommandHandler : IBotCommandHandler
 
     public string ParseArgument(string text) => null;
 
-    public Task Execute(string argument, ChatRoom chat) =>
-        new NewWordsFlow(chat, _frequentWordService, _userService, _usersWordsService, _addWordService,
-            _localDictionary, _questionSelector, _examSettings).EnterAsync();
+    public Task Execute(string argument, ChatRoom chat) => new NewWordsFlow(chat,
+        _frequentWordService, _userService, _usersWordsService, _addWordService,
+        _localDictionary, _questionSelector, _examSettings,
+        minWordsSelection: 5,
+        maxWordSelection: 10,
+        preferedQuestionSize: 20).EnterAsync();
 }

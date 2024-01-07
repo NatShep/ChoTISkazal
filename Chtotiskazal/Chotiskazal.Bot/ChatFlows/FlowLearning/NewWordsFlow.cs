@@ -16,6 +16,9 @@ public class NewWordsFlow
     private readonly AddWordService _addWordService;
     private readonly LocalDictionaryService _localDictionary;
     private readonly ExamSettings _examSettings;
+    private readonly int _maxWordSelection;
+    private readonly int _minWordsSelection;
+    private readonly int _preferedQuestionSize;
     private readonly QuestionSelector _questionSelector;
 
     public NewWordsFlow(
@@ -26,7 +29,11 @@ public class NewWordsFlow
         AddWordService addWordService,
         LocalDictionaryService localDictionary,
         QuestionSelector questionSelector,
-        ExamSettings examSettings)
+        ExamSettings examSettings,
+        int maxWordSelection = 4,
+        int minWordsSelection = 2,
+        int preferedQuestionSize = 12
+    )
     {
         Chat = chat;
         _frequentWordService = frequentWordService;
@@ -36,6 +43,9 @@ public class NewWordsFlow
         _localDictionary = localDictionary;
         _questionSelector = questionSelector;
         _examSettings = examSettings;
+        _maxWordSelection = maxWordSelection;
+        _minWordsSelection = minWordsSelection;
+        _preferedQuestionSize = preferedQuestionSize;
     }
 
     public async Task EnterAsync()
@@ -45,7 +55,7 @@ public class NewWordsFlow
             Chat, _frequentWordService, _userService,
             _usersWordsService, _addWordService, _localDictionary);
         var additionResult =
-            await frequentWordFlow.EnterAsync(maxWordSelection: 4, minWordsSelection: 2, preferedQuestionSize: 12);
+            await frequentWordFlow.EnterAsync(_maxWordSelection, _minWordsSelection, _preferedQuestionSize);
 
         //Проводим легкий экзамен
         await CollectWordsForExam(Chat.User, additionResult);

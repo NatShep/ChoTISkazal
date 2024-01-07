@@ -145,6 +145,7 @@ public class MainFlow
                 _localDictionaryService, _questionSelector, _settings.ExamSettings),
             new InternalMutualCommandHandler(_mutualPhrasesService),
             new InternalStatsUpdateCommandHandler(_userService, _usersWordsService),
+            new InternalShowWordsStats(_frequentWordService)
             //new ShowLearningSetsBotCommandHandler(_learningSetService),
             // new SelectLearningSet(
             //     _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
