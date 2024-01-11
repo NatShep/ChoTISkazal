@@ -47,13 +47,16 @@ public class AddWordFromFrequentWordsFlow
         _localDictionaryService = localDictionaryService;
     }
 
-    public async Task<AddFreqWordResults> EnterAsync(int minWordsSelection, int maxWordSelection, int preferedQuestionSize)
+    public async Task<AddFreqWordResults> EnterAsync(
+        int minWordsSelection,
+        int maxWordSelection,
+        int preferedQuestionSize)
     {
         var typing = Chat.SendTyping();
 
         var count = await _frequentWordService.Count();
 
-        _selector = new FreqWordsSelector(Chat.User.OrderedFrequentItems.ToList() , count);
+        _selector = new FreqWordsSelector(Chat.User.OrderedFrequentItems.ToList(), count);
         await MoveToNextFrequentWord();
         await typing;
         var messageId = await Chat.SendMarkdownMessageAsync(GetCurrentMessage(), GetCurrentKeyboard());
@@ -93,7 +96,7 @@ public class AddWordFromFrequentWordsFlow
             }
             else
                 await Chat.ConfirmCallback(userInput.Id);
-            
+
             wordsShowed++;
             if (wordsSelected >= maxWordSelection ||
                 (wordsSelected >= minWordsSelection && wordsShowed >= preferedQuestionSize))
@@ -107,10 +110,10 @@ public class AddWordFromFrequentWordsFlow
 
         var newWords = _addedWordModels.DistinctBy(i => i.Word).ToArray();
         return new AddFreqWordResults(
-            AddedWords: newWords, 
-            WordShowedCount: wordsShowed, 
-            WordSkippedCount: wordsSkipped, 
-            WordsKnownCount: wordsShowed- newWords.Length - wordsSkipped, 
+            AddedWords: newWords,
+            WordShowedCount: wordsShowed,
+            WordSkippedCount: wordsSkipped,
+            WordsKnownCount: wordsShowed - newWords.Length - wordsSkipped,
             messageId: messageId);
     }
 
@@ -156,32 +159,7 @@ public class AddWordFromFrequentWordsFlow
 
     private async Task<CurrentFrequentWord> SearchNextFrequentWord()
     {
-        var order = -1;
-        //если слов меньше 10, то берем рандомные слова
-        //далее - чем больше слов известно, тем уменшается дисперсия
-        if (_selector.Count <= 10)
-            order = Rand.Rnd.Next(0, _selector.MaxSize - 1);
-        else
-        {
-            while (order < 0 || order > _selector.MaxSize - 1)
-            {
-                var dispersion = _selector.Count switch
-                {
-                    < 15 => 60,
-                    < 20 => 50,
-                    < 40 => 15,
-                    _ => 10
-                };
-                var section = _selector.CalcCentralSection();
-                var middle = (section.Left + section.Right) / 2;
-                order = (int)Rand.RandomNormal(middle, (middle * dispersion) / 100);
-            }
-        }
-        //Console.WriteLine("Order: "+ order);    
-
-        var foundNumber = _selector.GetFreeLeft(order)
-                          ?? _selector.GetFreeRight(order)
-                          ?? throw new Exception("There are no free numbers");
+        var foundNumber = GetNextNumber();
 
         var freqWord = await _frequentWordService.GetWord(foundNumber);
         if (string.IsNullOrEmpty(freqWord?.Word))
@@ -212,6 +190,59 @@ public class AddWordFromFrequentWordsFlow
         return new CurrentFrequentWord(freqWord, dictionaryWord, translations.ToArray());
     }
 
+    private int GetNextNumber()
+    {
+        int order = -1;
+        int foundNumber;
+        if (_selector.Count <= 10)
+        {
+            //если слов меньше 10, то берем рандомные слова
+            //далее - чем больше слов известно, тем уменшается дисперсия
+            order = Rand.Rnd.Next(0, _selector.MaxSize - 1);
+        }
+        else
+        {
+            var section = _selector.CalcCentralSection();
+            var middle = (section.Left + section.Right) / 2;
+            var distribution = _selector.GetDistribution(middle);
+            var redCount = distribution.GtRed + distribution.LtRed;
+            var greenCount = distribution.LtGreen + distribution.LtGreen;
+            if (greenCount > redCount * 1.5)
+            {
+                //there is much more green than red
+                // so we need to take word no less then right order
+                return _selector.GetFreeRight(section.Right)
+                       ?? _selector.GetFreeLeft(section.Right)
+                       ?? middle;
+            }
+
+            if (redCount > greenCount * 1.5)
+            {
+                //there is much more red on the left than red one on the right
+                return _selector.GetFreeLeft(section.Left)
+                       ?? _selector.GetFreeRight(section.Left)
+                       ?? middle;
+            }
+
+            while (order < 0 || order > _selector.MaxSize - 1)
+            {
+                //relatively same amount of red and green for user
+                var dispersion = _selector.Count switch
+                {
+                    < 15 => 60,
+                    < 20 => 50,
+                    < 40 => 15,
+                    _ => 10
+                };
+                order = (int)Rand.RandomNormal(middle, (middle * dispersion) / 100);
+            }
+        }
+
+        return _selector.GetFreeLeft(order)
+               ?? _selector.GetFreeRight(order)
+               ?? throw new Exception("There are no free numbers");
+    }
+
     private async Task SaveCurrent(FreqWordResult status)
     {
         _selector.Add(_current.FrequentWord.OrderNumber, status);
@@ -220,9 +251,9 @@ public class AddWordFromFrequentWordsFlow
             // add word to user learning
             foreach (var translation in _current.Translations)
             {
-               var word =  await _addWordService.AddTranslationToUser(Chat.User, translation);
-               if(word!=null)
-                   _addedWordModels.Add(word);
+                var word = await _addWordService.AddTranslationToUser(Chat.User, translation);
+                if (word != null)
+                    _addedWordModels.Add(word);
             }
         }
 
@@ -242,7 +273,8 @@ public class AddWordFromFrequentWordsFlow
             new[]
             {
                 InlineButtons.Button(Chat.Texts.SelectWordIsKnownInLearningSet, SelectKnownData),
-                InlineButtons.Button($"{Emojis.HeavyPlus}  {Chat.Texts.SelectToLearnWordInLearningSet}", SelectToLearnData)
+                InlineButtons.Button($"{Emojis.HeavyPlus}  {Chat.Texts.SelectToLearnWordInLearningSet}",
+                    SelectToLearnData)
             },
             new[]
             {
@@ -283,6 +315,7 @@ public class AddWordFromFrequentWordsFlow
             allowedTranslations = new[] { translations.First() };
         return allowedTranslations;
     }
+
     record CurrentFrequentWord(FrequentWord FrequentWord, DictionaryWord DictionaryWord, Translation[] Translations);
 }
 

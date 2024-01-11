@@ -117,7 +117,7 @@ public class FreqWordsSelector
         else
             return true;
     }
-    
+
     public void Add(int currentOrderNumber, FreqWordResult result)
     {
         int number = 0;
@@ -164,6 +164,7 @@ public class FreqWordsSelector
             {
                 return order;
             }
+
             order++;
         }
 
@@ -171,19 +172,30 @@ public class FreqWordsSelector
     }
 
     private UserFreqWord FindOrNull(int number) => _orderedHistory.FirstOrDefault(o => o.Number == number);
-    public bool Contains(int number) => _orderedHistory.Any(o => o.Number == number);
 
-    public (int red, int green) LETCount(int sectionLeft)
+    public FreqWordDistribution GetDistribution(int midPoint)
     {
-        var red = _orderedHistory.Count(c => c.Number <= sectionLeft && IsRed(c.Result));
-        var green = _orderedHistory.Count(c => c.Number <= sectionLeft && !IsRed(c.Result));
-        return (red, green);
-    }
+        var ltRed = 0;
+        var ltGreen = 0;
+        var gtRed = 0;
+        var gtGreen = 0;
+        foreach (var word in _orderedHistory)
+        {
+            var isRed = IsRed(word.Result);
+            if (word.Number < midPoint)
+            {
+                if (isRed) ltRed++;
+                else ltGreen++;
+            }
+            else if (word.Number > midPoint)
+            {
+                if (isRed) gtRed++;
+                else gtGreen++;
+            }
+        }
 
-    public (int red, int green) GETCount(int sectionRight)
-    {
-        var red = _orderedHistory.Count(c => c.Number >= sectionRight && IsRed(c.Result));
-        var green = _orderedHistory.Count(c => c.Number >= sectionRight && !IsRed(c.Result));
-        return (red, green);
+        return new FreqWordDistribution(ltRed, ltGreen, gtRed, gtGreen);
     }
 }
+
+public record FreqWordDistribution(int LtRed, int LtGreen, int GtRed, int GtGreen);
