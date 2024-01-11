@@ -54,14 +54,14 @@ public static class Questions {
 
     public static readonly Question EngTrust = new("Eng trust", new EnTrustScenario(),
         Frequency: LowMid,
-        ExpectedScore: Beginner2,
+        ExpectedScore: Beginner1,
         PassScore: 0.4,
         FailScore: 0.4
     );
 
     public static readonly Question RuTrust = new("Ru trust", new RuTrustScenario(),
         Frequency: LowMid,
-        ExpectedScore: Beginner2,
+        ExpectedScore: Beginner1,
         PassScore: 0.4,
         FailScore: 0.4
     );
@@ -77,7 +77,7 @@ public static class Questions {
     public static readonly Question RuTrustSingle = new("Ru trust single translation",
         new RuTrustSingleTranslationScenario(),
         Frequency: Mid,
-        ExpectedScore: Intermediate1,
+        ExpectedScore: Beginner2,
         PassScore: 1.3,
         FailScore: 0.7
     );
@@ -85,7 +85,7 @@ public static class Questions {
     public static readonly Question EngEasyWriteMissingLetter = new("Eng write mising",
         new EngWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate4,
+        ExpectedScore: Intermediate3,
         PassScore: 1.3,
         FailScore: 0.5
     );
@@ -93,7 +93,7 @@ public static class Questions {
     public static readonly Question RuEasyWriteMissingLetter = new("Ru write mising",
         new RuWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate4,
+        ExpectedScore: Intermediate3,
         PassScore: 1.1,
         FailScore: 0.5
     );
@@ -101,7 +101,7 @@ public static class Questions {
     public static readonly Question EngHardWriteMissingLetter = new("Eng write mising hard",
         new EngWriteMissingLettersScenario(StarredHardness.Hard),
         Frequency: LowMid,
-        ExpectedScore: Intermediate4,
+        ExpectedScore: Advanced,
         PassScore: 1.3,
         FailScore: 0.52
     );
@@ -109,7 +109,7 @@ public static class Questions {
     public static readonly Question RuHardWriteMissingLetter = new("Ru write mising hard",
         new RuWriteMissingLettersScenario(StarredHardness.Hard),
         Frequency: LowMid,
-        ExpectedScore: Intermediate4,
+        ExpectedScore: Advanced,
         PassScore: 1.1,
         FailScore: 0.56
     );
@@ -162,7 +162,7 @@ public static class Questions {
     
     
     public static readonly Question PhraseAssembleWithClueExam = new("Phrase: Assemble with clue", new PhraseAssembleWithClueScenario(),
-        Frequency: Mid,
+        Frequency: HiMid,
         ExpectedScore: Intermediate2,
         PassScore: 1,
         FailScore: 1
@@ -221,14 +221,14 @@ public static class Questions {
     );
 
     public static readonly Question EngExampleChoose = new("Eng Choose Phrase", new ExampleEngChooseScenario(),
-        Frequency: LowMid,
+        Frequency: Mid,
         ExpectedScore: Intermediate4,
         PassScore: 0.4,
         FailScore: 0.6
     );
 
     public static readonly Question RuExampleChoose = new("Ru Choose Phrase", new ExampleRuChooseScenario(),
-        Frequency: LowMid,
+        Frequency: Mid,
         ExpectedScore: Intermediate4,
         PassScore: 0.9,
         FailScore: 0.6
@@ -317,6 +317,13 @@ public static class Questions {
     {
         EngHardWriteMissingLetter,
         RuHardWriteMissingLetter,
+        EngWrite(localDictionaryService),
+        RuWrite(localDictionaryService),
+        RuWriteSingleTranslation(localDictionaryService),
+        ExampleAssembleExam,
+        ExampleAssembleWithClueExam,
+        PhraseAssembleExam,
+        PhraseAssembleWithClueExam,
         EngChoose,
         RuChoose,
         EngExampleChoose,
@@ -324,19 +331,12 @@ public static class Questions {
         EngTrust,
         RuTrust,
         RuTrustSingle,
-        EngWrite(localDictionaryService),
-        RuWrite(localDictionaryService),
-        RuWriteSingleTranslation(localDictionaryService),
         ClearExampleEngSubstitute,
         ClearExampleRuSubstitute,
         ExampleEngSubstitute,
         ExampleRuSubstitute,
         EngChooseWordInExample,
         ClearEngChooseWordInExample,
-        ExampleAssembleExam,
-        ExampleAssembleWithClueExam,
-        PhraseAssembleExam,
-        PhraseAssembleWithClueExam,
         IsItRightTranslationExam,
         EngChooseMultipleTranslationExam,
         RuChooseByTranscriptionExam,

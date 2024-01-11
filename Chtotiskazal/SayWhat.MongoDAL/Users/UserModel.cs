@@ -169,7 +169,7 @@ public class UserModel
     /// <summary>
     /// Количество новых слов у пользователя
     /// </summary>
-    public int WordsNewby => _totalScoreBaskets.BasketCountOfScores(0, (int)WordLeaningGlobalSettings.LearnedWordMinScore);
+    public int WordsNewby => _totalScoreBaskets.BasketCountOfScores(0, (int)WordLeaningGlobalSettings.LearningWordMinScore);
 
     public int LearningDone => _learningDone;
     

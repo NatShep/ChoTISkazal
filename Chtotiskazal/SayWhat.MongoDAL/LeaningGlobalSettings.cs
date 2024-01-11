@@ -8,7 +8,7 @@ public static class WordLeaningGlobalSettings {
     /// The highter it is - the more random question appears for target words
     /// the lower it is - the more expected, that only closest to word by hardness question appears  
     /// </summary>
-    public const double TheDampingFactorOfTheChoiceOfQuestions = 4;
+    public const double TheDampingFactorOfTheChoiceOfQuestions = 4.5;
     /// <summary>
     /// Absolute score reduced by {AgingFactor} per day in AgedScore calculation
     /// </summary>
