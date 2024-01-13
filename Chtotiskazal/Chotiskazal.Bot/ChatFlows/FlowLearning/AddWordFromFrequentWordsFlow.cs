@@ -193,20 +193,21 @@ public class AddWordFromFrequentWordsFlow
     private int GetNextNumber()
     {
         int order = -1;
-        int foundNumber;
         if (_selector.Count <= 10)
         {
             //если слов меньше 10, то берем рандомные слова
-            //далее - чем больше слов известно, тем уменшается дисперсия
             order = Rand.Rnd.Next(0, _selector.MaxSize - 1);
         }
         else
         {
+            //Вызываем
             var section = _selector.CalcCentralSection();
             var middle = (section.Left + section.Right) / 2;
             var distribution = _selector.GetDistribution(middle);
+            
             var redCount = distribution.GtRed + distribution.LtRed;
             var greenCount = distribution.LtGreen + distribution.LtGreen;
+            
             if (greenCount > redCount * 1.5)
             {
                 //there is much more green than red

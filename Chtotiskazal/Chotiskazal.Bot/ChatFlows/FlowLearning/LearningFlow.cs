@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Chotiskazal.Bot.Questions;
 using SayWhat.Bll.Services;
@@ -95,17 +94,30 @@ public class LearningFlow
             return LearnType.Exam;
         if (wordsCount < 10)
             return LearnType.Addition;
+
+        var notLearn = wordsCount - Chat.User.WordsLearned;
         // Для продолжающих
-        if(wordsCount - Chat.User.WordsLearned<10)
+        if(notLearn<10)
             return LearnType.Addition;
-       
+        // если всего слов меньше 30 - то добавляем раз в три раза
         if (wordsCount < 30)
             return Chat.User.ExamsInARow >= 2 ? LearnType.Addition : LearnType.Exam;
+        // если всего слов меньше 40 - то добавляем раз в четыре раза
         if (wordsCount < 40)
             return Chat.User.ExamsInARow >= 3 ? LearnType.Addition : LearnType.Exam;
         
         //для старожилов
-        return Chat.User.ExamsInARow >= 20 ? LearnType.Addition : LearnType.Exam;
+        var examInARow = notLearn switch
+        {
+            < 20  => 10, // если не выучено менее 20 слов, то добавление случается раз в 10 экзаменов (раз в день)
+            < 40  => 20,
+            < 60  => 30,
+            < 100 => 40,
+            _     => 50,  // если не выучено более 100 слов, то добавление случается раз в 50 экзаменов (раз в 5 дней)
+        };
+        return Chat.User.ExamsInARow >= examInARow 
+            ? LearnType.Addition 
+            : LearnType.Exam;
     }
     
     enum LearnType

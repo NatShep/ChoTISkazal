@@ -4,7 +4,8 @@ using SayWhat.Bll.Strings;
 
 namespace Chotiskazal.Bot.Questions;
 
-public static class Questions {
+public static class Questions
+{
     private const int Low = 40;
     private const int LowMid = 60;
     private const int Mid = 100;
@@ -42,8 +43,7 @@ public static class Questions {
         PassScore: 0.4,
         FailScore: 1
     );
-    
-   
+
 
     public static readonly Question EngChoose = new("Eng Choose", new EngChooseScenario(),
         Frequency: LowMid,
@@ -85,7 +85,7 @@ public static class Questions {
     public static readonly Question EngEasyWriteMissingLetter = new("Eng write mising",
         new EngWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate3,
+        ExpectedScore: Intermediate2,
         PassScore: 1.3,
         FailScore: 0.5
     );
@@ -93,7 +93,7 @@ public static class Questions {
     public static readonly Question RuEasyWriteMissingLetter = new("Ru write mising",
         new RuWriteMissingLettersScenario(StarredHardness.Easy),
         Frequency: LowMid,
-        ExpectedScore: Intermediate3,
+        ExpectedScore: Intermediate2,
         PassScore: 1.1,
         FailScore: 0.5
     );
@@ -101,7 +101,7 @@ public static class Questions {
     public static readonly Question EngHardWriteMissingLetter = new("Eng write mising hard",
         new EngWriteMissingLettersScenario(StarredHardness.Hard),
         Frequency: LowMid,
-        ExpectedScore: Advanced,
+        ExpectedScore: Intermediate4,
         PassScore: 1.3,
         FailScore: 0.52
     );
@@ -109,7 +109,7 @@ public static class Questions {
     public static readonly Question RuHardWriteMissingLetter = new("Ru write mising hard",
         new RuWriteMissingLettersScenario(StarredHardness.Hard),
         Frequency: LowMid,
-        ExpectedScore: Advanced,
+        ExpectedScore: Intermediate4,
         PassScore: 1.1,
         FailScore: 0.56
     );
@@ -146,41 +146,44 @@ public static class Questions {
         FailScore: 0.4
     );
 
-    public static readonly Question ExampleAssembleWithClueExam = new("Assemble phrase with clue", new ExampleAssembleWithClueScenario(),
+    public static readonly Question ExampleAssembleWithClueExam = new("Assemble phrase with clue",
+        new ExampleAssembleWithClueScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate1,
         PassScore: 1,
         FailScore: 1
     );
-    
+
     public static readonly Question ExampleAssembleExam = new("Assemble phrase", new ExampleAssembleScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate2,
         PassScore: 1.47,
         FailScore: 0.6
     );
-    
-    
-    public static readonly Question PhraseAssembleWithClueExam = new("Phrase: Assemble with clue", new PhraseAssembleWithClueScenario(),
+
+
+    public static readonly Question PhraseAssembleWithClueExam = new("Phrase: Assemble with clue",
+        new PhraseAssembleWithClueScenario(),
         Frequency: HiMid,
         ExpectedScore: Intermediate2,
         PassScore: 1,
         FailScore: 1
     );
-    
+
     public static readonly Question PhraseAssembleExam = new("Phrase: Assemble", new PhraseAssembleScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate3,
         PassScore: 1.47,
         FailScore: 0.6
     );
-    
+
     public static readonly Question PhraseRuChoose = new("Phrase: RuChoose", new PhraseRuChooseScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate2,
         PassScore: 1,
         FailScore: 1
     );
+
     public static readonly Question PhraseEngChoose = new("Phrase: Eng Choose", new PhraseEngChooseScenario(),
         Frequency: Mid,
         ExpectedScore: Intermediate2,
@@ -258,7 +261,7 @@ public static class Questions {
             PassScore: 2.0,
             FailScore: 0.7
         );
-    
+
     /// <summary>
     /// Воросы, которые задаются в первый раз для слова.
     /// Тут только тапательные вопросы

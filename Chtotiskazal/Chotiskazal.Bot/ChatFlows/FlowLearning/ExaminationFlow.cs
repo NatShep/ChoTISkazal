@@ -60,7 +60,13 @@ public class ExaminationFlow
         // Either you input only with buttons,
         // Either you input only ru input or buttons (so you need no to switch language on desktop)
         // Either you input only en input or buttons (so you need no to switch language on desktop)
-        var examType = Rand.GetRandomItem(ExamType.NoInput, ExamType.EnInputOnly, ExamType.RuInputOnly);
+        var examType = Rand.GetRandomItem(
+            ExamType.NoInput,     // Input exams are twice more often then no input exam
+            ExamType.EnInputOnly,   
+            ExamType.EnInputOnly, 
+            ExamType.RuInputOnly,
+            ExamType.RuInputOnly
+            );
 
         var examSettings = GetExamSetings(examType);
 
