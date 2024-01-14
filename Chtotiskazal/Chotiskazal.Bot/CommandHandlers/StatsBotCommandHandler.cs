@@ -23,7 +23,7 @@ public class StatsBotCommandHandler : IBotCommandHandler {
                 new[]
                 {
                     InlineButtons.MainMenu(chat.Texts),
-                    InlineButtons.Exam(chat.Texts),
+                    InlineButtons.Learn(chat.Texts),
                 },
                 new[] { InlineButtons.Translation(chat.Texts) },
                 new[]

@@ -36,18 +36,16 @@ public class SettingsFlow {
         }
     }
 
-    private async Task SetRemindFrequency(UserModel user) {
+    private async Task SetRemindFrequency(UserModel user)
+    {
+        var remindButton = user.NotificationState.NotificationEnabled
+            ? InlineButtons.Button(Chat.Texts.TurnOffRemind, BotCommands.NotificationSettingsOff)
+            : InlineButtons.Button(Chat.Texts.TurnOnRemind, BotCommands.NotificationSettingsOn);
+        
         await Chat.SendMessageAsync(
             Chat.Texts.RemindSettingsMessage,
-            InlineButtons.Button(Chat.Texts.RemindEveryDay, "1"),
-            InlineButtons.Button(Chat.Texts.RemindEveryThreeDays, "3"),
-            InlineButtons.Button(Chat.Texts.RemindEveryWeek, "7"),
-            InlineButtons.Button(Chat.Texts.DoNotRemind, "-1"),
+            remindButton,
             InlineButtons.Button(Chat.Texts.CancelButton, BotCommands.Start)
         );
-
-        user.SetRemindFrequency(int.Parse(await Chat.WaitInlineKeyboardInput()));
-        await _userService.Update(user);
-        await Chat.SendMessageAsync(Chat.Texts.SettingsApplied, InlineButtons.MainMenu(Chat.Texts));
     }
 }

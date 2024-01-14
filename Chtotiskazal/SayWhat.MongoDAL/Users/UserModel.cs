@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SayWhat.MongoDAL.Words;
@@ -56,8 +57,6 @@ public class UserModel
     [BsonElement("pc")] private int _pairsCount;
     [BsonElement("en_wtc")] private int _englishWordTranslationRequestsCount;
     [BsonElement("ru_wtc")] private int _russianWordTranslationRequestsCount;
-    [BsonElement("remindFr")] private int? _remindFrequency;
-    [BsonElement("remindLast")] private DateTime? _lastReminder;
     [BsonElement("mgs")] private int _maxGoalStreak;
     [BsonElement("exr")] private int _examsInARow = -1;
 
@@ -92,12 +91,13 @@ public class UserModel
     [BsonElement("gs")] private double _gamingScore;
 
     [BsonElement("fr")] private UserFrequencyState _frequencyState;
-    
+    [BsonElement("ntf")] private UserNotificationState _notificationState = new();
+
     #endregion
-    
-    private static readonly HashSet<int> AllowedFreqWordsResults = 
-        Enum.GetValues<FreqWordResult>().Select(e=>(int)e).ToHashSet();
-    
+
+    private static readonly HashSet<int> AllowedFreqWordsResults =
+        Enum.GetValues<FreqWordResult>().Select(e => (int)e).ToHashSet();
+
     /// <summary>
     /// Сколько экзаменов (а не изучений) было у пользователей подряд.
     /// 0 - если последним было добавление слов а не экзамен 
@@ -107,6 +107,9 @@ public class UserModel
         get => _examsInARow;
         set => _examsInARow = value;
     }
+
+    public UserNotificationState NotificationState => _notificationState;
+
     /// <summary>
     /// Набор сортированных по порядку выборов частотных слов для пользователя
     /// </summary>
@@ -116,11 +119,11 @@ public class UserModel
         {
             if (_frequencyState?.OrderedWords == null)
                 return Array.Empty<UserFreqWord>();
-            
+
             var answer = new List<UserFreqWord>();
             foreach (var word in _frequencyState.OrderedWords)
             {
-                if(AllowedFreqWordsResults.Contains(word.Result))
+                if (AllowedFreqWordsResults.Contains(word.Result))
                     answer.Add(new UserFreqWord(word.Number, (FreqWordResult)word.Result));
             }
 
@@ -143,9 +146,7 @@ public class UserModel
     public DateTime Created => Id.CreationTime;
     public DateTime LastActivity => _lastActivity;
     public DateTime LastExam => _lastExam;
-
-    public int? RemindFrequency => _remindFrequency;
-    public DateTime? LastReminder => _lastReminder;
+    
     public long? TelegramId => _telegramId;
     public string TelegramFirstName => _telegramFirstName;
     public string TelegramLastName => _telegramLastName;
@@ -162,17 +163,22 @@ public class UserModel
         get => _maxGoalStreak;
         set => _maxGoalStreak = value;
     }
+
     /// <summary>
     /// Количество выученных слов у пользователя
     /// </summary>
-    public int WordsLearned => _totalScoreBaskets.BasketCountOfScores((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
+    public int WordsLearned =>
+        _totalScoreBaskets.BasketCountOfScores((int)WordLeaningGlobalSettings.WellDoneWordMinScore);
+
     /// <summary>
     /// Количество новых слов у пользователя
     /// </summary>
-    public int WordsNewby => _totalScoreBaskets.BasketCountOfScores(0, (int)WordLeaningGlobalSettings.LearningWordMinScore);
+    public int WordsNewby =>
+        _totalScoreBaskets.BasketCountOfScores(0, (int)WordLeaningGlobalSettings.LearningWordMinScore);
 
     public int LearningDone => _learningDone;
-    
+    public int QuestionAsked => _questionPassed + _questionFailed;
+
     public void OnAnyActivity() => _lastActivity = DateTime.Now;
 
     private void OnQuestionActivity()
@@ -180,8 +186,6 @@ public class UserModel
         OnAnyActivity();
         _lastExam = DateTime.Now;
     }
-
-    public void SetRemindFrequency(int frequency) => _remindFrequency = frequency;
 
     public void AddFrequentWord(int frequentWordOrderNumber, FreqWordResult status)
     {
@@ -343,12 +347,6 @@ public class UserModel
         ApplyWordStatsChanges(scoreDelta, today, month, gamingScore);
     }
 
-    public void OnStatsChangings(WordStatsChange change)
-    {
-        var (today, month) = FixStatsAndGetCurrent();
-        ApplyWordStatsChanges(change, today, month, 0);
-    }
-
     private void ApplyWordStatsChanges(
         WordStatsChange statsChange, DailyStats dailyStats, MonthsStats monthsStats, double gamingScore)
     {
@@ -393,7 +391,7 @@ public class UserModel
         ApplyWordStatsChanges(statsChange, today, month, gamingScore);
     }
 
-    public double OnQuestionFailed(WordStatsChange statsChange)
+    public void OnQuestionFailed(WordStatsChange statsChange)
     {
         _questionFailed++;
         var (today, month) = FixStatsAndGetCurrent();
@@ -404,7 +402,6 @@ public class UserModel
         OnQuestionActivity();
 
         ApplyWordStatsChanges(statsChange, today, month, WordLeaningGlobalSettings.QuestionFailedGamingScore);
-        return WordLeaningGlobalSettings.QuestionFailedGamingScore;
     }
 
     public void OnLearningDone()
@@ -420,32 +417,15 @@ public class UserModel
         OnAnyActivity();
     }
 
-    public IReadOnlyList<DailyStats> GetLastWeek()
-    {
-        var today = GetToday();
-        var dailyStats = new List<DailyStats>(7);
-        dailyStats.Add(today);
-        for (int i = 1; i < LastDaysStats.Count - 1; i++)
-        {
-            var stats = LastDaysStats[^i];
-            if ((today.Date - stats.Date).TotalDays > 7)
-                break;
-            dailyStats.Add(stats);
-        }
-
-        return dailyStats;
-    }
-
     public void RecreateTotalStatisticScores(IEnumerable<UserWordModel> allUserWords)
     {
-        var days = new Dictionary<DateTime, DailyStats>();
-        var months = new Dictionary<DateTime, MonthsStats>();
         _totalScoreBaskets = Baskets.CreateBaskets();
         var totalChange = WordStatsChange.Zero;
         foreach (var word in allUserWords)
         {
             totalChange += WordStatsChange.CreateForScore(word.AbsoluteScore);
         }
+
         _wordsCount = allUserWords.Count();
         _totalScoreBaskets = totalChange.Baskets.ToArray();
     }
@@ -533,72 +513,4 @@ public class UserModel
         _wordsCount = allUserWords.Count();
         _totalScoreBaskets = totalChange.Baskets.ToArray();
     }
-    
-}
-
-[BsonIgnoreExtraElements]
-public class UserFrequencyState
-{
-    [BsonElement("w")] public List<UserFreqStoredItem> OrderedWords { get; set; }
-}
-
-[BsonIgnoreExtraElements]
-public class UserFreqStoredItem
-{
-    public UserFreqStoredItem()
-    {
-        
-    }
-    public UserFreqStoredItem(int number, int result)
-    {
-        Number = number;
-        Result = result;
-    }
-    [BsonElement("n")] public int Number { get; set; }
-    [BsonElement("r")] public int Result { get; set; }
-}
-
-public class UserFreqWord
-{
-    public UserFreqWord()
-    {
-        
-    }
-    public UserFreqWord(int number, FreqWordResult result)
-    {
-        Number = number;
-        Result = result;
-    }
-    /// <summary>
-    /// Частотный номер слова
-    /// </summary>
-    public int Number { get; set; }
-    /// <summary>
-    /// Статус выбора
-    /// </summary>
-    public FreqWordResult Result { get; set; }
-}
-
-public enum FreqWordResult
-{   
-    /// <summary>
-    /// User choose to learn word
-    /// </summary>
-    UserSelectToLearn = 0,
-    /// <summary>
-    /// User choose that word is known
-    /// </summary>
-    UserSelectThatItIsKnown = 10,
-    /// <summary>
-    /// User choose to skip the word. Such a word does not saves to user model, and resstarts after bot resstart
-    /// </summary>
-    UserSelectToSkip = 20,
-    /// <summary>
-    /// User already learning the word 
-    /// </summary>
-    AlreadyLearning = 30,
-    /// <summary>
-    /// User already learned the word with bot 
-    /// </summary>
-    AlreadyLearned = 40,
 }

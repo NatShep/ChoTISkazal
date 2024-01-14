@@ -15,7 +15,9 @@ public class BotCommands {
     public const string Report = "/report";
     public const string Settings = "/settings";
     public const string RemoveWord = "/removeword";
-
+    public const string SnoozeMotivationHeader = "/repatGoalStreakNotify";
+    public const string NotificationSettingsOn = "/setnotificationon";
+    public const string NotificationSettingsOff = "/setnotificationoff";
 
     public static readonly BotCommand[] Descriptions =
     {

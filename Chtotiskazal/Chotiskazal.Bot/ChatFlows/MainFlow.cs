@@ -143,12 +143,12 @@ public class MainFlow
             new AddFrequentWordsCommandHandler(
                 _frequentWordService, _userService, _usersWordsService, _addWordsService,
                 _localDictionaryService, _questionSelector, _settings.ExamSettings),
+            new RepeatGoalStreakNotificationCommandHandler(_userService),
+            new SettingsEnableNotifications(_userService),
+            
             new InternalMutualCommandHandler(_mutualPhrasesService),
             new InternalStatsUpdateCommandHandler(_userService, _usersWordsService),
             new InternalShowWordsStats(_frequentWordService)
-            //new ShowLearningSetsBotCommandHandler(_learningSetService),
-            // new SelectLearningSet(
-            //     _learningSetService, _localDictionaryService, _userService, _usersWordsService, _addWordsService),
         };
     }
 
@@ -182,7 +182,7 @@ public class MainFlow
             var commands = new[]
             {
                 new[] { InlineButtons.Translation(Chat.Texts) },
-                new[] { InlineButtons.Exam(Chat.Texts) },
+                new[] { InlineButtons.Learn(Chat.Texts) },
                 Chat.User.WasInterfaceLanguageChanged ? null : new[] { InlineButtons.Chlang(Chat.Texts) },
                 new[] { InlineButtons.Stats(Chat.Texts), InlineButtons.HowToUse(Chat.Texts) },
                 new[] { InlineButtons.Settings(Chat.Texts) }

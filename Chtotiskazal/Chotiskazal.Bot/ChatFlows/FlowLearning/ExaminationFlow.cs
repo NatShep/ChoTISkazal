@@ -218,7 +218,7 @@ public class ExaminationFlow
         }
 
         Chat.User.OnLearningDone();
-        var (goalStreak, hasGap) = StatsHelper.GetGoalsStreak(
+        var (goalStreak, _) = StatsHelper.GetCurrentGoalsStreak(
             Chat.User.GetCalendar(),
             _regularExamSettings.ExamsCountGoalForDay);
 

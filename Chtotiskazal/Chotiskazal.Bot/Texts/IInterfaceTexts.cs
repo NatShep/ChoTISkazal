@@ -106,11 +106,8 @@ public interface IInterfaceTexts {
     string SettingsApplied { get; }
 
     string RemindSettingsMessage { get; }
-    string RemindEveryDay { get; }
-    string RemindEveryWeek { get; }
-    string RemindEveryThreeDays { get; }
-    string DoNotRemind { get; }
-    string ReminderLearn { get; }
+    string TurnOffRemind { get; }
+    string TurnOnRemind { get; }
     string PressTranslateToMoveStartTranslation { get; }
     string ToLearnPhrase { get; }
     string ItWasLongTimeAgo { get; }
@@ -132,6 +129,13 @@ public interface IInterfaceTexts {
     Markdown TwoExamsToGoal { get; }
     Markdown GoToLearnAfterAddition { get; }
     Markdown YourNewWords { get; }
+
+    Markdown MotivationReminderLearn { get; }
+    Markdown MotivationYouAlmostFinishedGoalForTheDay { get; }
+    Markdown MotivationYouCanLooseGoalStreakToday(int days);
+    Markdown MotivationSnoozeScheduled { get; }
+    string SnoozeGoalStreak15Button { get; }
+    string SnoozeGoalStreak60Button { get; }
 
     Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase);
     Markdown YouHaveATypoLetsTryAgain(string text);

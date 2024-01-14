@@ -108,14 +108,15 @@ static class Program {
             Reporter.WriteInfo($"{Chats.Count} users were waiting for us");
         }
 
-        //_botClient.OnUpdate += BotClientOnOnUpdate;
-        //_botClient.OnMessage += Bot_OnMessage;
-
-        //_botClient.StartReceiving();
-
         ReportSenderJob.Launch(TimeSpan.FromDays(1), telegramLogger);
         var mutualJobTask = MutualPhraseJob.Launch(_mutualPhraseService, _userService, telegramLogger, launchHour: 4);
-        var remindJobTask = RemindSenderJob.Launch(_botClient, _userService, telegramLogger);
+
+        var notificatinJob = new NotificationJob(
+            _botClient, 
+            _userService, 
+            _settings.ExamSettings.ExamsCountGoalForDay,
+            telegramLogger);
+        notificatinJob.Launch();
         var updateCurrentScoreJobTask = UpdateCurrentScoresJob.Launch(telegramLogger, _userService, _userWordService);
         var receiverOptions = new ReceiverOptions()
         {
@@ -143,7 +144,6 @@ static class Program {
         //----
         // it will never happens
         await mutualJobTask;
-        await remindJobTask;
         await updateCurrentScoreJobTask;
         await receiveTask;
     }

@@ -6,7 +6,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Chotiskazal.Bot;
 
-public static class InlineButtons {
+public static class InlineButtons
+{
     public static InlineKeyboardButton Button(string text, string callbackData) =>
         new(text ?? throw new InvalidDataException("Keyboard text cannot be null")) { CallbackData = callbackData };
 
@@ -26,10 +27,10 @@ public static class InlineButtons {
     public static InlineKeyboardButton Settings(IInterfaceTexts texts) =>
         Button($"{texts.SettingsButton} {Emojis.Gear}", BotCommands.Settings);
 
-    public static InlineKeyboardButton Exam(IInterfaceTexts texts) =>
-        Exam($"{texts.LearnButton} {Emojis.Learning}");
+    public static InlineKeyboardButton Learn(IInterfaceTexts texts) =>
+        Learn($"{texts.LearnButton} {Emojis.Learning}");
 
-    public static InlineKeyboardButton Exam(string text) =>
+    public static InlineKeyboardButton Learn(string text) =>
         Button(text, BotCommands.Learn);
 
     public static InlineKeyboardButton Stats(IInterfaceTexts texts) =>
@@ -54,7 +55,13 @@ public static class InlineButtons {
         Button(texts.ChangeLanguageButton, BotCommands.Chlang);
 
     public const string StartExaminationButtonData = "/startExamination";
-    
+
     public static InlineKeyboardButton StartExaminationButton(IInterfaceTexts texts) =>
         Button(texts.StartButton, StartExaminationButtonData);
+
+    public static InlineKeyboardButton SnoozeGoalStreak15(IInterfaceTexts texts) =>
+        Button(texts.SnoozeGoalStreak15Button, BotCommands.SnoozeMotivationHeader + 15);
+
+    public static InlineKeyboardButton SnoozeGoalStreak60(IInterfaceTexts texts) =>
+        Button(texts.SnoozeGoalStreak60Button, BotCommands.SnoozeMotivationHeader + 60);
 }

@@ -5,10 +5,11 @@ using SayWhat.Bll.Strings;
 
 namespace Chotiskazal.Bot.Texts;
 
-public class EnglishTexts : IInterfaceTexts {
+public class EnglishTexts : IInterfaceTexts
+{
     public string more => "more";
     public string less => "less";
-        
+
     public string thenClickStart => "then click start";
     public string ChooseTheTranslation => "Choose the translation";
     public string translatesAs => "translates as";
@@ -23,19 +24,23 @@ public class EnglishTexts : IInterfaceTexts {
     public string SelectWordIsKnownInLearningSet => "I know that";
     public string Skip => "Skip it";
     public string ChooseLearningSet => "Choose learning set";
-    public string RussianInputExpected => "Russian input is expected"; 
+    public string RussianInputExpected => "Russian input is expected";
     public string EnglishInputExpected => "English input is expected";
     public string TodaysGoal => "Goal for the day";
     public string Exams => "exams";
     public string TodayGoalReached => "You have reached the goal for the day";
-    public Markdown OutOfScopeWithCandidate(string otherMeaning) {
+
+    public Markdown OutOfScopeWithCandidate(string otherMeaning)
+    {
         return Markdown.Escaped("Chosen translation is out of scope (did you mean ")
             .AddMarkdown($"\"{otherMeaning}\"".ToSemiBoldMarkdown())
             .AddEscaped("?).\r\nExpected translations are");
     }
+
     public string OutOfScopeTranslation
         => "Chosen translation is out of scope (but it is correct)." +
            "\r\nExpected translations are";
+
     public string FailedTranslationWas => "The translation was";
     public string ItIsNotRightTryAgain => "No. It is not right. Try again";
     public string SeeTheTranslation => "See the translation";
@@ -48,22 +53,26 @@ public class EnglishTexts : IInterfaceTexts {
     public string ChooseWhichWordHasThisTranscription => "Choose which word has this transcription";
     public string RetryAlmostRightWithTypo => "Almost right. But you have a typo. Let's try again";
     public string ShowTheTranslationButton => "Show the translation";
-    public string WriteTheTranslation  => "Write the translation... ";
+    public string WriteTheTranslation => "Write the translation... ";
     public string RightTranslationWas => "The right translation was";
-    public string CorrectTranslationButQuestionWasAbout => "Your translation was correct, but the question was about the word";
+
+    public string CorrectTranslationButQuestionWasAbout =>
+        "Your translation was correct, but the question was about the word";
+
     public string LetsTryAgain => "Let's try again";
     public string ChooseTheTranscription => "Choose the transcription";
     public string SettingsButton => "Settings";
-    public string RemindSettingsButton => "Remind frequency";
+    public string RemindSettingsButton => "Reminders";
     public string ChangeLanguageButton => $"{Emojis.RuFlag} Переключить язык интерфейса на русский ";
 
     public string AllowedSettings => "Available settings";
     public string SettingsApplied => "Settings applied";
-    public string RemindSettingsMessage => "How often do you want I remind you about myself?";
+    public string RemindSettingsMessage => "Can I send reminders about learning words?";
     public string RemindEveryDay => "Every day";
     public string RemindEveryThreeDays => "Once per thee days";
     public string RemindEveryWeek => "Once per week";
-    public string DoNotRemind => "Do not remind";
+    public string TurnOffRemind => "Turn notifications off";
+    public string TurnOnRemind => "Turn notifications on";
     public string ReminderLearn => "Hey! Do you remember about me! Let's repeat words!\r\n";
     public string PressTranslateToMoveStartTranslation => $"Press {BotCommands.Translate} to tranlate word";
 
@@ -72,6 +81,21 @@ public class EnglishTexts : IInterfaceTexts {
 
     public Markdown GoToLearnAfterAddition { get; } = Markdown.Escaped("Now let's learn these new words");
     public Markdown YourNewWords { get; } = Markdown.Escaped("New added words");
+
+    public Markdown MotivationReminderLearn { get; } =
+        Markdown.Escaped("Hey! Do you remember about me? Let's repeat words!").NewLine();
+
+    public Markdown MotivationYouAlmostFinishedGoalForTheDay { get; } =
+        Markdown.Escaped("Today you have almost completed the goal for the day. There's less than half left!");
+
+    public Markdown MotivationYouCanLooseGoalStreakToday(int days) =>
+        Markdown.Escaped(
+            $"Your goal steak length is {days} days for now.\r\n Complete the training today so as not to lose the pace!");
+
+    public Markdown MotivationSnoozeScheduled { get; } = Markdown.Escaped("The reminder is scheduled");
+    public string SnoozeGoalStreak15Button => "Remind me in 15 min";
+    public string SnoozeGoalStreak60Button => "Remind me in an hour";
+
 
     public Markdown WordsInPhraseWithClueAreShuffledWriteThemInOrder(string shuffledEnTranslation, string ruPhrase) =>
         Markdown.Escaped("Phrase").NewLine() +
@@ -84,9 +108,9 @@ public class EnglishTexts : IInterfaceTexts {
         => Markdown.Escaped("You have a typo. Correct spelling is ") +
            Markdown.Escaped(text).ToSemiBold() +
            Markdown.Escaped(". Let's try again.");
-       
+
     #region questionResult
-        
+
     public string Passed1 => "Ayeee!";
     public string PassedOpenIHopeYouWereHonest => "Good. I hope you were honest";
     public string PassedHideousWell => "Well";
@@ -94,7 +118,7 @@ public class EnglishTexts : IInterfaceTexts {
     public string FailedOpenButYouWereHonest => "But you were honest...";
     public string FailedHideousHonestyIsGold => "Honesty is gold...";
     public string FailedMistaken(string text) => $"Mistaken. Correct spelling is '{text}'";
-    public string FastExamLearningHeader  => "Fast learning. You only need to press buttons";
+    public string FastExamLearningHeader => "Fast learning. You only need to press buttons";
     public string WriteExamLearningHeader => "Learning";
     public string EnterWordToRemove => "Enter word to remove from questions and stats";
 
@@ -111,11 +135,11 @@ public class EnglishTexts : IInterfaceTexts {
 
     public string DidYouWriteSomething => "Did you write something? I was asleep the whole time...";
 
-    public string EnterWordOrStart => 
+    public string EnterWordOrStart =>
         "Enter english or russian word or text to translate or /start to open main menu ";
 
     public string NoTranslationsFound => "No translations found. Check the word and try again";
-    
+
     public Markdown CarefullyStudyTheList =>
         Markdown.Escaped("Study translations in the list bellow:");
 
@@ -140,12 +164,14 @@ public class EnglishTexts : IInterfaceTexts {
                     $"3⃣ Earn scores for your action and watch your progress using {BotCommands.Stats} command.\r\n\r\n" +
                     $"4⃣ Use {BotCommands.Help} command to see info how it works.\r\n\r\n" +
                     "\uD83D\uDE09Yes, it's free. We have done this bot for us and our friends. " +
-                    "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!").NewLine().NewLine()
-        .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group").NewLine()
+                    "And we hope it makes you a little bit happy and gonna learn billion of words. We ve checked it!")
+        .NewLine().NewLine()
+        .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group")
+        .NewLine()
         .AddEscaped("https://t.me/chtotiskazalna").NewLine().NewLine()
         .AddEscaped("or create issue on the github").NewLine()
         .AddEscaped("https://github.com/NatShep/ChoTISkazal/issues");
-        
+
     public Markdown MainMenuText =>
         Markdown.Escaped("I am a translator and teacher.\r\n" +
                          "First you can use me as a regular translator." +
@@ -156,14 +182,17 @@ public class EnglishTexts : IInterfaceTexts {
         .AddEscaped($"If you have any questions, suggestions, or you find a problem, feel free to join our group")
         .NewLine()
         .AddEscaped("https://t.me/chtotiskazalna");
-    
-    public string ReportWasSentEnterAdditionalInformationAboutTheReport 
+
+    public string ReportWasSentEnterAdditionalInformationAboutTheReport
         => "The report has been sent to the developers. When they wake up, they will definitely watch it!\r\n\r\n" +
            "To better understand what happened, you can send any additional comment by reply message:";
+
     public string ThankYouForYourCommentInReport => "Thanks! You can continue working with the bot.";
     public string ActionIsNotAllowed => "action is not allowed";
-    public string OopsSomethingGoesWrong => 
+
+    public string OopsSomethingGoesWrong =>
         "Oops. Something goes wrong ;( \r\nWrite /start to go to main menu.";
+
     public string ToLearnPhrase => "I want to learn it";
     public string ItWasLongTimeAgo => "It was long time ago";
     public string IDontKnow => "I don't know";
@@ -182,7 +211,7 @@ public class EnglishTexts : IInterfaceTexts {
 
     public string MessageAfterTranslationIsSelected(Translation translation)
         => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is saved";
-   
+
     public string MessageAfterTranslationIsDeselected(Translation translation)
         => $"Translation  '{translation.TranslatedText} - {translation.OriginText}' is removed";
 
@@ -192,12 +221,12 @@ public class EnglishTexts : IInterfaceTexts {
     public Markdown LearnSomeWords(in int length)
         => Markdown.Escaped($"You have learned {length} words. Let's do more!");
 
-    public Markdown PageXofY(in int number,in int count)
+    public Markdown PageXofY(in int number, in int count)
         => Markdown.Escaped($"\r\nPage {number} of {count}...").ToMono();
 
-    public Markdown XofY(in int x,in int y)
+    public Markdown XofY(in int x, in int y)
         => Markdown.Escaped($"{x} of {y}").ToMono();
-    
+
     public Markdown WordNotFound(string word) =>
         Markdown.Escaped("Word").Space() +
         Markdown.Escaped(word).ToSemiBold().Space() +
@@ -207,7 +236,7 @@ public class EnglishTexts : IInterfaceTexts {
         Markdown.Escaped("Success. Word").Space() +
         Markdown.Escaped(word).ToSemiBold().Space() +
         Markdown.Escaped("is removed from questions and stats").Space();
-    
+
     public Markdown TipYouCanEnterCommandIfYouDontKnowTheAnswerForWriteExam(string dontKnownSubcommand) =>
         Markdown.Escaped($"Tip: Enter {dontKnownSubcommand} if you don't know the answer for write question");
 
@@ -233,9 +262,11 @@ public class EnglishTexts : IInterfaceTexts {
         return msg;
     }
 
-    public Markdown CongratulateAllQuestionPassed => Markdown.Escaped("Congratulations! You answered all the questions without mistakes!");
-    
-    public Markdown TwoExamsToGoal => Markdown.Escaped("Almost done! There are two more exams left before the goal of the day!");
+    public Markdown CongratulateAllQuestionPassed =>
+        Markdown.Escaped("Congratulations! You answered all the questions without mistakes!");
+
+    public Markdown TwoExamsToGoal =>
+        Markdown.Escaped("Almost done! There are two more exams left before the goal of the day!");
 
     public string WordIsAddedForLearning(string word) =>
         $"{Emojis.SoftMark} Word {Emojis.OpenQuote}{word}{Emojis.CloseQuote} is added for learning";
@@ -250,9 +281,10 @@ public class EnglishTexts : IInterfaceTexts {
         $"All words from learning set '{setShortName}' were added";
 
     public string YouForgotCountWords(in int forgottenWordsCount)
-        =>$"You forgot {forgottenWordsCount} words";
+        => $"You forgot {forgottenWordsCount} words";
 
     #region buttons
+
     public string YesButton => "Yes";
     public string NoButton => "No";
     public string StartButton => "Start";
@@ -268,9 +300,11 @@ public class EnglishTexts : IInterfaceTexts {
     public string ShowWellKnownWords => "My learned words";
 
     #endregion
-        
+
     #region stats
-    public string[] ShortDayNames { get; } = {
+
+    public string[] ShortDayNames { get; } =
+    {
         "mon",
         "tue",
         "wed",

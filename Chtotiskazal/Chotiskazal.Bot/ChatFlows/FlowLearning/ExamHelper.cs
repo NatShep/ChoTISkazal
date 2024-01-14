@@ -82,7 +82,7 @@ public static class ExamHelper
     public static InlineKeyboardButton[][] GetButtonsForExamResultMessage(IInterfaceTexts texts) =>
         new[]
         {
-            new[] { InlineButtons.Exam($"🔁 {texts.OneMoreLearnButton}") },
+            new[] { InlineButtons.Learn($"🔁 {texts.OneMoreLearnButton}") },
             new[]
             {
                 InlineButtons.Stats(texts),
@@ -138,7 +138,7 @@ public static class ExamHelper
             message = message
                 .AddEscaped($"{Emojis.GreenCircle} {chat.Texts.TodayGoalReached}")
                 .NewLine();
-            var (goalStreak, hasGap) = StatsHelper.GetGoalsStreak(
+            var (goalStreak, hasGap) = StatsHelper.GetCurrentGoalsStreak(
                 chat.User.GetCalendar(),
                 examSettings.ExamsCountGoalForDay);
             if (goalStreak > 1)

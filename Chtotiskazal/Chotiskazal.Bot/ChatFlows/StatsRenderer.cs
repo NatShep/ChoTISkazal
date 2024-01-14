@@ -27,7 +27,7 @@ public static class StatsRenderer
         msg += Render7WeeksCalendarMarkdown(settings, calendat, chat.Texts)
             .ToQuotationMono()
             .NewLine();
-        var (goalStreakCount, hasGaps) = StatsHelper.GetGoalsStreak(calendat, settings.ExamsCountGoalForDay);
+        var (goalStreakCount, hasGaps) = StatsHelper.GetCurrentGoalsStreak(calendat, settings.ExamsCountGoalForDay);
         msg += chat.Texts.GoalStreakStatsFooter(chat.User.MaxGoalStreak, goalStreakCount, hasGaps);
         return msg;
     }

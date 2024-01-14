@@ -60,19 +60,28 @@ public class RussianTexts : IInterfaceTexts
     public string LetsTryAgain => "Давайте еще разок";
     public string ChooseTheTranscription => "Выберите транскрипцию";
     public string SettingsButton => "Настройки";
-    public string RemindSettingsButton => "Частота напоминаний";
+    public string RemindSettingsButton => "Напоминания";
     public string ChangeLanguageButton => $"{Emojis.EnFlag} Switch interface to english";
     public string AllowedSettings => "Доступные настройки";
     public string SettingsApplied => "Настройки применены";
-    public string RemindSettingsMessage => "Как часто напоминать тебе учить слова?";
-    public string RemindEveryDay => "Каждый день";
-    public string RemindEveryThreeDays => "Раз в три дня";
-    public string RemindEveryWeek => "Раз в неделю";
-    public string DoNotRemind => "Не напоминать";
-    public string ReminderLearn => "Вы не забыли про меня? Предлагаю повторить слова!\r\n";
+    public string RemindSettingsMessage => "Можно ли посылать напоминания про изучения слов?";
+    public string TurnOffRemind => "Отключить напоминания";
+    public string TurnOnRemind => "Включить напоминания";
     public string PressTranslateToMoveStartTranslation => $"Нажмите {BotCommands.Translate} для перевода слова";
     public string ToLearnPhrase => "Я хочу это учить";
     public Markdown YourNewWords { get; } = Markdown.Escaped("Новые добавленные слова");
+
+    public Markdown MotivationReminderLearn { get; } =
+        Markdown.Escaped("Вы не забыли про меня? Предлагаю повторить слова!").NewLine();
+    public Markdown MotivationYouAlmostFinishedGoalForTheDay { get; } =
+        Markdown.Escaped("Сегодня вы почти выполнили цель на день. Осталось меньше половины!");
+    public Markdown MotivationYouCanLooseGoalStreakToday(int days) =>
+        Markdown.Escaped(
+            $"Вы выполняли цель на день в течении {days} дней.\r\n Пройдите обучение сегодня что бы не потерять темп!");
+
+    public Markdown MotivationSnoozeScheduled { get; } = Markdown.Escaped("Напоминание поставлено");
+    public string SnoozeGoalStreak15Button => "Напомнить через 15 мин";
+    public string SnoozeGoalStreak60Button => "Напомнить через час";
 
     public Markdown WordsInPhraseAreShuffledWriteThemInOrder =>
         Markdown.Escaped("Слава во фразе перепутаны местами. Напишите эту фразу");
@@ -146,7 +155,7 @@ public class RussianTexts : IInterfaceTexts
             "1⃣ Можешь использовать меня как русско-английский переводчик. " +
             $"Просто напиши мне слово на любом языке или нажми команду {BotCommands.Translate} для перевода.\r\n\r\n" +
             "2⃣ Затем, когда будет времечко нажми на кнопку ")
-        .AddMarkdown($"\"Ботать {Emojis.Learning}\"".ToSemiBoldMarkdown())
+        .AddMarkdown($"\"Учить {Emojis.Learning}\"".ToSemiBoldMarkdown())
         .AddEscaped($" или набери команду {BotCommands.Learn}, что учить слова.\r\n\r\n" +
                     $"3⃣ Следи за своими успехами при помощи команды {BotCommands.Stats}.\r\n\r\n" +
                     $"4⃣ Введи команду {BotCommands.Help} что бы увидеть это сообщение.\r\n\r\n" +
@@ -161,7 +170,7 @@ public class RussianTexts : IInterfaceTexts
     public Markdown MainMenuText =>
         Markdown.Escaped("Я переводчик и учитель.\r\n" +
                          "Можешь использовать меня как русско-английский переводчик.\r\n\r\n" +
-                         $"Затем, когда будет свободная минутка, нажми на кнопку \"Ботать {Emojis.Learning}\" или " +
+                         $"Затем, когда будет свободная минутка, нажми на кнопку \"Учить {Emojis.Learning}\" или " +
                          $"набери команду {BotCommands.Learn} что бы учить слова");
 
     public Markdown MainMenuTextForNewUserText => MainMenuText.NewLine()
@@ -274,7 +283,7 @@ public class RussianTexts : IInterfaceTexts
     public string OneMoreLearnButton => "Продолжить изучение";
     public string TranslateButton => "Перевод";
     public string ContinueButton => "Продолжить";
-    public string LearnButton => "Ботать";
+    public string LearnButton => "Учить";
     public string StatsButton => "Статы";
     public string HelpButton => "Помощь";
     public string MainMenuButton => "Глав меню";
